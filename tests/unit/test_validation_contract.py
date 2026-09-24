@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import shutil
 import sys
@@ -308,6 +309,72 @@ class TestEvidenceBundle(unittest.TestCase):
             result.inventory_product_ids.append("fixture:missing-product")
             self.assertTrue(result.selection_complete)
             self.assertFalse(result.all_products_executed)
+
+    def _write(self, directory, mutate):
+        source_root = Path(directory) / "source"
+        result = self._passing_repository(source_root)
+        mutate(result.products[0])
+        return write_bundle(source_root, Path(directory) / "output", result)
+
+    def test_producer_refuses_a_check_citing_an_unregistered_tool(self):
+        """The contract makes this a producer check, not only a consumer one.
+
+        Before, write_bundle wrote the bundle and the CLI exited 0; only a later
+        verify-bundle on that same file reported the dangling reference.
+        """
+        def mutate(product):
+            product.gates[3].checks[0].tool_id = "ngspice"
+
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "unknown tool"):
+                self._write(directory, mutate)
+
+    def test_producer_refuses_a_check_citing_an_unknown_requirement(self):
+        def mutate(product):
+            product.gates[3].checks[0].requirement_ids = ["PRODUCT:MADE-UP-REQ"]
+
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "unknown requirement"):
+                self._write(directory, mutate)
+
+    @staticmethod
+    def _duplicate_check_id(product):
+        """Add a second V0 check reusing the first one's ID with distinct evidence.
+
+        A byte-identical duplicate is already rejected by the evidence index's
+        uniqueItems, by coincidence. Two different checks sharing one ID are not,
+        and they make the receipt-to-index binding (keyed on check_id) ambiguous.
+        """
+        duplicate = copy.deepcopy(product.gates[0].checks[0])
+        payload = canonical_json_bytes({"duplicate": True}) + b"\n"
+        digest = sha256_bytes(payload)
+        path = f"generated/{digest}.json"
+        duplicate.evidence = [
+            EvidenceReference(
+                path=path,
+                sha256=digest,
+                media_type="application/json",
+                size_bytes=len(payload),
+            )
+        ]
+        duplicate.generated_evidence = {path: payload}
+        product.gates[0].checks.append(duplicate)
+
+    def test_producer_refuses_duplicate_check_ids(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "duplicate check ID"):
+                self._write(directory, self._duplicate_check_id)
+
+    def test_verifier_refuses_duplicate_check_ids(self):
+        """Consumer side of the same rule, independent of the producer check."""
+        with tempfile.TemporaryDirectory() as directory:
+            # create=True keeps this meaningful against a producer without the check.
+            with mock.patch(
+                "ecad_validation.evidence._check_receipt_references", create=True
+            ):
+                bundle_path = self._write(directory, self._duplicate_check_id)
+            with self.assertRaisesRegex(ValueError, "check IDs are not unique"):
+                verify_bundle(bundle_path)
 
     def test_bundle_verifier_recomputes_inventory_coverage(self):
         with tempfile.TemporaryDirectory() as directory:

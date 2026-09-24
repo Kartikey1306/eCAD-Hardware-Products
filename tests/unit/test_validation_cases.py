@@ -7,12 +7,16 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
+from ecad_validation.adapters.base import AdapterResult, Capability  # noqa: E402
+from ecad_validation.adapters.ngspice import NgspiceAdapter  # noqa: E402
+from ecad_validation.adapters.python_control import PythonControlAdapter  # noqa: E402
 from ecad_validation.cases import execute_cases  # noqa: E402
-from ecad_validation.models import GateLevel, Verdict  # noqa: E402
+from ecad_validation.models import ExecutionStatus, GateLevel, Verdict  # noqa: E402
 
 
 class TestExecutableCases(unittest.TestCase):
@@ -67,6 +71,88 @@ class TestExecutableCases(unittest.TestCase):
         self.assertEqual(len(generated), 1)
         payload = result.generated_evidence[generated[0].path]
         self.assertEqual(json.loads(payload)["metrics"], {"temperature_c": 42.5})
+
+    GOLDEN = {"temperature_c": {"value": 42.0, "absolute_tolerance": 0.5}}
+
+    def test_unknown_requirement_id_fails_the_case_before_execution(self):
+        """A case may only cite requirements the catalog defines.
+
+        Otherwise the receipt references an ID no requirements document
+        contains, and the producer emits a bundle its own verifier rejects.
+        The case would otherwise PASS, so this is not a lucky failure.
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            product = self._product(
+                Path(directory),
+                "golden",
+                {
+                    "id": "made-up-requirement",
+                    "adapter": "python_control",
+                    "inputs": ["simulation/model.py"],
+                    "expected_metrics": self.GOLDEN,
+                    "requirement_ids": ["PRODUCT:MADE-UP-REQ"],
+                },
+            )
+            result = execute_cases(product, GateLevel.V3, "golden")[0]
+        self.assertEqual(result.verdict, Verdict.FAIL)
+        self.assertEqual(result.reason_code, "CASE_REQUIREMENT_UNKNOWN")
+        self.assertTrue(result.evidence, "a FAIL must carry evidence")
+        self.assertTrue(any("PRODUCT:MADE-UP-REQ" in item for item in result.findings))
+        self.assertEqual(result.metrics, {}, "the adapter must not have run")
+
+    def test_unavailable_adapter_is_attributed_to_the_validator(self):
+        """The tool that never ran cannot be the tool that decided the verdict."""
+        unavailable = Capability(adapter="ngspice", available=False, reason="TOOL_NOT_INSTALLED")
+        with tempfile.TemporaryDirectory() as directory:
+            product = self._product(
+                Path(directory),
+                "golden",
+                {
+                    "id": "spice-reference",
+                    "adapter": "ngspice",
+                    "inputs": ["simulation/model.py"],
+                    "expected_metrics": self.GOLDEN,
+                },
+            )
+            with mock.patch.object(NgspiceAdapter, "capability", return_value=unavailable):
+                result = execute_cases(product, GateLevel.V3, "golden")[0]
+        self.assertEqual(result.verdict, Verdict.BLOCKED)
+        self.assertEqual(result.tool_id, "ecad-validator")
+        self.assertTrue(any("ngspice" in item for item in result.findings))
+
+    def test_passing_tool_without_a_version_is_not_a_pass(self):
+        """Every invoked tool must record its exact version; none may be invented.
+
+        The receipt schema requires a non-empty version for every registered
+        tool, so a PASS from a tool that reported none cannot be recorded
+        honestly under that tool. It is blocked rather than misattributed.
+        """
+        versionless = AdapterResult(
+            adapter="python_control",
+            execution_status=ExecutionStatus.COMPLETED,
+            verdict=Verdict.PASS,
+            reason_code="TOOL_EXITED_ZERO",
+            summary="model executed",
+            command=["python", "simulation/model.py"],
+            tool_version=None,
+            metrics={"temperature_c": 42.5},
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            product = self._product(
+                Path(directory),
+                "golden",
+                {
+                    "id": "versionless-reference",
+                    "adapter": "python_control",
+                    "inputs": ["simulation/model.py"],
+                    "expected_metrics": self.GOLDEN,
+                },
+            )
+            with mock.patch.object(PythonControlAdapter, "run", return_value=versionless):
+                result = execute_cases(product, GateLevel.V3, "golden")[0]
+        self.assertEqual(result.verdict, Verdict.BLOCKED)
+        self.assertEqual(result.reason_code, "TOOL_VERSION_UNAVAILABLE")
+        self.assertEqual(result.tool_id, "ecad-validator")
 
     def test_golden_mismatch_fails(self):
         with tempfile.TemporaryDirectory() as directory:

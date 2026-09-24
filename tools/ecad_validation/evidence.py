@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import shutil
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Set
 
 from .contract import (
     artifact_reference,
@@ -25,6 +25,39 @@ def _write_json(path: Path, value: Any) -> str:
     return sha256_bytes(payload)
 
 
+def _check_receipt_references(receipt: Dict[str, Any], requirement_ids: Set[str]) -> None:
+    """Enforce the contract's mandatory producer cross-reference checks.
+
+    JSON Schema cannot prove cross-document identity or uniqueness by a
+    selected field, so the contract makes these "mandatory producer and
+    consumer checks". verify_bundle performs them on the consumer side;
+    without them here, validate reported success for a bundle its own
+    verifier then rejected.
+    """
+    product_id = receipt["product"]["id"]
+    tool_ids = [tool["tool_id"] for tool in receipt["tools"]]
+    if len(tool_ids) != len(set(tool_ids)):
+        raise ValueError(f"receipt tool IDs are not unique: {product_id}")
+    seen: Set[str] = set()
+    for gate in receipt["gates"]:
+        for check in gate["checks"]:
+            check_id = check["check_id"]
+            if check_id in seen:
+                raise ValueError(f"duplicate check ID in receipt: {product_id} {check_id}")
+            seen.add(check_id)
+            if check["tool_id"] not in tool_ids:
+                raise ValueError(
+                    f"check references unknown tool: {product_id} {check_id} "
+                    f"{check['tool_id']}"
+                )
+            unknown = sorted(set(check["requirement_ids"]) - requirement_ids)
+            if unknown:
+                raise ValueError(
+                    f"check references unknown requirement: {product_id} {check_id} "
+                    + ", ".join(unknown)
+                )
+
+
 def write_bundle(root: Path, output: Path, result: RepositoryRunResult) -> Path:
     """Write schema-valid product bundles and a repository-level index."""
     if output.exists() and any(output.iterdir()):
@@ -37,6 +70,9 @@ def write_bundle(root: Path, output: Path, result: RepositoryRunResult) -> Path:
     )
     requirements_document = json.loads(requirements_source.read_text(encoding="utf-8"))
     validate_document(root, "requirements.schema.json", requirements_document)
+    catalog_requirement_ids = {
+        str(entry["requirement_id"]) for entry in requirements_document.get("requirements", [])
+    }
     inventory_source = root / "tools" / "catalog" / "product_inventory.json"
     inventory_document = json.loads(inventory_source.read_text(encoding="utf-8"))
     if sha256_bytes(canonical_json_bytes(inventory_document)) != result.inventory_sha256:
@@ -128,6 +164,7 @@ def write_bundle(root: Path, output: Path, result: RepositoryRunResult) -> Path:
                         "path": repository_path,
                     }
 
+        _check_receipt_references(receipt, catalog_requirement_ids)
         validate_document(root, "validation-receipt.schema.json", receipt)
         receipt_path = product_dir / "receipt.json"
         receipt_digest = _write_json(receipt_path, receipt)
@@ -462,6 +499,15 @@ def verify_bundle(bundle_path: Path) -> Dict[str, Any]:
         by_gate = {gate.get("gate"): gate for gate in gates if isinstance(gate, dict)}
         if set(by_gate) != {"V0", "V1", "V2", "V3", "V4"}:
             raise ValueError(f"receipt lacks exact V0-V4 gates: {product_id}")
+        check_id_values = [
+            check.get("check_id")
+            for gate in gates
+            if isinstance(gate, dict)
+            for check in gate.get("checks", [])
+            if isinstance(check, dict)
+        ]
+        if len(check_id_values) != len(set(check_id_values)):
+            raise ValueError(f"receipt check IDs are not unique: {product_id}")
         gate_verdicts = []
         for name in ("V0", "V1", "V2", "V3", "V4"):
             gate = by_gate[name]

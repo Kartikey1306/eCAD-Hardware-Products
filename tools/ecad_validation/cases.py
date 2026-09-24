@@ -6,7 +6,7 @@ import json
 import os
 import math
 from pathlib import Path
-from typing import Dict, List, Mapping, Type
+from typing import Dict, FrozenSet, List, Mapping, Type
 
 from .adapters.base import Adapter, AdapterRequest
 from .adapters.hdl import HDLAdapter
@@ -33,6 +33,26 @@ ADAPTERS: Dict[str, Type[Adapter]] = {
     "ngspice": NgspiceAdapter,
     "iverilog": HDLAdapter,
 }
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+REQUIREMENT_CATALOG = (
+    REPOSITORY_ROOT / "contracts" / "hardware-validation" / "v1" / "policy-requirements.json"
+)
+VALIDATOR_TOOL_ID = "ecad-validator"
+
+
+def catalog_requirement_ids(path: Path = REQUIREMENT_CATALOG) -> FrozenSet[str]:
+    """Return every requirement ID the bundled requirements catalog defines.
+
+    The contract makes "referenced tool and requirement IDs exist" a mandatory
+    producer check. write_bundle copies this same catalog into every product
+    bundle as requirements.json, so an ID outside it can never be resolved by
+    a consumer.
+    """
+    document = json.loads(path.read_text(encoding="utf-8"))
+    return frozenset(
+        str(entry["requirement_id"]) for entry in document.get("requirements", [])
+    )
 
 
 def _blocked(gate: GateLevel, check_id: str, reason: str, summary: str) -> CheckResult:
@@ -249,6 +269,26 @@ def execute_cases(product: Path, gate: GateLevel, directory: str) -> List[CheckR
                 )
             )
             continue
+        declared_requirements = [str(value) for value in case.get("requirement_ids", [])]
+        unknown_requirements = sorted(set(declared_requirements) - catalog_requirement_ids())
+        if unknown_requirements:
+            results.append(
+                CheckResult(
+                    check_id=f"{gate.value.lower()}.{case_id}",
+                    gate=gate,
+                    domain=Domain.DATA_MANAGEMENT,
+                    layer=Layer.VALIDATION,
+                    execution_status=ExecutionStatus.COMPLETED,
+                    verdict=Verdict.FAIL,
+                    reason_code="CASE_REQUIREMENT_UNKNOWN",
+                    summary="case cites requirement IDs the requirements catalog does not define",
+                    evidence=_references(product, [manifest]),
+                    findings=[
+                        f"unknown requirement ID: {value}" for value in unknown_requirements
+                    ],
+                )
+            )
+            continue
         adapter_name = str(case.get("adapter") or "")
         adapter_type = ADAPTERS.get(adapter_name)
         if adapter_type is None:
@@ -396,6 +436,22 @@ def execute_cases(product: Path, gate: GateLevel, directory: str) -> List[CheckR
                     Verdict.BLOCKED: "CORNER_LIMITS_MISSING",
                     Verdict.INCONCLUSIVE: "CORNER_METRICS_INCONCLUSIVE",
                 }[verdict]
+        # A check is attributed to the tool that decided it. An adapter that
+        # reported no version either never ran (the validator made the BLOCKED
+        # decision) or ran unidentified -- and the receipt schema requires a
+        # version for every registered tool while the contract forbids
+        # inventing one, so such a PASS cannot be recorded honestly.
+        tool_id = adapter_result.adapter
+        if not adapter_result.tool_version:
+            findings = [
+                *findings,
+                f"adapter {adapter_result.adapter!r} reported no tool version; "
+                f"the verdict is attributed to {VALIDATOR_TOOL_ID}",
+            ]
+            tool_id = VALIDATOR_TOOL_ID
+            if verdict is Verdict.PASS:
+                verdict = Verdict.BLOCKED
+                reason_code = "TOOL_VERSION_UNAVAILABLE"
         evidence = [
             EvidenceReference(
                 path=path.relative_to(product).as_posix(),
@@ -414,7 +470,7 @@ def execute_cases(product: Path, gate: GateLevel, directory: str) -> List[CheckR
                 verdict=verdict,
                 reason_code=reason_code,
                 summary=adapter_result.summary,
-                tool_id=adapter_result.adapter,
+                tool_id=tool_id,
                 tool_version=adapter_result.tool_version or "",
                 tool_invocation=adapter_result.command,
                 tool_settings={
