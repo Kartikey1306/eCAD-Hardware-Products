@@ -16,6 +16,7 @@ from .quantity import Status, quantity, rounded, source, unknown
 SCHEMA_ID = "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json"
 LENGTH_TO_METRES = {"mm": 1e-3, "m": 1.0, "inch": 0.0254}
 STANDARD_GRAVITY = 9.80665  # m/s^2, defined exactly by the 3rd CGPM (1901)
+AXIS_SENSE_MIN_COSINE = 0.5  # an annotated sense must lie within 60 degrees of the CAD axis
 
 Matrix = List[List[float]]
 Vector = List[float]
@@ -292,11 +293,28 @@ def build_engineering_model(
             axis = unknown("1", cad_source, f"joint axis from {realizer!r}: {reason}")
             origin = unknown("m", cad_source, f"joint origin from {realizer!r}: {reason}")
         else:
-            axis = quantity(
-                rounded(canonical_direction(_apply(rotation, direction_local))), "1", Status.DERIVED,
-                cad_source, derived_from=[cad_input],
-                note=f"common axis of the cylindrical faces of {realizer!r}; rotation is right-handed about it",
-            )
+            line = canonical_direction(_apply(rotation, direction_local))
+            sense_path = f"annotations:{annotations_ref}#joints/{joint['joint_id']}/axis_sense"
+            sense = joint["axis_sense"]
+            length = sum(item * item for item in sense) ** 0.5
+            agreement = sum(a * b for a, b in zip(line, sense)) / length if length else 0.0
+            # The CAD fixes the axis line; only design intent can fix which way
+            # a positive angle turns. Without an explicit sense the sign would
+            # follow a canonicalisation rule, and a rigid re-orientation of the
+            # whole design could mirror the joint's range with nothing noticing.
+            if abs(agreement) < AXIS_SENSE_MIN_COSINE:
+                axis = unknown(
+                    "1", annotation_source,
+                    f"joint {joint['joint_id']}: axis_sense is more than 60 degrees from the CAD axis {rounded(line)}",
+                )
+            else:
+                oriented = line if agreement > 0 else [0.0 - item for item in line]
+                axis = quantity(
+                    rounded(_clean_unit(oriented)), "1", Status.DERIVED, cad_source,
+                    derived_from=[cad_input, sense_path],
+                    note=(f"line from the cylindrical faces of {realizer!r}, direction from the annotated "
+                          "axis_sense; a positive angle is right-handed about it"),
+                )
             origin = quantity(
                 rounded([a + b for a, b in zip(_apply(rotation, origin_local), translation)]), "m",
                 Status.DERIVED, cad_source, derived_from=[cad_input],

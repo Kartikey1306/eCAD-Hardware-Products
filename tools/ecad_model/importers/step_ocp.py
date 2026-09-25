@@ -2,31 +2,69 @@
 
 CAD files are untrusted input and the STEP parser is native code, so parsing
 never happens in the calling process. extract() runs this module as a child
-through the repository's hardened run_process: the child sees only a copy of
-the one STEP file inside a throwaway workspace, under a scrubbed environment
-and a timeout, so a crash or hang in the kernel costs one extraction rather
-than the caller, and the parser cannot follow external references out of the
-workspace. The child reports the SHA-256 of the bytes it parsed, and the
-parent refuses the result unless that matches the file it was asked to read.
+through the repository's hardened run_process: the child sees a copy of the
+one STEP file inside a throwaway workspace, under a scrubbed environment and a
+timeout, so a crash or hang in the kernel costs one extraction rather than the
+caller. The child reports the SHA-256 of the bytes it parsed, and the parent
+refuses the result unless that matches the file it was asked to read.
+
+The workspace alone does not confine the parser: OCCT resolves a STEP file's
+external document references (DOCUMENT_FILE and friends) at transfer time,
+including absolute and ``../`` paths, and a hash of the top-level file would
+not cover what they load. Such files are therefore refused before parsing, and
+the reader's own list of external files is checked again after transfer.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .base import CADImporter
+from .base import CADImporter, ExtractionError
 
 EXTRACTION_SCHEMA = "https://embeddedos.org/schemas/cad-dataset/v1/cad-extraction.schema.json"
 IMPORTER_VERSION = "1.0.0"
 EXTRACTION_TIMEOUT_SECONDS = 120
 MEMORY_LIMIT_BYTES = 2 * 1024 * 1024 * 1024
+REJECTED_EXIT = 3  # the child's exit status when it refuses a file on its content
 # OCCT prints transfer statistics to stdout from C++, interleaved with ours,
 # so the document is found by this prefix rather than by being the last line.
 RESULT_MARKER = "ECAD_EXTRACTION_JSON:"
+# Entities through which a STEP file makes the reader load other files.
+EXTERNAL_REFERENCE_ENTITIES = (
+    "DOCUMENT_FILE",
+    "EXTERNAL_SOURCE",
+    "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT",
+    "PRODUCT_DEFINITION_WITH_ASSOCIATED_DOCUMENTS",
+)
+_STRING_LITERAL = re.compile(rb"'(?:[^']|'')*'")
+_EXTERNAL = re.compile(rb"\b(" + b"|".join(name.encode() for name in EXTERNAL_REFERENCE_ENTITIES) + rb")\s*\(", re.IGNORECASE)
+
+
+def external_references(data: bytes) -> list:
+    """Names of the external-reference entities a STEP file instantiates.
+
+    String literals are removed first, so a part *named* DOCUMENT_FILE is not
+    mistaken for one; anything left over is refused rather than guessed about.
+
+    Args:
+        data: The STEP file's bytes.
+
+    Returns:
+        Sorted distinct entity names found; empty for a self-contained file.
+
+    Example:
+        >>> external_references(b"#1 = DOCUMENT_FILE('../../secret.stp','',$,#2,'',$);")
+        ['DOCUMENT_FILE']
+        >>> external_references(b"#1 = PRODUCT('DOCUMENT_FILE(','',$,(#2));")
+        []
+    """
+    stripped = _STRING_LITERAL.sub(b"''", data)
+    return sorted({match.group(1).decode().upper() for match in _EXTERNAL.finditer(stripped)})
 
 
 def _kernel_version() -> str:
@@ -98,7 +136,7 @@ class StepImporter(CADImporter):
         from ecad_validation.models import ExecutionStatus
 
         if not self.available():
-            raise ValueError("the STEP importer needs cadquery-ocp, which is not installed")
+            raise ExtractionError("unavailable", "the STEP importer needs cadquery-ocp, which is not installed")
         resolved = path.resolve()
         root = repository_root.resolve()
         relative = resolved.relative_to(root).as_posix()
@@ -113,18 +151,26 @@ class StepImporter(CADImporter):
                 environment={"PYTHONPATH": str(tools), "PYTHONDONTWRITEBYTECODE": "1"},
             )
         )
+        detail = ((result.stderr or "").strip().splitlines()[-1:] or [result.reason_code])[0]
+        if result.execution_status is ExecutionStatus.TIMED_OUT:
+            raise ExtractionError("timed_out", f"STEP extraction of {relative} timed out after {EXTRACTION_TIMEOUT_SECONDS} s")
+        if result.execution_status is ExecutionStatus.UNAVAILABLE:
+            raise ExtractionError("unavailable", f"STEP extraction of {relative} could not start: {result.reason_code}")
+        if result.returncode == REJECTED_EXIT:
+            # The child read the file and refused it on its content.
+            raise ExtractionError("rejected", f"STEP extraction of {relative} refused the file: {detail}")
         if result.execution_status is not ExecutionStatus.COMPLETED or result.returncode != 0:
-            detail = (result.stderr or "").strip().splitlines()[-1:] or [result.reason_code]
-            raise ValueError(f"STEP extraction of {relative} failed ({result.reason_code}): {detail[0]}")
+            raise ExtractionError(
+                "crashed", f"STEP extraction of {relative} failed ({result.reason_code}, exit {result.returncode}): {detail}")
         marked = [line[len(RESULT_MARKER):] for line in result.stdout.splitlines() if line.startswith(RESULT_MARKER)]
         if len(marked) != 1:
-            raise ValueError(f"STEP extraction of {relative} produced {len(marked)} result documents, expected 1")
+            raise ExtractionError("crashed", f"STEP extraction of {relative} produced {len(marked)} result documents, expected 1")
         try:
             document = json.loads(marked[0])
         except json.JSONDecodeError as exc:
-            raise ValueError(f"STEP extraction of {relative} produced malformed JSON") from exc
+            raise ExtractionError("crashed", f"STEP extraction of {relative} produced malformed JSON") from exc
         if document["source"]["sha256"] != expected:
-            raise ValueError(f"STEP extraction parsed different bytes than {relative}")
+            raise ExtractionError("rejected", f"STEP extraction parsed different bytes than {relative}")
         return document
 
 
@@ -218,6 +264,11 @@ def _extract_in_process(path: Path, relative: str) -> Dict[str, Any]:
     from OCP.XCAFDoc import XCAFDoc_DocumentTool, XCAFDoc_ShapeTool
 
     data = path.read_bytes()
+    external = external_references(data)
+    if external:
+        raise ValueError(
+            f"{relative}: external document references are not supported ({', '.join(external)}); "
+            "every part must be inside the one file that is hashed")
     document = TDocStd_Document(TCollection_ExtendedString("XmlOcaf"))
     # Pin the document to millimetres: OCCT then converts whatever unit the
     # file declares. Verified with one 10 mm cube written as mm, m and inch
@@ -232,6 +283,8 @@ def _extract_in_process(path: Path, relative: str) -> Dict[str, Any]:
         raise ValueError(f"{relative}: OCCT could not read the file as STEP")
     if not reader.Transfer(document):
         raise ValueError(f"{relative}: OCCT could not transfer the STEP data")
+    if reader.ExternFiles().Size():
+        raise ValueError(f"{relative}: the reader loaded external files; refusing the result")
 
     shape_tool = XCAFDoc_DocumentTool.ShapeTool_s(document.Main())
     roots = Sequence_TDF_Label()
@@ -305,7 +358,7 @@ def main(argv: List[str]) -> int:
         document = _extract_in_process(Path(relative), relative)
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
-        return 1
+        return REJECTED_EXIT
     print(RESULT_MARKER + json.dumps(document, sort_keys=True, allow_nan=False, separators=(",", ":")), flush=True)
     return 0
 

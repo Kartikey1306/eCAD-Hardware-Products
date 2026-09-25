@@ -145,6 +145,14 @@ def checked_pairs(model: mujoco.MjModel, moving: Set[int]) -> List[Tuple[int, in
 def rom_sweep(model: mujoco.MjModel, scenario: Dict[str, Any]) -> Dict[str, float]:
     address, body, low, high = hinge(model)
     moving = subtree(model, body)
+    parent = int(model.body_parentid[body])
+    joint_pair = frozenset((parent, body))
+    excluded = {frozenset((int(s) >> 16, int(s) & 0xFFFF)) for s in model.exclude_signature}
+    if joint_pair in excluded:
+        # The joint is realised by its own parent or child, so their box
+        # proxies overlap by construction and the pair cannot be checked. No
+        # clearance metric is reported: a requirement on it is INCONCLUSIVE.
+        return {"rom_joint_pair_unchecked": 1.0}
     pairs = checked_pairs(model, moving)
     if not pairs:
         raise ValueError("no moving-versus-fixed geometry pair is checked; clearance would be vacuous")

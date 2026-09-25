@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 import math
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from .builder import resolve
 from .mjcf import rigid_groups
@@ -70,13 +70,52 @@ def _moving(model: Dict[str, Any]) -> List[str]:
     ]
 
 
-def reference_value(model: Dict[str, Any], derivation: str) -> Tuple[float, List[str]]:
+MOVE_STEP_S = 1e-3  # the rated_move scenario samples its profile at this step
+
+
+def _rotate(vector: Sequence[float], axis: Sequence[float], angle: float) -> List[float]:
+    """Rodrigues: rotate a vector right-handedly about a unit axis."""
+    c, s = math.cos(angle), math.sin(angle)
+    k = _cross(axis, vector)
+    along = _dot(axis, vector)
+    return [v * c + ki * s + a * along * (1 - c) for v, ki, a in zip(vector, k, axis)]
+
+
+def _bodies(model: Dict[str, Any], scenario: Dict[str, Any], used: List[str], missing: List[str]) -> List[List[Any]]:
+    """(mass, centre of mass, inertia) of every moving body, with any payload override applied."""
+    bodies = []
+    for cid in _moving(model):
+        paths = [f"components/{cid}/physical/{name}" for name in ("mass", "center_of_mass", "inertia_about_com")]
+        used += paths
+        mass, com, inertia = (_known(model, path, missing) for path in paths)
+        if mass is not None and scenario.get("payload_component") == cid:
+            # Same shape at a different uniform density: the centre of mass
+            # stays put and the inertia scales with the mass, exactly as the
+            # scenario script applies the override.
+            ratio = scenario["payload_mass_kg"] / mass
+            mass, inertia = scenario["payload_mass_kg"], [[ratio * item for item in row] for row in inertia]
+        bodies.append([mass, com, inertia])
+    return bodies
+
+
+def reference_value(
+    model: Dict[str, Any], derivation: str, scenario: Optional[Dict[str, Any]] = None
+) -> Tuple[float, List[str]]:
     """Compute one closed-form reference value from the engineering model.
+
+    For a single revolute joint every one of these is exact: the moment of
+    inertia about a fixed axis does not depend on the angle, and the
+    velocity-dependent terms of the equation of motion vanish. None of them
+    runs the simulator or reads the MJCF.
 
     Args:
         model: An engineering model with one joint.
-        derivation: "gravity_torque_as_modelled", "small_oscillation_period"
-            or "moving_mass".
+        derivation: One of "moving_mass", "gravity_torque_as_modelled",
+            "small_oscillation_period", "equilibrium_angle",
+            "min_jerk_peak_speed", "min_jerk_peak_accel",
+            "rated_move_peak_torque".
+        scenario: The case's scenario. Its payload override is applied, and
+            the move derivations read start_rad, end_rad and duration_s.
 
     Returns:
         (value in SI units, model paths the value was computed from).
@@ -91,53 +130,78 @@ def reference_value(model: Dict[str, Any], derivation: str) -> Tuple[float, List
         >>> model = json.loads((item / "derived/engineering_model.json").read_text())
         >>> round(reference_value(model, "moving_mass")[0], 6)
         0.934914
+        >>> round(reference_value(model, "min_jerk_peak_speed",
+        ...                       {"name": "rated_move", "start_rad": 0.0, "end_rad": 1.0, "duration_s": 1.0})[0], 6)
+        1.875
     """
+    scenario = scenario or {}
+    if derivation in ("min_jerk_peak_speed", "min_jerk_peak_accel"):
+        delta = abs(scenario["end_rad"] - scenario["start_rad"])
+        duration = scenario["duration_s"]
+        # Peaks of 30s^2 - 60s^3 + 30s^4 (at s = 1/2) and of
+        # 60s - 180s^2 + 120s^3 (at s = 1/2 - sqrt(3)/6).
+        if derivation == "min_jerk_peak_speed":
+            return 1.875 * delta / duration, []
+        return (10 / math.sqrt(3)) * delta / duration**2, []
+
     joint = model["joints"][0]
     jid = joint["joint_id"]
-    used: List[str] = []
+    used: List[str] = [f"joints/{jid}/axis", f"joints/{jid}/origin"]
     missing: List[str] = []
     axis = _known(model, f"joints/{jid}/axis", missing)
     origin = _known(model, f"joints/{jid}/origin", missing)
-    used += [f"joints/{jid}/axis", f"joints/{jid}/origin"]
     gravity = model["design"]["gravity"]["value"]
-    bodies = []
-    for cid in _moving(model):
-        paths = [f"components/{cid}/physical/{name}" for name in ("mass", "center_of_mass", "inertia_about_com")]
-        used += paths
-        values = [_known(model, path, missing) for path in paths]
-        bodies.append(values)
+    bodies = _bodies(model, scenario, used, missing)
     if missing:
         raise ReferenceBlocked(f"{derivation} needs quantities that are UNKNOWN", missing)
+    arms = [[c - o for c, o in zip(com, origin)] for _, com, _ in bodies]
+
+    def gravity_torque(angle: float) -> float:
+        """Torque gravity exerts about the axis with the moving group turned by angle."""
+        return sum(
+            _dot(_cross(_rotate(arm, axis, angle), [mass * g for g in gravity]), axis)
+            for (mass, _, _), arm in zip(bodies, arms)
+        )
+
+    inertia_axis = 0.0
+    for (mass, _, inertia), arm in zip(bodies, arms):
+        perpendicular = [ri - _dot(arm, axis) * ai for ri, ai in zip(arm, axis)]
+        inertia_axis += _dot(axis, [_dot(row, axis) for row in inertia]) + mass * _dot(perpendicular, perpendicular)
 
     if derivation == "moving_mass":
         return sum(mass for mass, _, _ in bodies), used
-
-    # Gravity torque about the joint axis in the as-modelled pose (q = 0).
-    torque = sum(_dot(_cross([c - o for c, o in zip(com, origin)], [mass * g for g in gravity]), axis)
-                 for mass, com, _ in bodies)
     if derivation == "gravity_torque_as_modelled":
-        return abs(torque), used
+        return abs(gravity_torque(0.0)), used
+
+    total = sum(mass for mass, _, _ in bodies)
+    combined = [sum(mass * arm[i] for (mass, _, _), arm in zip(bodies, arms)) / total for i in range(3)]
+    radial = [ci - _dot(combined, axis) * ai for ci, ai in zip(combined, axis)]
+    g_perp = [g - _dot(gravity, axis) * a for g, a in zip(gravity, axis)]
+    if _dot(radial, radial) == 0 or _dot(g_perp, g_perp) == 0:
+        raise ReferenceBlocked("the moving group's centre of mass lies on the joint axis, or the axis is vertical", [])
+
+    if derivation == "equilibrium_angle":
+        # The rotation, right-handed about the axis, that carries the centre
+        # of mass directly "below" the axis along the perpendicular gravity.
+        return math.atan2(_dot(_cross(radial, g_perp), axis), _dot(radial, g_perp)), used
 
     if derivation == "small_oscillation_period":
         # Linearised pendulum about the stable equilibrium:
         #   I_axis * theta'' = -M * |g_perp| * d * theta
-        # with I_axis by the parallel-axis theorem and d the perpendicular
-        # distance from the axis to the moving group's centre of mass.
-        total = sum(mass for mass, _, _ in bodies)
-        combined = [sum(mass * com[i] for mass, com, _ in bodies) / total for i in range(3)]
-        inertia_axis = 0.0
-        for mass, com, inertia in bodies:
-            r = [c - o for c, o in zip(com, origin)]
-            r_perp = [ri - _dot(r, axis) * ai for ri, ai in zip(r, axis)]
-            about_com = _dot(axis, [_dot(row, axis) for row in inertia])
-            inertia_axis += about_com + mass * _dot(r_perp, r_perp)
-        r = [c - o for c, o in zip(combined, origin)]
-        distance = math.sqrt(max(0.0, _dot(r, r) - _dot(r, axis) ** 2))
-        g_perp = [g - _dot(gravity, axis) * a for g, a in zip(gravity, axis)]
-        restoring = total * math.sqrt(_dot(g_perp, g_perp)) * distance
-        if restoring <= 0:
-            raise ReferenceBlocked("the moving group's centre of mass lies on the joint axis", [])
+        restoring = total * math.sqrt(_dot(g_perp, g_perp)) * math.sqrt(_dot(radial, radial))
         return 2 * math.pi * math.sqrt(inertia_axis / restoring), used
+
+    if derivation == "rated_move_peak_torque":
+        start, end, duration = scenario["start_rad"], scenario["end_rad"], scenario["duration_s"]
+        delta, peak = end - start, 0.0
+        for step in range(int(round(duration / MOVE_STEP_S)) + 1):
+            s = min(1.0, step * MOVE_STEP_S / duration)
+            angle = start + delta * (10 * s**3 - 15 * s**4 + 6 * s**5)
+            accel = delta * (60 * s - 180 * s**2 + 120 * s**3) / duration**2
+            # Required joint torque: inertia times acceleration, minus the
+            # torque gravity already supplies.
+            peak = max(peak, abs(inertia_axis * accel - gravity_torque(angle)))
+        return peak, used
 
     raise ValueError(f"unknown derivation {derivation!r}")
 
@@ -182,14 +246,19 @@ def compile_cases(
         >>> model = json.loads((item / "derived/engineering_model.json").read_text())
         >>> requirements = json.loads((item / "requirements/requirements.json").read_text())
         >>> golden, corners, blocked = compile_cases(model, requirements, "m.xml")
-        >>> len(golden["cases"]), len(corners["cases"]), [entry["id"] for entry in blocked]
-        (3, 5, ['REQ-XD-001'])
+        >>> len(golden["cases"]) == len(requirements["reference_values"])
+        True
+        >>> unknown_limits = [r["requirement_id"] for r in requirements["requirements"]
+        ...                   if "quantity" in r["limit"]
+        ...                   and resolve(model, r["limit"]["quantity"])["status"] == "UNKNOWN"]
+        >>> [entry["id"] for entry in blocked] == unknown_limits
+        True
     """
     blocked: List[Dict[str, Any]] = []
     golden = []
     for reference in requirements["reference_values"]:
         try:
-            value, _used = reference_value(model, reference["derivation"])
+            value, _used = reference_value(model, reference["derivation"], reference["scenario"])
         except ReferenceBlocked as exc:
             blocked.append(
                 {"id": reference["reference_id"], "gate": "V3", "reason": str(exc), "unknown_paths": exc.paths}

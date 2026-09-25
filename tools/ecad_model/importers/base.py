@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 # First bytes by which a format identifies itself. Detection trusts content,
 # not the file extension, because CAD files are untrusted input.
@@ -19,6 +19,59 @@ MAX_CAD_BYTES = 256 * 1024 * 1024
 
 class UnsupportedFormat(ValueError):
     """The file is a format no importer here can read. Never guessed around."""
+
+
+class ExtractionError(ValueError):
+    """Extraction did not produce a result, with the reason classified.
+
+    kind is one of:
+        "rejected"     the file was read and refused on its content (decisive)
+        "crashed"      the parser died or produced no usable result
+        "timed_out"    the parser exceeded its time limit
+        "unavailable"  the kernel is not installed here
+    Callers map these to different verdicts; they are not all "unavailable".
+    """
+
+    def __init__(self, kind: str, message: str):
+        super().__init__(message)
+        self.kind = kind
+
+
+def regular_file(path: Path, limit: Optional[int] = None) -> int:
+    """Refuse anything but a regular file within the size limit, before opening it.
+
+    A FIFO would block a read forever, and an oversized file would be read
+    whole before any other guard ran.
+
+    Args:
+        path: The file about to be read.
+        limit: Largest acceptable size in bytes; MAX_CAD_BYTES when None, read at
+            call time so the module constant stays the single setting.
+
+    Returns:
+        The file's size in bytes.
+
+    Raises:
+        UnsupportedFormat: Not a regular file (or a symlink), or too large.
+
+    Example:
+        >>> import tempfile, os
+        >>> with tempfile.TemporaryDirectory() as d:
+        ...     fifo = Path(d) / "part.step"; os.mkfifo(fifo)
+        ...     regular_file(fifo)
+        Traceback (most recent call last):
+        ...
+        ecad_model.importers.base.UnsupportedFormat: part.step: not a regular file
+    """
+    import stat
+
+    limit = MAX_CAD_BYTES if limit is None else limit
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode):
+        raise UnsupportedFormat(f"{path.name}: not a regular file")
+    if info.st_size > limit:
+        raise UnsupportedFormat(f"{path.name}: {info.st_size} bytes exceeds the {limit}-byte input limit")
+    return info.st_size
 
 
 class CADImporter(ABC):
@@ -64,9 +117,7 @@ def detect_format(path: Path) -> str:
         >>> detect_format(root / "datasets/cad/robotic_joint_001/source/robotic_joint_001.step")
         'step'
     """
-    size = path.stat().st_size
-    if size > MAX_CAD_BYTES:
-        raise UnsupportedFormat(f"{path.name}: {size} bytes exceeds the {MAX_CAD_BYTES}-byte input limit")
+    regular_file(path)
     with path.open("rb") as handle:
         head = handle.read(64)
     if head.startswith(b"version https://git-lfs.github.com/spec/"):

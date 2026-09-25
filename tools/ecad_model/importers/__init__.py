@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict
 
-from .base import CADImporter, UnsupportedFormat, detect_format
+from .base import CADImporter, ExtractionError, UnsupportedFormat, detect_format, regular_file
 from .step_ocp import StepImporter
 
 IMPORTERS: Dict[str, CADImporter] = {"step": StepImporter()}
@@ -14,9 +14,11 @@ IMPORTERS: Dict[str, CADImporter] = {"step": StepImporter()}
 def importer_for(path: Path) -> CADImporter:
     """Return the importer for a file, or raise UnsupportedFormat.
 
-    A format that is recognised but has no importer here (STL, glTF) is
-    reported as unsupported rather than read partially: STL carries no
-    assembly, and pretending otherwise would fabricate structure.
+    A format that is recognised but has no importer here (ASCII STL, binary
+    glTF) is reported as unsupported by name rather than read partially: STL
+    carries no assembly, and pretending otherwise would fabricate structure.
+    Binary STL and JSON glTF have no reliable signature and are refused as
+    unrecognised.
 
     Args:
         path: The CAD file.
@@ -40,4 +42,4 @@ def importer_for(path: Path) -> CADImporter:
     return importer
 
 
-__all__ = ["CADImporter", "IMPORTERS", "UnsupportedFormat", "detect_format", "importer_for"]
+__all__ = ["CADImporter", "ExtractionError", "IMPORTERS", "UnsupportedFormat", "detect_format", "importer_for", "regular_file"]

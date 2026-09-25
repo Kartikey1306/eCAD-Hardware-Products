@@ -221,14 +221,21 @@ def build_mjcf(model: Dict[str, Any], *, timestep: float = 0.0005) -> str:
         for second in ids[i + 1:]:
             if roots[first] == roots[second]:
                 exclusions.add((first, second))
-    # The joint's realizing part (a shaft) runs in a bore of the joint's
-    # parent: a designed bearing interface, whose box proxies overlap by
-    # construction. The joint's parent/child pair itself is deliberately NOT
-    # excluded -- that is the pair the clearance check exists to watch.
-    realizer, parent = joint["realized_by"], joint["parent"]
-    if realizer in ids and parent in ids and roots[realizer] != roots[parent]:
-        first, second = sorted((realizer, parent))
-        exclusions.add((first, second))
+    # The joint's realizing part runs in a bore of the other side: a designed
+    # bearing interface whose box proxies overlap by construction. A shaft on
+    # the moving side runs in the parent; a fixed pin runs in the child. When
+    # the realizer is the parent or child itself, the bearing IS the joint
+    # pair: it has to be excluded, and the clearance scenario then reports
+    # that pair as unchecked rather than passing it vacuously.
+    realizer, parent, child = joint["realized_by"], joint["parent"], joint["child"]
+    if realizer in (parent, child):
+        bearing = (parent, child)
+    elif roots[realizer] == moving_root:
+        bearing = (realizer, parent)
+    else:
+        bearing = (realizer, child)
+    first, second = sorted(bearing)
+    exclusions.add((first, second))
     lines.append("  <contact>")
     for first, second in sorted(tuple(sorted(pair)) for pair in exclusions):
         lines.append(f"    <exclude body1={quoteattr(first)} body2={quoteattr(second)}/>")

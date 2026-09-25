@@ -89,6 +89,7 @@ def pendulum(bob_material="water"):
         },
         "joints": [{
             "joint_id": "j1", "type": "revolute", "parent": "frame", "child": "bob", "realized_by": "bob",
+            "axis_sense": [0.0, 1.0, 0.0],
             "limits": {
                 "lower": quantity(-1.0, "rad", Status.SPECIFIED, ANNOTATION),
                 "upper": quantity(1.0, "rad", Status.SPECIFIED, ANNOTATION),
@@ -413,6 +414,257 @@ class TestComparisonAndSanity(unittest.TestCase):
         self.assertIn("triangle inequality", inertia_problems("c", [[1, 0, 0], [0, 1, 0], [0, 0, 5]])[0])
 
 
+
+
+def _rotation_z(degrees):
+    c, s_ = math.cos(math.radians(degrees)), math.sin(math.radians(degrees))
+    return [[c, -s_, 0.0], [s_, c, 0.0], [0.0, 0.0, 1.0]]
+
+
+def _matmul(a, b):
+    return [[sum(a[i][k] * b[k][j] for k in range(3)) for j in range(3)] for i in range(3)]
+
+
+def _apply(r, v):
+    return [sum(r[i][k] * v[k] for k in range(3)) for i in range(3)]
+
+
+def _yawed(degrees):
+    """The pendulum with the whole assembly, and its annotated sense, turned about +Z."""
+    extraction, annotations = pendulum()
+    turn = _rotation_z(degrees)
+    for part in extraction["parts"]:
+        part["rotation"] = _matmul(turn, part["rotation"])
+        part["translation"] = _apply(turn, part["translation"])
+    annotations["joints"][0]["axis_sense"] = _apply(turn, annotations["joints"][0]["axis_sense"])
+    return build(extraction, annotations)
+
+
+class TestJointSense(unittest.TestCase):
+    """Regression: the joint's sense came from a canonicalisation rule, so a rigid
+    re-orientation of the whole design could mirror its range unseen."""
+
+    DERIVATIONS = ("gravity_torque_as_modelled", "small_oscillation_period", "moving_mass", "equilibrium_angle")
+
+    def test_physics_is_invariant_under_a_rigid_yaw_of_the_whole_design(self):
+        reference = {name: reference_value(build(*pendulum()), name)[0] for name in self.DERIVATIONS}
+        for degrees in (30.0, 90.0, 179.8, 180.2, 271.0):
+            model = _yawed(degrees)
+            for name in self.DERIVATIONS:
+                with self.subTest(degrees=degrees, derivation=name):
+                    self.assertAlmostEqual(reference_value(model, name)[0], reference[name], places=9)
+
+    def test_the_annotated_sense_sets_the_direction_of_a_positive_angle(self):
+        extraction, annotations = pendulum()
+        forward = build(extraction, annotations)
+        annotations["joints"][0]["axis_sense"] = [0.0, -1.0, 0.0]
+        reverse = build(extraction, annotations)
+        self.assertEqual(forward["joints"][0]["axis"]["value"], [0.0, 1.0, 0.0])
+        self.assertEqual(reverse["joints"][0]["axis"]["value"], [0.0, -1.0, 0.0])
+        self.assertAlmostEqual(reference_value(forward, "equilibrium_angle")[0], math.pi / 2, places=12)
+        self.assertAlmostEqual(reference_value(reverse, "equilibrium_angle")[0], -math.pi / 2, places=12)
+
+    def test_a_sense_far_from_the_cad_axis_is_unknown(self):
+        extraction, annotations = pendulum()
+        annotations["joints"][0]["axis_sense"] = [1.0, 0.5, 0.0]  # 63 degrees from +Y
+        axis = build(extraction, annotations)["joints"][0]["axis"]
+        self.assertEqual(axis["status"], "UNKNOWN")
+        self.assertIn("60 degrees", axis["note"])
+
+
+class TestGeometryConventions(unittest.TestCase):
+    def test_inertia_rotates_as_r_i_r_transpose(self):
+        """Regression for the reviewer's surviving mutant: R^T I R passed because the
+        only rotated part was symmetric under a 90-degree turn."""
+        extraction, annotations = pendulum()
+        turn = _rotation_z(30.0)
+        extraction["parts"][1]["rotation"] = turn  # a 20 x 20 x 20 bob is isotropic;
+        a, b, c = 40.0, 20.0, 10.0  # so make it a 40 x 20 x 10 box
+        box = box_part("bob", (a, b, c), (120, -10, 40), cylinders=extraction["parts"][1]["cylindrical_faces"])
+        box["rotation"] = turn
+        extraction["parts"][1] = box
+        model = build(extraction, annotations)
+        got = component(model, "bob")["physical"]["inertia_about_com"]["value"]
+        mass = 1000.0 * a * b * c * 1e-9
+        local = [mass * (b * b + c * c) / 12 * 1e-6, mass * (a * a + c * c) / 12 * 1e-6, mass * (a * a + b * b) / 12 * 1e-6]
+        diagonal = [[local[0], 0, 0], [0, local[1], 0], [0, 0, local[2]]]
+        transpose = [[turn[j][i] for j in range(3)] for i in range(3)]
+        expected = _matmul(_matmul(turn, diagonal), transpose)
+        wrong = _matmul(_matmul(transpose, diagonal), turn)
+        for i in range(3):
+            for j in range(3):
+                self.assertAlmostEqual(got[i][j], expected[i][j], places=15)
+        self.assertGreater(abs(expected[0][1] - wrong[0][1]), 1e-9, "fixture must tell the two apart")
+
+    def test_coaxial_faces_at_different_axial_positions_share_one_axis(self):
+        extraction, annotations = pendulum()
+        faces = extraction["parts"][1]["cylindrical_faces"]
+        extraction["parts"][1]["cylindrical_faces"] = [
+            *faces, {"axis_origin_local": [-90.0, 55.0, 10.0], "axis_direction_local": [0.0, -1.0, 0.0], "radius": 3.0}]
+        axis = build(extraction, annotations)["joints"][0]["axis"]
+        self.assertEqual(axis["status"], "DERIVED")
+        self.assertEqual(axis["value"], [0.0, 1.0, 0.0])
+
+    def test_period_of_a_tilted_axis_uses_the_perpendicular_gravity(self):
+        """An axis tilted 30 degrees out of the horizontal feels g cos(30)."""
+        extraction, annotations = pendulum()
+        tilt = math.radians(30.0)
+        direction = [0.0, math.cos(tilt), math.sin(tilt)]
+        extraction["parts"][1]["cylindrical_faces"][0]["axis_direction_local"] = direction
+        annotations["joints"][0]["axis_sense"] = direction
+        model = build(extraction, annotations)
+        mass, lever = 0.008, 0.1
+        inertia_axis = mass * 2 * 0.02**2 / 12 + mass * lever**2
+        expected = 2 * math.pi * math.sqrt(inertia_axis / (mass * STANDARD_GRAVITY * math.cos(tilt) * lever))
+        self.assertAlmostEqual(reference_value(model, "small_oscillation_period")[0], expected, places=12)
+
+
+class TestMoveReferences(unittest.TestCase):
+    """Closed forms for the rated move, checked against arithmetic done here."""
+
+    SCENARIO = {"name": "rated_move", "start_rad": 0.0, "end_rad": -1.2, "duration_s": 0.5}
+
+    def test_minimum_jerk_peaks(self):
+        model = build(*pendulum())
+        self.assertAlmostEqual(reference_value(model, "min_jerk_peak_speed", self.SCENARIO)[0], 1.875 * 1.2 / 0.5)
+        self.assertAlmostEqual(reference_value(model, "min_jerk_peak_accel", self.SCENARIO)[0],
+                               10 / math.sqrt(3) * 1.2 / 0.25)
+
+    def test_rated_move_peak_torque_for_a_point_like_bob(self):
+        """Bob at radius d about +Y: gravity torque m g d cos(q), inertia I_com + m d^2."""
+        model = build(*pendulum())
+        mass, lever = 0.008, 0.1
+        inertia = mass * 2 * 0.02**2 / 12 + mass * lever**2
+        peak = 0.0
+        for step in range(501):
+            s_ = step / 500
+            q = -1.2 * (10 * s_**3 - 15 * s_**4 + 6 * s_**5)
+            accel = -1.2 * (60 * s_ - 180 * s_**2 + 120 * s_**3) / 0.25
+            peak = max(peak, abs(inertia * accel - mass * STANDARD_GRAVITY * lever * math.cos(q)))
+        self.assertAlmostEqual(reference_value(model, "rated_move_peak_torque", self.SCENARIO)[0], peak, places=12)
+
+    def test_the_payload_override_is_applied_to_every_reference(self):
+        model = build(*pendulum())
+        scenario = {"name": "static_sweep", "payload_component": "bob", "payload_mass_kg": 0.024}
+        self.assertAlmostEqual(reference_value(model, "moving_mass", scenario)[0], 0.024, places=15)
+        self.assertAlmostEqual(reference_value(model, "gravity_torque_as_modelled", scenario)[0],
+                               0.024 * STANDARD_GRAVITY * 0.1, places=12)
+
+
+def _three_part(realizer_side):
+    """frame + arm, with a separate pin on either side of the joint."""
+    frame = box_part("frame", (40, 40, 40), (-20, -20, -60))
+    arm = box_part("arm", (100, 10, 10), (0, 30, -5))
+    pin = box_part("pin", (6, 60, 6), (-3, -25, -3),
+                   cylinders=[{"axis_origin_local": [3.0, 0.0, 3.0], "axis_direction_local": [0.0, 1.0, 0.0], "radius": 3.0}])
+    extraction = {"source": {"path": "fixture.step", "sha256": "0" * 64, "format": "step"},
+                  "length_unit": "mm", "parts": [frame, arm, pin]}
+    water = {"name": "water", "density": quantity(1000.0, "kg/m^3", Status.SPECIFIED, ANNOTATION)}
+    annotations = {
+        "design_id": "three", "materials": {"water": water},
+        "parts": {name: {"component_id": name, "kind": "structure", "material": "water"} for name in ("frame", "arm", "pin")},
+        "joints": [{"joint_id": "j1", "type": "revolute", "parent": "frame", "child": "arm", "realized_by": "pin",
+                    "axis_sense": [0.0, 1.0, 0.0],
+                    "limits": {"lower": quantity(-1.0, "rad", Status.SPECIFIED, ANNOTATION),
+                               "upper": quantity(1.0, "rad", Status.SPECIFIED, ANNOTATION)}}],
+        "attachments": [{"component": "pin", "attached_to": realizer_side}],
+        "components_without_cad": [], "relationships": [],
+    }
+    return build(extraction, annotations)
+
+
+class TestBearingExclusion(unittest.TestCase):
+    def exclusions(self, model):
+        import re
+
+        return {tuple(sorted(p)) for p in re.findall(r'<exclude body1="([^"]+)" body2="([^"]+)"/>', build_mjcf(model))}
+
+    def test_a_shaft_on_the_moving_side_runs_in_the_parent(self):
+        self.assertIn(("frame", "pin"), self.exclusions(_three_part("arm")))
+        self.assertNotIn(("arm", "frame"), self.exclusions(_three_part("arm")))
+
+    def test_a_fixed_pin_runs_in_the_child(self):
+        """Regression: a fixed pin was never excluded, so clearance failed at every pose."""
+        pairs = self.exclusions(_three_part("frame"))
+        self.assertIn(("arm", "pin"), pairs)
+        self.assertNotIn(("arm", "frame"), pairs)
+
+    def test_a_joint_realised_by_its_own_child_excludes_the_joint_pair_openly(self):
+        """The pair must be excluded -- its proxies overlap by construction -- and the
+        clearance scenario then reports it unchecked rather than passing it."""
+        self.assertIn(("bob", "frame"), self.exclusions(build(*pendulum())))
+
+
+class TestRefusals(unittest.TestCase):
+    """Every documented refusal, so none can be deleted unnoticed."""
+
+    def test_builder_refuses_inconsistent_annotations(self):
+        cases = {
+            "joint names a missing component": lambda a: a["joints"][0].__setitem__("child", "ghost"),
+            "attachment names a missing component": lambda a: a["attachments"].append({"component": "ghost", "attached_to": "bob"}),
+            "relationship names a missing component": lambda a: a["relationships"].append({"relation": "drives", "from": "ghost", "to": "bob"}),
+            "a component is declared twice": lambda a: a["components_without_cad"].append(
+                {"component_id": "bob", "name": "again", "kind": "other", "domains": {}}),
+        }
+        for label, mutate in cases.items():
+            extraction, annotations = pendulum()
+            mutate(annotations)
+            with self.subTest(label), self.assertRaises(ValueError):
+                build(extraction, annotations)
+
+    def test_mechanical_model_refuses_what_it_cannot_represent(self):
+        model = build(*pendulum())
+        two = copy.deepcopy(model)
+        two["joints"].append(copy.deepcopy(two["joints"][0]))
+        with self.assertRaisesRegex(ModelIncomplete, "exactly one joint"):
+            build_mjcf(two)
+        welded = copy.deepcopy(model)
+        welded["relationships"].append({"relation": "attached_to", "from": "bob", "to": "frame", "source": ANNOTATION})
+        with self.assertRaisesRegex(ModelIncomplete, "rigidly attached"):
+            build_mjcf(welded)
+        axis = copy.deepcopy(model)
+        axis["joints"][0]["axis"] = unknown("1", ANNOTATION, "fixture")
+        with self.assertRaisesRegex(ModelIncomplete, "axis is UNKNOWN"):
+            build_mjcf(axis)
+
+
+class TestUnknownsIndexOrder(unittest.TestCase):
+    def test_index_is_sorted_whatever_the_facet_order(self):
+        """Decay-proof twin of the regression test: its own fixture, not the sample's gaps."""
+        extraction, annotations = pendulum()
+        annotations["components_without_cad"] = [{
+            "component_id": "motor", "name": "motor", "kind": "motor",
+            "domains": {"thermal": {"limit": unknown("degC", ANNOTATION, "x")},
+                        "electrical": {"kt": unknown("N*m/A", ANNOTATION, "x")},
+                        "mechanical": {"torque": unknown("N*m", ANNOTATION, "x")}},
+        }]
+        model = build(extraction, annotations)
+        paths = [entry["path"] for entry in model["unknowns"]]
+        self.assertEqual(paths, sorted(paths))
+        self.assertEqual(len(paths), 3)
+        reversed_model = json.loads(json.dumps(model, sort_keys=True))
+        facets = component(reversed_model, "motor")["domains"]
+        component(reversed_model, "motor")["domains"] = dict(reversed(list(facets.items())))
+        self.assertEqual(index_unknowns(reversed_model), model["unknowns"])
+
+
+class TestTolerance(unittest.TestCase):
+    """The documented reproducibility tolerance, pinned: 1e-9 relative, scaled per array."""
+
+    def test_scalars(self):
+        self.assertEqual(same_content(1.0, 1.0 + 5e-10), [])
+        self.assertTrue(same_content(1.0, 1.0 + 2e-9))
+
+    def test_arrays_scale_by_their_largest_element(self):
+        """Regression: near-zero inertia products carry kernel noise that a per-element
+        relative test called a difference, which would fail CI off macOS."""
+        self.assertEqual(same_content([[1e10, 4.8e-7], [4.8e-7, 1e10]], [[1e10, -3e-7], [-3e-7, 1e10]]), [])
+        self.assertTrue(same_content([[1e10, 0.0]], [[1e10, 30.0]]))  # 3e-9 of the scale
+
+    def test_xml_identifiers_compare_exactly(self):
+        self.assertTrue(same_text('<body name="joint_001"/>', '<body name="joint_1"/>', "m"))
+        self.assertTrue(same_text('pos="1 2"', 'pos="1 2 3"', "m"))
+        self.assertEqual(same_text('fullinertia="1e-3 0 4.8e-20"', 'fullinertia="1e-3 0 -3e-20"', "m"), [])
 
 class TestDocumentationExamples(unittest.TestCase):
     """QUALITY.md: every public function's example must be one that was actually run."""

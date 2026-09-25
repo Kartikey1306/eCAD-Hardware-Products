@@ -127,9 +127,13 @@
         "derivation": {
           "description": "Name of the independent closed-form derivation that computes the expected value from the engineering model. The value itself is computed, not typed.",
           "enum": [
+            "moving_mass",
             "gravity_torque_as_modelled",
             "small_oscillation_period",
-            "moving_mass"
+            "equilibrium_angle",
+            "min_jerk_peak_speed",
+            "min_jerk_peak_accel",
+            "rated_move_peak_torque"
           ]
         },
         "source": {
@@ -150,7 +154,8 @@
         "operator",
         "limit",
         "unit",
-        "source"
+        "source",
+        "illustrative"
       ],
       "properties": {
         "requirement_id": {
@@ -212,6 +217,10 @@
         },
         "source": {
           "$ref": "common.schema.json#/definitions/source"
+        },
+        "illustrative": {
+          "description": "True for an example limit chosen to exercise the pipeline rather than a real requirement. Carried into every trace and report row.",
+          "type": "boolean"
         }
       }
     }

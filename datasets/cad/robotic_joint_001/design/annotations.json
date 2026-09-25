@@ -8,12 +8,12 @@
       "density": {
         "value": 2700.0,
         "unit": "kg/m^3",
-        "status": "SPECIFIED",
+        "status": "ESTIMATED",
         "source": {
-          "kind": "handbook",
-          "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3"
+          "kind": "estimation",
+          "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3, from general engineering knowledge"
         },
-        "note": "nominal handbook value for the specified alloy, not a supplier certificate"
+        "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses"
       }
     },
     "steel_1045": {
@@ -21,12 +21,12 @@
       "density": {
         "value": 7850.0,
         "unit": "kg/m^3",
-        "status": "SPECIFIED",
+        "status": "ESTIMATED",
         "source": {
-          "kind": "handbook",
-          "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3"
+          "kind": "estimation",
+          "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3, from general engineering knowledge"
         },
-        "note": "nominal handbook value for the specified alloy, not a supplier certificate"
+        "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses"
       }
     }
   },
@@ -64,6 +64,11 @@
       "parent": "pillar",
       "child": "link",
       "realized_by": "shaft",
+      "axis_sense": [
+        0.0,
+        1.0,
+        0.0
+      ],
       "limits": {
         "lower": {
           "value": -2.0943951023931953,

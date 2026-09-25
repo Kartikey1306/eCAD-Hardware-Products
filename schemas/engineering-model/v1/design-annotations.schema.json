@@ -5,22 +5,47 @@
   "description": "Design intent a STEP file does not carry: which CAD part is which component, material assignment, joints and their limits, and components that exist in the design but not in the CAD. Every value states its source.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "annotations_version", "design_id", "materials", "parts", "joints", "attachments", "components_without_cad", "relationships"],
+  "required": [
+    "$schema",
+    "annotations_version",
+    "design_id",
+    "materials",
+    "parts",
+    "joints",
+    "attachments",
+    "components_without_cad",
+    "relationships"
+  ],
   "properties": {
-    "$schema": {"const": "https://embeddedos.org/schemas/engineering-model/v1/design-annotations.schema.json"},
-    "annotations_version": {"const": "1.0.0"},
-    "design_id": {"$ref": "common.schema.json#/definitions/identifier"},
+    "$schema": {
+      "const": "https://embeddedos.org/schemas/engineering-model/v1/design-annotations.schema.json"
+    },
+    "annotations_version": {
+      "const": "1.0.0"
+    },
+    "design_id": {
+      "$ref": "common.schema.json#/definitions/identifier"
+    },
     "materials": {
       "type": "object",
       "minProperties": 1,
-      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "density"],
+        "required": [
+          "name",
+          "density"
+        ],
         "properties": {
-          "name": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
-          "density": {"$ref": "common.schema.json#/definitions/quantity"}
+          "name": {
+            "$ref": "common.schema.json#/definitions/nonEmptyString"
+          },
+          "density": {
+            "$ref": "common.schema.json#/definitions/quantity"
+          }
         }
       }
     },
@@ -31,11 +56,30 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["component_id", "kind", "material"],
+        "required": [
+          "component_id",
+          "kind",
+          "material"
+        ],
         "properties": {
-          "component_id": {"$ref": "common.schema.json#/definitions/identifier"},
-          "kind": {"enum": ["structure", "shaft", "payload", "bearing", "fastener", "housing", "other"]},
-          "material": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}
+          "component_id": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          },
+          "kind": {
+            "enum": [
+              "structure",
+              "shaft",
+              "payload",
+              "bearing",
+              "fastener",
+              "housing",
+              "other"
+            ]
+          },
+          "material": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
         }
       }
     },
@@ -44,23 +88,57 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["joint_id", "type", "parent", "child", "realized_by", "limits"],
+        "required": [
+          "joint_id",
+          "type",
+          "parent",
+          "child",
+          "realized_by",
+          "axis_sense",
+          "limits"
+        ],
         "properties": {
-          "joint_id": {"$ref": "common.schema.json#/definitions/identifier"},
-          "type": {"enum": ["revolute"]},
-          "parent": {"$ref": "common.schema.json#/definitions/identifier"},
-          "child": {"$ref": "common.schema.json#/definitions/identifier"},
+          "joint_id": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          },
+          "type": {
+            "enum": [
+              "revolute"
+            ]
+          },
+          "parent": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          },
+          "child": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          },
           "realized_by": {
             "description": "The component whose cylindrical faces define the joint axis. The axis is extracted from CAD geometry, never typed in.",
             "$ref": "common.schema.json#/definitions/identifier"
           },
+          "axis_sense": {
+            "description": "Assembly-frame vector the joint's positive rotation axis points along. The CAD fixes the axis line; this fixes the sense of a positive angle. Must lie within 60 degrees of the CAD axis or the axis is UNKNOWN.",
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number"
+            }
+          },
           "limits": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["lower", "upper"],
+            "required": [
+              "lower",
+              "upper"
+            ],
             "properties": {
-              "lower": {"$ref": "common.schema.json#/definitions/quantity"},
-              "upper": {"$ref": "common.schema.json#/definitions/quantity"}
+              "lower": {
+                "$ref": "common.schema.json#/definitions/quantity"
+              },
+              "upper": {
+                "$ref": "common.schema.json#/definitions/quantity"
+              }
             }
           }
         }
@@ -72,10 +150,17 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["component", "attached_to"],
+        "required": [
+          "component",
+          "attached_to"
+        ],
         "properties": {
-          "component": {"$ref": "common.schema.json#/definitions/identifier"},
-          "attached_to": {"$ref": "common.schema.json#/definitions/identifier"}
+          "component": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          },
+          "attached_to": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          }
         }
       }
     },
@@ -84,19 +169,47 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["component_id", "name", "kind", "domains"],
+        "required": [
+          "component_id",
+          "name",
+          "kind",
+          "domains"
+        ],
         "properties": {
-          "component_id": {"$ref": "common.schema.json#/definitions/identifier"},
-          "name": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
-          "kind": {"enum": ["motor", "gearbox", "motor_driver", "battery", "sensor", "controller", "pcb", "other"]},
+          "component_id": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          },
+          "name": {
+            "$ref": "common.schema.json#/definitions/nonEmptyString"
+          },
+          "kind": {
+            "enum": [
+              "motor",
+              "gearbox",
+              "motor_driver",
+              "battery",
+              "sensor",
+              "controller",
+              "pcb",
+              "other"
+            ]
+          },
           "domains": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-              "mechanical": {"$ref": "#/definitions/facet"},
-              "electrical": {"$ref": "#/definitions/facet"},
-              "control": {"$ref": "#/definitions/facet"},
-              "thermal": {"$ref": "#/definitions/facet"}
+              "mechanical": {
+                "$ref": "#/definitions/facet"
+              },
+              "electrical": {
+                "$ref": "#/definitions/facet"
+              },
+              "control": {
+                "$ref": "#/definitions/facet"
+              },
+              "thermal": {
+                "$ref": "#/definitions/facet"
+              }
             }
           }
         }
@@ -107,11 +220,30 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["relation", "from", "to"],
+        "required": [
+          "relation",
+          "from",
+          "to"
+        ],
         "properties": {
-          "relation": {"enum": ["mounted_to", "connected_to", "drives", "powered_by", "controls", "senses", "constrained_by", "thermally_connected_to"]},
-          "from": {"$ref": "common.schema.json#/definitions/identifier"},
-          "to": {"$ref": "common.schema.json#/definitions/identifier"}
+          "relation": {
+            "enum": [
+              "mounted_to",
+              "connected_to",
+              "drives",
+              "powered_by",
+              "controls",
+              "senses",
+              "constrained_by",
+              "thermally_connected_to"
+            ]
+          },
+          "from": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          },
+          "to": {
+            "$ref": "common.schema.json#/definitions/identifier"
+          }
         }
       }
     }
@@ -119,8 +251,12 @@
   "definitions": {
     "facet": {
       "type": "object",
-      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
-      "additionalProperties": {"$ref": "common.schema.json#/definitions/quantity"}
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "common.schema.json#/definitions/quantity"
+      }
     }
   }
 }

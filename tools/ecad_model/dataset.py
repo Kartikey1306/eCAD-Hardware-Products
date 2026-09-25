@@ -39,7 +39,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from . import MODEL_VERSION
 from .builder import build_engineering_model, index_unknowns, resolve
-from .importers import importer_for
+from .importers import ExtractionError, UnsupportedFormat, importer_for, regular_file
 from .mjcf import build_mjcf, rigid_groups
 from .requirements import CONTRACT_DOMAIN, compile_cases
 from .schemas import REPOSITORY_ROOT, validate as validate_schema
@@ -48,6 +48,7 @@ ITEM_SCHEMA = "https://embeddedos.org/schemas/cad-dataset/v1/dataset-item.schema
 EXTRACTION = "derived/cad_extraction.json"
 MODEL = "derived/engineering_model.json"
 ANNOTATIONS = "design/annotations.json"
+PROVENANCE = "source/provenance.json"
 REQUIREMENTS = "requirements/requirements.json"
 GOLDEN = "validation/golden/cases.json"
 CORNERS = "validation/corners/cases.json"
@@ -87,6 +88,7 @@ class Item:
         steps = sorted((self.root / "source").glob("*.step"))
         if len(steps) != 1:
             raise ValueError(f"{self.root}: expected exactly one source/*.step, found {len(steps)}")
+        regular_file(steps[0])
         self.cad = steps[0]
         self.mjcf = f"derived/mechanical/{self.item_id}.mjcf.xml"
 
@@ -113,12 +115,23 @@ class Item:
             >>> item.cad in item.files()
             True
         """
+        relative = self.repo_relative(self.root)
+        ignored = subprocess.run(
+            ["git", "-C", str(REPOSITORY_ROOT), "check-ignore", "-q", "--no-index", "--", relative],
+            capture_output=True, timeout=30,
+        )
+        if ignored.returncode == 0:
+            raise ValueError(f"{relative}: the item lies under a git-ignored path, so its files cannot be enumerated")
         listed = subprocess.run(
+            # :(literal) stops git reading the item's own path as a glob or pathspec magic.
             ["git", "-C", str(REPOSITORY_ROOT), "ls-files", "-co", "--exclude-standard", "-z", "--",
-             self.repo_relative(self.root)],
+             f":(literal){relative}"],
             check=True, capture_output=True, timeout=30,
         ).stdout.decode("utf-8")
-        return sorted(REPOSITORY_ROOT / name for name in listed.split("\0") if name)
+        files = sorted(REPOSITORY_ROOT / name for name in listed.split("\0") if name)
+        if self.cad not in files:
+            raise ValueError(f"{relative}: git does not list the item's own CAD file; refusing to skip its checks")
+        return files
 
 
 def _json_bytes(value: Any) -> bytes:
@@ -170,33 +183,56 @@ def _derive(item: Item) -> Dict[str, bytes]:
     }
 
 
+# Domains this platform has a validator for. A domain is only ever reported
+# "implemented" from here, never from a sample's data.
+VALIDATED_DOMAINS = {
+    "mechanical": "joint statics, rated-move dynamics, free oscillation and range-of-motion clearance, "
+                  "simulated with MuJoCo and compared with closed-form references",
+}
+
+
 def _domain_status(model: Dict[str, Any]) -> List[Dict[str, str]]:
-    blocked_by: Dict[str, List[str]] = {}
-    for unknown in model["unknowns"]:
-        for domain in unknown["needed_by"]:
-            blocked_by.setdefault(domain, []).append(unknown["path"])
+    missing: Dict[str, List[str]] = {}
+    for entry in model["unknowns"]:
+        for domain in entry["needed_by"]:
+            missing.setdefault(domain, []).append(entry["path"])
     statuses = []
     for domain in DOMAINS:
-        if domain == "mechanical":
-            reason = "joint statics, rated-move dynamics, free oscillation and range-of-motion clearance are simulated"
-            if blocked_by.get(domain):
-                reason += "; comparison with actuator capability is BLOCKED on " + ", ".join(sorted(blocked_by[domain]))
+        lacking = sorted(missing.get(domain, []))
+        if domain in VALIDATED_DOMAINS:
+            reason = VALIDATED_DOMAINS[domain]
+            if lacking:
+                reason += "; requirements resting on " + ", ".join(lacking) + " are BLOCKED"
             statuses.append({"domain": domain, "status": "implemented", "reason": reason})
-        elif blocked_by.get(domain):
-            statuses.append(
-                {"domain": domain, "status": "blocked", "reason": "UNKNOWN: " + ", ".join(sorted(blocked_by[domain]))}
-            )
         else:
-            statuses.append(
-                {"domain": domain, "status": "not_started", "reason": "no domain model or validator exists for this item yet"}
-            )
+            reason = f"no {domain} validator exists in this platform yet"
+            if lacking:
+                reason += "; this sample also lacks " + ", ".join(lacking)
+            statuses.append({"domain": domain, "status": "not_implemented", "reason": reason})
     return statuses
+
+
+def _provenance(item: Item) -> Dict[str, Any]:
+    """The sample's hand-authored provenance. Its absence stops the build: a
+    licence the builder filled in would be a licence nobody checked."""
+    path = item.path(PROVENANCE)
+    if not path.is_file():
+        raise ValueError(f"{item.item_id}: {PROVENANCE} is missing; licence and origin are never assumed")
+    document = json.loads(path.read_bytes())
+    validate_schema(document, "cad-dataset/v1/source-provenance")
+    return document
+
+
+def _simulation_files(item: Item) -> List[str]:
+    return sorted(item.item_relative(path) for path in item.path("simulation").glob("*.py"))
 
 
 def _item_manifest(item: Item, derived: Dict[str, bytes]) -> Dict[str, Any]:
     model = json.loads(derived[MODEL])
+    provenance = _provenance(item)
+    kernel = json.loads(derived[EXTRACTION])["importer"]
     producers = {
-        EXTRACTION: ("ecad_model.importers.step_ocp", json.loads(derived[EXTRACTION])["importer"]["kernel_version"]),
+        EXTRACTION: ("ecad_model.importers.step_ocp", kernel["kernel_version"]),
         MODEL: ("ecad_model.builder", MODEL_VERSION),
         item.mjcf: ("ecad_model.mjcf", MODEL_VERSION),
         GOLDEN: ("ecad_model.requirements", MODEL_VERSION),
@@ -211,27 +247,38 @@ def _item_manifest(item: Item, derived: Dict[str, bytes]) -> Dict[str, Any]:
     }
     roles = {EXTRACTION: "cad_extraction", MODEL: "engineering_model", item.mjcf: "mechanical_model",
              GOLDEN: "golden_cases", CORNERS: "corner_cases"}
-    generator = item.path("source/generate_step.py")
-    origin: Dict[str, Any] = {"kind": "self_authored", "author": "eCAD-Hardware-Products contributors"}
-    if generator.is_file():
+    origin: Dict[str, Any] = dict(provenance["origin"])
+    if item.path("source/generate_step.py").is_file():
         origin["generator"] = _artifact(item, "source/generate_step.py")
     return {
         "$schema": ITEM_SCHEMA,
         "dataset_item_version": "1.0.0",
         "item_id": item.item_id,
         "title": model["design"]["name"],
+        "description": provenance["description"],
+        "artifact_type": provenance["artifact_type"],
+        "artifact_version": provenance["artifact_version"],
+        "units": provenance["units"],
+        "coordinate_system": provenance["coordinate_system"],
+        "created_at": provenance["created_at"],
+        "collected_at": provenance["collected_at"],
+        "versions": {
+            "extraction": f"{kernel['name']} {kernel['version']} ({kernel['kernel_version']})",
+            "engineering_model": MODEL_VERSION,
+            "domain_models": {"mechanical": f"ecad_model.mjcf {MODEL_VERSION}"},
+            "validation_contract": "hardware-validation v1.0.0",
+        },
         "source": {
             "cad": _artifact(item, item.item_relative(item.cad)),
             "origin": origin,
-            "license": {
-                "spdx": "MIT",
-                "attribution": "eCAD-Hardware-Products contributors",
-                "redistribution_permitted": True,
-                "training_use_permitted": True,
-                "basis": "self-authored in this repository, which is MIT licensed (see LICENSE)",
-            },
+            "license": dict(provenance["license"]),
         },
-        "inputs": {"annotations": _artifact(item, ANNOTATIONS), "requirements": _artifact(item, REQUIREMENTS)},
+        "inputs": {
+            "provenance": _artifact(item, PROVENANCE),
+            "annotations": _artifact(item, ANNOTATIONS),
+            "requirements": _artifact(item, REQUIREMENTS),
+            "simulation": [_artifact(item, path) for path in _simulation_files(item)],
+        },
         "derived": [
             {
                 "role": roles[path],
@@ -267,28 +314,105 @@ def build(directory: Path) -> List[str]:
         'dataset-item.json'
     """
     item = Item(directory)
+    _refuse_symlinks(item)
     derived = _derive(item)
     for relative, data in derived.items():
-        target = item.path(relative)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
+        _write_inside(item, relative, data)
     manifest = _item_manifest(item, derived)
     validate_schema(manifest, "cad-dataset/v1/dataset-item")
-    item.path("dataset-item.json").write_bytes(_json_bytes(manifest))
+    _write_inside(item, "dataset-item.json", _json_bytes(manifest))
     return [*derived, "dataset-item.json"]
+
+
+def _refuse_symlinks(item: Item) -> None:
+    """Refuse an item that contains any symlink, before anything is read or written.
+
+    Git tracks symlinks. One inside an item can redirect a read to a file the
+    hashes do not cover, or a build's write to any file the user can modify.
+    """
+    import os
+
+    for directory, subdirectories, files in os.walk(item.root, followlinks=False):
+        for name in [*subdirectories, *files]:
+            path = Path(directory) / name
+            if path.is_symlink():
+                raise ValueError(f"{item.item_id}: {item.root.name}/{path.relative_to(item.root).as_posix()} "
+                                 "is a symlink; dataset items may not contain symlinks")
+
+
+def _write_inside(item: Item, relative: str, data: bytes) -> None:
+    """Write a derived file, refusing any symlink on the way to it.
+
+    A committed item can carry symlinks, and Path.write_bytes follows them:
+    without this, building an untrusted item could overwrite any file the
+    user can write.
+    """
+    target = item.root / relative
+    current = item.root
+    for part in Path(relative).parts:
+        current = current / part
+        if current.is_symlink():
+            raise ValueError(f"{relative}: refusing to write through the symlink {item.item_relative(current.parent)}/{part}")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if not target.resolve().is_relative_to(item.root):
+        raise ValueError(f"{relative}: resolves outside the item")
+    target.write_bytes(data)
 
 
 # --- comparison ------------------------------------------------------------
 
-_NUMBER = re.compile(r"-?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
+_QUOTED = re.compile(r'"([^"]*)"')
 
 
-def _close(a: float, b: float) -> bool:
-    return math.isclose(a, b, rel_tol=RELATIVE_TOLERANCE, abs_tol=ABSOLUTE_TOLERANCE)
+def _close(a: float, b: float, scale: float = 0.0) -> bool:
+    """Equal within the relative tolerance of the larger of the values and scale."""
+    tolerance = max(ABSOLUTE_TOLERANCE, RELATIVE_TOLERANCE * max(abs(a), abs(b), scale))
+    return abs(a - b) <= tolerance
+
+
+def _flatten(value: Any) -> Optional[List[float]]:
+    """The numbers of a (nested) all-number list, or None if it holds anything else."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return [float(value)]
+    if isinstance(value, list):
+        flat: List[float] = []
+        for item in value:
+            inner = _flatten(item)
+            if inner is None:
+                return None
+            flat += inner
+        return flat
+    return None
+
+
+def _same_shape(a: Any, b: Any) -> bool:
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(_same_shape(x, y) for x, y in zip(a, b))
+    return not isinstance(a, list) and not isinstance(b, list)
+
+
+def _array_problems(a: List[float], b: List[float], where: str) -> List[str]:
+    # One tolerance for the whole array, scaled by its largest magnitude: a
+    # physically zero product of inertia beside a 1e10 moment is kernel noise
+    # (Linux aarch64 against macOS arm64: up to 1e-8 mm^5), and a per-element
+    # relative test would call two platforms' noise a difference.
+    scale = max([abs(item) for item in a + b] or [0.0])
+    return [
+        f"{where}[{i}]: {x!r} != {y!r}"
+        for i, (x, y) in enumerate(zip(a, b))
+        if not _close(x, y, scale)
+    ]
 
 
 def same_content(a: Any, b: Any, where: str = "") -> List[str]:
     """Differences between two JSON values; numbers compare with tolerance.
+
+    Scalars compare with a relative tolerance of 1e-9 (absolute floor 1e-12).
+    An all-number array -- a vector or matrix -- uses one tolerance scaled by
+    its largest element, so noise in a physically zero entry is not a
+    difference.
 
     Args:
         a: The committed value.
@@ -303,6 +427,8 @@ def same_content(a: Any, b: Any, where: str = "") -> List[str]:
         []
         >>> same_content({"m": 1.0}, {"m": 1.1})
         ['/m: 1.0 != 1.1']
+        >>> same_content({"I": [[1e10, 4.8e-7]]}, {"I": [[1e10, -3e-7]]})
+        []
     """
     if isinstance(a, bool) or isinstance(b, bool) or a is None or b is None or isinstance(a, str):
         return [] if a == b else [f"{where or '<root>'}: {a!r} != {b!r}"]
@@ -311,6 +437,11 @@ def same_content(a: Any, b: Any, where: str = "") -> List[str]:
     if isinstance(a, list) and isinstance(b, list):
         if len(a) != len(b):
             return [f"{where}: length {len(a)} != {len(b)}"]
+        flat_a, flat_b = _flatten(a), _flatten(b)
+        if flat_a is not None and flat_b is not None:
+            if not _same_shape(a, b):
+                return [f"{where}: array shapes differ"]
+            return _array_problems(flat_a, flat_b, where)
         return [d for i, (x, y) in enumerate(zip(a, b)) for d in same_content(x, y, f"{where}[{i}]")]
     if isinstance(a, dict) and isinstance(b, dict):
         if a.keys() != b.keys():
@@ -319,8 +450,23 @@ def same_content(a: Any, b: Any, where: str = "") -> List[str]:
     return [f"{where}: {type(a).__name__} != {type(b).__name__}"]
 
 
+def _numbers(text: str) -> Optional[List[float]]:
+    tokens = text.split()
+    if not tokens:
+        return None
+    try:
+        return [float(token) for token in tokens]
+    except ValueError:
+        return None
+
+
 def same_text(a: str, b: str, where: str) -> List[str]:
-    """Differences between two texts whose embedded numbers compare with tolerance.
+    """Differences between two XML texts whose numeric attribute values compare with tolerance.
+
+    Everything outside quoted attribute values must match exactly, and so must
+    every non-numeric value. An attribute holding only numbers -- a position,
+    an inertia list -- compares as one array with a tolerance scaled by its
+    largest element.
 
     Args:
         a: The committed text.
@@ -333,16 +479,28 @@ def same_text(a: str, b: str, where: str) -> List[str]:
     Example:
         >>> same_text('pos="1 2.5"', 'pos="1 2.5000000000001"', "model.xml")
         []
+        >>> same_text('<body name="joint_001"/>', '<body name="joint_1"/>', "model.xml")
+        ["model.xml: value 0: 'joint_001' != 'joint_1'"]
     """
-    tokens_a, tokens_b = _NUMBER.split(a), _NUMBER.split(b)
-    numbers_a, numbers_b = _NUMBER.findall(a), _NUMBER.findall(b)
-    if tokens_a != tokens_b or len(numbers_a) != len(numbers_b):
-        return [f"{where}: text differs outside its numbers"]
-    return [
-        f"{where}: number {i}: {x} != {y}"
-        for i, (x, y) in enumerate(zip(numbers_a, numbers_b))
-        if not _close(float(x), float(y))
-    ]
+    parts_a, parts_b = _QUOTED.split(a), _QUOTED.split(b)
+    if len(parts_a) != len(parts_b):
+        return [f"{where}: the documents have different structure"]
+    problems = []
+    for index, (x, y) in enumerate(zip(parts_a, parts_b)):
+        if index % 2 == 0:
+            if x != y:
+                problems.append(f"{where}: text differs outside attribute values")
+            continue
+        value = index // 2
+        numbers_x, numbers_y = _numbers(x), _numbers(y)
+        if numbers_x is None or numbers_y is None:
+            if x != y:
+                problems.append(f"{where}: value {value}: {x!r} != {y!r}")
+        elif len(numbers_x) != len(numbers_y):
+            problems.append(f"{where}: value {value}: {len(numbers_x)} numbers != {len(numbers_y)}")
+        else:
+            problems += _array_problems(numbers_x, numbers_y, f"{where}: value {value}")
+    return problems
 
 
 def integrity(item: Item) -> List[str]:
@@ -359,15 +517,26 @@ def integrity(item: Item) -> List[str]:
         []
     """
     manifest = json.loads(item.path("dataset-item.json").read_bytes())
-    recorded = [manifest["source"]["cad"], manifest["inputs"]["annotations"], manifest["inputs"]["requirements"]]
+    inputs = manifest["inputs"]
+    recorded = [manifest["source"]["cad"], inputs["provenance"], inputs["annotations"], inputs["requirements"],
+                *inputs["simulation"]]
     if "generator" in manifest["source"]["origin"]:
         recorded.append(manifest["source"]["origin"]["generator"])
     recorded += [entry["artifact"] for entry in manifest["derived"]]
     problems = []
+    committed = {item.item_relative(path) for path in item.files()} - {"dataset-item.json"}
+    unrecorded = sorted(committed - {artifact["path"] for artifact in recorded})
+    if unrecorded:
+        problems.append("files not recorded in dataset-item.json: " + ", ".join(unrecorded))
     for artifact in recorded:
         path = item.path(artifact["path"])
         if not path.is_file():
             problems.append(f"{artifact['path']}: recorded in dataset-item.json but missing")
+            continue
+        try:
+            regular_file(path)
+        except UnsupportedFormat as exc:
+            problems.append(f"{artifact['path']}: {exc}")
             continue
         data = path.read_bytes()
         if _sha256(data) != artifact["sha256"] or len(data) != artifact["size_bytes"]:
@@ -405,6 +574,87 @@ def reproducibility(item: Item, derived: Optional[Dict[str, bytes]] = None) -> L
     return problems
 
 
+def _without_derived_hashes(manifest: Dict[str, Any]) -> Dict[str, Any]:
+    stripped = json.loads(json.dumps(manifest))
+    for entry in stripped["derived"]:
+        entry["artifact"].pop("sha256")
+        entry["artifact"].pop("size_bytes")
+    return stripped
+
+
+def manifest_problems(item: Item, derived: Optional[Dict[str, bytes]] = None) -> List[str]:
+    """dataset-item.json must be exactly what build would write now.
+
+    It is generated, so a hand edit -- a licence flag, a domain claimed as
+    implemented -- is a divergence from what the inputs imply. Derived-file
+    hashes are left out: integrity() checks them against the committed bytes
+    exactly, and reproducibility() checks their content within tolerance, so
+    a last-digit difference between platforms does not fail here.
+
+    Args:
+        item: The dataset item.
+        derived: A derivation already computed for this item.
+
+    Returns:
+        One message per divergence; empty when the manifest is current.
+
+    Example:
+        >>> manifest_problems(Item(REPOSITORY_ROOT / "datasets/cad/robotic_joint_001"))
+        []
+    """
+    fresh = _item_manifest(item, _derive(item) if derived is None else derived)
+    committed = json.loads(item.path("dataset-item.json").read_bytes())
+    return same_content(_without_derived_hashes(committed), _without_derived_hashes(fresh), "dataset-item.json")
+
+
+def cited_source_problems(item: Item) -> List[str]:
+    """Every file an annotation cites by hash must still have that hash.
+
+    A citation is read only if it resolves to a regular file inside the
+    repository: annotations are untrusted input, and an absolute or ../ ref
+    would otherwise have the checker read any file on the host.
+
+    Args:
+        item: The dataset item.
+
+    Returns:
+        One message per cited file that is outside the repository, missing,
+        not a regular file, or changed.
+
+    Example:
+        >>> cited_source_problems(Item(REPOSITORY_ROOT / "datasets/cad/robotic_joint_001"))
+        []
+    """
+    problems = []
+
+    def walk(node: Any) -> None:
+        if isinstance(node, dict):
+            origin = node.get("source") if {"value", "status", "source"} <= node.keys() else None
+            if isinstance(origin, dict) and "sha256" in origin:
+                ref = origin["ref"]
+                path = (REPOSITORY_ROOT / ref).resolve()
+                if not path.is_relative_to(REPOSITORY_ROOT):
+                    problems.append(f"cited source {ref} lies outside the repository; it is not read")
+                elif not path.exists():
+                    problems.append(f"cited source {ref} does not exist")
+                else:
+                    try:
+                        regular_file(path)
+                    except UnsupportedFormat as exc:
+                        problems.append(f"cited source {ref}: {exc}")
+                    else:
+                        if _sha256(path.read_bytes()) != origin["sha256"]:
+                            problems.append(f"cited source {ref} has changed since it was cited")
+            for value in node.values():
+                walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value)
+
+    walk(json.loads(item.path(ANNOTATIONS).read_bytes()))
+    return sorted(set(problems))
+
+
 def check(directory: Path) -> List[str]:
     """All integrity and reproducibility problems of an item.
 
@@ -420,7 +670,9 @@ def check(directory: Path) -> List[str]:
         []
     """
     item = Item(directory)
-    return integrity(item) + reproducibility(item)
+    derived = _derive(item)
+    return (integrity(item) + cited_source_problems(item) + reproducibility(item, derived)
+            + manifest_problems(item, derived))
 
 
 # --- physical sanity -----------------------------------------------------------
@@ -605,35 +857,51 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
             validate_schema(json.loads(item.path(relative).read_bytes()), schema)
         except (OSError, ValueError) as exc:
             v0_problems.append(f"{relative}: {exc}")
-    v0_problems += integrity(item)
+    v0_problems += integrity(item) + cited_source_problems(item)
     v0 = [result("v0.dataset-schemas-and-hashes", GateLevel.V0, Domain.DATA_MANAGEMENT, Layer.DESIGN, v0_problems,
                  inputs, "DATASET_SCHEMAS_VALID", "DATASET_SCHEMA_OR_HASH_INVALID",
                  "every dataset document conforms to its schema and every recorded hash matches")]
 
     # V1: the CAD re-extracts, and the physics it yields is physically possible.
+    failure: Optional[Tuple[Any, Any, str, str]] = None
     try:
         fresh = _derive(item)
         model = json.loads(fresh[MODEL])
         extraction = json.loads(fresh[EXTRACTION])
         v1_problems = _sanity_problems(model)
-        v1_blocked: Optional[str] = None
+    except ExtractionError as exc:
+        fresh, model, extraction, v1_problems = {}, {}, {}, []
+        failure = {
+            "rejected": (ExecutionStatus.COMPLETED, Verdict.FAIL, "CAD_REJECTED", "the CAD was read and refused on its content"),
+            "crashed": (ExecutionStatus.CRASHED, Verdict.INCONCLUSIVE, "CAD_EXTRACTION_CRASHED", "the CAD parser died or produced no result"),
+            "timed_out": (ExecutionStatus.TIMED_OUT, Verdict.INCONCLUSIVE, "CAD_EXTRACTION_TIMED_OUT", "the CAD parser exceeded its time limit"),
+            "unavailable": (ExecutionStatus.UNAVAILABLE, Verdict.BLOCKED, "CAD_KERNEL_UNAVAILABLE", "the CAD kernel is not installed here"),
+        }[exc.kind]
+        v1_blocked: Optional[str] = str(exc)
     except (OSError, ValueError) as exc:
-        fresh, model, extraction, v1_problems, v1_blocked = {}, {}, {}, [], str(exc)
-    if v1_blocked is None:
+        # A schema-invalid input or an inconsistent annotation: the item is wrong.
+        fresh, model, extraction, v1_problems = {}, {}, {}, []
+        failure = (ExecutionStatus.COMPLETED, Verdict.FAIL, "DATASET_INPUT_INVALID", "the item's inputs cannot be built into a model")
+        v1_blocked = str(exc)
+    else:
+        v1_blocked = None
+    if failure is None:
         v1 = [result("v1.cad-extraction-and-physical-sanity", GateLevel.V1, Domain.PHYSICAL_DESIGN, Layer.MODEL,
                      v1_problems, [cad_rel, ANNOTATIONS], "PHYSICAL_SANITY_PASSED", "PHYSICAL_SANITY_FAILED",
                      "the CAD re-extracts and every mass, inertia, axis and limit is physically possible")]
     else:
+        status, verdict, reason, summary = failure
+        refs, extra = generated("v1.cad-extraction-and-physical-sanity", {"failure": v1_blocked})
         v1 = [CheckResult(check_id="v1.cad-extraction-and-physical-sanity", gate=GateLevel.V1,
                           domain=Domain.PHYSICAL_DESIGN, layer=Layer.MODEL,
-                          execution_status=ExecutionStatus.UNAVAILABLE, verdict=Verdict.BLOCKED,
-                          reason_code="CAD_EXTRACTION_UNAVAILABLE", summary="the CAD could not be extracted here",
-                          findings=[v1_blocked], evidence=evidence(cad_rel))]
+                          execution_status=status, verdict=verdict, reason_code=reason, summary=summary,
+                          findings=[v1_blocked or summary], evidence=[*evidence(cad_rel), *refs],
+                          generated_evidence=extra)]
 
     # V2: the committed derivation reproduces from the CAD and every cross-reference resolves.
     if fresh:
         requirements = json.loads(item.path(REQUIREMENTS).read_bytes())
-        v2_problems = reproducibility(item, fresh) + _invariant_problems(
+        v2_problems = reproducibility(item, fresh) + manifest_problems(item, fresh) + _invariant_problems(
             item, model, extraction, requirements, fresh[item.mjcf].decode("utf-8"))
         v2 = [result("v2.cad-model-invariants", GateLevel.V2, Domain.PHYSICAL_DESIGN, Layer.VALIDATION, v2_problems,
                      [cad_rel, ANNOTATIONS, REQUIREMENTS, EXTRACTION, MODEL, item.mjcf],
@@ -642,8 +910,8 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
     else:
         v2 = [CheckResult(check_id="v2.cad-model-invariants", gate=GateLevel.V2, domain=Domain.PHYSICAL_DESIGN,
                           layer=Layer.VALIDATION, execution_status=ExecutionStatus.UNAVAILABLE,
-                          verdict=Verdict.BLOCKED, reason_code="CAD_EXTRACTION_UNAVAILABLE",
-                          summary="invariants need a fresh extraction, which was unavailable",
+                          verdict=Verdict.BLOCKED, reason_code="CAD_EXTRACTION_NOT_AVAILABLE",
+                          summary="invariants need a fresh extraction, which V1 could not produce",
                           findings=[v1_blocked or "extraction unavailable"], evidence=evidence(cad_rel))]
 
     # V3/V4: the existing case engine, then BLOCKED checks for what rests on an UNKNOWN.
@@ -700,9 +968,22 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
     ))
     gate_results = [GateResult.from_checks(level, gates[level]) for level in GateLevel]
     tools: Dict[str, Dict[str, Any]] = {
-        "ecad-validator": {"tool_id": "ecad-validator", "name": "eCAD dataset validator", "version": MODEL_VERSION,
-                           "invocation": ["python3", "tools/ecad_model/cli.py", "validate"], "settings": {}},
+        "ecad-validator": {
+            "tool_id": "ecad-validator", "name": "eCAD dataset validator", "version": MODEL_VERSION,
+            "invocation": ["python3", "tools/cad_dataset.py", "validate", item.repo_relative(item.root),
+                           "--output", "<output directory>"],
+            # The output path is host-specific; recording it would break portability.
+            "settings": {"redacted_arguments": ["--output"]},
+        },
     }
+    if extraction:
+        tools["opencascade"] = {
+            "tool_id": "opencascade", "name": "OpenCASCADE via cadquery-ocp",
+            "version": extraction["importer"]["kernel_version"],
+            "invocation": ["python3", "-m", "ecad_model.importers.step_ocp", item.item_relative(item.cad)],
+            "settings": {"document_length_unit": "mm", "timeout_seconds": 120,
+                         "address_space_limit_bytes": 2 * 1024 * 1024 * 1024, "isolation": "run_process workspace copy"},
+        }
     for gate in gate_results:
         for check_result in gate.checks:
             if check_result.tool_id != "ecad-validator" and check_result.tool_version:
@@ -748,14 +1029,27 @@ def _check_references(receipt: Dict[str, Any], requirements: Dict[str, Any]) -> 
 
 def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
                requirements: Dict[str, Any]) -> None:
-    """Write receipt, content-addressed evidence, requirement trace and report."""
+    """Write the receipt, content-addressed evidence and its index, the trace and the report.
+
+    The receipt and evidence index are contract documents, so they follow the
+    contract's serialisation rule exactly: canonical JSON (sorted keys,
+    compact separators) plus one final LF, hashed as stored.
+    """
+    from ecad_validation.contract import validate_document
+    from ecad_validation.hashing import canonical_json_bytes
+
+    def canonical(value: Any) -> bytes:
+        return canonical_json_bytes(value) + b"\n"
+
     evidence_dir = output / "evidence" / "sha256"
     evidence_dir.mkdir(parents=True, exist_ok=True)
     index = []
-    for gate in product.gates:
-        for check_result in gate.checks:
+    for gate_index, gate in enumerate(product.gates):
+        for check_index, check_result in enumerate(gate.checks):
+            receipt_check = receipt["gates"][gate_index]["checks"][check_index]
             for position, reference in enumerate(check_result.evidence):
                 data = check_result.generated_evidence.get(reference.path)
+                generated = data is not None
                 if data is None:
                     data = item.path(reference.path).read_bytes()
                 if _sha256(data) != reference.sha256:
@@ -763,12 +1057,35 @@ def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
                 target = evidence_dir / reference.sha256
                 if not target.exists():
                     target.write_bytes(data)
+                stored = target.relative_to(output).as_posix()
+                receipt_check["evidence"][position]["path"] = stored
+                provenance = (
+                    {"source_type": "generated", "generator_tool_id": check_result.tool_id,
+                     "recorded_at": product.completed_at}
+                    if generated else
+                    {"source_type": "repository", "source_path": f"{item.repo_relative(item.root)}/{reference.path}",
+                     "source_commit": product.source_commit, "recorded_at": product.completed_at}
+                )
                 index.append({
-                    "check_id": check_result.check_id, "position": position, "source_path": reference.path,
-                    "stored": target.relative_to(output).as_posix(), "sha256": reference.sha256,
+                    "evidence_id": receipt_check["evidence"][position]["evidence_id"],
+                    "path": stored, "sha256": reference.sha256, "media_type": reference.media_type,
+                    "size_bytes": reference.size_bytes, "check_id": check_result.check_id,
+                    "requirement_ids": check_result.requirement_ids, "producer_tool_id": check_result.tool_id,
+                    "captured_at": product.completed_at, "provenance": provenance,
                 })
-    (output / "receipt.json").write_bytes(_json_bytes(receipt))
-    (output / "evidence-index.json").write_bytes(_json_bytes({"evidence": index}))
+    validate_document(REPOSITORY_ROOT, "validation-receipt.schema.json", receipt)
+    receipt_bytes = canonical(receipt)
+    (output / "receipt.json").write_bytes(receipt_bytes)
+    evidence_index = {
+        "$schema": "https://embeddedos.org/schemas/hardware-validation/v1/evidence-index.schema.json",
+        "contract_version": receipt["contract_version"],
+        "product_id": receipt["product"]["id"],
+        "receipt_sha256": _sha256(receipt_bytes),
+        "generated_at": product.completed_at,
+        "evidence": index,
+    }
+    validate_document(REPOSITORY_ROOT, "evidence-index.schema.json", evidence_index)
+    (output / "evidence-index.json").write_bytes(canonical(evidence_index))
     trace = _requirement_trace(receipt, requirements, json.loads(item.path(MODEL).read_bytes()))
     (output / "trace.json").write_bytes(_json_bytes(trace))
     (output / "report.md").write_text(_report(receipt, trace), encoding="utf-8")
@@ -778,15 +1095,18 @@ def _requirement_trace(receipt: Dict[str, Any], requirements: Dict[str, Any],
                       model: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Requirement -> check -> measurement -> verdict -> CAD components, for every requirement."""
     checks = {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]}
-    moving = []
+    moving: List[str] = []
+    fixed: List[str] = []
     joint = model["joints"][0] if model["joints"] else None
     if joint:
         roots = rigid_groups(model)
-        moving = sorted(
-            f"{c['component_id']} ({c['cad_ref']['occurrence']})"
-            for c in model["components"]
-            if c["cad_ref"] is not None and roots[c["component_id"]] == roots[joint["child"]]
-        )
+        for c in model["components"]:
+            if c["cad_ref"] is None:
+                continue
+            label = f"{c['component_id']} ({c['cad_ref']['occurrence']})"
+            (moving if roots[c["component_id"]] == roots[joint["child"]] else fixed).append(label)
+        moving.sort()
+        fixed.sort()
     rows = []
     for gate, entries, key in (("V3", requirements["reference_values"], "reference_id"),
                                ("V4", requirements["requirements"], "requirement_id")):
@@ -804,7 +1124,12 @@ def _requirement_trace(receipt: Dict[str, Any], requirements: Dict[str, Any],
                 "reason_code": (check_result or {}).get("reason_code"),
                 "check_id": (check_result or {}).get("check_id"),
                 "findings": (check_result or {}).get("findings", []),
-                "cad_components": moving,
+                "kind": "reference" if gate == "V3" else (
+                    "illustrative requirement" if entry.get("illustrative") else "requirement"),
+                "source": entry["source"],
+                # Clearance is measured between the two sides; everything else
+                # depends only on the parts that move.
+                "cad_components": sorted(moving + fixed) if metric.startswith("rom_") else moving,
             })
     return rows
 
@@ -823,12 +1148,16 @@ def _report(receipt: Dict[str, Any], trace: List[Dict[str, Any]]) -> str:
     for gate in receipt["gates"]:
         summary = ", ".join(f"{c['check_id']}={c['verdict']}" for c in gate["checks"])
         lines.append(f"| {gate['gate']} | {gate['verdict']} | {summary} |")
-    lines += ["", "## Requirements", "", "| Requirement | Metric | Measured | Verdict | Why |", "|---|---|---|---|---|"]
+    lines += ["", "## Requirements", "",
+              "| Requirement | Kind | Metric | Measured | Verdict | Why |", "|---|---|---|---|---|---|"]
     for row in trace:
         measured = "—" if row["measured"] is None else f"{row['measured']:.6g} {row['unit']}"
         why = "; ".join(row["findings"]) or row["reason_code"] or ""
-        lines.append(f"| {row['requirement_id']} | `{row['metric']}` | {measured} | {row['verdict']} | {why} |")
-    lines += ["", "Every row traces to the CAD occurrences it depends on in `trace.json`."]
+        lines.append(f"| {row['requirement_id']} | {row['kind']} | `{row['metric']}` | {measured} | "
+                     f"{row['verdict']} | {why} |")
+    lines += ["", "An illustrative requirement is an example limit chosen to exercise the pipeline, "
+              "not a customer, safety or certification requirement.",
+              "Every row traces to the CAD occurrences it depends on in `trace.json`."]
     return "\n".join(lines) + "\n"
 
 

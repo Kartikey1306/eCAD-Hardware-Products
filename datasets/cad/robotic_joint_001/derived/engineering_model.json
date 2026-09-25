@@ -75,12 +75,12 @@
       "kind": "structure",
       "material": {
         "density": {
-          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses",
           "source": {
-            "kind": "handbook",
-            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3"
+            "kind": "estimation",
+            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3, from general engineering knowledge"
           },
-          "status": "SPECIFIED",
+          "status": "ESTIMATED",
           "unit": "kg/m^3",
           "value": 2700.0
         },
@@ -273,12 +273,12 @@
       "kind": "structure",
       "material": {
         "density": {
-          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses",
           "source": {
-            "kind": "handbook",
-            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3"
+            "kind": "estimation",
+            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3, from general engineering knowledge"
           },
-          "status": "SPECIFIED",
+          "status": "ESTIMATED",
           "unit": "kg/m^3",
           "value": 2700.0
         },
@@ -471,12 +471,12 @@
       "kind": "payload",
       "material": {
         "density": {
-          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses",
           "source": {
-            "kind": "handbook",
-            "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3"
+            "kind": "estimation",
+            "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3, from general engineering knowledge"
           },
-          "status": "SPECIFIED",
+          "status": "ESTIMATED",
           "unit": "kg/m^3",
           "value": 7850.0
         },
@@ -669,12 +669,12 @@
       "kind": "structure",
       "material": {
         "density": {
-          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses",
           "source": {
-            "kind": "handbook",
-            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3"
+            "kind": "estimation",
+            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3, from general engineering knowledge"
           },
-          "status": "SPECIFIED",
+          "status": "ESTIMATED",
           "unit": "kg/m^3",
           "value": 2700.0
         },
@@ -867,12 +867,12 @@
       "kind": "shaft",
       "material": {
         "density": {
-          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses",
           "source": {
-            "kind": "handbook",
-            "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3"
+            "kind": "estimation",
+            "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3, from general engineering knowledge"
           },
-          "status": "SPECIFIED",
+          "status": "ESTIMATED",
           "unit": "kg/m^3",
           "value": 7850.0
         },
@@ -1146,9 +1146,10 @@
     {
       "axis": {
         "derived_from": [
-          "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+          "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1",
+          "annotations:datasets/cad/robotic_joint_001/design/annotations.json#joints/j1/axis_sense"
         ],
-        "note": "common axis of the cylindrical faces of 'shaft'; rotation is right-handed about it",
+        "note": "line from the cylindrical faces of 'shaft', direction from the annotated axis_sense; a positive angle is right-handed about it",
         "source": {
           "kind": "cad",
           "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
@@ -1267,7 +1268,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
-        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+        "sha256": "415e314b6a7345169c5524a353f30ac8da47deb5b88fb53097583b6aea6608fa"
       },
       "to": "base_plate"
     },
@@ -1277,7 +1278,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
-        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+        "sha256": "415e314b6a7345169c5524a353f30ac8da47deb5b88fb53097583b6aea6608fa"
       },
       "to": "link"
     },
@@ -1287,7 +1288,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
-        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+        "sha256": "415e314b6a7345169c5524a353f30ac8da47deb5b88fb53097583b6aea6608fa"
       },
       "to": "link"
     },
@@ -1297,7 +1298,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
-        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+        "sha256": "415e314b6a7345169c5524a353f30ac8da47deb5b88fb53097583b6aea6608fa"
       },
       "to": "pillar"
     },
@@ -1307,7 +1308,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
-        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+        "sha256": "415e314b6a7345169c5524a353f30ac8da47deb5b88fb53097583b6aea6608fa"
       },
       "to": "drive"
     },
@@ -1317,7 +1318,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
-        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+        "sha256": "415e314b6a7345169c5524a353f30ac8da47deb5b88fb53097583b6aea6608fa"
       },
       "to": "actuator"
     },
@@ -1327,7 +1328,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
-        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+        "sha256": "415e314b6a7345169c5524a353f30ac8da47deb5b88fb53097583b6aea6608fa"
       },
       "to": "link"
     }
