@@ -31,7 +31,15 @@ Matrix = Sequence[Sequence[float]]
 
 
 class ModelIncomplete(ValueError):
-    """The engineering model lacks a value the mechanical model needs."""
+    """The engineering model cannot be represented as a mechanical model."""
+
+
+class MissingInput(ModelIncomplete):
+    """A value the mechanical model needs is UNKNOWN.
+
+    That is a missing input, not a defect in the design: validation reports
+    it BLOCKED with MISSING_REQUIRED_INPUT, never FAIL.
+    """
 
 
 def _num(value: float) -> str:
@@ -76,7 +84,7 @@ def rotation_to_quaternion(r: Matrix) -> List[float]:
 
 def _known(item: Dict[str, Any], label: str) -> Any:
     if item["status"] == Status.UNKNOWN.value:
-        raise ModelIncomplete(f"{label} is UNKNOWN: {item.get('note', 'no value recorded')}")
+        raise MissingInput(f"{label} is UNKNOWN: {item.get('note', 'no value recorded')}")
     return item["value"]
 
 

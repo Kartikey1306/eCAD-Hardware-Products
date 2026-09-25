@@ -31,6 +31,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
 import subprocess
 from datetime import datetime, timezone
@@ -40,7 +41,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 from . import MODEL_VERSION
 from .builder import build_engineering_model, index_unknowns, resolve
 from .importers import ExtractionError, UnsupportedFormat, importer_for, regular_file
-from .mjcf import build_mjcf, rigid_groups
+from .mjcf import MissingInput, build_mjcf, rigid_groups
 from .requirements import CONTRACT_DOMAIN, compile_cases
 from .schemas import REPOSITORY_ROOT, validate as validate_schema
 
@@ -95,6 +96,22 @@ class Item:
     def path(self, relative: str) -> Path:
         return self.root / relative
 
+    def read(self, relative: str) -> bytes:
+        """The bytes of one of the item's files, if it is a regular file.
+
+        Every read of an item's content goes through here. The item is
+        untrusted input: a FIFO would block the read forever, a symlink could
+        point outside the item, and an oversized file would be read whole
+        before any other guard ran.
+
+        Raises:
+            UnsupportedFormat: Not a regular file, or too large.
+            OSError: The file does not exist.
+        """
+        path = self.path(relative)
+        regular_file(path)
+        return path.read_bytes()
+
     def repo_relative(self, path: Path) -> str:
         return path.resolve().relative_to(REPOSITORY_ROOT).as_posix()
 
@@ -144,7 +161,7 @@ def _sha256(data: bytes) -> str:
 
 
 def _artifact(item: Item, relative: str, data: Optional[bytes] = None) -> Dict[str, Any]:
-    payload = item.path(relative).read_bytes() if data is None else data
+    payload = item.read(relative) if data is None else data
     media = "application/json" if relative.endswith(".json") else (
         "application/xml" if relative.endswith(".xml") else (
             "application/step" if relative.endswith(".step") else "text/x-python"
@@ -155,9 +172,9 @@ def _artifact(item: Item, relative: str, data: Optional[bytes] = None) -> Dict[s
 
 def _derive(item: Item) -> Dict[str, bytes]:
     """Every derived file of an item, computed from its CAD and inputs alone."""
-    annotations_bytes = item.path(ANNOTATIONS).read_bytes()
+    annotations_bytes = item.read(ANNOTATIONS)
     annotations = json.loads(annotations_bytes)
-    requirements = json.loads(item.path(REQUIREMENTS).read_bytes())
+    requirements = json.loads(item.read(REQUIREMENTS))
     validate_schema(annotations, "engineering-model/v1/design-annotations")
     validate_schema(requirements, "engineering-model/v1/engineering-requirements")
 
@@ -215,10 +232,9 @@ def _domain_status(model: Dict[str, Any]) -> List[Dict[str, str]]:
 def _provenance(item: Item) -> Dict[str, Any]:
     """The sample's hand-authored provenance. Its absence stops the build: a
     licence the builder filled in would be a licence nobody checked."""
-    path = item.path(PROVENANCE)
-    if not path.is_file():
+    if not os.path.lexists(item.path(PROVENANCE)):
         raise ValueError(f"{item.item_id}: {PROVENANCE} is missing; licence and origin are never assumed")
-    document = json.loads(path.read_bytes())
+    document = json.loads(item.read(PROVENANCE))
     validate_schema(document, "cad-dataset/v1/source-provenance")
     return document
 
@@ -516,7 +532,7 @@ def integrity(item: Item) -> List[str]:
         >>> integrity(Item(REPOSITORY_ROOT / "datasets/cad/robotic_joint_001"))
         []
     """
-    manifest = json.loads(item.path("dataset-item.json").read_bytes())
+    manifest = json.loads(item.read("dataset-item.json"))
     inputs = manifest["inputs"]
     recorded = [manifest["source"]["cad"], inputs["provenance"], inputs["annotations"], inputs["requirements"],
                 *inputs["simulation"]]
@@ -566,7 +582,7 @@ def reproducibility(item: Item, derived: Optional[Dict[str, bytes]] = None) -> L
         if not path.is_file():
             problems.append(f"{relative}: derived file is not committed")
             continue
-        committed = path.read_bytes()
+        committed = item.read(relative)
         if relative.endswith(".json"):
             problems += same_content(json.loads(committed), json.loads(data), relative)
         else:
@@ -603,7 +619,7 @@ def manifest_problems(item: Item, derived: Optional[Dict[str, bytes]] = None) ->
         []
     """
     fresh = _item_manifest(item, _derive(item) if derived is None else derived)
-    committed = json.loads(item.path("dataset-item.json").read_bytes())
+    committed = json.loads(item.read("dataset-item.json"))
     return same_content(_without_derived_hashes(committed), _without_derived_hashes(fresh), "dataset-item.json")
 
 
@@ -651,7 +667,7 @@ def cited_source_problems(item: Item) -> List[str]:
             for value in node:
                 walk(value)
 
-    walk(json.loads(item.path(ANNOTATIONS).read_bytes()))
+    walk(json.loads(item.read(ANNOTATIONS)))
     return sorted(set(problems))
 
 
@@ -670,6 +686,11 @@ def check(directory: Path) -> List[str]:
         []
     """
     item = Item(directory)
+    # Before anything is read or parsed: a symlink could redirect a read past
+    # the hashes, and an item git cannot enumerate is refused before the
+    # native STEP parser is run on it.
+    _refuse_symlinks(item)
+    item.files()
     derived = _derive(item)
     return (integrity(item) + cited_source_problems(item) + reproducibility(item, derived)
             + manifest_problems(item, derived))
@@ -815,9 +836,8 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
     def evidence(*relatives: str) -> List[EvidenceReference]:
         refs = []
         for relative in relatives:
-            path = item.path(relative)
-            if path.is_file():
-                data = path.read_bytes()
+            if item.path(relative).is_file():
+                data = item.read(relative)
                 refs.append(EvidenceReference(path=relative, sha256=_sha256(data),
                                               media_type=_artifact(item, relative)["media_type"],
                                               size_bytes=len(data)))
@@ -854,7 +874,7 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
         (MODEL, "engineering-model/v1/engineering-model"),
     ):
         try:
-            validate_schema(json.loads(item.path(relative).read_bytes()), schema)
+            validate_schema(json.loads(item.read(relative)), schema)
         except (OSError, ValueError) as exc:
             v0_problems.append(f"{relative}: {exc}")
     v0_problems += integrity(item) + cited_source_problems(item)
@@ -878,6 +898,12 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
             "unavailable": (ExecutionStatus.UNAVAILABLE, Verdict.BLOCKED, "CAD_KERNEL_UNAVAILABLE", "the CAD kernel is not installed here"),
         }[exc.kind]
         v1_blocked: Optional[str] = str(exc)
+    except MissingInput as exc:
+        # A value nobody has recorded is a missing input, not a design defect.
+        fresh, model, extraction, v1_problems = {}, {}, {}, []
+        failure = (ExecutionStatus.SKIPPED, Verdict.BLOCKED, "MISSING_REQUIRED_INPUT",
+                   "a value the mechanical model needs is UNKNOWN")
+        v1_blocked = str(exc)
     except (OSError, ValueError) as exc:
         # A schema-invalid input or an inconsistent annotation: the item is wrong.
         fresh, model, extraction, v1_problems = {}, {}, {}, []
@@ -900,7 +926,7 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
 
     # V2: the committed derivation reproduces from the CAD and every cross-reference resolves.
     if fresh:
-        requirements = json.loads(item.path(REQUIREMENTS).read_bytes())
+        requirements = json.loads(item.read(REQUIREMENTS))
         v2_problems = reproducibility(item, fresh) + manifest_problems(item, fresh) + _invariant_problems(
             item, model, extraction, requirements, fresh[item.mjcf].decode("utf-8"))
         v2 = [result("v2.cad-model-invariants", GateLevel.V2, Domain.PHYSICAL_DESIGN, Layer.VALIDATION, v2_problems,
@@ -911,15 +937,16 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
         v2 = [CheckResult(check_id="v2.cad-model-invariants", gate=GateLevel.V2, domain=Domain.PHYSICAL_DESIGN,
                           layer=Layer.VALIDATION, execution_status=ExecutionStatus.UNAVAILABLE,
                           verdict=Verdict.BLOCKED, reason_code="CAD_EXTRACTION_NOT_AVAILABLE",
-                          summary="invariants need a fresh extraction, which V1 could not produce",
+                          summary="invariants need a fresh derivation from the CAD, which V1 could not produce",
                           findings=[v1_blocked or "extraction unavailable"], evidence=evidence(cad_rel))]
 
     # V3/V4: the existing case engine, then BLOCKED checks for what rests on an UNKNOWN.
-    requirements = json.loads(item.path(REQUIREMENTS).read_bytes())
-    committed_model = json.loads(item.path(MODEL).read_bytes())
+    requirements = json.loads(item.read(REQUIREMENTS))
+    committed_model = json.loads(item.read(MODEL))
     _golden, _corners, blocked = compile_cases(committed_model, requirements, item.mjcf)
     engineering_ids = {entry["reference_id"] for entry in requirements["reference_values"]} | {
         entry["requirement_id"] for entry in requirements["requirements"]}
+    illustrative_ids = {entry["requirement_id"] for entry in requirements["requirements"] if entry["illustrative"]}
     gates: Dict[Any, List[Any]] = {GateLevel.V0: v0, GateLevel.V1: v1, GateLevel.V2: v2}
     for level, directory_name in ((GateLevel.V3, "golden"), (GateLevel.V4, "corners")):
         checks = execute_cases(item.root, level, directory_name)
@@ -927,6 +954,15 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
             case_id = check_result.check_id.split(".", 1)[1]
             if case_id in engineering_ids:
                 check_result.requirement_ids = [*check_result.requirement_ids, case_id]
+            if case_id in illustrative_ids and check_result.verdict is Verdict.PASS:
+                # Meeting a limit invented to exercise the pipeline qualifies
+                # nothing. The contract's WARNING is advisory and cannot satisfy
+                # a required check, so such a sample is never eligible for ebuild.
+                check_result.verdict = Verdict.WARNING
+                check_result.reason_code = "WITHIN_ILLUSTRATIVE_LIMIT"
+                check_result.summary = "within an illustrative limit, which is not a qualification"
+                check_result.findings = [*check_result.findings,
+                                         f"{case_id} is illustrative: not a customer, safety or certification requirement"]
         for entry in blocked:
             if entry["gate"] != level.value:
                 continue
@@ -1051,7 +1087,7 @@ def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
                 data = check_result.generated_evidence.get(reference.path)
                 generated = data is not None
                 if data is None:
-                    data = item.path(reference.path).read_bytes()
+                    data = item.read(reference.path)
                 if _sha256(data) != reference.sha256:
                     raise ValueError(f"evidence changed during validation: {reference.path}")
                 target = evidence_dir / reference.sha256
@@ -1086,7 +1122,7 @@ def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
     }
     validate_document(REPOSITORY_ROOT, "evidence-index.schema.json", evidence_index)
     (output / "evidence-index.json").write_bytes(canonical(evidence_index))
-    trace = _requirement_trace(receipt, requirements, json.loads(item.path(MODEL).read_bytes()))
+    trace = _requirement_trace(receipt, requirements, json.loads(item.read(MODEL)))
     (output / "trace.json").write_bytes(_json_bytes(trace))
     (output / "report.md").write_text(_report(receipt, trace), encoding="utf-8")
 
@@ -1156,7 +1192,8 @@ def _report(receipt: Dict[str, Any], trace: List[Dict[str, Any]]) -> str:
         lines.append(f"| {row['requirement_id']} | {row['kind']} | `{row['metric']}` | {measured} | "
                      f"{row['verdict']} | {why} |")
     lines += ["", "An illustrative requirement is an example limit chosen to exercise the pipeline, "
-              "not a customer, safety or certification requirement.",
+              "not a customer, safety or certification requirement. Meeting one is reported WARNING "
+              "(WITHIN_ILLUSTRATIVE_LIMIT), never PASS.",
               "Every row traces to the CAD occurrences it depends on in `trace.json`."]
     return "\n".join(lines) + "\n"
 

@@ -67,6 +67,14 @@
     {
       "if": {"properties": {"origin": {"properties": {"kind": {"const": "third_party"}}}}},
       "then": {"properties": {"license": {"required": ["license_text_sha256"]}}}
+    },
+    {
+      "description": "An unverified licence permits nothing: redistribution and training use are never assumed.",
+      "if": {"properties": {"license": {"properties": {"license_verified": {"const": false}}}}},
+      "then": {"properties": {"license": {"properties": {
+        "redistribution_permitted": {"const": false},
+        "training_use_permitted": {"const": false}
+      }}}}
     }
   ],
   "definitions": {

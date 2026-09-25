@@ -103,6 +103,11 @@ jobs:
             tools/requirements-cad.txt
             tools/constraints-cad.txt
 
+      - name: Install system libraries
+        # OpenCASCADE's wheel links libGL.so.1, which a bare Debian image lacks
+        # (measured on python:3.12-slim). Installed rather than assumed present.
+        run: sudo apt-get update && sudo apt-get install -y libgl1
+
       - name: Install the CAD kernel and simulator
         run: |
           python -m pip install --upgrade pip

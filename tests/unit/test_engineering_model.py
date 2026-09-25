@@ -129,6 +129,21 @@ class TestQuantity(unittest.TestCase):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 quantity(bad, "1", Status.SPECIFIED, ANNOTATION)
 
+    def test_an_unverified_licence_permits_neither_redistribution_nor_training(self):
+        """Spec: if licence status is unclear, license_verified = false and
+        redistribution is not assumed."""
+        from ecad_model.schemas import validate
+
+        provenance = json.loads((REPO_ROOT / "datasets/cad/robotic_joint_001/source/provenance.json").read_text())
+        validate(provenance, "cad-dataset/v1/source-provenance")
+        provenance["license"]["license_verified"] = False
+        for field in ("redistribution_permitted", "training_use_permitted"):
+            with self.subTest(field):
+                with self.assertRaisesRegex(ValueError, field):
+                    validate(provenance, "cad-dataset/v1/source-provenance")
+                provenance["license"][field] = False
+        validate(provenance, "cad-dataset/v1/source-provenance")
+
     def test_schema_enforces_the_same_rules(self):
         """A hand-written document cannot bypass the constructor's rules."""
         base = {"value": 1.0, "unit": "kg", "status": "SPECIFIED", "source": ANNOTATION}

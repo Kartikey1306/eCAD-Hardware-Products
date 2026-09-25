@@ -63,6 +63,7 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertIn("-r tools/requirements-cad.txt", job)
         # Every transitive CAD dependency is pinned (SECURITY-STANDARDS.md).
         self.assertIn("-c tools/constraints-cad.txt", job)
+        self.assertIn("apt-get install -y libgl1", job)  # the CAD kernel links libGL
         self.assertIn("run: python run_all_tests.py --tb=short", job)  # the whole suite, not a subset
         self.assertIn("python tools/cad_dataset.py check datasets/cad/robotic_joint_001", job)
         self.assertNotIn("continue-on-error", job)

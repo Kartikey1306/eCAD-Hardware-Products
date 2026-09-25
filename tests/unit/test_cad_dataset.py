@@ -280,20 +280,33 @@ class TestEndToEnd(unittest.TestCase):
         build(target)
         return target
 
-    def test_committed_item_passes_every_measurable_check(self):
+    def test_committed_item_meets_every_measurable_check(self):
         from ecad_validation.contract import validate_document
 
         checks = self.run_item(ITEM)
         receipt = checks.pop("_receipt")
         validate_document(REPO_ROOT, "validation-receipt.schema.json", receipt)
         requirements = json.loads((ITEM / "requirements" / "requirements.json").read_text())
-        measurable = [f"v3.{r['reference_id']}" for r in requirements["reference_values"]] + [
-            f"v4.{r['requirement_id']}" for r in requirements["requirements"] if "value" in r["limit"]]
+        references = [f"v3.{r['reference_id']}" for r in requirements["reference_values"]]
+        limited = {f"v4.{r['requirement_id']}": r["illustrative"]
+                   for r in requirements["requirements"] if "value" in r["limit"]}
+        measurable = [*references, *limited]
         self.assertGreaterEqual(len(measurable), 14)
         for check_id in ("v0.dataset-schemas-and-hashes", "v0.dataset-input-immutability",
-                         "v1.cad-extraction-and-physical-sanity", "v2.cad-model-invariants", *measurable):
+                         "v1.cad-extraction-and-physical-sanity", "v2.cad-model-invariants", *references):
             with self.subTest(check_id):
                 self.assertEqual(checks[check_id]["verdict"], "PASS", checks[check_id]["findings"])
+        for check_id, illustrative in limited.items():
+            with self.subTest(check_id):
+                # Every limit met; one that is illustrative is advisory, not a pass.
+                expected = ("WARNING", "WITHIN_ILLUSTRATIVE_LIMIT") if illustrative else ("PASS", "CORNER_LIMITS_PASSED")
+                self.assertEqual((checks[check_id]["verdict"], checks[check_id]["reason_code"]), expected,
+                                 checks[check_id]["findings"])
+        for check_id in measurable:
+            with self.subTest(binding=check_id):
+                # The receipt binds each executed check to the engineering
+                # requirement it implements, not only to the gate policy.
+                self.assertIn(check_id.split(".", 1)[1], checks[check_id]["requirement_ids"])
 
         tools = {tool["tool_id"]: tool for tool in receipt["tools"]}
         validator = tools["ecad-validator"]["invocation"]
@@ -301,6 +314,23 @@ class TestEndToEnd(unittest.TestCase):
         self.assertTrue((REPO_ROOT / validator[1]).is_file())
         extraction = json.loads((ITEM / "derived" / "cad_extraction.json").read_text())
         self.assertEqual(tools["opencascade"]["version"], extraction["importer"]["kernel_version"])
+
+    def test_only_a_real_requirement_can_pass(self):
+        """An illustrative limit met is WARNING, which blocks ebuild eligibility;
+        the same limit marked as a real requirement is PASS."""
+        def make_real(target):
+            def mutate(requirements):
+                next(r for r in requirements["requirements"] if r["requirement_id"] == "REQ-MECH-001")["illustrative"] = False
+            _edit_json(target / "requirements" / "requirements.json", mutate)
+
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
+            checks = self.run_item(self.copy_and_rebuild(directory, make_real))
+        self.assertEqual(checks["v4.REQ-MECH-001"]["verdict"], "PASS")
+        self.assertEqual((checks["v4.REQ-MECH-002"]["verdict"], checks["v4.REQ-MECH-002"]["reason_code"]),
+                         ("WARNING", "WITHIN_ILLUSTRATIVE_LIMIT"))
+        gates = {g["gate"]: g["verdict"] for g in checks["_receipt"]["gates"]}
+        self.assertEqual(gates["V4"], "BLOCKED")
+        self.assertFalse(checks["_receipt"]["eligible_for_ebuild"])
 
     def test_the_cross_domain_requirement_is_blocked_on_its_unknown(self):
         checks = self.run_item(ITEM)
@@ -545,7 +575,8 @@ class TestHonestOutcomes(unittest.TestCase):
                     {"value": value, "unit": "N*m", "status": "SPECIFIED", "source": {"kind": "datasheet", "ref": "fixture"}})
             return mutate
 
-        for value, expected in ((None, "BLOCKED"), (5.0, "PASS"), (3.0, "FAIL")):
+        # REQ-XD-001 is illustrative, so meeting it is WARNING, never PASS.
+        for value, expected in ((None, "BLOCKED"), (5.0, "WARNING"), (3.0, "FAIL")):
             with self.subTest(torque=value), tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as d:
                 item = _copy_item(d)
                 _edit_json(item / "design" / "annotations.json", with_torque(value))
@@ -662,6 +693,88 @@ class TestUntrustedInput(unittest.TestCase):
         self.assertEqual(caught.exception.kind, "rejected")
         self.assertIn("external document references are not supported", str(caught.exception))
 
+    def test_external_files_the_reader_loads_are_refused_after_transfer(self):
+        """Second layer: a multi-file assembly that evades the pre-parse scan is
+        still refused, because the reader reports the part file it loaded."""
+        from unittest import mock
+
+        from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox
+        from OCP.STEPCAFControl import STEPCAFControl_Writer
+        from OCP.STEPControl import STEPControl_AsIs
+        from OCP.TCollection import TCollection_ExtendedString
+        from OCP.TDataStd import TDataStd_Name
+        from OCP.TDocStd import TDocStd_Document
+        from OCP.TopLoc import TopLoc_Location
+        from OCP.XCAFDoc import XCAFDoc_DocumentTool
+        from OCP.gp import gp_Trsf
+
+        from ecad_model.importers import step_ocp
+
+        document = TDocStd_Document(TCollection_ExtendedString("XmlOcaf"))
+        tool = XCAFDoc_DocumentTool.ShapeTool_s(document.Main())
+        assembly = tool.NewShape()
+        TDataStd_Name.Set_s(assembly, TCollection_ExtendedString("assembly"))
+        part = tool.AddShape(BRepPrimAPI_MakeBox(10, 10, 10).Shape(), False)
+        TDataStd_Name.Set_s(part, TCollection_ExtendedString("cube"))
+        tool.AddComponent(assembly, part, TopLoc_Location(gp_Trsf()))
+        tool.UpdateAssemblies()
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
+            main = Path(directory) / "main.step"
+            writer = STEPCAFControl_Writer()
+            writer.Transfer(document, STEPControl_AsIs, "part_")  # multi-file: one external file per part
+            writer.Write(str(main))
+            self.assertTrue(list(Path(directory).glob("part_*")), "the writer must have produced an external part")
+            self.assertTrue(step_ocp.external_references(main.read_bytes()), "the first layer sees it")
+            with mock.patch.object(step_ocp, "external_references", return_value=[]):
+                with self.assertRaisesRegex(ValueError, "the reader loaded external files"):
+                    step_ocp._extract_in_process(main, "main.step")
+
+    def test_a_fifo_among_the_inputs_is_refused_without_blocking(self):
+        """Path: design/annotations.json is a FIFO -> check opens it -> blocks forever."""
+        import threading
+
+        from ecad_model.dataset import check
+        from ecad_model.importers import UnsupportedFormat
+
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
+            item = _copy_item(directory)
+            fifo = item / "design" / "annotations.json"
+            fifo.unlink()
+            os.mkfifo(fifo)
+
+            def release():
+                # A regression blocks in open(); opening the write end releases
+                # it, so the test fails instead of hanging the suite.
+                try:
+                    os.close(os.open(fifo, os.O_WRONLY | os.O_NONBLOCK))
+                except OSError:
+                    pass
+
+            timer = threading.Timer(10.0, release)
+            timer.daemon = True
+            timer.start()
+            try:
+                with self.assertRaisesRegex(UnsupportedFormat, "not a regular file"):
+                    check(item)
+            finally:
+                timer.cancel()
+
+    def test_check_refuses_a_symlinked_directory_before_reading_through_it(self):
+        """Path: design/ is a symlink -> every annotation read is redirected outside the
+        item, and each file there is still a regular file, so a per-file guard passes."""
+        from ecad_model.dataset import check
+
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
+            item = _copy_item(directory)
+            outside = Path(tempfile.mkdtemp())
+            shutil.move(str(item / "design"), outside / "design")
+            (item / "design").symlink_to(outside / "design", target_is_directory=True)
+            try:
+                with self.assertRaisesRegex(ValueError, "dataset items may not contain symlinks"):
+                    check(item)
+            finally:
+                shutil.rmtree(outside)
+
     def test_build_does_not_write_through_a_symlink(self):
         """Path: a committed item whose derived/ is a symlink -> build writes through it."""
         from ecad_model.dataset import build
@@ -691,6 +804,13 @@ class TestUntrustedInput(unittest.TestCase):
                 item = _copy_item(directory)
                 with self.assertRaisesRegex(ValueError, "git-ignored"):
                     Item(item).files()
+                # check refuses it before the native STEP parser ever runs on it.
+                from unittest import mock
+
+                from ecad_model.dataset import check
+                with mock.patch("ecad_model.dataset.importer_for", side_effect=AssertionError("parsed")):
+                    with self.assertRaisesRegex(ValueError, "git-ignored"):
+                        check(item)
         finally:
             if created and ignored.exists():
                 shutil.rmtree(ignored)
@@ -716,6 +836,26 @@ class TestExtractionFailureVerdicts(unittest.TestCase):
     def setUpClass(cls):
         require("OCP")
         mujoco_on_path()
+
+    def test_a_missing_input_is_blocked_not_a_design_failure(self):
+        """A part whose material density nobody has recorded cannot be simulated:
+        that is BLOCKED with MISSING_REQUIRED_INPUT, not a FAIL of the design."""
+        from ecad_model.dataset import validate
+
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
+            item = _copy_item(directory)
+
+            def forget_density(annotations):
+                annotations["materials"]["steel_1045"]["density"] = {
+                    "value": None, "unit": "kg/m^3", "status": "UNKNOWN",
+                    "source": {"kind": "design_annotation", "ref": "design/annotations.json"},
+                    "note": "not recorded"}
+            _edit_json(item / "design" / "annotations.json", forget_density)
+            with tempfile.TemporaryDirectory() as output:
+                receipt = validate(item, Path(output) / "run")
+            v1 = next(c for g in receipt["gates"] for c in g["checks"] if c["check_id"].startswith("v1."))
+            self.assertEqual((v1["verdict"], v1["reason_code"]), ("BLOCKED", "MISSING_REQUIRED_INPUT"), v1["findings"])
+            self.assertTrue(any("UNKNOWN" in finding for finding in v1["findings"]))
 
     def test_each_failure_kind_has_its_own_verdict(self):
         from unittest import mock
