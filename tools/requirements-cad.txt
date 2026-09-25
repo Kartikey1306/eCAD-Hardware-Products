@@ -4,19 +4,23 @@
 #     python3 -m pip install -r tools/requirements.txt -r tools/requirements-cad.txt
 #
 # Kept out of requirements.txt deliberately: cadquery-ocp needs Python >= 3.11
-# while the main test matrix still runs 3.10, and together these weigh about
-# 170 MB. Without them the dataset tests skip and say why; the CI job that
-# installs them sets ECAD_REQUIRE_CAD_TOOLS=1 so a skip there is a failure.
+# while the main test matrix still runs 3.10, and with their dependencies
+# these are about 280 MB of wheels on Linux (tools/constraints-cad.txt has
+# the measured figures). Without them the dataset tests skip and say why; the
+# CI job that installs them sets ECAD_REQUIRE_CAD_TOOLS=1 so a skip there is a
+# failure.
 #
 # Pinned: extraction and simulation results are recorded against exact tool
 # versions, and the committed derived files are reproduced against them.
+# Every transitive dependency is pinned too, with its declared licence, in
+# tools/constraints-cad.txt; install with -c tools/constraints-cad.txt.
 
 # OpenCASCADE bindings: reads STEP assemblies, computes volumes and inertia.
-# Pulls vtk (~107 MB, BSD) and cadquery-ocp-proxy (Apache-2.0). Package
-# metadata declares Apache-2.0; the OpenCASCADE kernel it bundles is
+# Package metadata declares Apache-2.0; the OpenCASCADE kernel it bundles is
 # licensed separately upstream -- review that before redistributing wheels.
+# Pulls cadquery-ocp-proxy and vtk, and vtk pulls matplotlib and its tree.
 cadquery-ocp==8.0.1.0.0
 
 # MuJoCo rigid-body dynamics: statics, rated moves, free swing, clearance.
-# Apache-2.0. Pulls absl-py and etils (Apache-2.0), glfw (MIT), pyopengl (BSD).
+# Apache-2.0. Pulls absl-py, etils[epath], glfw, numpy, pyopengl, websockets.
 mujoco==3.14.0

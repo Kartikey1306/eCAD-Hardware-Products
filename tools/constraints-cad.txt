@@ -1,0 +1,49 @@
+# Exact versions of everything tools/requirements-cad.txt installs, direct and
+# transitive, for the cad-dataset CI job:
+#
+#     python -m pip install -r tools/requirements.txt -r tools/requirements-cad.txt \
+#         -c tools/constraints-cad.txt pytest
+#
+# SECURITY-STANDARDS.md: a transitive dependency is a new dependency, and
+# versions are pinned. A constraint only applies to a package that something
+# else asks for, so this file adds nothing on its own; it stops a new release
+# of an indirect dependency from changing the job between two runs.
+#
+# Licences are as each package's metadata declares them (the SPDX expression
+# where one is given, otherwise the trove classifier), read from the installed
+# distributions. That is a record, not a legal review.
+# Measured 2026-09-25: this exact set is what Python 3.14 on macOS arm64
+# installs, and it resolves unchanged on Python 3.12 for Linux x86_64 and
+# aarch64 (pip download with this file). As wheels it is 287 MB on Linux
+# x86_64 and 269 MB on aarch64, of which vtk is 146 MB and 136 MB.
+
+# cadquery-ocp -> cadquery-ocp-proxy, vtk
+cadquery-ocp==8.0.1.0.0          # Apache-2.0 (bindings; the bundled OpenCASCADE kernel is licensed upstream)
+cadquery-ocp-proxy==8.0.1.0.0    # Apache-2.0
+vtk==9.6.2                       # BSD
+
+# vtk -> matplotlib
+matplotlib==3.11.2               # Matplotlib licence agreement (PSF-style)
+contourpy==1.4.0                 # BSD-3-Clause
+cycler==0.12.1                   # BSD
+fonttools==4.66.0                # MIT
+kiwisolver==1.5.1                # BSD
+packaging==26.3                  # Apache-2.0 OR BSD-2-Clause
+pillow==12.3.0                   # MIT-CMU
+pyparsing==3.3.3                 # MIT
+python-dateutil==2.9.0.post0     # dual: BSD / Apache
+six==1.17.0                      # MIT
+
+# mujoco -> absl-py, etils[epath], glfw, numpy, pyopengl, websockets
+mujoco==3.14.0                   # Apache-2.0
+absl-py==2.5.0                   # Apache-2.0
+etils==1.14.0                    # Apache
+fsspec==2026.9.0                 # BSD-3-Clause (etils[epath])
+typing_extensions==4.16.0        # PSF-2.0 (etils[epath])
+zipp==4.1.0                      # MIT (etils[epath])
+glfw==2.10.2                     # MIT
+pyopengl==3.1.10                 # BSD
+websockets==17.1                 # BSD-3-Clause
+
+# shared with tools/requirements.txt, which allows a range
+numpy==2.5.3                     # BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0

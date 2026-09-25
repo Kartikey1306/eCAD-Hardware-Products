@@ -101,11 +101,13 @@ jobs:
           cache-dependency-path: |
             tools/requirements.txt
             tools/requirements-cad.txt
+            tools/constraints-cad.txt
 
       - name: Install the CAD kernel and simulator
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r tools/requirements.txt -r tools/requirements-cad.txt pytest
+          python -m pip install -r tools/requirements.txt -r tools/requirements-cad.txt \
+            -c tools/constraints-cad.txt pytest
 
       - name: Complete test suite, CAD tests mandatory
         run: python run_all_tests.py --tb=short
