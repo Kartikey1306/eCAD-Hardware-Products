@@ -1,0 +1,385 @@
+{
+  "$schema": "https://embeddedos.org/schemas/cad-dataset/v1/cad-extraction.schema.json",
+  "extraction_version": "1.0.0",
+  "importer": {
+    "kernel": "OpenCASCADE",
+    "kernel_version": "cadquery-ocp 8.0.1.0.0",
+    "name": "ecad_model.importers.step_ocp",
+    "version": "1.0.0"
+  },
+  "length_unit": "mm",
+  "parts": [
+    {
+      "bounding_box_local": {
+        "max": [
+          360.0,
+          75.0,
+          20.0
+        ],
+        "min": [
+          -60.0,
+          -25.0,
+          0.0
+        ]
+      },
+      "center_of_mass_local": [
+        150.0,
+        25.000000000000004,
+        10.0
+      ],
+      "cylindrical_faces": [],
+      "face_count": 6,
+      "inertia_about_com_unit_density_local": [
+        [
+          727999999.9999998,
+          4.76837158203125e-07,
+          0.0
+        ],
+        [
+          4.76837158203125e-07,
+          12376000000.0,
+          2.9802322387695312e-08
+        ],
+        [
+          0.0,
+          2.9802322387695312e-08,
+          13048000000.0
+        ]
+      ],
+      "name": "base_plate",
+      "occurrence": "base_plate:1",
+      "rotation": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "solid_count": 1,
+      "surface_area": 104800.0,
+      "translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "volume": 840000.0
+    },
+    {
+      "bounding_box_local": {
+        "max": [
+          320.0,
+          20.0,
+          15.0
+        ],
+        "min": [
+          -20.0,
+          0.0,
+          -15.0
+        ]
+      },
+      "center_of_mass_local": [
+        151.68184435735063,
+        10.0,
+        -1.7826081076879823e-15
+      ],
+      "cylindrical_faces": [
+        {
+          "axis_direction_local": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "axis_origin_local": [
+            0.0,
+            -5.0,
+            0.0
+          ],
+          "radius": 6.0
+        }
+      ],
+      "face_count": 7,
+      "inertia_about_com_unit_density_local": [
+        [
+          22004244.255918574,
+          0.0,
+          -4.658245349712495e-08
+        ],
+        [
+          0.0,
+          1928994847.624282,
+          2.418687472527377e-10
+        ],
+        [
+          -4.658245349712495e-08,
+          2.418687472527377e-10,
+          1920439806.92099
+        ]
+      ],
+      "name": "link",
+      "occurrence": "link:1",
+      "rotation": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "solid_count": 1,
+      "surface_area": 35727.78756580314,
+      "translation": [
+        0.0,
+        33.0,
+        200.0
+      ],
+      "volume": 201738.0532894153
+    },
+    {
+      "bounding_box_local": {
+        "max": [
+          40.0,
+          24.0,
+          40.0
+        ],
+        "min": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "center_of_mass_local": [
+        20.0,
+        12.0,
+        20.0
+      ],
+      "cylindrical_faces": [],
+      "face_count": 6,
+      "inertia_about_com_unit_density_local": [
+        [
+          6963199.999999996,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          10240000.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          6963200.0
+        ]
+      ],
+      "name": "payload",
+      "occurrence": "payload:1",
+      "rotation": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "solid_count": 1,
+      "surface_area": 7039.999999999999,
+      "translation": [
+        275.0,
+        31.0,
+        215.0
+      ],
+      "volume": 38399.99999999999
+    },
+    {
+      "bounding_box_local": {
+        "max": [
+          30.0,
+          25.0,
+          210.0
+        ],
+        "min": [
+          -30.0,
+          -25.0,
+          0.0
+        ]
+      },
+      "center_of_mass_local": [
+        -8.357181631720887e-18,
+        -3.2086866948376303e-16,
+        104.20151536388575
+      ],
+      "cylindrical_faces": [
+        {
+          "axis_direction_local": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "axis_origin_local": [
+            0.0,
+            -30.0,
+            180.0
+          ],
+          "radius": 6.5
+        }
+      ],
+      "face_count": 7,
+      "inertia_about_com_unit_density_local": [
+        [
+          2407318873.6863384,
+          -5.1036626975502274e-11,
+          3.901093483927221e-10
+        ],
+        [
+          -5.1036626975502274e-11,
+          2466381402.462698,
+          1.782910477079844e-09
+        ],
+        [
+          3.901093483927221e-10,
+          1.782910477079844e-09,
+          318797272.7427329
+        ]
+      ],
+      "name": "pillar",
+      "occurrence": "pillar:1",
+      "rotation": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "solid_count": 1,
+      "surface_area": 53976.570645605156,
+      "translation": [
+        0.0,
+        0.0,
+        20.0
+      ],
+      "volume": 623363.3855192886
+    },
+    {
+      "bounding_box_local": {
+        "max": [
+          6.0,
+          6.0,
+          100.0
+        ],
+        "min": [
+          -6.0,
+          -6.0,
+          0.0
+        ]
+      },
+      "center_of_mass_local": [
+        8.845868625186432e-16,
+        2.3945229210642424e-16,
+        50.0
+      ],
+      "cylindrical_faces": [
+        {
+          "axis_direction_local": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "axis_origin_local": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "radius": 6.0
+        }
+      ],
+      "face_count": 3,
+      "inertia_about_com_unit_density_local": [
+        [
+          9526565.562745698,
+          -3.786758510741237e-12,
+          -3.092281986027956e-11
+        ],
+        [
+          -3.786758510741237e-12,
+          9526565.562745698,
+          2.4153023826558375e-13
+        ],
+        [
+          -3.092281986027956e-11,
+          2.4153023826558375e-13,
+          203575.20395261986
+        ]
+      ],
+      "name": "shaft",
+      "occurrence": "shaft:1",
+      "rotation": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.110223024625e-16,
+          1.0
+        ],
+        [
+          0.0,
+          -1.0,
+          1.110223024625e-16
+        ]
+      ],
+      "solid_count": 1,
+      "surface_area": 3996.1058553664648,
+      "translation": [
+        0.0,
+        -35.0,
+        200.0
+      ],
+      "volume": 11309.733552923257
+    }
+  ],
+  "source": {
+    "format": "step",
+    "path": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+    "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+  }
+}

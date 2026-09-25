@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/design-annotations.schema.json",
+  "title": "eCAD Design Annotations v1",
+  "description": "Design intent a STEP file does not carry: which CAD part is which component, material assignment, joints and their limits, and components that exist in the design but not in the CAD. Every value states its source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "annotations_version", "design_id", "materials", "parts", "joints", "attachments", "components_without_cad", "relationships"],
+  "properties": {
+    "$schema": {"const": "https://embeddedos.org/schemas/engineering-model/v1/design-annotations.schema.json"},
+    "annotations_version": {"const": "1.0.0"},
+    "design_id": {"$ref": "common.schema.json#/definitions/identifier"},
+    "materials": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "density"],
+        "properties": {
+          "name": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+          "density": {"$ref": "common.schema.json#/definitions/quantity"}
+        }
+      }
+    },
+    "parts": {
+      "description": "Keyed by the CAD part name exactly as the STEP file names it.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["component_id", "kind", "material"],
+        "properties": {
+          "component_id": {"$ref": "common.schema.json#/definitions/identifier"},
+          "kind": {"enum": ["structure", "shaft", "payload", "bearing", "fastener", "housing", "other"]},
+          "material": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}
+        }
+      }
+    },
+    "joints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["joint_id", "type", "parent", "child", "realized_by", "limits"],
+        "properties": {
+          "joint_id": {"$ref": "common.schema.json#/definitions/identifier"},
+          "type": {"enum": ["revolute"]},
+          "parent": {"$ref": "common.schema.json#/definitions/identifier"},
+          "child": {"$ref": "common.schema.json#/definitions/identifier"},
+          "realized_by": {
+            "description": "The component whose cylindrical faces define the joint axis. The axis is extracted from CAD geometry, never typed in.",
+            "$ref": "common.schema.json#/definitions/identifier"
+          },
+          "limits": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["lower", "upper"],
+            "properties": {
+              "lower": {"$ref": "common.schema.json#/definitions/quantity"},
+              "upper": {"$ref": "common.schema.json#/definitions/quantity"}
+            }
+          }
+        }
+      }
+    },
+    "attachments": {
+      "description": "Rigid attachments: component is fixed to attached_to. Determines which body a part moves with.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["component", "attached_to"],
+        "properties": {
+          "component": {"$ref": "common.schema.json#/definitions/identifier"},
+          "attached_to": {"$ref": "common.schema.json#/definitions/identifier"}
+        }
+      }
+    },
+    "components_without_cad": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["component_id", "name", "kind", "domains"],
+        "properties": {
+          "component_id": {"$ref": "common.schema.json#/definitions/identifier"},
+          "name": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+          "kind": {"enum": ["motor", "gearbox", "motor_driver", "battery", "sensor", "controller", "pcb", "other"]},
+          "domains": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "mechanical": {"$ref": "#/definitions/facet"},
+              "electrical": {"$ref": "#/definitions/facet"},
+              "control": {"$ref": "#/definitions/facet"},
+              "thermal": {"$ref": "#/definitions/facet"}
+            }
+          }
+        }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["relation", "from", "to"],
+        "properties": {
+          "relation": {"enum": ["mounted_to", "connected_to", "drives", "powered_by", "controls", "senses", "constrained_by", "thermally_connected_to"]},
+          "from": {"$ref": "common.schema.json#/definitions/identifier"},
+          "to": {"$ref": "common.schema.json#/definitions/identifier"}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "facet": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {"$ref": "common.schema.json#/definitions/quantity"}
+    }
+  }
+}

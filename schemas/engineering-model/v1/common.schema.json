@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json",
+  "title": "eCAD Engineering Model v1 Common Types",
+  "description": "Shared closed definitions. Every engineering value is a quantity that states where it came from; an unknown value is null and says so.",
+  "definitions": {
+    "identifier": {
+      "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/identifier"
+    },
+    "nonEmptyString": {
+      "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/nonEmptyString"
+    },
+    "relativePath": {
+      "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/relativePath"
+    },
+    "sha256": {
+      "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/sha256"
+    },
+    "status": {
+      "description": "Epistemic status. DERIVED is a deterministic function of other recorded values and must name them in derived_from. AI_ASSUMPTION must never be presented as SPECIFIED or MEASURED.",
+      "enum": ["MEASURED", "SPECIFIED", "DERIVED", "SIMULATED", "ESTIMATED", "AI_ASSUMPTION", "UNKNOWN"]
+    },
+    "engineeringDomain": {
+      "enum": [
+        "mechanical",
+        "electrical",
+        "digital",
+        "pcb",
+        "power_electronics",
+        "control",
+        "electromagnetic",
+        "thermal",
+        "full_system"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "cad",
+            "datasheet",
+            "design_annotation",
+            "requirement",
+            "handbook",
+            "measurement",
+            "simulation",
+            "estimation",
+            "computation",
+            "ai"
+          ]
+        },
+        "ref": {"$ref": "#/definitions/nonEmptyString"},
+        "sha256": {"$ref": "#/definitions/sha256"}
+      }
+    },
+    "numberOrMatrix": {
+      "oneOf": [
+        {"type": "number"},
+        {"type": "array", "minItems": 1, "items": {"type": "number"}},
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "array", "minItems": 1, "items": {"type": "number"}}
+        }
+      ]
+    },
+    "quantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "status", "source"],
+      "properties": {
+        "value": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/definitions/numberOrMatrix"}]
+        },
+        "unit": {"type": "string", "minLength": 1},
+        "status": {"$ref": "#/definitions/status"},
+        "source": {"$ref": "#/definitions/source"},
+        "derived_from": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/definitions/nonEmptyString"}
+        },
+        "note": {"$ref": "#/definitions/nonEmptyString"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "UNKNOWN"}}},
+          "then": {"properties": {"value": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"value": {"type": "null"}}},
+          "then": {"properties": {"status": {"const": "UNKNOWN"}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "DERIVED"}}},
+          "then": {
+            "required": ["derived_from"],
+            "properties": {"derived_from": {"minItems": 1}}
+          }
+        }
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "size_bytes", "media_type"],
+      "properties": {
+        "path": {"$ref": "#/definitions/relativePath"},
+        "sha256": {"$ref": "#/definitions/sha256"},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "media_type": {"$ref": "#/definitions/nonEmptyString"}
+      }
+    }
+  }
+}

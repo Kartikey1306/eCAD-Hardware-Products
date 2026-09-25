@@ -1,0 +1,253 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json",
+  "title": "eCAD Engineering Semantic Model v1",
+  "description": "The bridge between CAD and every domain model. Physical structure comes from the CAD; design intent the CAD cannot carry comes from annotations; nothing is invented. Units are SI throughout.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "model_version",
+    "design",
+    "components",
+    "joints",
+    "relationships",
+    "unknowns"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json"
+    },
+    "model_version": {"const": "1.0.0"},
+    "design": {"$ref": "#/definitions/design"},
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/definitions/component"}
+    },
+    "joints": {"type": "array", "items": {"$ref": "#/definitions/joint"}},
+    "relationships": {"type": "array", "items": {"$ref": "#/definitions/relationship"}},
+    "unknowns": {
+      "description": "Index of every UNKNOWN quantity in the model, with the domains that need it. Generated; never hand-edited.",
+      "type": "array",
+      "items": {"$ref": "#/definitions/unknown"}
+    }
+  },
+  "definitions": {
+    "quantity": {"$ref": "common.schema.json#/definitions/quantity"},
+    "identifier": {"$ref": "common.schema.json#/definitions/identifier"},
+    "design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design_id", "name", "revision", "source_cad", "gravity"],
+      "properties": {
+        "design_id": {"$ref": "#/definitions/identifier"},
+        "name": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "revision": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "source_cad": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "format", "sha256", "length_unit"],
+          "properties": {
+            "path": {"$ref": "common.schema.json#/definitions/relativePath"},
+            "format": {"enum": ["step"]},
+            "sha256": {"$ref": "common.schema.json#/definitions/sha256"},
+            "length_unit": {
+              "description": "Length unit the CAD file declares; the model converts to metres.",
+              "enum": ["mm", "m", "inch"]
+            }
+          }
+        },
+        "gravity": {"$ref": "#/definitions/quantity"}
+      }
+    },
+    "cadRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["part", "occurrence"],
+      "properties": {
+        "part": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "occurrence": {"$ref": "common.schema.json#/definitions/nonEmptyString"}
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component_id", "name", "kind", "cad_ref", "material", "geometry", "physical", "placement", "domains"],
+      "properties": {
+        "component_id": {"$ref": "#/definitions/identifier"},
+        "name": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "kind": {
+          "enum": [
+            "structure",
+            "shaft",
+            "payload",
+            "bearing",
+            "fastener",
+            "housing",
+            "motor",
+            "gearbox",
+            "motor_driver",
+            "battery",
+            "sensor",
+            "controller",
+            "pcb",
+            "other"
+          ]
+        },
+        "cad_ref": {
+          "description": "null means the component is part of the design but not represented in the CAD.",
+          "oneOf": [{"$ref": "#/definitions/cadRef"}, {"type": "null"}]
+        },
+        "material": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "density"],
+              "properties": {
+                "name": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+                "density": {"$ref": "#/definitions/quantity"}
+              }
+            }
+          ]
+        },
+        "geometry": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["volume", "surface_area", "bounding_box_local"],
+              "properties": {
+                "volume": {"$ref": "#/definitions/quantity"},
+                "surface_area": {"$ref": "#/definitions/quantity"},
+                "bounding_box_local": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["min", "max"],
+                  "properties": {
+                    "min": {"$ref": "#/definitions/quantity"},
+                    "max": {"$ref": "#/definitions/quantity"}
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "physical": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mass", "center_of_mass", "inertia_about_com"],
+              "properties": {
+                "mass": {"$ref": "#/definitions/quantity"},
+                "center_of_mass": {"$ref": "#/definitions/quantity"},
+                "inertia_about_com": {"$ref": "#/definitions/quantity"}
+              }
+            }
+          ]
+        },
+        "placement": {
+          "description": "Pose of the component's local frame in the assembly frame.",
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["translation", "rotation"],
+              "properties": {
+                "translation": {"$ref": "#/definitions/quantity"},
+                "rotation": {"$ref": "#/definitions/quantity"}
+              }
+            }
+          ]
+        },
+        "domains": {
+          "description": "Per-domain facets. Each facet maps a parameter name to a quantity.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mechanical": {"$ref": "#/definitions/facet"},
+            "electrical": {"$ref": "#/definitions/facet"},
+            "digital": {"$ref": "#/definitions/facet"},
+            "pcb": {"$ref": "#/definitions/facet"},
+            "power_electronics": {"$ref": "#/definitions/facet"},
+            "control": {"$ref": "#/definitions/facet"},
+            "electromagnetic": {"$ref": "#/definitions/facet"},
+            "thermal": {"$ref": "#/definitions/facet"}
+          }
+        }
+      }
+    },
+    "facet": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {"$ref": "#/definitions/quantity"}
+    },
+    "joint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["joint_id", "type", "parent", "child", "realized_by", "axis", "origin", "limits"],
+      "properties": {
+        "joint_id": {"$ref": "#/definitions/identifier"},
+        "type": {"enum": ["revolute", "prismatic", "fixed"]},
+        "parent": {"$ref": "#/definitions/identifier"},
+        "child": {"$ref": "#/definitions/identifier"},
+        "realized_by": {"oneOf": [{"$ref": "#/definitions/identifier"}, {"type": "null"}]},
+        "axis": {"$ref": "#/definitions/quantity"},
+        "origin": {"$ref": "#/definitions/quantity"},
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lower", "upper"],
+          "properties": {
+            "lower": {"$ref": "#/definitions/quantity"},
+            "upper": {"$ref": "#/definitions/quantity"}
+          }
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relation", "from", "to", "source"],
+      "properties": {
+        "relation": {
+          "enum": [
+            "contains",
+            "mounted_to",
+            "connected_to",
+            "drives",
+            "powered_by",
+            "controls",
+            "senses",
+            "attached_to",
+            "constrained_by",
+            "thermally_connected_to"
+          ]
+        },
+        "from": {"$ref": "#/definitions/identifier"},
+        "to": {"$ref": "#/definitions/identifier"},
+        "source": {"$ref": "common.schema.json#/definitions/source"}
+      }
+    },
+    "unknown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "needed_by"],
+      "properties": {
+        "path": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "needed_by": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "common.schema.json#/definitions/engineeringDomain"}
+        },
+        "note": {"$ref": "common.schema.json#/definitions/nonEmptyString"}
+      }
+    }
+  }
+}

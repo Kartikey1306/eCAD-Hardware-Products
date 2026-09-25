@@ -1,0 +1,132 @@
+{
+  "$schema": "https://embeddedos.org/schemas/hardware-validation/v1/validation-cases.schema.json",
+  "cases": [
+    {
+      "adapter": "mujoco",
+      "arguments": [
+        "--model",
+        "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "--scenario",
+        "{\"name\":\"static_sweep\"}"
+      ],
+      "domain": "integrated_physics",
+      "id": "REQ-MECH-001",
+      "inputs": [
+        "simulation/joint_dynamics.py",
+        "derived/mechanical/robotic_joint_001.mjcf.xml"
+      ],
+      "metric_limits": {
+        "static_torque_max_abs_nm": {
+          "maximum": 2.5
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "mujoco",
+      "arguments": [
+        "--model",
+        "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "--scenario",
+        "{\"name\":\"static_sweep\",\"payload_component\":\"payload\",\"payload_mass_kg\":1.0}"
+      ],
+      "domain": "integrated_physics",
+      "id": "REQ-MECH-002",
+      "inputs": [
+        "simulation/joint_dynamics.py",
+        "derived/mechanical/robotic_joint_001.mjcf.xml"
+      ],
+      "metric_limits": {
+        "static_torque_max_abs_nm": {
+          "maximum": 4.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "mujoco",
+      "arguments": [
+        "--model",
+        "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "--scenario",
+        "{\"duration_s\":0.8,\"end_rad\":-1.5707963267948966,\"name\":\"rated_move\",\"start_rad\":0.0}"
+      ],
+      "domain": "integrated_physics",
+      "id": "REQ-MECH-003",
+      "inputs": [
+        "simulation/joint_dynamics.py",
+        "derived/mechanical/robotic_joint_001.mjcf.xml"
+      ],
+      "metric_limits": {
+        "move_peak_torque_abs_nm": {
+          "maximum": 3.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "mujoco",
+      "arguments": [
+        "--model",
+        "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "--scenario",
+        "{\"duration_s\":0.8,\"end_rad\":-1.5707963267948966,\"name\":\"rated_move\",\"start_rad\":0.0}"
+      ],
+      "domain": "integrated_physics",
+      "id": "REQ-MECH-004",
+      "inputs": [
+        "simulation/joint_dynamics.py",
+        "derived/mechanical/robotic_joint_001.mjcf.xml"
+      ],
+      "metric_limits": {
+        "move_peak_speed_rad_s": {
+          "maximum": 5.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "mujoco",
+      "arguments": [
+        "--model",
+        "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "--scenario",
+        "{\"name\":\"rom_sweep\"}"
+      ],
+      "domain": "integrated_physics",
+      "id": "REQ-MECH-005",
+      "inputs": [
+        "simulation/joint_dynamics.py",
+        "derived/mechanical/robotic_joint_001.mjcf.xml"
+      ],
+      "metric_limits": {
+        "rom_min_clearance_m": {
+          "minimum": 0.005
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    }
+  ],
+  "contract_version": "1.0.0",
+  "gate": "V4"
+}

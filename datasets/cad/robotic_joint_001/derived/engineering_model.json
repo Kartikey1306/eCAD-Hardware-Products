@@ -1,0 +1,1372 @@
+{
+  "$schema": "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json",
+  "components": [
+    {
+      "cad_ref": {
+        "occurrence": "base_plate:1",
+        "part": "base_plate"
+      },
+      "component_id": "base_plate",
+      "domains": {},
+      "geometry": {
+        "bounding_box_local": {
+          "max": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#base_plate:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              0.36,
+              0.075,
+              0.02
+            ]
+          },
+          "min": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#base_plate:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              -0.06,
+              -0.025,
+              0.0
+            ]
+          }
+        },
+        "surface_area": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#base_plate:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^2",
+          "value": 0.1048
+        },
+        "volume": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#base_plate:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^3",
+          "value": 0.00084
+        }
+      },
+      "kind": "structure",
+      "material": {
+        "density": {
+          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "source": {
+            "kind": "handbook",
+            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3"
+          },
+          "status": "SPECIFIED",
+          "unit": "kg/m^3",
+          "value": 2700.0
+        },
+        "name": "aluminium alloy 6061"
+      },
+      "name": "base_plate",
+      "physical": {
+        "center_of_mass": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#base_plate:1"
+          ],
+          "note": "assembly frame",
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            0.15,
+            0.025,
+            0.01
+          ]
+        },
+        "inertia_about_com": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#base_plate:1",
+            "components/base_plate/material/density"
+          ],
+          "note": "about the component's centre of mass, assembly axes",
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg*m^2",
+          "value": [
+            [
+              0.0019656,
+              1.28746032715e-18,
+              0.0
+            ],
+            [
+              1.28746032715e-18,
+              0.0334152,
+              8.04662704468e-20
+            ],
+            [
+              0.0,
+              8.04662704468e-20,
+              0.0352296
+            ]
+          ]
+        },
+        "mass": {
+          "derived_from": [
+            "components/base_plate/geometry/volume",
+            "components/base_plate/material/density"
+          ],
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg",
+          "value": 2.268
+        }
+      },
+      "placement": {
+        "rotation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#base_plate:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "1",
+          "value": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "translation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#base_plate:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "cad_ref": {
+        "occurrence": "link:1",
+        "part": "link"
+      },
+      "component_id": "link",
+      "domains": {},
+      "geometry": {
+        "bounding_box_local": {
+          "max": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#link:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              0.32,
+              0.02,
+              0.015
+            ]
+          },
+          "min": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#link:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              -0.02,
+              0.0,
+              -0.015
+            ]
+          }
+        },
+        "surface_area": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#link:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^2",
+          "value": 0.0357277875658
+        },
+        "volume": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#link:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^3",
+          "value": 0.000201738053289
+        }
+      },
+      "kind": "structure",
+      "material": {
+        "density": {
+          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "source": {
+            "kind": "handbook",
+            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3"
+          },
+          "status": "SPECIFIED",
+          "unit": "kg/m^3",
+          "value": 2700.0
+        },
+        "name": "aluminium alloy 6061"
+      },
+      "name": "link",
+      "physical": {
+        "center_of_mass": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#link:1"
+          ],
+          "note": "assembly frame",
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            0.151681844357,
+            0.043,
+            0.2
+          ]
+        },
+        "inertia_about_com": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#link:1",
+            "components/link/material/density"
+          ],
+          "note": "about the component's centre of mass, assembly axes",
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg*m^2",
+          "value": [
+            [
+              5.9411459491e-05,
+              0.0,
+              -1.25772624442e-19
+            ],
+            [
+              0.0,
+              0.00520828608859,
+              6.53045617582e-22
+            ],
+            [
+              -1.25772624442e-19,
+              6.53045617582e-22,
+              0.00518518747869
+            ]
+          ]
+        },
+        "mass": {
+          "derived_from": [
+            "components/link/geometry/volume",
+            "components/link/material/density"
+          ],
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg",
+          "value": 0.544692743881
+        }
+      },
+      "placement": {
+        "rotation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#link:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "1",
+          "value": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "translation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#link:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            0.0,
+            0.033,
+            0.2
+          ]
+        }
+      }
+    },
+    {
+      "cad_ref": {
+        "occurrence": "payload:1",
+        "part": "payload"
+      },
+      "component_id": "payload",
+      "domains": {},
+      "geometry": {
+        "bounding_box_local": {
+          "max": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#payload:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              0.04,
+              0.024,
+              0.04
+            ]
+          },
+          "min": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#payload:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "surface_area": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#payload:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^2",
+          "value": 0.00704
+        },
+        "volume": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#payload:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^3",
+          "value": 3.84e-05
+        }
+      },
+      "kind": "payload",
+      "material": {
+        "density": {
+          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "source": {
+            "kind": "handbook",
+            "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3"
+          },
+          "status": "SPECIFIED",
+          "unit": "kg/m^3",
+          "value": 7850.0
+        },
+        "name": "AISI 1045 carbon steel"
+      },
+      "name": "payload",
+      "physical": {
+        "center_of_mass": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#payload:1"
+          ],
+          "note": "assembly frame",
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            0.295,
+            0.043,
+            0.235
+          ]
+        },
+        "inertia_about_com": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#payload:1",
+            "components/payload/material/density"
+          ],
+          "note": "about the component's centre of mass, assembly axes",
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg*m^2",
+          "value": [
+            [
+              5.466112e-05,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              8.0384e-05,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              5.466112e-05
+            ]
+          ]
+        },
+        "mass": {
+          "derived_from": [
+            "components/payload/geometry/volume",
+            "components/payload/material/density"
+          ],
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg",
+          "value": 0.30144
+        }
+      },
+      "placement": {
+        "rotation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#payload:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "1",
+          "value": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "translation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#payload:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            0.275,
+            0.031,
+            0.215
+          ]
+        }
+      }
+    },
+    {
+      "cad_ref": {
+        "occurrence": "pillar:1",
+        "part": "pillar"
+      },
+      "component_id": "pillar",
+      "domains": {},
+      "geometry": {
+        "bounding_box_local": {
+          "max": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#pillar:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              0.03,
+              0.025,
+              0.21
+            ]
+          },
+          "min": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#pillar:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              -0.03,
+              -0.025,
+              0.0
+            ]
+          }
+        },
+        "surface_area": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#pillar:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^2",
+          "value": 0.0539765706456
+        },
+        "volume": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#pillar:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^3",
+          "value": 0.000623363385519
+        }
+      },
+      "kind": "structure",
+      "material": {
+        "density": {
+          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "source": {
+            "kind": "handbook",
+            "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3"
+          },
+          "status": "SPECIFIED",
+          "unit": "kg/m^3",
+          "value": 2700.0
+        },
+        "name": "aluminium alloy 6061"
+      },
+      "name": "pillar",
+      "physical": {
+        "center_of_mass": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#pillar:1"
+          ],
+          "note": "assembly frame",
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            -8.35718163172e-21,
+            -3.20868669484e-19,
+            0.124201515364
+          ]
+        },
+        "inertia_about_com": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#pillar:1",
+            "components/pillar/material/density"
+          ],
+          "note": "about the component's centre of mass, assembly axes",
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg*m^2",
+          "value": [
+            [
+              0.00649976095895,
+              -1.37798892834e-22,
+              1.05329524066e-21
+            ],
+            [
+              -1.37798892834e-22,
+              0.00665922978665,
+              4.81385828812e-21
+            ],
+            [
+              1.05329524066e-21,
+              4.81385828812e-21,
+              0.000860752636405
+            ]
+          ]
+        },
+        "mass": {
+          "derived_from": [
+            "components/pillar/geometry/volume",
+            "components/pillar/material/density"
+          ],
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg",
+          "value": 1.6830811409
+        }
+      },
+      "placement": {
+        "rotation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#pillar:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "1",
+          "value": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "translation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#pillar:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            0.0,
+            0.0,
+            0.02
+          ]
+        }
+      }
+    },
+    {
+      "cad_ref": {
+        "occurrence": "shaft:1",
+        "part": "shaft"
+      },
+      "component_id": "shaft",
+      "domains": {},
+      "geometry": {
+        "bounding_box_local": {
+          "max": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              0.006,
+              0.006,
+              0.1
+            ]
+          },
+          "min": {
+            "derived_from": [
+              "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+            ],
+            "source": {
+              "kind": "cad",
+              "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+              "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+            },
+            "status": "DERIVED",
+            "unit": "m",
+            "value": [
+              -0.006,
+              -0.006,
+              0.0
+            ]
+          }
+        },
+        "surface_area": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^2",
+          "value": 0.00399610585537
+        },
+        "volume": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m^3",
+          "value": 1.13097335529e-05
+        }
+      },
+      "kind": "shaft",
+      "material": {
+        "density": {
+          "note": "nominal handbook value for the specified alloy, not a supplier certificate",
+          "source": {
+            "kind": "handbook",
+            "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3"
+          },
+          "status": "SPECIFIED",
+          "unit": "kg/m^3",
+          "value": 7850.0
+        },
+        "name": "AISI 1045 carbon steel"
+      },
+      "name": "shaft",
+      "physical": {
+        "center_of_mass": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+          ],
+          "note": "assembly frame",
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            8.84586862519e-19,
+            0.015,
+            0.2
+          ]
+        },
+        "inertia_about_com": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1",
+            "components/shaft/material/density"
+          ],
+          "note": "about the component's centre of mass, assembly axes",
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg*m^2",
+          "value": [
+            [
+              7.47835396676e-05,
+              -2.42744135903e-22,
+              2.97260543093e-23
+            ],
+            [
+              -2.42744135903e-22,
+              1.59806535103e-06,
+              -1.89601237038e-24
+            ],
+            [
+              2.97260543093e-23,
+              -1.89601237038e-24,
+              7.47835396676e-05
+            ]
+          ]
+        },
+        "mass": {
+          "derived_from": [
+            "components/shaft/geometry/volume",
+            "components/shaft/material/density"
+          ],
+          "source": {
+            "kind": "computation",
+            "ref": "tools/ecad_model/builder.py"
+          },
+          "status": "DERIVED",
+          "unit": "kg",
+          "value": 0.0887814083904
+        }
+      },
+      "placement": {
+        "rotation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "1",
+          "value": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              -1.0,
+              0.0
+            ]
+          ]
+        },
+        "translation": {
+          "derived_from": [
+            "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+          ],
+          "source": {
+            "kind": "cad",
+            "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+            "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+          },
+          "status": "DERIVED",
+          "unit": "m",
+          "value": [
+            0.0,
+            -0.035,
+            0.2
+          ]
+        }
+      }
+    },
+    {
+      "cad_ref": null,
+      "component_id": "actuator",
+      "domains": {
+        "electrical": {
+          "torque_constant": {
+            "note": "no motor is selected",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "N*m/A",
+            "value": null
+          },
+          "winding_resistance": {
+            "note": "no motor is selected",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "ohm",
+            "value": null
+          }
+        },
+        "mechanical": {
+          "continuous_output_torque": {
+            "note": "no motor or gearbox is selected: needs torque constant, continuous current and gear ratio",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "N*m",
+            "value": null
+          },
+          "gear_ratio": {
+            "note": "no gearbox is selected",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "1",
+            "value": null
+          }
+        },
+        "thermal": {
+          "maximum_winding_temperature": {
+            "note": "no motor is selected",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "degC",
+            "value": null
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "motor",
+      "material": null,
+      "name": "joint actuator (motor and gearbox, not yet selected)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "component_id": "drive",
+      "domains": {
+        "control": {
+          "current_loop_bandwidth": {
+            "source": {
+              "kind": "datasheet",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "SPECIFIED",
+            "unit": "Hz",
+            "value": 20000.0
+          }
+        },
+        "electrical": {
+          "rated_current": {
+            "note": "the datasheet states 5 A without saying whether it is continuous or peak",
+            "source": {
+              "kind": "datasheet",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "SPECIFIED",
+            "unit": "A",
+            "value": 5.0
+          },
+          "rated_power": {
+            "source": {
+              "kind": "datasheet",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "SPECIFIED",
+            "unit": "W",
+            "value": 200.0
+          },
+          "supply_voltage": {
+            "source": {
+              "kind": "datasheet",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": 48.0
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "motor_driver",
+      "material": null,
+      "name": "eServo-200 EtherCAT servo drive",
+      "physical": null,
+      "placement": null
+    }
+  ],
+  "design": {
+    "design_id": "robotic_joint_001",
+    "gravity": {
+      "note": "assembly +Z is up",
+      "source": {
+        "kind": "handbook",
+        "ref": "standard gravity, 3rd CGPM (1901)"
+      },
+      "status": "SPECIFIED",
+      "unit": "m/s^2",
+      "value": [
+        0.0,
+        0.0,
+        -9.80665
+      ]
+    },
+    "name": "robotic joint 001",
+    "revision": "1.0",
+    "source_cad": {
+      "format": "step",
+      "length_unit": "mm",
+      "path": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+      "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+    }
+  },
+  "joints": [
+    {
+      "axis": {
+        "derived_from": [
+          "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+        ],
+        "note": "common axis of the cylindrical faces of 'shaft'; rotation is right-handed about it",
+        "source": {
+          "kind": "cad",
+          "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+          "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+        },
+        "status": "DERIVED",
+        "unit": "1",
+        "value": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      "child": "link",
+      "joint_id": "j1",
+      "limits": {
+        "lower": {
+          "note": "-120 degrees: the link lifted up and back over the pillar",
+          "source": {
+            "kind": "design_annotation",
+            "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+          },
+          "status": "SPECIFIED",
+          "unit": "rad",
+          "value": -2.0943951023931953
+        },
+        "upper": {
+          "note": "+25 degrees: the link lowered toward the base plate; positive rotation about +Y lowers the tip",
+          "source": {
+            "kind": "design_annotation",
+            "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+          },
+          "status": "SPECIFIED",
+          "unit": "rad",
+          "value": 0.4363323129985824
+        }
+      },
+      "origin": {
+        "derived_from": [
+          "cad:datasets/cad/robotic_joint_001/source/robotic_joint_001.step#shaft:1"
+        ],
+        "note": "point on the axis nearest the realizing part's centre of mass",
+        "source": {
+          "kind": "cad",
+          "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+          "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+        },
+        "status": "DERIVED",
+        "unit": "m",
+        "value": [
+          0.0,
+          0.015,
+          0.2
+        ]
+      },
+      "parent": "pillar",
+      "realized_by": "shaft",
+      "type": "revolute"
+    }
+  ],
+  "model_version": "1.0.0",
+  "relationships": [
+    {
+      "from": "robotic_joint_001",
+      "relation": "contains",
+      "source": {
+        "kind": "cad",
+        "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+        "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+      },
+      "to": "base_plate"
+    },
+    {
+      "from": "robotic_joint_001",
+      "relation": "contains",
+      "source": {
+        "kind": "cad",
+        "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+        "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+      },
+      "to": "link"
+    },
+    {
+      "from": "robotic_joint_001",
+      "relation": "contains",
+      "source": {
+        "kind": "cad",
+        "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+        "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+      },
+      "to": "payload"
+    },
+    {
+      "from": "robotic_joint_001",
+      "relation": "contains",
+      "source": {
+        "kind": "cad",
+        "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+        "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+      },
+      "to": "pillar"
+    },
+    {
+      "from": "robotic_joint_001",
+      "relation": "contains",
+      "source": {
+        "kind": "cad",
+        "ref": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+        "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+      },
+      "to": "shaft"
+    },
+    {
+      "from": "pillar",
+      "relation": "attached_to",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
+        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+      },
+      "to": "base_plate"
+    },
+    {
+      "from": "shaft",
+      "relation": "attached_to",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
+        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+      },
+      "to": "link"
+    },
+    {
+      "from": "payload",
+      "relation": "attached_to",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
+        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+      },
+      "to": "link"
+    },
+    {
+      "from": "link",
+      "relation": "constrained_by",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
+        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+      },
+      "to": "pillar"
+    },
+    {
+      "from": "actuator",
+      "relation": "powered_by",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
+        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+      },
+      "to": "drive"
+    },
+    {
+      "from": "drive",
+      "relation": "controls",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
+        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+      },
+      "to": "actuator"
+    },
+    {
+      "from": "actuator",
+      "relation": "drives",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/robotic_joint_001/design/annotations.json",
+        "sha256": "07dcf78724d4b3aa50c48d1ec07adfdd2f550269256cf8c7f6606cf17037f07d"
+      },
+      "to": "link"
+    }
+  ],
+  "unknowns": [
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no motor is selected",
+      "path": "components/actuator/domains/electrical/torque_constant"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no motor is selected",
+      "path": "components/actuator/domains/electrical/winding_resistance"
+    },
+    {
+      "needed_by": [
+        "mechanical"
+      ],
+      "note": "no motor or gearbox is selected: needs torque constant, continuous current and gear ratio",
+      "path": "components/actuator/domains/mechanical/continuous_output_torque"
+    },
+    {
+      "needed_by": [
+        "mechanical"
+      ],
+      "note": "no gearbox is selected",
+      "path": "components/actuator/domains/mechanical/gear_ratio"
+    },
+    {
+      "needed_by": [
+        "thermal"
+      ],
+      "note": "no motor is selected",
+      "path": "components/actuator/domains/thermal/maximum_winding_temperature"
+    }
+  ]
+}

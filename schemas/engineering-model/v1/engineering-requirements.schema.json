@@ -1,0 +1,219 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/engineering-requirements.schema.json",
+  "title": "eCAD Machine-Readable Engineering Requirements v1",
+  "description": "Numeric requirements evaluated deterministically. reference_values verify a domain model against an independent derivation (V3 golden); requirements bound a simulated metric under a scenario (V4 corner). A limit may be a number or a path to a model quantity; an UNKNOWN limit makes the requirement BLOCKED, never assumed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "requirements_version",
+    "design_id",
+    "reference_values",
+    "requirements"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://embeddedos.org/schemas/engineering-model/v1/engineering-requirements.schema.json"
+    },
+    "requirements_version": {
+      "const": "1.0.0"
+    },
+    "design_id": {
+      "$ref": "common.schema.json#/definitions/identifier"
+    },
+    "reference_values": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/referenceValue"
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/requirement"
+      }
+    }
+  },
+  "definitions": {
+    "metric": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "static_sweep",
+            "rated_move",
+            "rom_sweep",
+            "free_swing"
+          ]
+        },
+        "payload_mass_kg": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "start_rad": {
+          "type": "number"
+        },
+        "end_rad": {
+          "type": "number"
+        },
+        "duration_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "amplitude_rad": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "payload_component": {
+          "$ref": "common.schema.json#/definitions/identifier"
+        }
+      },
+      "dependencies": {
+        "payload_mass_kg": [
+          "payload_component"
+        ],
+        "payload_component": [
+          "payload_mass_kg"
+        ]
+      }
+    },
+    "referenceValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_id",
+        "title",
+        "domain",
+        "metric",
+        "scenario",
+        "unit",
+        "absolute_tolerance",
+        "derivation",
+        "source"
+      ],
+      "properties": {
+        "reference_id": {
+          "$ref": "common.schema.json#/definitions/identifier"
+        },
+        "title": {
+          "$ref": "common.schema.json#/definitions/nonEmptyString"
+        },
+        "domain": {
+          "$ref": "common.schema.json#/definitions/engineeringDomain"
+        },
+        "metric": {
+          "$ref": "#/definitions/metric"
+        },
+        "scenario": {
+          "$ref": "#/definitions/scenario"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "absolute_tolerance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "derivation": {
+          "description": "Name of the independent closed-form derivation that computes the expected value from the engineering model. The value itself is computed, not typed.",
+          "enum": [
+            "gravity_torque_as_modelled",
+            "small_oscillation_period",
+            "moving_mass"
+          ]
+        },
+        "source": {
+          "$ref": "common.schema.json#/definitions/source"
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "title",
+        "domain",
+        "component",
+        "metric",
+        "scenario",
+        "operator",
+        "limit",
+        "unit",
+        "source"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "common.schema.json#/definitions/identifier"
+        },
+        "title": {
+          "$ref": "common.schema.json#/definitions/nonEmptyString"
+        },
+        "domain": {
+          "$ref": "common.schema.json#/definitions/engineeringDomain"
+        },
+        "component": {
+          "description": "The component or joint the requirement constrains; must resolve in the engineering model.",
+          "$ref": "common.schema.json#/definitions/identifier"
+        },
+        "metric": {
+          "$ref": "#/definitions/metric"
+        },
+        "scenario": {
+          "$ref": "#/definitions/scenario"
+        },
+        "operator": {
+          "enum": [
+            "<=",
+            ">="
+          ]
+        },
+        "limit": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "quantity"
+              ],
+              "properties": {
+                "quantity": {
+                  "$ref": "common.schema.json#/definitions/nonEmptyString"
+                }
+              }
+            }
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "common.schema.json#/definitions/source"
+        }
+      }
+    }
+  }
+}

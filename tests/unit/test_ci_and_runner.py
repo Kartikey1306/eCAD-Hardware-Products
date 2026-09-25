@@ -53,6 +53,18 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertNotIn("python -m build", self.workflow)
         self.assertNotIn("dist/*.whl", self.workflow)
 
+    def test_cad_dataset_job_cannot_skip_silently(self):
+        """The dataset tests skip without the CAD kernel. The one job that installs
+        it must turn a skip into a failure, or a broken install reads as green."""
+        start = self.workflow.index("\n  cad-dataset:\n")
+        following = self.workflow.find("\n  release:\n", start)
+        job = self.workflow[start:following]
+        self.assertIn('ECAD_REQUIRE_CAD_TOOLS: "1"', job)
+        self.assertIn("-r tools/requirements-cad.txt", job)
+        self.assertIn("run: python run_all_tests.py --tb=short", job)  # the whole suite, not a subset
+        self.assertIn("python tools/cad_dataset.py check datasets/cad/robotic_joint_001", job)
+        self.assertNotIn("continue-on-error", job)
+
 
 class TestTestRunner(unittest.TestCase):
     @mock.patch("run_all_tests.subprocess.run")

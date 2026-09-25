@@ -1,0 +1,85 @@
+{
+  "$schema": "https://embeddedos.org/schemas/hardware-validation/v1/validation-cases.schema.json",
+  "cases": [
+    {
+      "adapter": "mujoco",
+      "arguments": [
+        "--model",
+        "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "--scenario",
+        "{\"name\":\"static_sweep\"}"
+      ],
+      "domain": "integrated_physics",
+      "expected_metrics": {
+        "static_torque_at_zero_nm": {
+          "absolute_tolerance": 1e-06,
+          "value": 1.68227981292
+        }
+      },
+      "id": "REF-MECH-001",
+      "inputs": [
+        "simulation/joint_dynamics.py",
+        "derived/mechanical/robotic_joint_001.mjcf.xml"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "mujoco",
+      "arguments": [
+        "--model",
+        "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "--scenario",
+        "{\"amplitude_rad\":0.01,\"name\":\"free_swing\"}"
+      ],
+      "domain": "integrated_physics",
+      "expected_metrics": {
+        "small_oscillation_period_s": {
+          "absolute_tolerance": 0.0001,
+          "value": 1.02007275955
+        }
+      },
+      "id": "REF-MECH-002",
+      "inputs": [
+        "simulation/joint_dynamics.py",
+        "derived/mechanical/robotic_joint_001.mjcf.xml"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "mujoco",
+      "arguments": [
+        "--model",
+        "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "--scenario",
+        "{\"name\":\"static_sweep\"}"
+      ],
+      "domain": "integrated_physics",
+      "expected_metrics": {
+        "moving_mass_kg": {
+          "absolute_tolerance": 1e-09,
+          "value": 0.934914152271
+        }
+      },
+      "id": "REF-MECH-003",
+      "inputs": [
+        "simulation/joint_dynamics.py",
+        "derived/mechanical/robotic_joint_001.mjcf.xml"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    }
+  ],
+  "contract_version": "1.0.0",
+  "gate": "V3"
+}
