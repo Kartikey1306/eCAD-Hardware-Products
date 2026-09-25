@@ -18,6 +18,7 @@ Status is one of: `todo`, `in-progress`, `blocked`, `review`, `done`.
 | T-006 | Route the generated boards and add pin-level signal nets | — | build | todo | T-002 |
 | T-008 | Assign real IPC-7351 land patterns to every placed footprint | — | build | todo | T-007 |
 | T-009 | Run DRC and export fabrication outputs (needs KiCad installed) | — | verify | blocked | KiCad unavailable: `apt` needs root |
+| T-010 | CAD dataset, engineering semantic model, and robotic-joint mechanical validation (issue #27) | — | build | review | independent review |
 
 ### T-008 — Real land patterns
 
@@ -137,6 +138,50 @@ Affected
 Risks
 : Editing the total to match the sum hides a genuinely missing line item; editing
   a line item to match the total invents a cost. Neither is safe to guess.
+
+### T-010 — CAD dataset, engineering model, robotic-joint mechanical validation
+
+Owner: unassigned
+Mode: build
+Status: review
+Depends on: `fix/adapter-timeout-decode` (the feature branch is stacked on it); independent review
+
+Goal
+: A STEP design becomes an engineering model whose every value states its
+  source and status, and one domain -- mechanical -- is validated end to end
+  through the existing V0-V4 contract, on an architecture the other domains
+  attach to without changing it.
+
+Acceptance criteria (verbatim from the issue #27 implementation plan)
+: - "Build the CAD dataset + engineering semantic model + first robotic-joint
+    mechanical validation example, with enough structure that the exact same
+    data architecture can support the next eight domains."
+
+Files in scope
+: `schemas/engineering-model/v1/`, `schemas/cad-dataset/v1/`, `tools/ecad_model/`,
+  `tools/cad_dataset.py`, `tools/requirements-cad.txt`, `datasets/cad/`,
+  `tests/unit/test_engineering_model.py`, `tests/unit/test_cad_dataset.py`,
+  the `cad-dataset` job in `.github/workflows/ci.yml`, documentation.
+
+Out of scope
+: Every domain other than mechanical; importers other than STEP; the v1
+  receipt contract, which is reused unchanged; the product inventory.
+
+Risks
+: Committed derived files come from macOS arm64 and have not been reproduced
+  on Linux -- the `cad-dataset` job would reveal a divergence as a `check`
+  failure. `cadquery-ocp` cannot be installed on the Python 3.10 legs, where
+  the dataset tests skip by design.
+
+Verification
+: | Check | Command | Result |
+  |-------|---------|--------|
+  | Complete suite, CAD tests mandatory | `ECAD_REQUIRE_CAD_TOOLS=1 python3 -m pytest tests -q` | `PASS` -- 190 passed, 1793 subtests (macOS, Python 3.14) |
+  | Derivation reproduces from the CAD | `python3 tools/cad_dataset.py check datasets/cad/robotic_joint_001` | `PASS` -- exit 0 |
+  | Test discrimination | 16 single-edit mutations of the new code | `PASS` -- 16 of 16 killed |
+  | Skip cannot go silent | tests with `OCP`/`mujoco` hidden, with and without `ECAD_REQUIRE_CAD_TOOLS=1` | `PASS` -- 17 skipped with reason / 7 failed + 10 errors |
+  | Linux reproduction | the `cad-dataset` CI job | `NOT RUN` -- no Linux runner used |
+  | Independent review | -- | `NOT RUN` |
 
 ## Completed
 

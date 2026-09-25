@@ -110,6 +110,24 @@ it succeeds only when every selected product has real `PASS` evidence for V0,
 V1, V2, V3, and V4. Historical baseline entries never waive a failed or missing
 requirement.
 
+## CAD dataset and engineering model
+
+`datasets/cad/` holds CAD dataset items for the multi-domain validation work
+in issue #27. Each item is a STEP design, the design intent the CAD cannot
+carry, and machine-readable requirements; the pipeline extracts it with the
+OpenCASCADE kernel, builds an engineering model in which every value states
+its source and status, and runs V0-V4 with domain simulators. `UNKNOWN`
+values are never filled in: a requirement that depends on one is `BLOCKED`.
+
+```bash
+python3 -m pip install -r tools/requirements.txt -r tools/requirements-cad.txt
+python3 tools/cad_dataset.py check    datasets/cad/robotic_joint_001
+python3 tools/cad_dataset.py validate datasets/cad/robotic_joint_001 --output /tmp/joint-run
+```
+
+See [datasets/cad/README.md](datasets/cad/README.md) and
+[docs/cad-dataset-engineering-model-v1.md](docs/cad-dataset-engineering-model-v1.md).
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
