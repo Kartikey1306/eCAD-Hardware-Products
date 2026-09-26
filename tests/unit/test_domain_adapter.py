@@ -1026,6 +1026,32 @@ class TestUntrustedRunsAndItems(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "environment record is malformed"):
                 regenerate_results(item, run, self.registry)
 
+    def test_a_forged_case_document_is_not_read_for_results(self):
+        """A run directory whose receipt cites, with a consistent digest, a case
+        document that breaks its schema: the results do not read it."""
+        from ecad_model.dataset import regenerate_results
+        from ecad_model.requirements import CASES_SCHEMA
+
+        with _scratch() as directory, tempfile.TemporaryDirectory() as output:
+            item, run = self._run(directory, output)
+            receipt = json.loads((run / "receipt.json").read_bytes())
+
+            def is_case_document(evidence):
+                try:
+                    return json.loads((run / evidence["path"]).read_bytes()).get("$schema") == CASES_SCHEMA
+                except ValueError:
+                    return False
+
+            [cited] = [e for e in _checks(receipt)["v4.REQ-DIG-001"]["evidence"] if is_case_document(e)]
+            data = json.dumps({"$schema": CASES_SCHEMA, "gate": "V4",
+                               "cases": [{"id": "REQ-DIG-001", "metric_limits": "x", "seed": "y"}]}).encode()
+            digest = hashlib.sha256(data).hexdigest()
+            (run / "evidence" / "sha256" / digest).write_bytes(data)
+            cited.update(path=f"evidence/sha256/{digest}", sha256=digest, size_bytes=len(data))
+            (run / "receipt.json").write_bytes(json.dumps(receipt).encode())
+            [row] = json.loads(regenerate_results(item, run, self.registry))["results"]
+        self.assertEqual((row["applied_bound"], row["configuration"]["seed"]), (None, None))
+
     def test_a_model_outside_the_receipt_s_digest_is_not_regenerated_from(self):
         from ecad_model.dataset import build, regenerate_results, validate
 
