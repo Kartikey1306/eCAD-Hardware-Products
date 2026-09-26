@@ -81,7 +81,18 @@
           "description": "True only once a person has read the licence text that governs this artefact.",
           "type": "boolean"
         },
-        "license_text_sha256": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/sha256"},
+        "license_text": {
+          "description": "The licence text that governs the artefact, as a repository file and its hash; check re-hashes it. LICENSE for a self-authored sample.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256"],
+          "properties": {
+            "path": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/relativePath"},
+            "sha256": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/sha256"}
+          }
+        },
+        "verified_by": {"description": "Who read the licence text of a third-party artefact.", "$ref": "#/definitions/nonEmptyString"},
+        "verified_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
         "redistribution_permitted": {"type": "boolean"},
         "training_use_permitted": {"type": "boolean"},
         "basis": {"$ref": "#/definitions/nonEmptyString"}
@@ -91,7 +102,16 @@
   "allOf": [
     {
       "if": {"properties": {"origin": {"properties": {"kind": {"const": "third_party"}}}}},
-      "then": {"properties": {"license": {"required": ["license_text_sha256"]}}}
+      "then": {"properties": {"license": {"required": ["license_text"]}}}
+    },
+    {
+      "description": "A verified licence cites the text that was read. A third-party one also says who read it and when; a self-authored sample is governed by the repository's own LICENSE, which the basis names.",
+      "if": {"properties": {"license": {"properties": {"license_verified": {"const": true}}}}},
+      "then": {"properties": {"license": {"required": ["license_text"]}}}
+    },
+    {
+      "if": {"properties": {"origin": {"properties": {"kind": {"const": "third_party"}}}, "license": {"properties": {"license_verified": {"const": true}}}}},
+      "then": {"properties": {"license": {"required": ["license_text", "verified_by", "verified_at"]}}}
     },
     {
       "description": "An unverified licence permits nothing: redistribution and training use are never assumed.",

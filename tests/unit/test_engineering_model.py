@@ -186,6 +186,21 @@ class TestQuantity(unittest.TestCase):
                 provenance["license"][field] = False
         validate(provenance, "cad-dataset/v1/source-provenance")
 
+    def test_a_verified_licence_cites_its_text_and_a_third_party_one_its_verifier(self):
+        provenance = json.loads((REPO_ROOT / "datasets/cad/robotic_joint_001/source/provenance.json").read_text())
+        validate(provenance, "cad-dataset/v1/source-provenance")
+        unverifiable = copy.deepcopy(provenance)
+        del unverifiable["license"]["license_text"]
+        with self.assertRaisesRegex(ValueError, "license_text"):
+            validate(unverifiable, "cad-dataset/v1/source-provenance")
+        third = copy.deepcopy(provenance)
+        third["origin"] = {"kind": "third_party", "author": "someone", "url": "https://example.org/part.step",
+                           "modifications": "none"}
+        with self.assertRaisesRegex(ValueError, "verified_by"):
+            validate(third, "cad-dataset/v1/source-provenance")
+        third["license"].update(verified_by="a named reviewer", verified_at="2026-09-26")
+        validate(third, "cad-dataset/v1/source-provenance")
+
     def test_schema_enforces_the_same_rules(self):
         """A hand-written document cannot bypass the constructor's rules."""
         base = {"value": 1.0, "unit": "kg", "status": "SPECIFIED", "source": ANNOTATION}

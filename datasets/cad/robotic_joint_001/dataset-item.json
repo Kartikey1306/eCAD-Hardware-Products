@@ -142,7 +142,7 @@
       "status": "NOT_IMPLEMENTED"
     }
   ],
-  "hash": "sha256:ad78e179f9d4f0f45f446522665d8010a0bba13a5720c7bd0f9d501b89c29b24",
+  "hash": "sha256:47d654d14b587b48be85f160e5ec40d8fc6e6949e40b2ca4d9263b90570c6546",
   "inputs": {
     "annotations": {
       "media_type": "application/json",
@@ -153,8 +153,8 @@
     "provenance": {
       "media_type": "application/json",
       "path": "source/provenance.json",
-      "sha256": "0da9a9f3b925b1d530e1cc35c0a84c43a18276c34ac49fc4d725b5edbf5b7b1a",
-      "size_bytes": 1179
+      "sha256": "8c80213b9aaf0b38db99bab29a50e33bb61c8de48aeaad294868e9d7cd312909",
+      "size_bytes": 1298
     },
     "requirements": {
       "media_type": "application/json",
@@ -185,6 +185,10 @@
     "license": {
       "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation",
       "basis": "authored in this repository by source/generate_step.py and committed under the repository's MIT LICENSE",
+      "license_text": {
+        "path": "LICENSE",
+        "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"
+      },
       "license_verified": true,
       "redistribution_permitted": true,
       "spdx": "MIT",
@@ -201,6 +205,7 @@
       "kind": "self_authored"
     }
   },
+  "source_url": null,
   "title": "robotic joint 001",
   "units": "mm",
   "versions": {

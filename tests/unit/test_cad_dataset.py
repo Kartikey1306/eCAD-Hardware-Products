@@ -606,6 +606,15 @@ class TestManifestAndCitations(unittest.TestCase):
                     self.assertTrue(any("lies outside the repository" in p
                                         for p in cited_source_problems(Item(item))))
 
+    def test_a_licence_text_that_changed_is_caught(self):
+        from ecad_model.dataset import Item, cited_source_problems
+
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
+            item = _copy_item(directory)
+            _edit_json(item / "source" / "provenance.json",
+                       lambda p: p["license"]["license_text"].update(sha256="0" * 64))
+            self.assertIn("licence text LICENSE has changed since it was cited", cited_source_problems(Item(item)))
+
     def test_building_without_provenance_is_refused(self):
         from ecad_model.dataset import build
 

@@ -21,6 +21,7 @@
     "spdx": "MIT",
     "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation",
     "license_verified": true,
+    "license_text": {"path": "LICENSE", "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"},
     "redistribution_permitted": true,
     "training_use_permitted": true,
     "basis": "authored in this repository by source/generate_step.py and committed under the repository's MIT LICENSE"

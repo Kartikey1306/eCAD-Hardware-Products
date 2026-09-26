@@ -296,6 +296,7 @@ def _item_manifest(item: Item, derivation: Derivation, registry: Optional[Dict[s
         "dataset_item_version": MANIFEST_VERSION,
         "item_id": item.item_id,
         "domain": item.domain,
+        "source_url": provenance["origin"].get("url"),
         "title": model["design"]["name"],
         "description": provenance["description"],
         "artifact_type": provenance["artifact_type"],
@@ -662,7 +663,7 @@ def manifest_problems(item: Item, derived: Optional[Derivation] = None,
 
 
 def cited_source_problems(item: Item) -> List[str]:
-    """Every file an annotation cites by hash must still have that hash.
+    """Every file an annotation cites by hash, and the licence text, must still have that hash.
 
     A citation is read only if it resolves to a regular file inside the
     repository: annotations are untrusted input, and an absolute or ../ ref
@@ -679,26 +680,15 @@ def cited_source_problems(item: Item) -> List[str]:
         >>> cited_source_problems(Item(REPOSITORY_ROOT / "datasets/cad/robotic_joint_001"))
         []
     """
-    problems = []
+    problems: List[str] = []
 
     def walk(node: Any) -> None:
         if isinstance(node, dict):
             origin = node.get("source") if {"value", "status", "source"} <= node.keys() else None
             if isinstance(origin, dict) and "sha256" in origin:
-                ref = origin["ref"]
-                path = (REPOSITORY_ROOT / ref).resolve()
-                if not path.is_relative_to(REPOSITORY_ROOT):
-                    problems.append(f"cited source {ref} lies outside the repository; it is not read")
-                elif not path.exists():
-                    problems.append(f"cited source {ref} does not exist")
-                else:
-                    try:
-                        regular_file(path)
-                    except UnsupportedFormat as exc:
-                        problems.append(f"cited source {ref}: {exc}")
-                    else:
-                        if _sha256(path.read_bytes()) != origin["sha256"]:
-                            problems.append(f"cited source {ref} has changed since it was cited")
+                problem = _citation_problem("cited source", origin["ref"], origin["sha256"])
+                if problem:
+                    problems.append(problem)
             for value in node.values():
                 walk(value)
         elif isinstance(node, list):
@@ -706,7 +696,29 @@ def cited_source_problems(item: Item) -> List[str]:
                 walk(value)
 
     walk(json.loads(item.read(ANNOTATIONS)))
+    licence = item.provenance["license"].get("license_text")
+    if licence:
+        problem = _citation_problem("licence text", licence["path"], licence["sha256"])
+        if problem:
+            problems.append(problem)
     return sorted(set(problems))
+
+
+def _citation_problem(what: str, ref: str, sha256: str) -> Optional[str]:
+    """Why a file cited by hash does not hold: outside the repository (not
+    read), missing, not a regular file, or changed since it was cited."""
+    path = (REPOSITORY_ROOT / ref).resolve()
+    if not path.is_relative_to(REPOSITORY_ROOT):
+        return f"{what} {ref} lies outside the repository; it is not read"
+    if not path.exists():
+        return f"{what} {ref} does not exist"
+    try:
+        regular_file(path)
+    except UnsupportedFormat as exc:
+        return f"{what} {ref}: {exc}"
+    if _sha256(path.read_bytes()) != sha256:
+        return f"{what} {ref} has changed since it was cited"
+    return None
 
 
 def check(directory: Path, registry: Optional[Dict[str, DomainAdapter]] = None) -> List[str]:
