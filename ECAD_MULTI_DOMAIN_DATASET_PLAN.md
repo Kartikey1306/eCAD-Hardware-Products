@@ -7,11 +7,10 @@ document; its section numbers are cited as *spec §n*).
 
 Base: local branch `wip/stack`, code at `bd999d5`, added to by the
 documentation commit that carries this file — `master` (751616a) plus the
-stack in §1.1. The first implementation stage (§21 item 3) is in progress
-on the local branch `feat/multi-domain-foundation`, which forks from this
-commit. An independent review of that branch has open findings, so each of
-its items is `PARTIAL` here; the branch updates these markers as it closes
-them. Nothing here is pushed. Every statement about the
+stack in §1.1. The first implementation stage (§21 item 3) is on the local
+branch `feat/multi-domain-foundation`, which forks from that commit; this
+copy of the plan is that branch's, and §21 item 3 marks the state of each of
+its items there. Nothing here is pushed. Every statement about the
 repository was checked against that state. Load-bearing claims carry an
 evidence label per `CLAUDE.md`: **Verified** (a command was run and its output
 read), **Observed** (visible in the code), **Inferred**, **Assumed**,
@@ -78,7 +77,7 @@ These are labels for this document only. Data uses the spec §34 vocabulary
 | `fix/portable-evidence-paths` | `e4b6513` | No host paths in hash-bound legacy evidence |
 | `fix/producer-cross-reference-checks` | `6e6aae3` | Producer refuses bundles its own verifier rejects |
 | `wip/stack` | the documentation commit carrying this file | `fea3fc4` → `3639778` (the cross-reference fix, cherry-picked; patch-identical to `6e6aae3`) → the mechanical pipeline (`b965aa4`, `17a4770`) → review fixes `f4398f4`, mutation suite `8db907e`, pins `9c5b890`, second-review fixes `c9be0b6`, harness `be63d19`, fixes from a check of this plan's claims `bd999d5` (§7), then the documentation commit |
-| `feat/multi-domain-foundation` | on the documentation commit | Forked from the stack; §21 item 3, in progress (marked there) |
+| `feat/multi-domain-foundation` | code at `b4fca10`, then its documentation commit | Forked from the stack's documentation commit: five feature commits, the fixes of two reviews (`2beb77a`), one test (`b4fca10`); §21 item 3 (each item marked there) |
 | `fix/version-probe-reason-codes` | not written | RESULT-2 (§7.2); planned for §21 item 1 |
 
 `feat/cad-dataset-engineering-model` (`50a8557`) is the pre-review version of
@@ -118,10 +117,10 @@ the mechanical pipeline; `wip/stack` supersedes it.
   documents, consumer verification.
 - **Engineering-model v1 and cad-dataset v1** (on the stack): quantity, model,
   annotations, requirements; extraction, dataset item, source provenance.
-  **Versioning:** these families are declared pre-release until the foundation
-  PR merges, and are amended in place until then. From that merge on, the
-  repository rule applies: an incompatible change needs a new versioned
-  directory (SCOPE-1, §9.3).
+  **Versioning:** the stack declares these families pre-release, amended in
+  place until the foundation lands. The foundation branch removes that
+  declaration: from its merge on, the repository rule applies, and an
+  incompatible change needs a new versioned directory (SCOPE-1, §9.3).
 
 ## 4. Existing CAD extraction
 
@@ -209,7 +208,7 @@ Nothing here has landed.
 | T9 | Tests pinned to the sample's current gaps | Refuted as a defect (latent); a fixture-built ordering test was added anyway | `test_index_is_sorted_whatever_the_facet_order` · `unknowns-unsorted` |
 | T10 | Reproducibility tolerance unpinned | Fixed | `test_scalars`, `test_arrays_scale_by_their_largest_element` · `reltol-too-loose`, `per-element-tolerance` |
 | T11 | Documented refusals deletable without a failure | Fixed | `TestImporterRefusals`, `test_builder_refuses_inconsistent_annotations`, `test_mechanical_model_refuses_what_it_cannot_represent` · `mirrored-placement-allowed`, `duplicate-names-allowed`, `nested-assembly-allowed` |
-| T12 | Receipt requirement binding and trace components untested | Fixed: both halves | `test_committed_item_meets_every_measurable_check`, `test_the_trace_names_both_sides_for_clearance_and_marks_illustrative_limits` · `requirement-binding-dropped`, `clearance-trace-one-side` |
+| T12 | Receipt requirement binding and trace components untested | Fixed: both halves | `test_committed_item_meets_every_measurable_check`, `test_the_trace_names_both_sides_for_clearance_and_marks_illustrative_limits` (on this branch `test_the_results_name_both_sides_for_clearance_and_mark_illustrative_limits`) · `requirement-binding-dropped`, `clearance-trace-one-side` |
 | T13 | Free-swing crossing interpolation and equilibrium angle unchecked | Fixed: `equilibrium_angle` reference | `test_period_of_a_tilted_axis_uses_the_perpendicular_gravity` · `crossing-not-interpolated` |
 | I1 = S2 | Per-element reproducibility tolerance fails on Linux kernel noise | Fixed: one tolerance per array, scaled by its largest element | as T10; Linux: §20 R1 |
 | I2 | MuJoCo not importable by `python3` on `PATH` → no receipt | Fixed (stacked on the cross-reference fix): a `BLOCKED` receipt | `test_an_unavailable_simulator_gives_a_blocked_receipt_not_a_crash` |
@@ -242,12 +241,13 @@ Nothing here has landed.
 | HONESTY-1 | The receipt's `eligible_for_ebuild` is overall `PASS`, so a sample whose illustrative limits all pass would read as release-eligible (latent: `REQ-XD-001` keeps today's receipt `BLOCKED`) | Fixed on the stack: a met illustrative limit is `WARNING` `WITHIN_ILLUSTRATIVE_LIMIT`, which the contract treats as blocking · `test_only_a_real_requirement_can_pass`, `test_committed_item_meets_every_measurable_check` · `illustrative-limit-passes` |
 | STATE-2 | V3/V4 execution records and receipt `tools[]` embed the host interpreter's absolute path (`process.py` argv[0], `python_control.py:82`, `cases.py:401`), in 14 of 30 hash-bound evidence files of a dataset run; `fix/portable-evidence-paths` covers only `engine.py` (spec §24) | Open. Existing merged code; extends that fix branch |
 | FACT-3, -11, -12 | The first S6 fix guarded only the CAD file; `check` read inputs before refusing symlinks or unenumerable items; the post-transfer external-file refusal was untested | Fixed on the stack (rows S1, S3, S4, S6 above) |
-| ACC-9 | `validate` did not refuse a symlinked item (only `build` and `check` did) | Fixed on the stack · `test_check_refuses_a_symlinked_directory_before_reading_through_it` (now `check` and `validate`) · `validate-follows-symlinks` |
+| ACC-9 | `validate` did not refuse a symlinked item (only `build` and `check` did) | Fixed on the stack · `test_check_refuses_a_symlinked_directory_before_reading_through_it` (now `check` and `validate`) · `validate-follows-symlinks` (on this branch folded into `check-follows-symlinks`: `Item` refuses before either reads) |
 | ACC-1 | The simulation-script mutants were killed only by the manifest's hash of the script, so no behavioural test was shown to catch wrong physics there | Fixed in the harness: the item is rebuilt after such a mutant; results in §16 |
 | RESULT-2 | On a failed version probe the adapters emit reason codes containing `:`, spaces or `-` (`capabilities.py:45/54/79`); the receipt then fails its own schema and none is written | Open. Existing merged code; fix branch `fix/version-probe-reason-codes`, §21 item 1 |
 | ARCH-7 | `python_control` reports the validator's interpreter version, not the model's packages, and may run a different interpreter; receipt tool records were last-writer-wins per `tool_id` | Tool records fixed on the stack: one record per tool keeps only what all its checks share · `test_committed_item_meets_every_measurable_check` · `tool-record-last-writer-wins`. The `python_control` half is open: a prerequisite of the first Python-model domain (§21 item 7) |
 | RESULT-8 | Version probes take the first output line; ngspice's is a banner (**Inferred**, ngspice not installed here) | Open; prerequisite of the electrical domain |
 | MAP-1 | A `BLOCKED` V3 reference falls back to contract domain `integrated_physics` because only `requirements[]` is searched | Fixed on `feat/multi-domain-foundation` (the lookup covers references); no observable effect for mechanical |
+| ENGINE-1 | The case engine reports a case document it cannot parse as `FAIL` with no evidence (`cases.py:157-170`); the receipt contract requires evidence for any verdict but `BLOCKED`, so the receipt fails its own schema and none is written (**Verified** through the dataset runner, 2026-09-26) | Open in merged code. The dataset runner on `feat/multi-domain-foundation` cites the document as the check's evidence; the product pipeline still has the defect. Fix belongs with §21 item 1 |
 
 ### 7.3 Missing (spec capabilities with no code)
 
@@ -255,7 +255,7 @@ With no code anywhere: training records; electrical, digital, PCB, power,
 control, EM, thermal and full-system domains; cross-domain rules beyond a
 model-quantity limit (`from_result`, `depends_on`); non-STEP importers.
 
-In progress on `feat/multi-domain-foundation` only, not on the stack (§21 item 3, `PARTIAL`): the
+On `feat/multi-domain-foundation` only, not on the stack (§21 item 3 marks each): the
 `UNSPECIFIED` and `NOT_AVAILABLE` statuses with one null predicate; the
 domain adapter layer, with the mechanical domain refactored onto it;
 artefact-neutral sources; tolerance, unit checking and per-domain
@@ -275,8 +275,74 @@ CAD re-extraction. No non-CAD sample can produce a valid model or manifest.
 Quantity provenance with `derived_from`; content-hash integrity separate from
 tolerance-based reproducibility; hand-written licence provenance;
 `UNKNOWN` limit → `BLOCKED`; isolated extraction; no synthesised simulator
-version for a `PASS` (`cases.py:439-454`); `implemented` only from the
+version for a `PASS` (`cases.py:439-454`); a domain's status only from the
 platform, never from sample data.
+
+### 7.5 Defects found by independent review of the foundation, and their state
+
+The foundation branch had its own five-lens review (correctness, contracts,
+untrusted input, test adequacy, acceptance), each finding checked by a
+separate verifier trying to refute it: 61 findings, 59 confirmed, 2 refuted
+(FK-F5, a domain-status reason read as a claim about requirements; FK-F13, a
+forged-status test that already tests what it should). (These counts are
+**Unknown** to a reader of the repository: they come from the review run's
+journal, local to the authoring session.) IDs carry the lens: FC
+correctness, FK contracts, FU untrusted input, FT tests, FA acceptance.
+Several lenses often found one defect; rows group them. Every fix is on
+`feat/multi-domain-foundation`; each named mutant is in
+`tests/mutation/run_mutations.py`, and §16 records the run that killed it.
+
+| IDs | Finding (as confirmed) | State | Test · mutant |
+|---|---|---|---|
+| FC-F1, FU-F4 | `validate` recompiled the committed model unguarded: a requirement V1 had already refused (a wrong unit; a move derivation on a scenario without its parameters) crashed it before any receipt | Fixed: V3/V4 take what is blocked from the fresh derivation; the vocabulary requires each scenario's parameters and pairs move derivations with the rated move | `test_a_requirement_that_cannot_compile_still_gives_a_receipt`, `test_each_scenario_carries_what_its_case_reads` · `cases-run-without-derivation`, `rated-move-parameters-optional`, `free-swing-amplitude-optional`, `move-derivation-any-scenario` |
+| FC-F2 | Input statuses were kept only at leaves: an `AI_ASSUMPTION` naming a parent was walked past and the verdict stood | Fixed: every non-`DERIVED` quantity on the way is an input | `test_an_assumption_that_names_a_parent_is_still_an_input` · `assumption-with-parents-walked-past`, `inputs-not-transitive` |
+| FC-F3 | A `derived_from` that does not resolve raised after every case had run, so no receipt | Fixed: reported, never raised (`INCONCLUSIVE` `INPUT_NOT_RESOLVABLE`); `build` refuses a model whose lineage cannot be followed | `test_an_unresolvable_path_is_reported_not_raised`, `test_lineage_problems_name_a_dangling_parent_and_a_cycle`, `test_a_model_whose_lineage_cannot_be_followed_is_not_built` · `unresolvable-input-raises`, `unresolved-ignored`, `unresolved-overrides-blocked`, `lineage-dangling-allowed`, `lineage-cycle-allowed`, `lineage-unchecked-at-build` |
+| FC-F5, FU-F3 | `except LookupError` also caught `KeyError`/`IndexError`: an invalid item was reported as its domain `NOT_IMPLEMENTED` | Fixed: `DomainNotImplemented`, decided before deriving; any error the inputs provoke is `DATASET_INPUT_INVALID` | `test_an_error_the_item_provokes_is_its_fault_not_a_missing_domain` · `item-error-crashes-validate` |
+| FC-F4 | A vector limit quantity raised `TypeError` in the tolerance fold | Fixed: refused as not a single number | `test_a_limit_quantity_that_is_not_one_number_is_refused` · `vector-limit-accepted` |
+| FC-F6 | A case document the requirements no longer compile stayed on disk and was executed | Fixed: `build` removes it, V2 reports it, `validate` never runs it | `test_a_case_document_the_requirements_no_longer_compile_is_removed_and_never_run` · `stale-case-document-run`, `-kept`, `-unreported` |
+| FK-F6 | With no adapter registered, the committed cases still ran | Fixed: every requirement `BLOCKED` `DERIVATION_NOT_AVAILABLE`, nothing runs | `test_without_its_adapter_the_domain_is_not_implemented_and_nothing_runs` · `cases-run-without-derivation` |
+| FC-F7, FK-F2, FU-F2, FT-F1, FT-F2, FA-RES-1 | Regeneration read the working tree and the regenerating host's platform, bound to an old receipt | Fixed: the run's environment is recorded in its `v0.pinned-clean-source` evidence; case documents and execution records come from verified evidence; refused unless the item's digest equals the receipt's | `test_results_regenerate_identically_anywhere_from_what_the_run_recorded`, `test_an_item_changed_after_the_run_is_not_regenerated` · `environment-from-this-process`, `environment-tools-empty`, `constraints-digest-dropped`, `regenerate-ignores-item-changes` |
+| FU-F1 | Regeneration trusted the run directory's paths, bytes and records | Fixed: receipt schema-checked and for this item; evidence read only at its content address and with its digest; a record counts only for its own check | `test_forged_or_misplaced_evidence_is_refused`, `test_a_record_is_the_execution_of_the_check_that_cites_it_or_nothing`, `test_a_run_of_one_item_is_not_regenerated_for_another` · `evidence-digest-unchecked`, `evidence-path-trusted`, `receipt-not-schema-checked`, `receipt-for-another-item`, `execution-record-of-another-check` |
+| FU-F5, FC-F11, FA-ACC-7a | Results iterated the requirements and filled `NOT_RUN` for a requirement no check covered; optional case fields were indexed; golden and corner cases shared one key space; results were written after the receipt | Fixed: each result names the check that decided it (its own or the gate-level stand-in), none decided is an error; ids unique across both arrays; a non-numeric metric is null with a finding; results written after the receipt (round 2, below) | `test_a_result_names_the_check_that_stood_in_for_its_missing_case`, `test_a_measurement_is_borrowed_only_by_a_requirement_blocked_on_its_limit`, `test_an_id_shared_by_a_reference_and_a_requirement_is_refused` · `results-decided-by-nothing`, `result-status-recomputed`, `non-number-measured`, `duplicate-ids-allowed` |
+| FA-HON-1, FK-F3, FC-F8 | `AVAILABLE` for any domain whose format was present, though only the primary domain's adapter runs | Fixed: primary only; the others `NOT_APPLICABLE` | `test_only_the_sample_s_primary_domain_is_available` · `secondary-domain-available`, `status-from-registry-alone` |
+| FK-F1, FK-F8, FT-F6, FA-NULL-1 | Dynamics metrics omitted the joint range, references omitted gravity, and gravity was read without the null predicate | Fixed | `TestMechanicalDependencies`; the slow `AI_ASSUMPTION joint range` case · `range-not-an-input`, `gravity-not-an-input`, `clearance-reads-mass`, `reference-inputs-empty`, `reference-gravity-unlisted`, `gravity-read-unchecked`, `weightless-design-crashes` |
+| FK-F11 | The AI rule relabelled a crash or a misconfiguration as an AI problem | Fixed: only the comparator's `PASS`/`FAIL` | `test_only_a_comparator_verdict_is_withheld_for_an_ai_assumption` · `ai-rule-on-any-verdict`, `ai-rule-dropped`, `ai-rule-spares-a-pass` |
+| FK-F12, FA-RES-2, FC-F9 | Any result without its own metric borrowed one; a scenario identifier was an input with a value status; the V3 bound was not what the comparator evaluates | Fixed | `test_a_measurement_is_borrowed_only_by_a_requirement_blocked_on_its_limit`, `test_each_check_has_one_result_that_copies_the_receipt_and_cites_its_evidence` · `borrowed-for-any-verdict`, `sibling-arguments-ignored`, `scenario-inputs-include-identifiers`, `scenario-inputs-dropped`, `v3-bound-as-min-max` |
+| FK-F4, FT-F12 | The results schema accepted combinations the contract forbids | Fixed: six cross-field rules | `test_the_results_schema_refuses_what_the_result_contract_forbids` · the eight `results-…` mutants (`results-pass-without-version`, `results-reference-illustrative`, `results-kind-disagrees`, `results-illustrative-pass`, `results-pass-unmeasured`, `results-null-input-not-blocked`, `results-assumption-passes`, `results-comparator-reason-on-assumption`) |
+| FK-F7, FT-F9, FT-F10 | The manifest schema lacked the provenance's licence rules; `source_url` and two provenance licence rules were untested | Fixed | `test_the_manifest_restates_the_licence_rules_of_the_provenance`, `test_a_third_party_sample_records_its_source_url`, `test_a_verified_licence_cites_its_text_and_a_third_party_one_its_verifier` · `manifest-unverified-permits-use`, `manifest-verified-uncited`, `manifest-third-party-verifier-optional`, `manifest-modifications-optional`, `source-url-dropped`, `source-url-null-for-third-party`, `provenance-verified-at-optional`, `provenance-third-party-uncited` |
+| FA-ACC-4, FC-F10 | V1 `MISSING_REQUIRED_INPUT` named a mass rather than the density it rests on, and only the first | Fixed: every root null value, as `<STATUS>: <path>` | `test_a_missing_input_is_blocked_not_a_design_failure`, `test_every_missing_value_is_named_not_only_the_first` · `missing-input-paths-dropped`, `missing-input-not-traced-to-its-root`, `null-mass-loses-its-inputs`, `mjcf-single-missing-unnamed` |
+| FU-F6, FU-F7 | `integrity` read manifest paths outside the item (a hash oracle); an item that is itself a symlink was followed | Fixed | `test_a_manifest_path_outside_the_item_is_not_read`, `test_an_item_is_refused_before_it_is_read` · `manifest-path-outside-item-read`, `item-root-symlink-followed`, `item-outside-repository-read` |
+| FC-F14, FA-PLAN-1(e) | With no extraction file the model's lineage omitted the artefacts; a design source's format was not checked against the provenance | Fixed | the fixture's lineage assertion, `test_a_source_the_provenance_does_not_declare_is_a_divergence` · `model-lineage-omits-artefacts`, `undeclared-source-format-allowed` |
+| FT-F3–F5, F7, F8, F11, F13–F15 | Single-line mutants of new code survived every test | Fixed: a test and a mutant each | beyond the rows above: `reference-unit-unchecked`, `foreign-reference-compiled`, `reference-scenarios-unchecked`, one `schema-…` mutant per per-status rule of `common.schema.json` (7), `unknown-comparator-accepted`, `unknown-fidelity-accepted`, `exact-comparator-ignored`, `manifest-domain-hard-coded`, `extraction-schema-not-checked`, `declared-source-missing-unnamed`, `unlisted-sources-skipped`, `expected-value-dropped`, `applied-bound-dropped`, `seed-dropped`, `illustrative-label-dropped`, `result-illustrative-flag-dropped`, `null-input-not-blocking`, `null-input-only-unknown` |
+| FT-F8 | An existing schema test's fixture failed on the note rule, not the rule its label names | Fixed: the fixture carries a note | `test_schema_enforces_the_same_rules` · `schema-unknown-may-carry-value` |
+| FC-F12 | The report pointed at a `results.json` that was never written | Fixed: it says why none was written | `test_without_its_adapter_the_domain_is_not_implemented_and_nothing_runs` |
+| FC-F13, FK-F10, FA-ACC-2 | Criterion 2's grep matched a doctest | Fixed: a neutral tool id | *code change only* |
+| FA-PLAN-1(b) | The validator reported the model-format version as its own | Fixed: `VALIDATOR_VERSION` | *value unchanged; no test* |
+| FA-ACC-1, FA-ACC-3, FA-ACC-9, FA-ACC-10, FA-PLAN-1, FK-F9 | The plan and the documentation overstated or were stale: criterion 1's exceptions, no dropped-illustrative mutant, the schema documentation not updated, the §11 claim, the item markers | Fixed: §11, §12, §21 item 3 here, and `docs/cad-dataset-engineering-model-v1.md` | *doc change* |
+
+A second review then checked each fix against its finding: 49 fixed, 10
+partly fixed, and new defects in the fixes, nearly all of one kind — a
+receipt still lost when committed files had drifted from the inputs; each
+claim was checked by a separate verifier, and one (N-docs-9) was refuted.
+Round 2 closed them:
+
+| IDs | Finding (as confirmed) | State | Test · mutant |
+|---|---|---|---|
+| FC-F1, FU-F4 (partly), N-code-2, N-contracts-2, N-docs-1 | On a built item, an entry V1 refused (a move derivation on a static sweep, an unknown metric) still crashed the results, which were built before the receipt | Fixed: every adapter call in the results is guarded, an unknown metric's fidelity is `null`, and the receipt is written before the results | `test_a_refused_entry_on_a_built_item_still_gives_a_receipt_and_results`, `test_a_metric_the_domain_does_not_produce_has_no_fidelity`, `test_a_failure_to_build_the_results_still_leaves_the_receipt` · `results-inputs-unguarded`, `unknown-metric-fidelity-crashes`, `results-before-receipt` |
+| FC-F11, FA-ACC-7a (partly), N-correctness-1, N-acceptance-1, N-code-1 | An entry the fresh derivation compiles but the committed document lacks had no check, and the results raised | Fixed: `BLOCKED` `COMMITTED_CASE_MISSING` | `test_a_requirement_added_without_a_rebuild_is_blocked_not_lost` · `committed-case-missing-unreported` |
+| N-correctness-2, N-acceptance-2, N-contracts-3 | A committed case for an entry the fresh derivation blocks ran beside the fresh `BLOCKED` check: a duplicate check id, no receipt | Fixed: a stale case is not counted, and the blocked check says so | `test_a_stale_case_for_a_requirement_now_blocked_is_discarded_not_duplicated` · `stale-committed-case-counted`, `stale-case-unnoted` |
+| FA-NULL-1 (partly), N-acceptance-3, N-code-4 | V3 checks were never propagated, so a reference resting on a null input kept its `PASS` and broke the results schema | Fixed: V3 inputs are propagated too (the AI rule stays on requirements) | `test_a_null_input_blocks_a_reference_as_it_blocks_a_requirement` · `v3-inputs-ignored` |
+| N-correctness-3, N-code-3, N-untrusted-input-1 | A committed model that does not parse, or is not a model, crashed V3/V4 or the results | Fixed: it is schema-checked first; V3/V4 `BLOCKED` `COMMITTED_MODEL_INVALID`; no results, and the report says why | `test_an_unusable_committed_model_gives_a_receipt_without_results` · `committed-model-schema-unchecked` |
+| N-code-5, N-acceptance-4 | A committed derived file or manifest that does not parse crashed V2 (already so on the stack); a case document that does not parse left a receipt that fails its schema (ENGINE-1, §7.2) | Fixed in the runner: reported as divergences, and the document cited as evidence | `test_committed_files_that_do_not_parse_are_divergences_not_crashes` · `reproducibility-parse-crash`, `manifest-shape-crash`, `uncited-engine-failure-kept` |
+| N-untrusted-input-3, N-acceptance-5, N-code-6 | Regeneration raised undocumented errors on a malformed record, and rebuilt results for a run that wrote none | Fixed | `test_a_malformed_environment_record_is_refused`, `test_a_run_that_wrote_no_results_has_none_to_regenerate` · `environment-shape-unchecked`, `regenerate-no-results-unchecked` |
+| N-correctness-4 | With no extraction file, the model's lineage listed other domains' artefacts | Fixed: only its adapter's formats | the lineage assertion in `test_only_the_sample_s_primary_domain_is_available` · `lineage-fallback-all-sources` |
+| N-contracts-1, N-tests-1, FT-F12 (partly) | `results-reference-illustrative` was an equivalent mutant: another rule already forced the flag | Fixed: the redundant clause removed; the mutant now drops the operator rule | `test_the_results_schema_refuses_what_the_result_contract_forbids` · `results-reference-any-operator` |
+| N-untrusted-input-2, N-tests-2 | The misplaced-evidence test passed on the receipt schema, never reaching the content-address check | Fixed: a schema-valid path that is not the content address | `test_forged_or_misplaced_evidence_is_refused` · `evidence-path-trusted` |
+| N-tests-3 | Two restated manifest licence rules had no test | Fixed | `test_the_manifest_restates_the_licence_rules_of_the_provenance` · `manifest-third-party-uncited`, `manifest-verified-at-optional` |
+| FT-F7 (partly) | No result assertion on `>=` or on a tolerance | Fixed | `test_a_reference_and_a_requirement_run_and_give_their_results` · `result-operator-fixed`, `result-tolerance-dropped` |
+| FT-F15 (partly) | No reference ran through a non-mechanical adapter | Fixed: the fixture gains a derivation, and a test-only stand-in for the Icarus adapter drives the engine's `PASS` paths | `test_a_reference_and_a_requirement_run_and_give_their_results` |
+| FA-ACC-1, FA-ACC-3, N-docs-3 (partly) | No clean-tree comparison or mutation result recorded for this branch | Recorded in §16 and `TASKS.md` T-011 | *verification record* |
+| N-docs-1–8, 10–17 | Documentation claims the code did not bear out (a receipt "whatever the item does", `SOURCE_REJECTED` for a content refusal, `cad_ref` as a generic check, the gravity sentence, the README's Linux claim and verifier rule, `--stop-timeout`, §8.1, §11, §12.1, stale wording) | Fixed | *doc change* |
 
 ---
 
@@ -311,23 +377,30 @@ verdicts (§12), never value statuses.
 test per site; without it an `UNSPECIFIED` density raises `TypeError` and no
 receipt is written, and an `UNSPECIFIED` limit compiles to
 `{"maximum": null}` (STATUS-1). Each unknowns-index entry and each `BLOCKED`
-finding also carries the actual status. (In progress on
+finding also carries the actual status. (Implemented on
 `feat/multi-domain-foundation`.)
 
-**Status propagation.** A result's inputs are the model paths its metric
-depends on, plus the limit's model quantity when the limit is one, and the
-transitive `derived_from` leaves of all of them, each with its status (§12.2,
-SCOPE-7). The rule is applied in `dataset.validate` after `execute_cases` and
-before gate aggregation, so the receipt and the per-requirement result agree,
-in this order (the first that applies wins):
+**Status propagation.** A check's inputs are what the model paths it depends
+on rest on through `derived_from` — its metric's dependencies and the
+limit's model quantity for a requirement, the derivation's inputs for a
+reference (§12.2) — namely every quantity on the way whose status is not
+`DERIVED`, and every `DERIVED` quantity with no model inputs of its own, each
+with its status (SCOPE-7). The rule is applied in `dataset.validate` after
+`execute_cases` and before gate aggregation, to V3 and V4 checks alike, so
+the receipt and the per-requirement result agree, in this order (the first
+that applies wins):
 
-1. any null-status leaf → `BLOCKED`, `MISSING_REQUIRED_INPUT`;
-2. any `AI_ASSUMPTION` leaf → a V4 `PASS` or `FAIL` becomes `INCONCLUSIVE`,
-   `INPUT_IS_AI_ASSUMPTION`; V3 is unaffected, since a golden compares two
-   computations on the same inputs (AI-1);
-3. a met illustrative limit → `WARNING`, `WITHIN_ILLUSTRATIVE_LIMIT`.
+1. any null-status input → `BLOCKED`, `MISSING_REQUIRED_INPUT`;
+2. any input that does not resolve in the model → `INCONCLUSIVE`,
+   `INPUT_NOT_RESOLVABLE`, unless already `BLOCKED`;
+3. any `AI_ASSUMPTION` input → the comparator's `PASS` or `FAIL` on a
+   requirement (`CORNER_LIMITS_PASSED`/`FAILED`) becomes `INCONCLUSIVE`,
+   `INPUT_IS_AI_ASSUMPTION`; a golden is unaffected, since it compares two
+   computations on the same inputs (AI-1), and so is a verdict the
+   comparator did not reach (a crash, a missing tool);
+4. a met illustrative limit → `WARNING`, `WITHIN_ILLUSTRATIVE_LIMIT`.
 
-`ESTIMATED` leaves do not change the verdict and are listed in the result.
+`ESTIMATED` inputs do not change the verdict and are listed in the result.
 
 The `AI_ASSUMPTION` rule is the conservative default for §20 Q7; the case
 engine stays status-blind.
@@ -417,12 +490,14 @@ cross-domain and full system).
 ### 9.3 Versioning (SCOPE-1)
 
 - Schema families: `engineering-model/v1` and `cad-dataset/v1` are declared
-  pre-release until PR 3 merges, in `docs/cad-dataset-engineering-model-v1.md`
-  (Versioning) on the stack, so PR 2 lands them labelled. After PR 3, a
-  compatible addition stays in v1 and an incompatible change needs v2.
-- Producers: one version constant per producer (importer, builder, each domain
-  model writer, compiler, validator) in place of the single shared
-  `MODEL_VERSION`, so a change to one bumps one.
+  pre-release in `docs/cad-dataset-engineering-model-v1.md` (Versioning) on
+  the stack, so PR 2 lands them labelled. PR 3 (this branch) replaces that
+  declaration with the rule: from its merge, a compatible addition stays in v1
+  and an incompatible change needs v2.
+- Producers: one version constant per producer (the STEP importer, the
+  builder, each domain adapter's derived outputs, the compiler, the results
+  generator, the validator), so a change to one bumps one. `MODEL_VERSION`
+  remains only as the version of the engineering-model document format.
 - A per-requirement result identifies the model by the SHA-256 of
   `engineering_model.json`, separately from the schema version (RESULT-5).
 
@@ -460,43 +535,51 @@ workspace before deleting it, and each adapter gets a metric parser (ngspice
 `.meas`/raw file, `vvp` `$display` markers, KiCad DRC report) that turns tool
 output into metrics and evidence (ARCH-2).
 
-**Domain adapter** (new, `ecad_model/domains/`). The spec's example
-(`prepare`, `run`, `collect_results`, `validate`) adapted to this repository,
-where running and deciding already belong to the case engine:
+**Domain adapter** (`ecad_model/domains/base.py`, provisional). The spec's
+example (`prepare`, `run`, `collect_results`, `validate`) adapted to this
+repository, where running and deciding already belong to the case engine.
+As implemented on the foundation branch:
 
 ```python
 class DomainAdapter(Protocol):
     domain: str
-
-    # input requirements
-    def accepted_artifacts(self) -> list[ArtifactKind]: ...          # kinds + importer per kind
-    def required_inputs(self, model, requirement) -> list[InputRef]: ...  # model paths or artefact kinds, per requirement
+    formats: FrozenSet[str]          # the artefact formats it reads
+    description: str                 # what it validates: the manifest's AVAILABLE reason
 
     # engineering model
-    def extract(self, sample) -> ModelContribution: ...              # components, facets from the sample's artefacts
-    def publish(self, model) -> list[Quantity]: ...                  # DERIVED facets for other domains
-    def vocabulary(self) -> Vocabulary: ...                          # facets, metrics with units and fidelity, scenarios, derivations
+    def extract(self, root, sources, annotations, refs) -> Extraction: ...   # model, raw extraction files, tool records
+    def document_schemas(self) -> Dict[str, str]: ...                        # each extraction file's schema, checked at V0
 
-    # prepare (spec) = domain models + checks + cases
-    def write_models(self, model) -> list[DerivedModel]: ...         # path, bytes, role, media type, producer + version, derived_from, comparator
-    def sanity_checks(self, model, sample) -> list[Check]: ...       # V1
-    def invariant_checks(self, model, derived) -> list[Check]: ...   # V2
-    def compile_cases(self, model, requirements) -> CompiledCases: ...  # cases + per-metric dependencies + fidelity
+    # prepare (spec) = domain models + checks + case targets
+    def write_models(self, model, sample_id) -> List[DerivedFile]: ...       # path, bytes, role, media type, producer + version, derived_from, comparator
+    def sanity_problems(self, model) -> List[str]: ...                       # V1
+    def invariant_problems(self, model, extraction_files, domain_models) -> List[str]: ...  # V2
+    def case_target(self, sample_id) -> CaseTarget: ...                      # tool adapter, inputs, arguments per scenario
+    def simulation_files(self, root) -> List[str]: ...                       # case scripts, hashed as inputs
 
-    # run + collect_results (spec) = existing case engine + tool adapters
-    def simulation_files(self) -> list[str]: ...                     # case scripts, hashed as inputs
+    # vocabulary and what each check rests on
+    def metrics(self) -> Dict[str, Metric]: ...                              # unit and fidelity per metric
+    def check_requirements(self, requirements) -> None: ...                  # refuses scenarios and derivations it lacks
+    def reference_value(self, model, derivation, scenario) -> Tuple[float, List[str]]: ...  # V3 closed forms
+    def reference_inputs(self, model, derivation, scenario) -> List[str]: ...
+    def dependencies(self, model, metric, scenario) -> List[str]: ...        # §12.2
+    def components_for(self, model, metric) -> List[str]: ...               # source parts a metric depends on
 ```
 
-`validate` in the spec's sense stays with the existing deterministic
-comparators and the status propagation of §8.1; cross-domain evaluation is a
-separate post-execution stage (§14). The protocol has no `depends_on` yet:
-the cross-domain PR adds it, with each adapter declaring the facets and
-results it consumes, and dependency order is defined there. Simulation files
-are declared by the adapter and recorded with a media type from their
-extension (`.py`, `.v`, `.cir`, …); the compiled case documents stay one pair
-per sample, written by the domain-neutral compiler with one version.
-Check IDs are namespaced by domain (`v1.mechanical.physical-sanity`) so
-several domains fit in one receipt.
+Case compilation stays domain-neutral (`requirements.compile_cases`, one
+version), fed by `case_target`, `reference_value` and `metrics`.
+Designed here but not yet in the protocol: publishing DERIVED facets for
+other domains (`publish`) and per-requirement input declarations beyond
+`dependencies`; both wait for the first cross-domain rule. `validate` in the
+spec's sense stays with the existing deterministic comparators and the status
+propagation of §8.1; cross-domain evaluation is a separate post-execution
+stage (§14). The protocol has no `depends_on` yet: the cross-domain PR adds
+it, with each adapter declaring the facets and results it consumes, and
+dependency order is defined there. Simulation files are declared by the
+adapter and recorded with a media type from their extension (`.py`, `.v`,
+`.cir`, …); the compiled case documents stay one pair per sample. Check IDs
+are namespaced by domain (`v1.mechanical.extraction-and-sanity`,
+`v2.mechanical.model-invariants`) so several domains fit in one receipt.
 
 The registry is the set of registered adapters in code. It replaces
 `VALIDATED_DOMAINS`; the manifest's domain status is derived from it (§12.3).
@@ -507,9 +590,13 @@ There is no hand-edited registry file, which would reintroduce H2
 exist yet; spec §32 asks for the adapter in the foundation. The spec wins
 under `CLAUDE.md` precedence, and the conflict is recorded here. To keep the
 protocol honest before a second domain exists, PR 3 checks it against one
-artefact-first domain (Icarus: HDL in, non-Python tool, metrics parsed from
-output) with a test-only fixture adapter, not a production stub. The protocol
-is marked provisional until the electrical domain lands (SEQ-1).
+artefact-first domain with a test-only fixture adapter, not a production
+stub: Verilog in, no CAD kernel, and a requirement compiled through the
+fixture's own metric vocabulary into a case the existing engine runs with the
+Icarus adapter, which the test reports as not installed so the outcome does
+not depend on the machine. No metric is parsed from a tool's output yet; that
+waits for a real HDL domain (§21 item 5). The protocol is marked provisional
+until the electrical domain lands (SEQ-1).
 
 ### 11.1 Simulator and importer roadmap (COVER-1)
 
@@ -538,56 +625,75 @@ tests of §16.
 ### 12.1 Per-requirement result
 
 Gate-level results stay the v1 receipt. Added:
-`engineering-model/v1/validation-result.schema.json`, one document per
-requirement or reference check, generated from the receipt, the requirements,
-the model and the per-check execution records. It replaces `trace.json` and
-keeps every trace field (RESULT-6).
+`engineering-model/v1/validation-results.schema.json`, one result per
+requirement or reference, each from the receipt check that decided it: its
+own `v3.<id>`/`v4.<id>`, or the gate-level check that stands in when the run
+compiled or executed none. Nothing is filled in for a requirement no check
+decided. It replaces `trace.json` and keeps every trace field (RESULT-6).
 
 | Field (spec §17) | Source | Null when |
 |---|---|---|
-| `validation_id` | `<sample_id>:<check_id>` | never |
+| `validation_id` | `<sample_id>:<gate>.<requirement id>` | never |
+| `check_id` | the receipt check that decided the result | never |
 | `domain` | the requirement's engineering domain (never the receipt's contract domain, MAP-1) | never |
-| `kind` | `reference` (V3), `requirement` or `illustrative requirement` (V4), as `trace.json` has it | never |
+| `kind` | `reference` (V3), `requirement` or `illustrative requirement` (V4), as the stack's `trace.json` had it | never |
 | `requirement`, `title`, `source`, `metric` | the requirement's or reference's own fields | never |
 | `component` | the requirement's component | V3: references name none |
 | `cad_components` | the source parts the metric depends on, from the adapter; both sides for clearance | never (may be empty) |
 | `illustrative` | the requirement's flag; `false` for a reference, which is computed, not chosen | never |
-| `status`, `reason_code`, `findings` | copied verbatim from the receipt check; a test asserts equality | never |
-| `measured_value` | the check's metric; for a `BLOCKED` requirement whose limit alone is null, the same metric and scenario from the check that measured it, named in `measured_by` (RESULT-3) | no metric was recorded |
-| `expected_value`, `operator`, `applied_bound` | the requirement's limit (V3: value, operator `within`); the bound actually compiled (§14) | the limit's status is null |
+| `status`, `reason_code`, `findings` | status and reason copied verbatim from the deciding check, and its findings, to which the generator adds a note for a metric that is not a number and for inputs it could not establish; a test asserts equality | never |
+| `measured_value` | the check's metric; for a V4 requirement `BLOCKED` only because its limit is null, the same metric with the same compiled arguments from the check that measured it, named in `measured_by` (RESULT-3); no other result borrows one | no metric was recorded |
+| `expected_value`, `operator`, `applied_bound` | the requirement's limit (V3: the reference value, operator `within`); the bound as compiled: a V4 minimum or maximum with the tolerance folded in (§14), a V3 `{value, absolute_tolerance}` as the golden comparator evaluates it | the limit's status is null or does not resolve, or no case was compiled |
 | `unit` | the requirement, checked against the adapter's metric vocabulary | never |
 | `tolerance` | V3 absolute tolerance; V4 requirement tolerance, default 0 | never |
-| `simulator`, `simulator_version`, `configuration` | the case's adapter; tool version, command and arguments from that check's hash-bound execution record (`cases.py:398-418`) — never from receipt `tools[]` (RESULT-1). `configuration` also carries the scenario parameters, time step and seed (spec §24); the execution record omits the seed today, so recording it is part of PR 3 | no execution record; the schema forbids null with `PASS` |
+| `simulator`, `simulator_version`, `configuration` | the case's adapter; tool version, command and arguments from that check's hash-bound execution record (`cases.py:398-418`) — never from receipt `tools[]` (RESULT-1). `configuration` carries the command, the scenario parameters and the seed of the compiled case (spec §24). The time step is fixed in the domain model, which the case cites as evidence, and is not a field; the case engine's execution records are unchanged and still omit the seed | no execution record; the schema forbids null with `PASS` |
 | `model_version`, `model_sha256` | engineering-model schema version; SHA-256 of `engineering_model.json` | never |
-| `model_fidelity` | the adapter's declaration for this metric | never |
-| `inputs` | transitive `derived_from` leaves with statuses; scenario overrides as their own entries sourced from the requirement (RESULT-4) | never (may be empty for V0–V2) |
+| `model_fidelity` | the adapter's declaration for this metric | the metric is not one the domain produces (an entry V1 refused) |
+| `inputs` | what the metric's dependencies (§12.2) rest on through `derived_from`: every quantity on the way whose status is not `DERIVED`, and every `DERIVED` one with no model inputs, with statuses; numeric scenario parameters as their own entries, `SPECIFIED` by the requirement or reference that states them (RESULT-4) | never (may be empty) |
 | `timestamp` | `receipt.completed_at`, so regeneration is byte-identical (RESULT-7) | never |
-| `environment` | OS, architecture and interpreter of the run, and the digest of `tools/constraints-cad.txt` with the installed versions of the tools the case used (spec §24, COVER-4) | never |
+| `environment` | OS, architecture and interpreter of the run and the digest of `tools/constraints-cad.txt`, as the run recorded them in its `v0.pinned-clean-source` evidence, with the version of every tool the receipt records for the run (spec §24, COVER-4) | never |
 | `source_dirty` | the receipt's `source.dirty` | never |
 | `input_hash` | `receipt.source.input_sha256`; scope: the sample's git-listed files, not code or out-of-sample citations | never |
 | `receipt_sha256`, `evidence` | the receipt's digest in full; the check's evidence IDs and digests | never |
 
-Results are written as canonical JSON to `results.json`, bound to the receipt
-by its full digest; each result cites its check's evidence digests. They are
+Results are written as canonical JSON to `results.json`, after the receipt
+and the evidence index, so nothing the results do can cost a run its receipt;
+when none can be built — no adapter, requirements that cannot be read, or a
+committed model that is missing or invalid — the report says why. They are
+bound to the receipt by its full digest; each result cites its check's evidence digests. They are
 not entries of the contract's evidence index, whose entries belong to receipt
-checks. `regenerate_results` rebuilds the file from the receipt and evidence
-alone, byte for byte. Verdicts are the v1 set: `PASS`, `FAIL`,
+checks. `regenerate_results` rebuilds the file byte for byte, on any machine,
+from the receipt and the run's stored evidence (case documents, execution
+records, environment), each verified against its recorded digest, together
+with the item's model and requirements; it refuses unless the item's digest
+equals the receipt's `input_sha256`, refuses a run that wrote no results,
+and treats the run directory as untrusted (a malformed environment record
+is refused too). The schema refuses the combinations the contract forbids (§14,
+§8.1): a `PASS` without a simulator version or a measured value, an
+illustrative `PASS`, a kind that disagrees with the illustrative flag, a
+result on a null-status input that is not `BLOCKED`, and a comparator
+verdict resting on an `AI_ASSUMPTION`. Verdicts are the v1 set: `PASS`, `FAIL`,
 `WARNING`, `NOT_RUN`, `BLOCKED`, `INCONCLUSIVE`.
 
 ### 12.2 Dependencies
 
-`compile_cases` returns, for each metric, the model paths it depends on
-(reference derivations already compute these and discard them). For the
-mechanical domain the dependency of a simulated metric is coarse and honest:
-every geometric component's mass properties, placement and (for clearance)
-bounding box, the joint, and gravity. Status propagation (§8.1) and `inputs`
-(§12.1) both read these.
+The adapter says, for each metric, the model paths it depends on
+(`dependencies`), and for each reference derivation the paths it reads
+(`reference_inputs`). For the mechanical domain the dependency of a simulated
+metric is coarse and honest: the joint's axis, origin and range for every
+metric (the range is in the MJCF every case runs on); for dynamics, every
+moving body's mass properties and placement, and gravity; for clearance,
+every body's placement and bounding box. Status propagation (§8.1) and
+`inputs` (§12.1) both read these.
 
 ### 12.3 Domain status vocabulary
 
-Data uses the spec §34 words: `AVAILABLE` (a registered adapter validates it)
-and `NOT_IMPLEMENTED`. Each entry's reason lists the sample's null-status
-inputs for that domain. `IMPLEMENTED`/`PARTIAL`/`PLANNED`/`BLOCKED` stay
+Data uses the spec §34 words: `AVAILABLE` (the sample's primary domain, whose
+registered adapter validates it from one of its artefacts: the only adapter
+run for a sample) and `NOT_IMPLEMENTED` (no adapter exists), plus
+`NOT_APPLICABLE` (an adapter exists but does not run for this sample: no
+artefact it reads, or not the primary domain). Each entry's reason lists the
+sample's null-status inputs for that domain. `IMPLEMENTED`/`PARTIAL`/`PLANNED`/`BLOCKED` stay
 labels of this document (FACT-14, STATUS-4).
 
 ## 13. Evidence and provenance design
@@ -688,8 +794,13 @@ From `TESTING.md` and from both reviews:
 - Every gate has a test that makes it fail.
 - A mutation suite per domain, run locally and in a scheduled CI job; a
   green baseline is required first, and every kill names its test.
-  Current: 68 mutants on the mechanical domain, all killed at `bd999d5` after a
-  green baseline (**Verified**); each kill names its test.
+  Current: on the stack, 68 mutants of the mechanical domain, all killed at
+  `bd999d5` after a green baseline (**Verified**). On the foundation branch,
+  200 mutants (the mechanical ones re-anchored, plus the foundation's and
+  both reviews'): at `2beb77a`, after a green baseline, 199 killed; the
+  survivor, `stale-committed-case-counted`, was a missing test, which
+  `b4fca10` adds and a targeted re-run shows killing it (**Verified**,
+  2026-09-26). Each kill names its test.
 - Property tests: rigid transforms of a whole design leave every physical
   metric unchanged.
 - Reference values for every simulated metric with a closed form.
@@ -786,7 +897,7 @@ An MVP with no real part can therefore never `PASS` on a part rating.
 | Q8 | Dataset layout: by primary domain (spec §3) or one directory per sample with domains in metadata? | Maintainer decision, before the first non-mechanical sample |
 | Q9 | New simulators (Verilator, Elmer, FMI) need the merged cases contract's adapter enum amended, or an open adapter ID checked against the registry | Maintainer decision |
 | Q10 | The spec orders mechanical after the foundation; this plan lands the existing mechanical work first, because spec §35 asks to preserve it and the review evidence is tied to it | Confirm |
-| R1 | Cross-platform reproduction. **Verified** at `bd999d5`: Linux aarch64 (`python:3.12-slim`, pinned wheels, only `git` and `libgl1` added) passes `check`, the complete suite (245) and gives the same `validate` verdicts as macOS. **Verified** at `c9be0b6`: Linux x86_64 under emulation passes `check`. **Not run**: MuJoCo stages on native x86_64, because the emulated CPU has no AVX | A native x86_64 run, which the `cad-dataset` CI job provides on its first execution |
+| R1 | Cross-platform reproduction. **Verified** at `bd999d5`: Linux aarch64 (`python:3.12-slim`, pinned wheels, only `git` and `libgl1` added) passes `check`, the complete suite (245) and gives the same `validate` verdicts as macOS; and again on the foundation at `2beb77a` (312 tests). **Verified** at `c9be0b6`: Linux x86_64 under emulation passes `check`. **Not run**: MuJoCo stages on native x86_64, because the emulated CPU has no AVX | A native x86_64 run, which the `cad-dataset` CI job provides on its first execution |
 | R2 | Several domains need system tools CI must install; install time and flakiness are unknown | CI trial |
 | R3 | Push access is read-only for this account; nothing can land without a fork or restored access | Access decision |
 | R4 | PR 3 regenerates mutation and reproduction evidence and re-anchors the mutation suite | Budgeted in §21 |
@@ -801,32 +912,43 @@ An MVP with no real part can therefore never `PASS` on a part rating.
    departure from spec §30 for the reason in Q10. Its documentation declares
    the two schema families pre-release (§9.3).
 3. **Foundation** (spec §32; the first stage to implement). Each item is
-   marked with its state on `feat/multi-domain-foundation`. All are `PARTIAL`
-   at this commit: code and tests exist for each, and an independent review
-   of the branch has findings still open against them:
-   - versioning (§9.3): per-producer version constants — PARTIAL;
+   marked with its state on `feat/multi-domain-foundation` at `b4fca10`: the
+   findings of two independent reviews are closed (§7.5), and the tests have
+   been seen killing the mutants of §16:
+   - versioning (§9.3): per-producer version constants, and the rule that
+     replaces the pre-release declaration — PARTIAL: both exist, but no test
+     has been seen failing when a producer's version is not recorded or not
+     bumped;
    - status types, one null predicate at every site, per-status rules
-     (§8.1) — PARTIAL; status propagation (§8.1) — PARTIAL;
+     (§8.1) — IMPLEMENTED; status propagation (§8.1), in V3 and V4 —
+     IMPLEMENTED;
    - artefact-neutral base types: `design.sources`, the manifest's source
      artefacts, domain-qualified derived roles, `Item` finding its sources
      through provenance, annotations that may carry no parts or materials
-     (§8.2, SCOPE-2) — PARTIAL;
+     (§8.2, SCOPE-2) — IMPLEMENTED;
    - provenance: primary domain and declared artefacts; licence-text
-     reference checked; `verified_by`/`verified_at`; spec §4 keys mapped
-     (§9.2, §18); source kind `product_specification` (§19) — PARTIAL;
+     reference checked; `verified_by`/`verified_at` for a verified
+     third-party licence (§18); spec §4 keys mapped (§9.2); source kind
+     `product_specification` (§19) — IMPLEMENTED;
    - dataset metadata: `domain`, `hash`, `versions.simulation`, `source_url`
-     (§9.2) — PARTIAL;
+     (§9.2) — IMPLEMENTED for `domain` and `source_url`; `hash` and
+     `versions.simulation` are regenerated and compared by `check`, but no
+     mutant of either has been run (PARTIAL for those two);
    - requirements: tolerance, unit checking, per-domain vocabularies (§14) —
-     PARTIAL;
+     IMPLEMENTED;
    - common validation result: schema and generator, replacing `trace.json`,
-     per-metric fidelity and dependencies (§12) — PARTIAL;
-   - evidence: results hash-bound and indexed; per-check execution records
-     as the source of simulator versions, recording the seed and the
-     environment (§12.1, §13) — PARTIAL;
+     per-metric fidelity and dependencies (§12) — IMPLEMENTED;
+   - evidence: results hash-bound; per-check execution records as the source
+     of simulator versions; the environment recorded in the run's evidence
+     (§12.1, §13) — PARTIAL: results are bound to the receipt by its digest
+     but are not entries of its evidence index (by design, §12.1), and the
+     seed and time step are not in the case engine's execution records (the
+     seed comes from the compiled case, the time step from the domain model
+     the case cites);
    - `DomainAdapter` protocol, in-code registry, mechanical refactored onto
      it, domain-namespaced check IDs, domain status in the spec §34 words
      plus `NOT_APPLICABLE`, the receipt-side MAP-1 fix (§11, §12.3) —
-     PARTIAL, provisional.
+     IMPLEMENTED, provisional.
 
    Not in scope: renaming `dataset-item.json`, moving `datasets/cad/`,
    training records, any new domain, `from_result`.
@@ -845,7 +967,18 @@ An MVP with no real part can therefore never `PASS` on a part rating.
       `PHYSICAL_SANITY_*` → `DOMAIN_SANITY_*`, and `CAD_REJECTED`,
       `CAD_EXTRACTION_CRASHED`, `CAD_EXTRACTION_TIMED_OUT`,
       `CAD_KERNEL_UNAVAILABLE` → `SOURCE_REJECTED`, `EXTRACTION_CRASHED`,
-      `EXTRACTION_TIMED_OUT`, `EXTRACTOR_UNAVAILABLE`.
+      `EXTRACTION_TIMED_OUT`, `EXTRACTOR_UNAVAILABLE`; the contract domain
+      of V1 and `v2.mechanical.model-invariants`, `physical_design` →
+      `integrated_physics` (the engineering domain's mapping), and of
+      `v2.dataset-reproduction`, `data_management`; V2's reason when V1
+      derived nothing, `CAD_EXTRACTION_NOT_AVAILABLE` →
+      `DERIVATION_NOT_AVAILABLE`; a blocked reference with no missing input,
+      `REQUIREMENT_INPUT_UNKNOWN` with no finding → `REFERENCE_NOT_APPLICABLE`
+      with its reason as the finding; and the eServo-200 quantities' source
+      kind, `datasheet` → `product_specification`, which re-hashes the
+      annotations. Two behaviours change only where the committed sample does
+      not reach: V3/V4 run no committed case when V1 derives no model, and a
+      V1 `MISSING_REQUIRED_INPUT` names each missing value by path.
    2. No mechanical names (`mjcf`, `mujoco`, `derived/mechanical`, `.step`)
       in `dataset.py` or `requirements.py` outside the mechanical adapter
       (`grep -nE "mjcf|mujoco|derived/mechanical|\.step"` finds nothing).
@@ -866,16 +999,23 @@ An MVP with no real part can therefore never `PASS` on a part rating.
       domain is `AVAILABLE`, mechanical `NOT_APPLICABLE` and every other
       domain `NOT_IMPLEMENTED`; without that adapter registered, `build`
       refuses and `validate` is `BLOCKED DOMAIN_NOT_IMPLEMENTED`.
-   7. One result per V3/V4 check; `status` equals the receipt verdict;
-      every evidence digest re-hashes; a `PASS` result has a
-      `simulator_version`; regeneration from one receipt is byte-identical;
-      every `rom_` result has `model_fidelity = SIMPLIFIED` (SCOPE-12).
+   7. One result per requirement and reference, naming the receipt check that
+      decided it, and one for every V3/V4 check that implements a
+      requirement; `status` equals that check's verdict; every evidence
+      digest re-hashes; a `PASS` result has a `simulator_version`;
+      regeneration from one receipt is byte-identical, on another host too,
+      and refused once the item has changed; every `rom_` result has
+      `model_fidelity = SIMPLIFIED` (SCOPE-12).
    8. The manifest's domain status is derived from the registry, and a test
       forging it fails `check`.
-   9. After the merge, the versioning rule of §9.3 applies; the pre-release
-      declaration is removed from the schema documentation.
+   9. The versioning rule of §9.3 replaces the pre-release declaration in
+      the schema documentation, taking effect at the merge.
    10. The protocol is exercised end to end by a test-only artefact-first
-       adapter (Verilog in, no CAD kernel, no simulator) (§11).
+       adapter (Verilog in, no CAD kernel): build, check, a requirement
+       compiled through its own metric vocabulary into a case the existing
+       engine runs with the Icarus adapter (reported not installed, so the
+       outcome does not depend on the machine), and a generated result (§11).
+       No HDL simulator runs, so no metric is parsed from a tool's output.
 4. **Electrical**: ngspice supply sample; output capture and metric parsing;
    version parsing; `spice` CI job. First artefact-first domain; the protocol
    stops being provisional here, and the PR lists every protocol change the

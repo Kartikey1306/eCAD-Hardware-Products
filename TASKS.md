@@ -19,6 +19,7 @@ Status is one of: `todo`, `in-progress`, `blocked`, `review`, `done`.
 | T-008 | Assign real IPC-7351 land patterns to every placed footprint | — | build | todo | T-007 |
 | T-009 | Run DRC and export fabrication outputs (needs KiCad installed) | — | verify | blocked | KiCad unavailable: `apt` needs root |
 | T-010 | CAD dataset, engineering semantic model, and robotic-joint mechanical validation (issue #27) | — | build | review | independent review |
+| T-011 | Multi-domain foundation: domain adapters, null statuses, per-requirement results, spec §4 metadata (plan §21 item 3) | — | build | review | T-010 |
 
 ### T-008 — Real land patterns
 
@@ -194,6 +195,66 @@ Verification (code at `bd999d5`, 2026-09-26)
   | Linux x86_64 | `check` in `python:3.12-slim` under emulation | `PASS` for OpenCASCADE reproduction (`check` exit 0, at `c9be0b6`). MuJoCo stages `NOT RUN`: the emulated CPU has no AVX and `import mujoco` aborts |
   | Pinned set resolves on Linux | `pip download -r tools/requirements.txt -r tools/requirements-cad.txt -c tools/constraints-cad.txt` for x86_64 and aarch64, Python 3.12 | `PASS` -- all 23 pins resolve unchanged |
   | Independent review | two reviews and a check of the plan's claims against the code, each finding checked by a separate verifier | `PASS` -- every confirmed finding within this task is fixed on the stack (`f4398f4`, `c9be0b6`, `bd999d5`); five in existing merged code or later domains are open, each listed with its owner in the plan §7.2 |
+
+### T-011 — Multi-domain foundation: domain adapters, null statuses, per-requirement results
+
+Owner: unassigned
+Mode: build
+Status: review (local branch `feat/multi-domain-foundation`; not pushed)
+Depends on: T-010 (`wip/stack`, which this branch builds on)
+
+Goal
+: The dataset pipeline knows no engineering domain: each domain attaches
+  through one adapter, a value can be missing in the three ways the
+  specification distinguishes, every requirement gets a result that says what
+  was measured against what on which inputs, and the dataset metadata and
+  licence provenance are what the specification asks for.
+
+Acceptance criteria (verbatim from `ECAD_MULTI_DOMAIN_DATASET_PLAN.md` §21 item 3)
+: 1. "No derived number changes." (with the named exceptions listed there)
+  2. "No mechanical names (`mjcf`, `mujoco`, `derived/mechanical`, `.step`) in `dataset.py` or `requirements.py` outside the mechanical adapter"
+  3. "No existing assertion is deleted or weakened; the mutation suite is re-anchored with a green baseline and zero survivors"
+  4. "For each of `UNKNOWN`, `UNSPECIFIED`, `NOT_AVAILABLE`, as a density and as a limit: `BLOCKED MISSING_REQUIRED_INPUT` with the status and the path, and a schema-valid receipt."
+  5. "With a requirement that is *not* illustrative, an `AI_ASSUMPTION` density, and separately an `AI_ASSUMPTION` limit quantity, give `INCONCLUSIVE INPUT_IS_AI_ASSUMPTION` both when the limit is met and when it is violated"
+  6. "A test-only sample with no STEP ... its domain is `AVAILABLE`, mechanical `NOT_APPLICABLE` and every other domain `NOT_IMPLEMENTED`; without that adapter registered, `build` refuses and `validate` is `BLOCKED DOMAIN_NOT_IMPLEMENTED`."
+  7. "One result per requirement and reference, naming the receipt check that decided it ..."
+  8. "The manifest's domain status is derived from the registry, and a test forging it fails `check`."
+  9. "The versioning rule of §9.3 replaces the pre-release declaration in the schema documentation, taking effect at the merge."
+  10. "The protocol is exercised end to end by a test-only artefact-first adapter"
+
+Files in scope
+: `tools/ecad_model/` (domains/, results.py, dataset.py, requirements.py,
+  quantity.py, builder.py, mjcf.py), `schemas/engineering-model/v1/`,
+  `schemas/cad-dataset/v1/`, `datasets/cad/robotic_joint_001/`,
+  `tests/unit/test_engineering_model.py`, `tests/unit/test_domain_adapter.py`,
+  `tests/unit/test_cad_dataset.py`, `tests/mutation/run_mutations.py`,
+  documentation, the plan.
+
+Out of scope
+: Any domain but mechanical; renaming `dataset-item.json` or moving
+  `datasets/cad/`; training records; cross-domain rules (`from_result`).
+
+Risks
+: The adapter protocol is provisional: one production domain uses it, and the
+  test-only Verilog adapter runs no simulator, so no metric has yet been
+  parsed from a non-Python tool. The engineering-model and cad-dataset v1
+  schemas change in place relative to the stack; they are declared stable
+  from this branch's merge.
+
+Verification (2026-09-26; code at `b4fca10` unless a row names `2beb77a`, which differs from it by one added test and wording)
+: | Check | Command | Result |
+  |-------|---------|--------|
+  | Complete suite, CAD tests mandatory | `ECAD_REQUIRE_CAD_TOOLS=1 python3 run_all_tests.py` | `PASS` -- 313 passed, 0 skipped (macOS arm64, Python 3.14.4) |
+  | Lint, new code | `ruff check tools/ecad_model tools/cad_dataset.py tests/unit/test_cad_dataset.py tests/unit/test_engineering_model.py tests/unit/test_domain_adapter.py tests/unit/test_ci_and_runner.py tests/mutation datasets/cad --select=E,F,W --ignore=E501` | `PASS` -- no findings |
+  | Type check | `mypy tools run_all_tests.py tests/mutation/run_mutations.py --ignore-missing-imports --no-strict-optional` | `PASS` for new code -- the same 11 errors in the same seven existing modules as at `bd999d5`; none in `tools/ecad_model` |
+  | Derivation reproduces | `python3 tools/cad_dataset.py check datasets/cad/robotic_joint_001` on a clean clone of `2beb77a` | `PASS` -- exit 0 |
+  | Criterion 1 on a clean clone of `2beb77a` | `validate`, then every check's verdict and metrics against the clean-clone receipt of `bd999d5` | `PASS` -- the 19 checks both runs have give identical verdicts and metrics; `v2.cad-model-invariants` is split into `v2.dataset-reproduction` and `v2.mechanical.model-invariants`, both `PASS`; the other differences are the named renames. V0-V3 `PASS`, V4 `BLOCKED` as designed; 82 evidence digests re-hash; 15 results, bound to the receipt |
+  | Criterion 2 | `grep -nE "mjcf\|mujoco\|derived/mechanical\|\.step" tools/ecad_model/dataset.py tools/ecad_model/requirements.py` | `PASS` -- no match |
+  | Test discrimination | `python3 tests/mutation/run_mutations.py --workers 3` | `PASS` -- at `2beb77a`, after the unmutated baseline passed, 199 of 200 mutants killed, each naming its test (93 by `test_engineering_model.py`, 62 by `test_domain_adapter.py`, 44 by `test_cad_dataset.py`). The survivor, `stale-committed-case-counted`, was a missing test; `b4fca10` adds it, and a targeted re-run (`--only stale-committed-case-counted`, green baseline) kills it |
+  | Skip cannot go silent (at `2beb77a`) | the dataset test files with `OCP`/`mujoco` absent, with and without `ECAD_REQUIRE_CAD_TOOLS=1` | `PASS` -- the 49 CAD tests skip, each with a reason, and the 113 fast tests (the adapter fixture included) still pass / with `ECAD_REQUIRE_CAD_TOOLS=1` all 49 are red (26 failed, 23 errors) |
+  | Linux aarch64 | the CI job's steps in `python:3.12-slim` with only `git` and `libgl1` added, offline from the pinned wheels, on a clean clone of `2beb77a` | `PASS` -- `check` exit 0; 312 passed; `validate` gives the same gate verdicts as macOS |
+  | Linux x86_64 | -- | `NOT RUN` on this branch; MuJoCo cannot run under emulation here (T-010) |
+  | Independent review | a five-lens review, each finding checked by a separate verifier; then a second review of every fix, its claims verified the same way | `PASS` -- 59 findings confirmed (2 refuted), then 49 found fixed and 10 partly, with new defects in the fixes; all closed on `2beb77a` (plan §7.5). The fixes of the second round have not had a third review. One defect in merged code is open: ENGINE-1 (plan §7.2) |
 
 ## Completed
 
