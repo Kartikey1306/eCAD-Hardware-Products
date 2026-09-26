@@ -143,10 +143,18 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
 
 
 def _first_failure(output: str) -> str:
-    """The first failing test pytest's short summary names, or "" if none."""
+    """The first failing test pytest's short summary names, or "" if none.
+
+    A failing subtest is summarised as "SUBFAILED(<params>) <test> - ..."; its
+    parameters are kept, since they say which case the mutant broke.
+    """
     for line in output.splitlines():
         if line.startswith(("FAILED ", "ERROR ")):
             return line.split()[1]
+        if line.startswith("SUBFAILED"):
+            node = next((token for token in line.split() if "::" in token), "")
+            params = line[len("SUBFAILED"):line.index(node)].strip() if node else ""
+            return f"{node} {params}".strip() or line
     return ""
 
 
