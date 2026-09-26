@@ -93,7 +93,9 @@ def compile_cases(
 
     Raises:
         ValueError: A unit differs from its metric's or its limit quantity's,
-            or a metric is one the domain does not produce.
+            a metric is one the domain does not produce, a limit quantity is
+            not a single number, or two entries share an id (each id is a
+            check id, and a result is keyed by it).
 
     Example:
         >>> import json; from pathlib import Path
@@ -112,6 +114,11 @@ def compile_cases(
         >>> [entry["id"] for entry in blocked] == unknown_limits
         True
     """
+    ids = [entry["reference_id"] for entry in requirements["reference_values"]] + [
+        entry["requirement_id"] for entry in requirements["requirements"]]
+    duplicated = sorted({entry_id for entry_id in ids if ids.count(entry_id) > 1})
+    if duplicated:
+        raise ValueError(f"reference and requirement ids must be unique: {', '.join(duplicated)} repeat")
     blocked: List[Dict[str, Any]] = []
     golden = []
     for reference in requirements["reference_values"]:
@@ -150,6 +157,8 @@ def compile_cases(
                     f"{requirement['requirement_id']}: limit unit {item['unit']} != requirement unit {requirement['unit']}"
                 )
             bound = item["value"]
+            if not isinstance(bound, (int, float)) or isinstance(bound, bool):
+                raise ValueError(f"{requirement['requirement_id']}: the limit {limit['quantity']} is not a single number")
         else:
             bound = limit["value"]
         case = _case(

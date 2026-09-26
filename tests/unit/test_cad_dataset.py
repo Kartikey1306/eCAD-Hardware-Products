@@ -315,7 +315,9 @@ class TestEndToEnd(unittest.TestCase):
         with tempfile.TemporaryDirectory() as output:
             receipt = validate(item, Path(output) / "run")
             self.assertTrue((Path(output) / "run" / "report.md").is_file())
-        return {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]} | {"_receipt": receipt}
+            results = json.loads((Path(output) / "run" / "results.json").read_text())["results"]
+        return {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]} | {
+            "_receipt": receipt, "_results": {row["requirement"]: row for row in results}}
 
     def copy_and_rebuild(self, directory: str, mutate) -> Path:
         from ecad_model.dataset import build
@@ -379,6 +381,9 @@ class TestEndToEnd(unittest.TestCase):
         self.assertEqual(checks["v4.REQ-MECH-001"]["verdict"], "PASS")
         self.assertEqual((checks["v4.REQ-MECH-002"]["verdict"], checks["v4.REQ-MECH-002"]["reason_code"]),
                          ("WARNING", "WITHIN_ILLUSTRATIVE_LIMIT"))
+        real = checks["_results"]["REQ-MECH-001"]
+        self.assertEqual((real["kind"], real["illustrative"], real["status"]), ("requirement", False, "PASS"))
+        self.assertNotIn("(illustrative)", " ".join(i.get("source", "") for i in real["inputs"]))
         gates = {g["gate"]: g["verdict"] for g in checks["_receipt"]["gates"]}
         self.assertEqual(gates["V4"], "BLOCKED")
         self.assertFalse(checks["_receipt"]["eligible_for_ebuild"])
@@ -529,6 +534,24 @@ class TestGatesFail(unittest.TestCase):
         checks = self.run_copy(forge)
         self.assertEqual(checks["v0.dataset-schemas-and-hashes"]["verdict"], "PASS", "integrity is satisfied by the forged hash")
         self.assertEqual(checks["v2.dataset-reproduction"]["verdict"], "FAIL")
+
+    def test_v0_checks_the_domain_s_extraction_against_its_schema(self):
+        import hashlib
+
+        def forge(item):
+            path = item / "derived" / "cad_extraction.json"
+            _edit_json(path, lambda extraction: extraction.pop("parts"))
+            data = path.read_bytes()
+
+            def rehash(manifest):
+                entry = next(e for e in manifest["derived"] if e["artifact"]["path"] == "derived/cad_extraction.json")
+                entry["artifact"].update(sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data))
+            _edit_json(item / "dataset-item.json", rehash)
+        checks = self.run_copy(forge)
+        v0 = checks["v0.dataset-schemas-and-hashes"]
+        self.assertEqual(v0["verdict"], "FAIL")
+        self.assertTrue(any(f.startswith("derived/cad_extraction.json:") and "parts" in f for f in v0["findings"]),
+                        v0["findings"])
 
     def test_a_positive_clearance_below_the_requirement_fails(self):
         """Regression: clearance was only tested with penetration, so a contact-only
@@ -720,12 +743,55 @@ class TestHonestOutcomes(unittest.TestCase):
                         self.assertTrue(result["simulator_version"])
                     self.assertEqual(result["model_fidelity"],
                                      "SIMPLIFIED" if result["metric"].startswith("rom_") else "EXACT_GEOMETRY")
-            # A requirement blocked only on its limit still reports what was measured, and by which check.
+            # Each field is what the run compiled and recorded, not a default the schema would accept.
+            corners = {c["id"]: c for c in json.loads((ITEM / "validation" / "corners" / "cases.json").read_text())["cases"]}
+            golden = {c["id"]: c for c in json.loads((ITEM / "validation" / "golden" / "cases.json").read_text())["cases"]}
+            holding = results["v4.REQ-MECH-001"]
+            self.assertEqual((holding["expected_value"], holding["applied_bound"], holding["operator"], holding["tolerance"]),
+                             (2.5, {"maximum": 2.5}, "<=", 0.0))
+            self.assertEqual((holding["configuration"]["seed"], holding["configuration"]["scenario"]),
+                             (corners["REQ-MECH-001"]["seed"], {"name": "static_sweep"}))
+            def parsed(evidence):
+                try:
+                    return json.loads((run / evidence["path"]).read_bytes())
+                except ValueError:
+                    return {}
+
+            record = next(parsed(e) for e in checks["v4.REQ-MECH-001"]["evidence"]
+                          if parsed(e).get("case_id") == "REQ-MECH-001")
+            self.assertEqual(holding["configuration"]["command"], record["command"])
+            self.assertEqual(holding["simulator_version"], record["tool_version"])
+            self.assertEqual(holding["model_sha256"],
+                             hashlib.sha256((ITEM / "derived" / "engineering_model.json").read_bytes()).hexdigest())
+            self.assertEqual(holding["validation_id"], "robotic_joint_001:v4.REQ-MECH-001")
+            self.assertEqual(holding["timestamp"], receipt["completed_at"])
+            self.assertEqual(holding["component"], "j1")
+            reference = results["v3.REF-MECH-001"]
+            expected_metric = golden["REF-MECH-001"]["expected_metrics"]["static_torque_at_zero_nm"]
+            self.assertEqual(reference["applied_bound"],
+                             {"value": expected_metric["value"], "absolute_tolerance": expected_metric["absolute_tolerance"]})
+            self.assertEqual((reference["expected_value"], reference["operator"], reference["component"]),
+                             (expected_metric["value"], "within", None))
+            payload = results["v4.REQ-MECH-002"]["inputs"]
+            self.assertIn({"path": "scenario/payload_mass_kg", "status": "SPECIFIED",
+                           "source": "requirement REQ-MECH-002 (illustrative)"}, payload)
+            self.assertNotIn("scenario/payload_component", [i["path"] for i in payload],
+                             "an identifier is not a value with a status")
+            # A requirement blocked only on its limit still reports what was measured, and by which check:
+            # one that ran the same metric with the same arguments.
             xd = results["v4.REQ-XD-001"]
             self.assertEqual(xd["status"], "BLOCKED")
             self.assertIsNone(xd["expected_value"])
             self.assertEqual((xd["simulator"], xd["simulator_version"]), (None, None), "nothing ran it; no version is inferred")
             self.assertEqual(xd["measured_value"], checks[xd["measured_by"]]["metrics"]["static_torque_max_abs_nm"])
+            self.assertEqual(xd["measured_value"], checks["v4.REQ-MECH-002"]["metrics"]["static_torque_max_abs_nm"],
+                             "REQ-MECH-002 runs the same scenario, so the same holding torque")
+            measured_by = xd["measured_by"].split(".", 1)[1]
+            self.assertEqual({**golden, **corners}[measured_by]["arguments"], corners["REQ-MECH-002"]["arguments"])
+            # Every static and dynamic requirement rests on the joint's range, which its case sweeps or moves within.
+            for check_id in ("v4.REQ-MECH-001", "v4.REQ-MECH-003", "v4.REQ-XD-001"):
+                with self.subTest(range=check_id):
+                    self.assertIn("joints/j1/limits/upper", [i["path"] for i in results[check_id]["inputs"]])
             self.assertIn({"path": "components/actuator/domains/mechanical/continuous_output_torque", "status": "UNKNOWN"},
                           xd["inputs"])
             # The inputs show what a DERIVED mass rests on.
@@ -769,7 +835,17 @@ class TestHonestOutcomes(unittest.TestCase):
             _edit_json(item / "requirements" / "requirements.json", two_limits)
             return "v4.REQ-XD-001", "v4.REQ-XD-002"
 
-        for label, prepare in (("AI_ASSUMPTION density", density_case), ("AI_ASSUMPTION limit", limit_case)):
+        def range_case(item):
+            # The holding torque is the peak over the joint's range: an assumed
+            # range is an assumed input, though no mass depends on it.
+            _edit_json(item / "design" / "annotations.json",
+                       lambda a: a["joints"][0]["limits"].update(upper=assumed(a["joints"][0]["limits"]["upper"]["value"],
+                                                                               "rad", "proposed range")))
+            _edit_json(item / "requirements" / "requirements.json", lambda r: real(r, "REQ-MECH-002"))
+            return "v4.REQ-MECH-001", "v4.REQ-MECH-002"
+
+        for label, prepare in (("AI_ASSUMPTION density", density_case), ("AI_ASSUMPTION limit", limit_case),
+                               ("AI_ASSUMPTION joint range", range_case)):
             with self.subTest(label), tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as d:
                 item = _copy_item(d)
                 met, violated = prepare(item)
@@ -1041,9 +1117,16 @@ class TestExtractionFailureVerdicts(unittest.TestCase):
                 with tempfile.TemporaryDirectory() as output:
                     receipt = validate(item, Path(output) / "run")
                 validate_document(REPO_ROOT, "validation-receipt.schema.json", receipt)
-                v1 = next(c for g in receipt["gates"] for c in g["checks"] if c["check_id"].startswith("v1."))
+                checks = {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]}
+                v1 = checks["v1.mechanical.extraction-and-sanity"]
                 self.assertEqual((v1["verdict"], v1["reason_code"]), ("BLOCKED", "MISSING_REQUIRED_INPUT"), v1["findings"])
-                self.assertTrue(any(status in finding for finding in v1["findings"]), v1["findings"])
+                # The finding names each missing value by path with its own status:
+                # the density both steel parts use, not the masses it leaves unknown.
+                self.assertEqual(v1["findings"], [f"{status}: components/payload/material/density",
+                                                  f"{status}: components/shaft/material/density"])
+                # The committed cases were compiled before the density went missing; none is run.
+                self.assertEqual((checks["v4.REQ-MECH-001"]["verdict"], checks["v4.REQ-MECH-001"]["reason_code"]),
+                                 ("BLOCKED", "DERIVATION_NOT_AVAILABLE"))
 
     def test_each_failure_kind_has_its_own_verdict(self):
         from unittest import mock

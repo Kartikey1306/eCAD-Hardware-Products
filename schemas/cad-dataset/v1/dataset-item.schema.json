@@ -173,7 +173,8 @@
               },
               "then": {
                 "required": [
-                  "url"
+                  "url",
+                  "modifications"
                 ]
               }
             }
@@ -235,7 +236,29 @@
             }
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "The licence rules of source-provenance, restated so the manifest is checkable on its own: a third-party artefact cites its licence text.",
+          "if": {"properties": {"origin": {"properties": {"kind": {"const": "third_party"}}}}},
+          "then": {"properties": {"license": {"required": ["license_text"]}}}
+        },
+        {
+          "description": "A verified licence cites the text that was read.",
+          "if": {"properties": {"license": {"properties": {"license_verified": {"const": true}}}}},
+          "then": {"properties": {"license": {"required": ["license_text"]}}}
+        },
+        {
+          "description": "A verified third-party licence says who read it and when.",
+          "if": {"properties": {"origin": {"properties": {"kind": {"const": "third_party"}}}, "license": {"properties": {"license_verified": {"const": true}}}}},
+          "then": {"properties": {"license": {"required": ["license_text", "verified_by", "verified_at"]}}}
+        },
+        {
+          "description": "An unverified licence permits nothing.",
+          "if": {"properties": {"license": {"properties": {"license_verified": {"const": false}}}}},
+          "then": {"properties": {"license": {"properties": {"redistribution_permitted": {"const": false}, "training_use_permitted": {"const": false}}}}}
+        }
+      ]
     },
     "inputs": {
       "type": "object",

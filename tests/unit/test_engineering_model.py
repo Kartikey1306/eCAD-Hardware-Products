@@ -198,14 +198,26 @@ class TestQuantity(unittest.TestCase):
                            "modifications": "none"}
         with self.assertRaisesRegex(ValueError, "verified_by"):
             validate(third, "cad-dataset/v1/source-provenance")
-        third["license"].update(verified_by="a named reviewer", verified_at="2026-09-26")
+        third["license"]["verified_by"] = "a named reviewer"
+        with self.assertRaisesRegex(ValueError, "verified_at"):
+            validate(third, "cad-dataset/v1/source-provenance")
+        third["license"]["verified_at"] = "2026-09-26"
         validate(third, "cad-dataset/v1/source-provenance")
+        unverified = copy.deepcopy(third)
+        unverified["license"].update(license_verified=False, redistribution_permitted=False, training_use_permitted=False)
+        for field in ("verified_by", "verified_at", "license_text"):
+            del unverified["license"][field]
+        # Even unverified, a third-party artefact says which licence text governs it.
+        with self.assertRaisesRegex(ValueError, "license_text"):
+            validate(unverified, "cad-dataset/v1/source-provenance")
 
     def test_schema_enforces_the_same_rules(self):
         """A hand-written document cannot bypass the constructor's rules."""
         base = {"value": 1.0, "unit": "kg", "status": "SPECIFIED", "source": ANNOTATION}
         cases = {
-            "unknown with a value": {**base, "status": "UNKNOWN"},
+            # Each carries everything else its status requires, so it fails
+            # only on the rule its label names.
+            "unknown with a value": {**base, "status": "UNKNOWN", "note": "x"},
             "unspecified with a value": {**base, "status": "UNSPECIFIED", "source": CITED, "note": "x"},
             "not available with a value": {**base, "status": "NOT_AVAILABLE", "note": "x"},
             "null claimed as specified": {**base, "value": None},
@@ -552,16 +564,30 @@ class TestMechanicalModel(unittest.TestCase):
     def test_unknown_mass_makes_the_mechanical_model_incomplete(self):
         model = copy.deepcopy(self.model)
         component(model, "payload")["physical"]["mass"] = unknown("kg", ANNOTATION, "fixture")
-        with self.assertRaisesRegex(ModelIncomplete, "payload mass is UNKNOWN"):
+        with self.assertRaisesRegex(ModelIncomplete, r"components/payload/physical/mass \(UNKNOWN\)") as caught:
             build_mjcf(model)
+        self.assertEqual(caught.exception.inputs, [{"path": "components/payload/physical/mass", "status": "UNKNOWN"}])
 
     def test_any_null_mass_makes_the_mechanical_model_incomplete(self):
         for status in NULL_STATUSES:
             with self.subTest(status=status.value):
                 model = copy.deepcopy(self.model)
                 component(model, "payload")["physical"]["mass"] = null_quantity("kg", status)
-                with self.assertRaisesRegex(ModelIncomplete, f"payload mass is {status.value}"):
+                with self.assertRaisesRegex(ModelIncomplete, rf"components/payload/physical/mass \({status.value}\)") as caught:
                     build_mjcf(model)
+                self.assertEqual(caught.exception.inputs,
+                                 [{"path": "components/payload/physical/mass", "status": status.value}])
+
+    def test_every_missing_value_is_named_not_only_the_first(self):
+        model = copy.deepcopy(self.model)
+        component(model, "payload")["physical"]["mass"] = unknown("kg", ANNOTATION, "fixture")
+        model["joints"][0]["limits"]["upper"] = unknown("rad", ANNOTATION, "fixture")
+        with self.assertRaises(ModelIncomplete) as caught:
+            build_mjcf(model)
+        self.assertEqual(caught.exception.inputs, [
+            {"path": f"joints/{model['joints'][0]['joint_id']}/limits/upper", "status": "UNKNOWN"},
+            {"path": "components/payload/physical/mass", "status": "UNKNOWN"},
+        ])
 
     def test_rotation_to_quaternion_round_trips(self):
         for angle in (0.0, 0.3, math.pi / 2, math.pi - 1e-3, math.pi):
@@ -806,7 +832,7 @@ class TestRefusals(unittest.TestCase):
             build_mjcf(welded)
         axis = copy.deepcopy(model)
         axis["joints"][0]["axis"] = unknown("1", ANNOTATION, "fixture")
-        with self.assertRaisesRegex(ModelIncomplete, "axis is UNKNOWN"):
+        with self.assertRaisesRegex(ModelIncomplete, r"joints/\w+/axis \(UNKNOWN\)"):
             build_mjcf(axis)
 
 
@@ -847,6 +873,310 @@ class TestTolerance(unittest.TestCase):
         self.assertTrue(same_text('<body name="joint_001"/>', '<body name="joint_1"/>', "m"))
         self.assertTrue(same_text('pos="1 2"', 'pos="1 2 3"', "m"))
         self.assertEqual(same_text('fullinertia="1e-3 0 4.8e-20"', 'fullinertia="1e-3 0 -3e-20"', "m"), [])
+
+class TestInputPropagation(unittest.TestCase):
+    """What a check's inputs make of its verdict (results.propagate), and how they are found."""
+
+    def setUp(self):
+        self.model = json.loads((ITEM / "derived" / "engineering_model.json").read_text())
+
+    def test_any_null_input_blocks_whatever_the_verdict_and_before_an_assumption(self):
+        from ecad_model.results import propagate
+
+        for status in NULL_STATUSES:
+            for verdict, reason in (("PASS", "CORNER_LIMITS_PASSED"), ("FAIL", "CORNER_LIMITS_FAILED"),
+                                    ("INCONCLUSIVE", "CORNER_METRICS_INCONCLUSIVE"), ("BLOCKED", "TOOL_NOT_INSTALLED")):
+                with self.subTest(status=status.value, verdict=verdict):
+                    inputs = [{"path": "x", "status": status.value}, {"path": "y", "status": "AI_ASSUMPTION"}]
+                    self.assertEqual(propagate(inputs, [], verdict, reason),
+                                     ("BLOCKED", "MISSING_REQUIRED_INPUT", [f"{status.value}: x"]))
+
+    def test_an_unresolvable_input_is_inconclusive_unless_already_blocked(self):
+        from ecad_model.results import propagate
+
+        self.assertEqual(propagate([], ["components/ghost/physical/mass"], "PASS", "CORNER_LIMITS_PASSED"),
+                         ("INCONCLUSIVE", "INPUT_NOT_RESOLVABLE",
+                          ["input not resolvable in the model: components/ghost/physical/mass"]))
+        self.assertIsNone(propagate([], ["components/ghost/physical/mass"], "BLOCKED", "TOOL_NOT_INSTALLED"))
+
+    def test_only_a_comparator_verdict_is_withheld_for_an_ai_assumption(self):
+        from ecad_model.results import propagate
+
+        assumed = [{"path": "components/link/material/density", "status": "AI_ASSUMPTION"}]
+        for verdict, reason in (("PASS", "CORNER_LIMITS_PASSED"), ("FAIL", "CORNER_LIMITS_FAILED")):
+            with self.subTest(verdict):
+                self.assertEqual(propagate(assumed, [], verdict, reason),
+                                 ("INCONCLUSIVE", "INPUT_IS_AI_ASSUMPTION",
+                                  ["AI_ASSUMPTION: components/link/material/density"]))
+        # A crash or a missing tool is not a judgement on the design; it keeps its own reason.
+        for verdict, reason in (("FAIL", "ADAPTER_EXECUTION_ERROR"), ("FAIL", "CASE_CONFIGURATION_INVALID"),
+                                ("BLOCKED", "TOOL_NOT_INSTALLED")):
+            with self.subTest(verdict=verdict, reason=reason):
+                self.assertIsNone(propagate(assumed, [], verdict, reason))
+
+    def test_an_assumption_that_names_a_parent_is_still_an_input(self):
+        """An AI_ASSUMPTION is not walked past because its derived_from names
+        another quantity, nor because it names itself."""
+        from ecad_model.results import input_leaves
+
+        for parents in (["components/pillar/material/density"], ["components/link/material/density"]):
+            with self.subTest(parents=parents):
+                model = copy.deepcopy(self.model)
+                density = component(model, "link")["material"]["density"]
+                density.update(status="AI_ASSUMPTION", source=source("ai", "fixture"), derived_from=parents)
+                found, unresolved = input_leaves(model, ["components/link/physical/mass"])
+                self.assertIn({"path": "components/link/material/density", "status": "AI_ASSUMPTION"}, found)
+                self.assertEqual(unresolved, [])
+
+    def test_a_derived_quantity_is_listed_through_its_inputs(self):
+        from ecad_model.results import input_leaves
+
+        found, _ = input_leaves(self.model, ["components/link/physical/mass"])
+        self.assertEqual(found, [{"path": "components/link/geometry/volume", "status": "DERIVED"},
+                                 {"path": "components/link/material/density", "status": "ESTIMATED"}])
+
+    def test_an_unresolvable_path_is_reported_not_raised(self):
+        from ecad_model.results import input_leaves
+
+        model = copy.deepcopy(self.model)
+        component(model, "link")["physical"]["mass"]["derived_from"].append("components/pilar/material/density")
+        found, unresolved = input_leaves(model, ["components/link/physical/mass", "design/annotations.json"])
+        self.assertEqual(unresolved, ["components/pilar/material/density", "design/annotations.json"])
+        self.assertIn({"path": "components/link/material/density", "status": "ESTIMATED"}, found)
+
+    def test_lineage_problems_name_a_dangling_parent_and_a_cycle(self):
+        from ecad_model.results import lineage_problems
+
+        self.assertEqual(lineage_problems(self.model), [])
+        dangling = copy.deepcopy(self.model)
+        component(dangling, "link")["physical"]["mass"]["derived_from"].append("components/pilar/material/density")
+        self.assertEqual(lineage_problems(dangling), [
+            "components/link/physical/mass: derived_from names components/pilar/material/density, "
+            "which is not a quantity in the model"])
+        cycle = copy.deepcopy(self.model)
+        component(cycle, "link")["material"]["density"]["derived_from"] = ["components/link/physical/mass"]
+        self.assertTrue(any("leads back to itself" in problem for problem in lineage_problems(cycle)))
+
+    def test_an_annotated_value_with_a_dangling_parent_reaches_the_model_and_is_caught(self):
+        """The builder copies an annotated quantity whole; lineage_problems is what the build refuses on."""
+        from ecad_model.results import lineage_problems
+
+        extraction, annotations = pendulum()
+        annotations["materials"]["water"]["density"]["derived_from"] = ["components/frame/material/densty"]
+        self.assertTrue(lineage_problems(build(extraction, annotations)))
+
+
+class TestMechanicalDependencies(unittest.TestCase):
+    """What the mechanical adapter says each metric and reference rests on."""
+
+    def setUp(self):
+        self.model = json.loads((ITEM / "derived" / "engineering_model.json").read_text())
+        self.moving = ["link", "payload", "shaft"]
+
+    def test_a_holding_torque_rests_on_gravity_the_joint_range_and_every_moving_mass(self):
+        paths = MECHANICAL.dependencies(self.model, "static_torque_max_abs_nm", {"name": "static_sweep"})
+        for path in ("design/gravity", "joints/j1/axis", "joints/j1/origin",
+                     "joints/j1/limits/lower", "joints/j1/limits/upper",
+                     *(f"components/{cid}/physical/{name}" for cid in self.moving
+                       for name in ("mass", "center_of_mass", "inertia_about_com"))):
+            with self.subTest(path):
+                self.assertIn(path, paths)
+        self.assertFalse([p for p in paths if p.startswith(("components/pillar/", "components/base_plate/"))],
+                         "a fixed body cannot change a holding torque")
+
+    def test_clearance_rests_on_geometry_and_the_range_not_on_mass(self):
+        paths = MECHANICAL.dependencies(self.model, "rom_min_clearance_m", {"name": "rom_sweep"})
+        for path in ("joints/j1/limits/lower", "joints/j1/limits/upper",
+                     "components/pillar/geometry/bounding_box_local/min",
+                     "components/base_plate/geometry/bounding_box_local/max",
+                     "components/link/geometry/bounding_box_local/min"):
+            with self.subTest(path):
+                self.assertIn(path, paths)
+        self.assertFalse([p for p in paths if "/physical/" in p or p == "design/gravity"])
+
+    def test_references_list_gravity_exactly_when_they_use_it(self):
+        mass_inputs = MECHANICAL.reference_inputs(self.model, "moving_mass", {"name": "static_sweep"})
+        self.assertIn("components/link/physical/mass", mass_inputs)
+        self.assertNotIn("design/gravity", mass_inputs)
+        for derivation, scenario in (("gravity_torque_as_modelled", {"name": "static_sweep"}),
+                                     ("small_oscillation_period", {"name": "free_swing", "amplitude_rad": 0.01}),
+                                     ("equilibrium_angle", {"name": "free_swing", "amplitude_rad": 0.01}),
+                                     ("rated_move_peak_torque", {"name": "rated_move", "start_rad": 0.0,
+                                                                 "end_rad": -1.0, "duration_s": 0.8})):
+            with self.subTest(derivation):
+                self.assertIn("design/gravity", MECHANICAL.reference_inputs(self.model, derivation, scenario))
+
+    def test_gravity_with_no_value_blocks_and_no_gravity_at_all_does_not_apply(self):
+        for status in NULL_STATUSES:
+            with self.subTest(status=status.value):
+                model = copy.deepcopy(self.model)
+                model["design"]["gravity"] = null_quantity("m/s^2", status)
+                with self.assertRaises(ReferenceBlocked) as caught:
+                    reference_value(model, "gravity_torque_as_modelled", {"name": "static_sweep"})
+                self.assertIn({"path": "design/gravity", "status": status.value}, caught.exception.paths)
+        weightless = copy.deepcopy(self.model)
+        del weightless["design"]["gravity"]
+        with self.assertRaises(ReferenceBlocked) as caught:
+            reference_value(weightless, "gravity_torque_as_modelled", {"name": "static_sweep"})
+        self.assertEqual(caught.exception.paths, [])
+        self.assertGreater(reference_value(weightless, "moving_mass", {"name": "static_sweep"})[0], 0)
+
+
+class TestRequirementRefusals(unittest.TestCase):
+    """What the compiler and the mechanical vocabulary refuse, each on its own."""
+
+    def setUp(self):
+        self.model = json.loads((ITEM / "derived" / "engineering_model.json").read_text())
+        self.requirements = json.loads((ITEM / "requirements" / "requirements.json").read_text())
+
+    def test_a_reference_unit_and_metric_are_checked_as_a_requirement_s_are(self):
+        for field, value, message in (("unit", "mN*m", "unit mN\\*m != the unit of static_torque_at_zero_nm"),
+                                      ("metric", "made_up_metric", "produces no metric 'made_up_metric'")):
+            with self.subTest(field):
+                requirements = copy.deepcopy(self.requirements)
+                requirements["reference_values"][0][field] = value
+                with self.assertRaisesRegex(ValueError, message):
+                    compile_mechanical(self.model, requirements)
+
+    def test_an_id_shared_by_a_reference_and_a_requirement_is_refused(self):
+        requirements = copy.deepcopy(self.requirements)
+        requirements["requirements"][0]["requirement_id"] = requirements["reference_values"][0]["reference_id"]
+        with self.assertRaisesRegex(ValueError, "must be unique: REF-MECH-001 repeat"):
+            compile_mechanical(self.model, requirements)
+
+    def test_a_limit_quantity_that_is_not_one_number_is_refused(self):
+        requirements = copy.deepcopy(self.requirements)
+        clearance = next(r for r in requirements["requirements"] if r["requirement_id"] == "REQ-MECH-005")
+        clearance["limit"] = {"quantity": "joints/j1/origin"}
+        with self.assertRaisesRegex(ValueError, "REQ-MECH-005: the limit joints/j1/origin is not a single number"):
+            compile_mechanical(self.model, requirements)
+
+    def test_each_scenario_carries_what_its_case_reads(self):
+        MECHANICAL.check_requirements(self.requirements)
+        move = {"name": "rated_move", "start_rad": 0.0, "end_rad": -1.0, "duration_s": 0.8}
+        for label, edit in (
+                ("rated move without its end", lambda r: r["requirements"][2]["scenario"].pop("end_rad")),
+                ("free swing without its amplitude", lambda r: r["reference_values"][1]["scenario"].pop("amplitude_rad")),
+                ("a move derivation on a static sweep", lambda r: r["reference_values"][6].update(scenario={"name": "static_sweep"})),
+                ("a reference scenario outside the vocabulary", lambda r: r["reference_values"][0]["scenario"].update(name="thermal_soak")),
+                ("a move derivation on a free swing", lambda r: r["reference_values"][8].update(
+                    scenario={"name": "free_swing", "amplitude_rad": 0.01}))):
+            requirements = copy.deepcopy(self.requirements)
+            self.assertEqual(requirements["requirements"][2]["scenario"], {**move, "end_rad": -1.5707963267948966})
+            edit(requirements)
+            with self.subTest(label), self.assertRaises(ValueError):
+                MECHANICAL.check_requirements(requirements)
+
+
+class TestContractSchemas(unittest.TestCase):
+    """Rules the manifest and results schemas state, each shown refusing on its own."""
+
+    def setUp(self):
+        self.manifest = json.loads((ITEM / "dataset-item.json").read_text())
+
+    def test_the_manifest_restates_the_licence_rules_of_the_provenance(self):
+        validate(self.manifest, "cad-dataset/v1/dataset-item")
+        cases = {}
+        unverified = copy.deepcopy(self.manifest)
+        unverified["source"]["license"]["license_verified"] = False  # training_use_permitted stays true
+        cases["unverified but permitting training"] = (unverified, "training_use_permitted|redistribution_permitted")
+        uncited = copy.deepcopy(self.manifest)
+        del uncited["source"]["license"]["license_text"]
+        cases["verified without the licence text"] = (uncited, "license_text")
+        third = copy.deepcopy(self.manifest)
+        third["source_url"] = "https://example.org/part.step"
+        third["source"]["origin"] = {"kind": "third_party", "author": "someone", "url": "https://example.org/part.step",
+                                     "modifications": "none"}
+        cases["third party verified without a verifier"] = (third, "verified_by")
+        unmodified = copy.deepcopy(third)
+        unmodified["source"]["license"].update(verified_by="a named reviewer", verified_at="2026-09-26")
+        validate(unmodified, "cad-dataset/v1/dataset-item")
+        del unmodified["source"]["origin"]["modifications"]
+        cases["third party without its modifications"] = (unmodified, "modifications")
+        anonymous = copy.deepcopy(third)
+        anonymous["source"]["license"].update(verified_by="a named reviewer", verified_at="2026-09-26")
+        anonymous["source_url"] = None
+        cases["third party with no source URL"] = (anonymous, "self_authored")
+        undated = copy.deepcopy(third)
+        undated["source"]["license"]["verified_by"] = "a named reviewer"
+        cases["third party verified by someone, but not when"] = (undated, "verified_at")
+        unread = copy.deepcopy(third)
+        unread["source"]["license"].update(license_verified=False, redistribution_permitted=False,
+                                           training_use_permitted=False)
+        del unread["source"]["license"]["license_text"]
+        cases["third party unverified, citing no licence text"] = (unread, "license_text")
+        for label, (document, message) in cases.items():
+            with self.subTest(label), self.assertRaisesRegex(ValueError, message):
+                validate(document, "cad-dataset/v1/dataset-item")
+
+    def _results(self, **changes):
+        requirement = json.loads((ITEM / "requirements" / "requirements.json").read_text())["requirements"][0]
+        row = {
+            "validation_id": "s:v4.R", "check_id": "v4.R", "domain": "mechanical", "kind": "requirement",
+            "requirement": "R", "title": "t", "source": requirement["source"], "metric": "m", "component": "c",
+            "cad_components": [], "illustrative": False, "status": "PASS", "reason_code": "CORNER_LIMITS_PASSED",
+            "findings": [], "measured_value": 1.0, "measured_by": "v4.R", "expected_value": 2.0, "operator": "<=",
+            "applied_bound": {"maximum": 2.0}, "unit": "N*m", "tolerance": 0.0, "simulator": "mujoco",
+            "simulator_version": "3.14.0", "configuration": {"command": ["x"], "scenario": {"name": "s"}, "seed": 0},
+            "model_version": "1.0.0", "model_sha256": "0" * 64, "model_fidelity": "EXACT_GEOMETRY",
+            "inputs": [{"path": "components/c/material/density", "status": "ESTIMATED"}],
+            "timestamp": "2026-09-26T00:00:00Z", "input_hash": "0" * 64, "source_dirty": False,
+            "environment": {"os": "Darwin", "machine": "arm64", "python": "3.14.4", "constraints_sha256": None,
+                            "tools": {}},
+            "receipt_sha256": "0" * 64, "evidence": [],
+        }
+        row.update(changes)
+        return {"$schema": "https://embeddedos.org/schemas/engineering-model/v1/validation-results.schema.json",
+                "results_version": "1.0.0", "sample_id": "s", "receipt_sha256": "0" * 64, "results": [row]}
+
+    def test_the_results_schema_refuses_what_the_result_contract_forbids(self):
+        schema = "engineering-model/v1/validation-results"
+        validate(self._results(), schema)
+        assumed = [{"path": "components/c/material/density", "status": "AI_ASSUMPTION"}]
+        refused = {
+            "a PASS with no simulator version": dict(simulator_version=None),
+            "a PASS with nothing measured": dict(measured_value=None),
+            "an illustrative reference": dict(kind="reference", operator="within", illustrative=True, status="FAIL"),
+            "a reference with a requirement's operator": dict(kind="reference", status="FAIL"),
+            "an illustrative requirement not flagged": dict(kind="illustrative requirement", status="WARNING"),
+            "a flagged requirement not called illustrative": dict(illustrative=True, status="WARNING"),
+            "an illustrative limit that passed": dict(kind="illustrative requirement", illustrative=True),
+            "a PASS resting on a null input": dict(inputs=[{"path": "x", "status": "UNKNOWN"}]),
+            "a FAIL resting on a null input": dict(inputs=[{"path": "x", "status": "NOT_AVAILABLE"}], status="FAIL",
+                                                   reason_code="CORNER_LIMITS_FAILED"),
+            "a PASS resting on an assumption": dict(inputs=assumed),
+            "a PASS by any reason resting on an assumption": dict(inputs=assumed, reason_code="FIXTURE_PASSED"),
+            "a comparator FAIL resting on an assumption": dict(inputs=assumed, status="FAIL",
+                                                               reason_code="CORNER_LIMITS_FAILED"),
+            "a WARNING resting on an assumption": dict(inputs=assumed, kind="illustrative requirement",
+                                                       illustrative=True, status="WARNING",
+                                                       reason_code="WITHIN_ILLUSTRATIVE_LIMIT"),
+        }
+        for label, changes in refused.items():
+            with self.subTest(label), self.assertRaises(ValueError):
+                validate(self._results(**changes), schema)
+        accepted = {
+            "a crash resting on an assumption": dict(inputs=assumed, status="FAIL", reason_code="ADAPTER_EXECUTION_ERROR"),
+            "a null input, BLOCKED": dict(inputs=[{"path": "x", "status": "UNKNOWN"}], status="BLOCKED",
+                                          reason_code="MISSING_REQUIRED_INPUT", simulator_version=None,
+                                          measured_value=None),
+            "a reference and the tolerance its comparator applies": dict(
+                kind="reference", operator="within", component=None, reason_code="GOLDEN_COMPARISON_PASSED",
+                applied_bound={"value": 1.0, "absolute_tolerance": 1e-6}),
+        }
+        for label, changes in accepted.items():
+            with self.subTest(accepted=label):
+                validate(self._results(**changes), schema)
+
+    def test_base_types_refuse_what_the_pipeline_cannot_honour(self):
+        from ecad_model.domains import DerivedFile, Metric
+
+        with self.assertRaisesRegex(ValueError, "unknown comparator"):
+            DerivedFile(path="p", data=b"", role="domain_model", media_type="text/plain", producer="x",
+                        version="1", derived_from=(), comparator="roughly")
+        with self.assertRaisesRegex(ValueError, "unknown model fidelity"):
+            Metric("1", "GOOD_ENOUGH")
+
 
 class TestDocumentationExamples(unittest.TestCase):
     """QUALITY.md: every public function's example must be one that was actually run."""

@@ -80,6 +80,10 @@ def _moving(model: Dict[str, Any]) -> List[str]:
 
 MOVE_STEP_S = 1e-3  # the rated_move scenario samples its profile at this step
 
+# The derivations that read a scenario's parameters, and the scenario that has them.
+DERIVATION_SCENARIO = {"min_jerk_peak_speed": "rated_move", "min_jerk_peak_accel": "rated_move",
+                       "rated_move_peak_torque": "rated_move"}
+
 
 def _rotate(vector: Sequence[float], axis: Sequence[float], angle: float) -> List[float]:
     """Rodrigues: rotate a vector right-handedly about a unit axis."""
@@ -130,7 +134,10 @@ def reference_value(
         (value in SI units, model paths the value was computed from).
 
     Raises:
-        ReferenceBlocked: An input is UNKNOWN; its paths are attached.
+        ReferenceBlocked: An input has a null status (its paths and statuses
+            are attached), or the design records no gravity, which every
+            derivation but the minimum-jerk ones needs (nothing is attached:
+            the derivation does not apply).
         ValueError: The derivation name is not recognised.
 
     Example:
@@ -159,8 +166,15 @@ def reference_value(
     missing: List[Dict[str, str]] = []
     axis = _known(model, f"joints/{jid}/axis", missing)
     origin = _known(model, f"joints/{jid}/origin", missing)
-    gravity = model["design"]["gravity"]["value"]
     bodies = _bodies(model, scenario, used, missing)
+    if derivation == "moving_mass":
+        if missing:
+            raise ReferenceBlocked(f"{derivation} needs quantities that have no value", missing)
+        return sum(mass for mass, _, _ in bodies), used
+    if "gravity" not in model["design"]:
+        raise ReferenceBlocked(f"{derivation} needs gravity, which this design does not record", [])
+    used.append("design/gravity")
+    gravity = _known(model, "design/gravity", missing)
     if missing:
         raise ReferenceBlocked(f"{derivation} needs quantities that have no value", missing)
     arms = [[c - o for c, o in zip(com, origin)] for _, com, _ in bodies]
@@ -177,8 +191,6 @@ def reference_value(
         perpendicular = [ri - _dot(arm, axis) * ai for ri, ai in zip(arm, axis)]
         inertia_axis += _dot(axis, [_dot(row, axis) for row in inertia]) + mass * _dot(perpendicular, perpendicular)
 
-    if derivation == "moving_mass":
-        return sum(mass for mass, _, _ in bodies), used
     if derivation == "gravity_torque_as_modelled":
         return abs(gravity_torque(0.0)), used
 
@@ -323,24 +335,34 @@ class MechanicalAdapter:
         return dict(METRICS)
 
     def check_requirements(self, requirements: Dict[str, Any]) -> None:
-        """Every scenario and derivation must be one this domain implements.
+        """Every scenario and derivation must be one this domain implements,
+        and every derivation must be given the scenario it reads.
 
         Raises:
             ValueError: A scenario or derivation is not in the mechanical
-                vocabulary (schemas/engineering-model/v1/mechanical-vocabulary).
+                vocabulary (schemas/engineering-model/v1/mechanical-vocabulary),
+                or a move derivation is paired with a scenario other than the
+                rated move, whose start, end and duration it computes from.
         """
         validate_schema({
             "scenarios": [entry["scenario"] for entry in (*requirements["reference_values"], *requirements["requirements"])],
             "derivations": [entry["derivation"] for entry in requirements["reference_values"]],
         }, "engineering-model/v1/mechanical-vocabulary")
+        for reference in requirements["reference_values"]:
+            needed = DERIVATION_SCENARIO.get(reference["derivation"])
+            if needed and reference["scenario"]["name"] != needed:
+                raise ValueError(f"{reference['reference_id']}: {reference['derivation']} is computed from the "
+                                 f"{needed} scenario, not {reference['scenario']['name']}")
 
     def dependencies(self, model: Dict[str, Any], metric: str, scenario: Dict[str, Any]) -> List[str]:
         """The model quantities a simulated metric depends on.
 
-        Coarse on purpose, and a superset of what any one metric reads: every
-        moving body's mass properties and placement, the joint and gravity;
-        for clearance, every body on both sides, their bounding boxes and the
-        joint's range.
+        Coarse on purpose, and a superset of what any one metric reads: the
+        joint's axis, origin and range -- the range is in the MJCF every case
+        runs on, the static sweep samples it, and the rated move is refused
+        outside it -- and, for dynamics, every moving body's mass properties
+        and placement and gravity; for clearance, every body on both sides
+        and their bounding boxes.
         """
         joint = model["joints"][0]
         jid = joint["joint_id"]
@@ -348,8 +370,9 @@ class MechanicalAdapter:
         geometric = [c["component_id"] for c in model["components"] if c["cad_ref"] is not None]
         clearance = metric.startswith("rom_")
         bodies = geometric if clearance else [cid for cid in geometric if roots[cid] == roots[joint["child"]]]
-        paths = [f"joints/{jid}/axis", f"joints/{jid}/origin"]
-        paths += [f"joints/{jid}/limits/lower", f"joints/{jid}/limits/upper"] if clearance else ["design/gravity"]
+        paths = [f"joints/{jid}/axis", f"joints/{jid}/origin", f"joints/{jid}/limits/lower", f"joints/{jid}/limits/upper"]
+        if not clearance:
+            paths.append("design/gravity")
         for cid in sorted(bodies):
             paths += [f"components/{cid}/placement/translation", f"components/{cid}/placement/rotation"]
             if clearance:

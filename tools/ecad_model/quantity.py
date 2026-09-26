@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import math
 from enum import Enum
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Union
 
 Number = Union[int, float]
 Value = Union[None, Number, List[Number], List[List[Number]]]
@@ -44,7 +44,14 @@ class MissingInput(ValueError):
     That is a missing input, not a defect in the design: validation reports it
     BLOCKED with MISSING_REQUIRED_INPUT, never FAIL. Domain model writers raise
     a subclass of it.
+
+    Attributes:
+        inputs: The null-status model quantities, each {"path", "status"}.
     """
+
+    def __init__(self, message: str, inputs: Sequence[Dict[str, str]] = ()):
+        super().__init__(message)
+        self.inputs = [dict(entry) for entry in inputs]
 
 
 def is_null(status: Union[Status, str]) -> bool:

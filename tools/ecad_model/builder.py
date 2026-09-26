@@ -207,8 +207,12 @@ def build_engineering_model(
         volume_path = f"{base}/geometry/volume"
 
         if is_null(density["status"]):
-            mass = unknown("kg", computation, f"mass = density x volume, and density is {density['status']}")
-            inertia = unknown("kg*m^2", computation, f"inertia scales with density, which is {density['status']}")
+            # Still naming its inputs, so the missing density -- with its own
+            # status -- is found from the mass that cannot be computed.
+            mass = quantity(None, "kg", Status.UNKNOWN, computation, derived_from=[volume_path, density_path],
+                            note=f"mass = density x volume, and density is {density['status']}")
+            inertia = quantity(None, "kg*m^2", Status.UNKNOWN, computation, derived_from=[cad_input, density_path],
+                               note=f"inertia scales with density, which is {density['status']}")
         else:
             rho = density["value"]
             mass = quantity(

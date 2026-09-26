@@ -28,12 +28,16 @@ DOMAINS = (
 REGISTRY: Dict[str, DomainAdapter] = {"mechanical": MechanicalAdapter()}
 
 
+class DomainNotImplemented(ValueError):
+    """No adapter for the domain is registered: nothing here can build a model from its artefacts."""
+
+
 def adapter_for(domain: str, registry: Optional[Mapping[str, DomainAdapter]] = None) -> DomainAdapter:
     """The registered adapter for a sample's primary domain.
 
     Raises:
-        ValueError: No adapter for the domain is registered, so nothing here
-            can build a model from the sample's artefacts.
+        DomainNotImplemented: No adapter for the domain is registered, so
+            nothing here can build a model from the sample's artefacts.
 
     Example:
         >>> adapter_for("mechanical").formats
@@ -41,23 +45,32 @@ def adapter_for(domain: str, registry: Optional[Mapping[str, DomainAdapter]] = N
     """
     adapters = REGISTRY if registry is None else registry
     if domain not in adapters:
-        raise ValueError(f"no {domain} adapter is registered in this platform: {domain} is NOT_IMPLEMENTED")
+        raise DomainNotImplemented(f"no {domain} adapter is registered in this platform: {domain} is NOT_IMPLEMENTED")
     return adapters[domain]
 
 
-def domain_status(sources: Sequence[SourceArtifact], unknowns: Sequence[Dict[str, Any]],
+def domain_status(primary: str, sources: Sequence[SourceArtifact], unknowns: Sequence[Dict[str, Any]],
                   registry: Optional[Mapping[str, DomainAdapter]] = None) -> List[Dict[str, str]]:
     """Each domain's status for one sample, in the specification's words.
 
-    AVAILABLE        a registered adapter validates this domain from one of the
-                     sample's artefacts;
-    NOT_APPLICABLE   an adapter exists, but the sample has no artefact it reads;
+    AVAILABLE        the sample's primary domain, whose registered adapter
+                     validates it from one of the sample's artefacts: the only
+                     adapter the pipeline runs for a sample;
+    NOT_APPLICABLE   an adapter exists but is not run for this sample: the
+                     sample has no artefact it reads, or the domain is not the
+                     sample's primary domain;
     NOT_IMPLEMENTED  no adapter for the domain exists in this platform.
 
     Each reason also lists the sample's null-status inputs for the domain.
 
+    Args:
+        primary: The sample's primary domain, from its provenance.
+        sources: The sample's declared source artefacts.
+        unknowns: The engineering model's unknowns index.
+        registry: Domain adapters in place of the platform's (tests only).
+
     Example:
-        >>> [s["status"] for s in domain_status([SourceArtifact("a.step", "step")], [])][:2]
+        >>> [s["status"] for s in domain_status("mechanical", [SourceArtifact("a.step", "step")], [])][:2]
         ['AVAILABLE', 'NOT_IMPLEMENTED']
     """
     adapters = REGISTRY if registry is None else registry
@@ -70,14 +83,20 @@ def domain_status(sources: Sequence[SourceArtifact], unknowns: Sequence[Dict[str
     for domain in DOMAINS:
         lacking = sorted(missing.get(domain, []))
         adapter = adapters.get(domain)
-        if adapter is not None and adapter.formats & formats:
+        if adapter is not None and domain == primary and adapter.formats & formats:
             status, reason = "AVAILABLE", adapter.description
             if lacking:
                 reason += "; requirements resting on " + ", ".join(lacking) + " are BLOCKED"
         else:
-            if adapter is not None:
+            if adapter is not None and not adapter.formats & formats:
                 status = "NOT_APPLICABLE"
                 reason = f"the {domain} adapter reads {', '.join(sorted(adapter.formats))}, which this sample does not have"
+            elif adapter is not None:
+                # Only the primary domain's adapter runs: its artefacts here are
+                # validated by nothing, so the domain is not claimed.
+                status = "NOT_APPLICABLE"
+                reason = (f"the {domain} adapter runs only for samples whose primary domain is {domain}; "
+                          f"this sample's is {primary}, so its {domain} artefacts are not validated")
             else:
                 status, reason = "NOT_IMPLEMENTED", f"no {domain} validator exists in this platform yet"
             if lacking:
@@ -87,6 +106,6 @@ def domain_status(sources: Sequence[SourceArtifact], unknowns: Sequence[Dict[str
 
 
 __all__ = [
-    "CaseTarget", "DOMAINS", "DerivedFile", "DomainAdapter", "Extraction", "Metric", "REGISTRY",
+    "CaseTarget", "DOMAINS", "DerivedFile", "DomainAdapter", "DomainNotImplemented", "Extraction", "Metric", "REGISTRY",
     "SourceArtifact", "adapter_for", "domain_status",
 ]

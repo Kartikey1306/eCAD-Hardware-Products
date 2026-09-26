@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://embeddedos.org/schemas/engineering-model/v1/validation-results.schema.json",
   "title": "eCAD Per-Requirement Validation Results v1",
-  "description": "One result per V3/V4 check of one run: what was measured against what, by which simulator at which version, on which inputs with which statuses, with which evidence. Generated from the run's receipt, compiled cases, execution records and engineering model; nothing in it is synthesised. Bound to its receipt by the receipt's full digest.",
+  "description": "One result per requirement and reference of one run, each from the receipt check that decided it: what was measured against what, by which simulator at which version, on which inputs with which statuses, with which evidence. Generated from the run's receipt, compiled cases, execution records, stored environment record and engineering model; nothing in it is synthesised. Bound to its receipt by the receipt's full digest.",
   "type": "object",
   "additionalProperties": false,
   "required": ["$schema", "results_version", "sample_id", "receipt_sha256", "results"],
@@ -23,7 +23,7 @@
       "properties": {
         "path": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
         "status": {"$ref": "common.schema.json#/definitions/status"},
-        "source": {"$ref": "common.schema.json#/definitions/nonEmptyString"}
+        "source": {"description": "For a scenario parameter, the requirement or reference that states it.", "$ref": "common.schema.json#/definitions/nonEmptyString"}
       }
     },
     "result": {
@@ -38,7 +38,7 @@
       ],
       "properties": {
         "validation_id": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
-        "check_id": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "check_id": {"description": "The receipt check that decided this result: the requirement's own, or the gate-level check that stands in when the run compiled or executed none.", "$ref": "common.schema.json#/definitions/nonEmptyString"},
         "domain": {"$ref": "common.schema.json#/definitions/engineeringDomain"},
         "kind": {"enum": ["reference", "requirement", "illustrative requirement"]},
         "requirement": {"$ref": "common.schema.json#/definitions/identifier"},
@@ -55,11 +55,11 @@
         "reason_code": {"$ref": "#/definitions/nullableString"},
         "findings": {"type": "array", "items": {"type": "string"}},
         "measured_value": {"description": "Null when no metric was recorded.", "$ref": "#/definitions/nullableNumber"},
-        "measured_by": {"description": "The check that measured it: this one, or for a requirement blocked only on its limit, the check that ran the same metric with the same arguments.", "$ref": "#/definitions/nullableString"},
+        "measured_by": {"description": "The check that measured it: this one, or, for a V4 requirement BLOCKED only because its limit has a null status, another check that ran the same metric with the same arguments.", "$ref": "#/definitions/nullableString"},
         "expected_value": {"description": "The reference value, or the limit the requirement states; null when the limit has a null status.", "$ref": "#/definitions/nullableNumber"},
         "operator": {"enum": ["within", "<=", ">="]},
         "applied_bound": {
-          "description": "The bound actually compiled, tolerance folded in; null when nothing was compiled.",
+          "description": "What the comparator actually evaluated, as compiled: a V4 minimum or maximum with the tolerance folded in, or a V3 value and absolute tolerance (|measured - value| <= absolute_tolerance); null when nothing was compiled.",
           "oneOf": [
             {"type": "null"},
             {
@@ -67,6 +67,12 @@
               "additionalProperties": false,
               "minProperties": 1,
               "properties": {"minimum": {"type": "number"}, "maximum": {"type": "number"}}
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["value", "absolute_tolerance"],
+              "properties": {"value": {"type": "number"}, "absolute_tolerance": {"type": "number", "minimum": 0}}
             }
           ]
         },
@@ -86,12 +92,16 @@
         },
         "model_version": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
         "model_sha256": {"$ref": "common.schema.json#/definitions/sha256"},
-        "model_fidelity": {"enum": ["EXACT_GEOMETRY", "REDUCED_ORDER", "SIMPLIFIED", "EMPIRICAL"]},
+        "model_fidelity": {
+          "description": "The adapter's declaration for the metric; null when the metric is not one the domain produces (an entry V1 refused).",
+          "oneOf": [{"type": "null"}, {"enum": ["EXACT_GEOMETRY", "REDUCED_ORDER", "SIMPLIFIED", "EMPIRICAL"]}]
+        },
         "inputs": {"type": "array", "items": {"$ref": "#/definitions/input"}},
         "timestamp": {"type": "string", "minLength": 1},
         "input_hash": {"$ref": "common.schema.json#/definitions/sha256"},
         "source_dirty": {"type": "boolean"},
         "environment": {
+          "description": "Where the run happened, from the environment record the run stored as hash-bound evidence, never from the process that regenerates the results.",
           "type": "object",
           "additionalProperties": false,
           "required": ["os", "machine", "python", "constraints_sha256", "tools"],
@@ -100,7 +110,7 @@
             "machine": {"type": "string"},
             "python": {"type": "string"},
             "constraints_sha256": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/definitions/sha256"}]},
-            "tools": {"type": "object", "additionalProperties": {"type": "string"}}
+            "tools": {"description": "Every tool the receipt records for the run, by tool id and version; the check's own tool is simulator/simulator_version.", "type": "object", "additionalProperties": {"type": "string"}}
           }
         },
         "receipt_sha256": {"$ref": "common.schema.json#/definitions/sha256"},
@@ -124,9 +134,45 @@
           "then": {"properties": {"simulator_version": {"$ref": "common.schema.json#/definitions/nonEmptyString"}}}
         },
         {
-          "description": "A reference is computed, not chosen, so it is never illustrative.",
+          "description": "A reference is compared within its absolute tolerance.",
           "if": {"properties": {"kind": {"const": "reference"}}},
-          "then": {"properties": {"illustrative": {"const": false}, "operator": {"const": "within"}}}
+          "then": {"properties": {"operator": {"const": "within"}}}
+        },
+        {
+          "description": "The kind says whether an entry is illustrative, and agrees with the flag: only an illustrative requirement is, and a reference, computed rather than chosen, never is.",
+          "if": {"properties": {"kind": {"const": "illustrative requirement"}}},
+          "then": {"properties": {"illustrative": {"const": true}}},
+          "else": {"properties": {"illustrative": {"const": false}}}
+        },
+        {
+          "description": "Meeting an illustrative limit is WARNING, never PASS.",
+          "if": {"properties": {"illustrative": {"const": true}}},
+          "then": {"properties": {"status": {"not": {"const": "PASS"}}}}
+        },
+        {
+          "description": "A PASS reports what was measured.",
+          "if": {"properties": {"status": {"const": "PASS"}}},
+          "then": {"properties": {"measured_value": {"type": "number"}}}
+        },
+        {
+          "description": "A result resting on a null-status input is BLOCKED.",
+          "if": {"properties": {"inputs": {"contains": {"properties": {"status": {"enum": ["UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE"]}}}}}},
+          "then": {"properties": {"status": {"const": "BLOCKED"}}}
+        },
+        {
+          "description": "No comparator verdict on a requirement stands on a value a model proposed.",
+          "if": {
+            "properties": {
+              "kind": {"enum": ["requirement", "illustrative requirement"]},
+              "inputs": {"contains": {"properties": {"status": {"const": "AI_ASSUMPTION"}}}}
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {"not": {"enum": ["PASS", "WARNING"]}},
+              "reason_code": {"not": {"enum": ["CORNER_LIMITS_PASSED", "CORNER_LIMITS_FAILED", "WITHIN_ILLUSTRATIVE_LIMIT"]}}
+            }
+          }
         }
       ]
     }

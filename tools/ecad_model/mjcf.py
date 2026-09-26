@@ -164,6 +164,25 @@ def build_mjcf(model: Dict[str, Any], *, timestep: float = 0.0005) -> str:
                 f"component {component['component_id']!r} is attached to neither side of the joint"
             )
 
+    # Every value the model needs, by model path: all the missing ones are
+    # reported together, each with its own status, not only the first.
+    jid = joint["joint_id"]
+    needed = [(f"joints/{jid}/axis", joint["axis"]), (f"joints/{jid}/origin", joint["origin"]),
+              (f"joints/{jid}/limits/lower", joint["limits"]["lower"]),
+              (f"joints/{jid}/limits/upper", joint["limits"]["upper"]),
+              ("design/gravity", model["design"]["gravity"])]
+    for component in geometric:
+        base = f"components/{component['component_id']}"
+        needed += [(f"{base}/physical/{name}", component["physical"][name])
+                   for name in ("mass", "center_of_mass", "inertia_about_com")]
+        needed += [(f"{base}/geometry/bounding_box_local/{end}", component["geometry"]["bounding_box_local"][end])
+                   for end in ("min", "max")]
+        needed += [(f"{base}/placement/{name}", component["placement"][name]) for name in ("rotation", "translation")]
+    missing = [{"path": path, "status": item["status"]} for path, item in needed if is_null(item["status"])]
+    if missing:
+        raise MissingInput("the mechanical model needs values that have none: "
+                           + ", ".join(f"{entry['path']} ({entry['status']})" for entry in missing), missing)
+
     axis = _known(joint["axis"], f"joint {joint['joint_id']} axis")
     origin = _known(joint["origin"], f"joint {joint['joint_id']} origin")
     lower = _known(joint["limits"]["lower"], f"joint {joint['joint_id']} lower limit")

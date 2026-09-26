@@ -46,14 +46,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from . import MODEL_VERSION
 from .builder import VERSION as BUILDER_VERSION, index_unknowns, resolve
-from .domains import DerivedFile, DomainAdapter, Extraction, SourceArtifact, adapter_for, domain_status
+from .domains import (
+    DerivedFile, DomainAdapter, DomainNotImplemented, Extraction, SourceArtifact, adapter_for, domain_status,
+)
 from .domains.base import MEDIA_TYPES
 from .importers import ExtractionError, UnsupportedFormat, regular_file
-from .quantity import MissingInput
+from .quantity import MissingInput, is_null
 from .requirements import CONTRACT_DOMAIN, VERSION as COMPILER_VERSION, compile_cases
-from .results import build_results, environment, input_leaves, propagate
+from .results import build_results, environment, input_leaves, lineage_problems, propagate, run_environment
 from .schemas import REPOSITORY_ROOT, validate as validate_schema
 
 ITEM_SCHEMA = "https://embeddedos.org/schemas/cad-dataset/v1/dataset-item.schema.json"
@@ -65,6 +66,8 @@ GOLDEN = "validation/golden/cases.json"
 CORNERS = "validation/corners/cases.json"
 MANIFEST = "dataset-item.json"
 MANIFEST_VERSION = "1.0.0"
+VALIDATOR_VERSION = "1.0.0"  # of this runner, as the receipt's ecad-validator tool
+CASE_DOCUMENTS = ((GOLDEN, "V3", "golden"), (CORNERS, "V4", "corners"))
 RELATIVE_TOLERANCE = 1e-9
 ABSOLUTE_TOLERANCE = 1e-12
 
@@ -79,8 +82,9 @@ class Item:
         directory: The item directory.
 
     Raises:
-        ValueError: The provenance is missing or invalid, or a declared source
-            is not a regular file inside the item.
+        ValueError: The item directory is a symlink or lies outside the
+            repository, the provenance is missing or invalid, or a declared
+            source is not a regular file inside the item.
 
     Example:
         >>> item = Item(REPOSITORY_ROOT / "datasets/cad/robotic_joint_001")
@@ -89,10 +93,15 @@ class Item:
     """
 
     def __init__(self, directory: Path):
-        self.root = directory.resolve()
-        self.item_id = self.root.name
         # Before anything is read: a symlink could redirect a read past the
-        # hashes, or a build's write to any file the user can modify.
+        # hashes, or a build's write to any file the user can modify -- the
+        # item directory itself as much as anything inside it.
+        if Path(directory).is_symlink():
+            raise ValueError(f"{directory}: the item directory is a symlink; dataset items may not contain symlinks")
+        self.root = Path(directory).resolve()
+        self.item_id = self.root.name
+        if not self.root.is_relative_to(REPOSITORY_ROOT):
+            raise ValueError(f"{directory}: resolves outside the repository; it is not read")
         _refuse_symlinks(self)
         self.provenance = _provenance(self)
         self.domain: str = self.provenance["domain"]
@@ -238,12 +247,32 @@ def _derive(item: Item, registry: Optional[Dict[str, DomainAdapter]] = None) -> 
         "annotations_sha256": _sha256(annotations_bytes),
     })
     validate_schema(extraction.model, "engineering-model/v1/engineering-model")
+    lineage = lineage_problems(extraction.model)
+    if lineage:
+        # An annotated value naming a parent that does not exist, or resting on
+        # itself, would leave every result depending on it without inputs.
+        raise ValueError(f"{item.item_id}: the model's lineage cannot be followed: " + "; ".join(lineage))
     files: Dict[str, DerivedFile] = {derived.path: derived for derived in extraction.files}
     files[MODEL] = DerivedFile(
         path=MODEL, data=_json_bytes(extraction.model), role="engineering_model", media_type="application/json",
         producer="ecad_model.builder", version=BUILDER_VERSION,
-        derived_from=(*(derived.path for derived in extraction.files), ANNOTATIONS))
-    for derived in adapter.write_models(extraction.model, item.item_id):
+        # The model is derived from the extraction files, or, when an adapter
+        # reads its artefacts directly, from the artefacts themselves.
+        derived_from=(*([derived.path for derived in extraction.files]
+                        or [source.path for source in item.sources if source.format in adapter.formats]),
+                      ANNOTATIONS))
+    try:
+        domain_models = adapter.write_models(extraction.model, item.item_id)
+    except MissingInput as exc:
+        # Name what is actually missing: a mass with no value rests on a
+        # density with no value, and it is the density, with its own status,
+        # that someone has to supply.
+        found, _ = input_leaves(extraction.model, [entry["path"] for entry in exc.inputs])
+        null = {leaf["path"] for leaf in found if is_null(leaf["status"])}
+        roots = [leaf for leaf in found if leaf["path"] in null and not null & set(
+            resolve(extraction.model, leaf["path"]).get("derived_from", []))]
+        raise MissingInput(str(exc), roots or exc.inputs) from exc
+    for derived in domain_models:
         files[derived.path] = derived
     golden, corners, blocked = compile_cases(extraction.model, requirements, adapter.case_target(item.item_id),
                                              adapter.reference_value, adapter.metrics())
@@ -337,7 +366,7 @@ def _item_manifest(item: Item, derivation: Derivation, registry: Optional[Dict[s
             }
             for path, derived in derivation.files.items()
         ],
-        "domains": domain_status(item.sources, model["unknowns"], registry),
+        "domains": domain_status(item.domain, item.sources, model["unknowns"], registry),
     }
 
 
@@ -368,6 +397,12 @@ def build(directory: Path, registry: Optional[Dict[str, DomainAdapter]] = None) 
     derivation = _derive(item, registry)
     for relative, data in derivation.data().items():
         _write_inside(item, relative, data)
+    for relative, _gate, _name in CASE_DOCUMENTS:
+        if relative not in derivation.files and os.path.lexists(item.path(relative)):
+            # The requirements now compile to no case of this gate. A committed
+            # document left behind would still be executed by validate.
+            regular_file(item.path(relative))
+            item.path(relative).unlink()
     manifest = _item_manifest(item, derivation, registry)
     validate_schema(manifest, "cad-dataset/v1/dataset-item")
     _write_inside(item, MANIFEST, _json_bytes(manifest))
@@ -577,7 +612,13 @@ def integrity(item: Item) -> List[str]:
     if unrecorded:
         problems.append(f"files not recorded in {MANIFEST}: " + ", ".join(unrecorded))
     for artifact in recorded:
+        relative = Path(artifact["path"])
         path = item.path(artifact["path"])
+        if relative.is_absolute() or ".." in relative.parts or not path.resolve().is_relative_to(item.root):
+            # The manifest is untrusted input. Reading a path it names outside
+            # the item would make check a hash oracle for any file on the host.
+            problems.append(f"{artifact['path']}: recorded in {MANIFEST} outside the item; it is not read")
+            continue
         if not path.is_file():
             problems.append(f"{artifact['path']}: recorded in {MANIFEST} but missing")
             continue
@@ -613,18 +654,25 @@ def reproducibility(item: Item, derived: Optional[Derivation] = None) -> List[st
         []
     """
     problems = []
-    for relative, fresh in (_derive(item) if derived is None else derived).files.items():
+    derivation = _derive(item) if derived is None else derived
+    for relative, _gate, _name in CASE_DOCUMENTS:
+        if relative not in derivation.files and os.path.lexists(item.path(relative)):
+            problems.append(f"{relative}: committed, but a fresh derivation compiles no such document")
+    for relative, fresh in derivation.files.items():
         path = item.path(relative)
         if not path.is_file():
             problems.append(f"{relative}: derived file is not committed")
             continue
         committed = item.read(relative)
-        if fresh.comparator == "json":
-            problems += same_content(json.loads(committed), json.loads(fresh.data), relative)
-        elif fresh.comparator == "numeric_attributes":
-            problems += same_text(committed.decode("utf-8"), fresh.data.decode("utf-8"), relative)
-        elif committed != fresh.data:
-            problems.append(f"{relative}: bytes differ from a fresh derivation")
+        try:
+            if fresh.comparator == "json":
+                problems += same_content(json.loads(committed), json.loads(fresh.data), relative)
+            elif fresh.comparator == "numeric_attributes":
+                problems += same_text(committed.decode("utf-8"), fresh.data.decode("utf-8"), relative)
+            elif committed != fresh.data:
+                problems.append(f"{relative}: bytes differ from a fresh derivation")
+        except ValueError as exc:  # JSONDecodeError and UnicodeDecodeError are ValueErrors
+            problems.append(f"{relative}: the committed file cannot be read as its producer wrote it: {exc}")
     return problems
 
 
@@ -658,8 +706,13 @@ def manifest_problems(item: Item, derived: Optional[Derivation] = None,
         []
     """
     fresh = _item_manifest(item, _derive(item, registry) if derived is None else derived, registry)
-    committed = json.loads(item.read(MANIFEST))
-    return same_content(_without_derived_hashes(committed), _without_derived_hashes(fresh), MANIFEST)
+    try:
+        committed = _without_derived_hashes(json.loads(item.read(MANIFEST)))
+    except ValueError as exc:
+        return [f"{MANIFEST}: not valid JSON: {exc}"]
+    except (KeyError, TypeError, AttributeError) as exc:
+        return [f"{MANIFEST}: does not have the shape build writes ({type(exc).__name__}: {exc})"]
+    return same_content(committed, _without_derived_hashes(fresh), MANIFEST)
 
 
 def cited_source_problems(item: Item) -> List[str]:
@@ -760,10 +813,14 @@ def _reference_problems(item: Item, model: Dict[str, Any], requirements: Dict[st
                 resolve(model, requirement["limit"]["quantity"])
             except KeyError as exc:
                 problems.append(f"{requirement['requirement_id']}: {exc.args[0]}")
+    declared = {(artifact.path, artifact.format) for artifact in item.sources}
     for source in model["design"]["sources"]:
         path = REPOSITORY_ROOT / source["path"]
         if not path.is_relative_to(item.root) or source["sha256"] != _sha256(item.read(item.item_relative(path))):
             problems.append(f"the engineering model was derived from different bytes of {source['path']}")
+        elif (item.item_relative(path), source["format"]) not in declared:
+            problems.append(f"the engineering model names {source['path']} as {source['format']}, "
+                            "which the provenance does not declare")
     if model["unknowns"] != index_unknowns(model):
         problems.append("the unknowns index is stale")
     return problems
@@ -799,7 +856,6 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
         >>> receipt["gates"][4]["verdict"]  # REQ-XD-001 rests on an UNKNOWN actuator torque
         'BLOCKED'
     """
-    from ecad_validation.cases import execute_cases
     from ecad_validation.contract import validate_document
     from ecad_validation.engine import repository_state
     from ecad_validation.models import (
@@ -848,7 +904,7 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
     inputs = [*source_paths, ANNOTATIONS, REQUIREMENTS, MANIFEST]
     try:
         adapter: Optional[DomainAdapter] = adapter_for(item.domain, registry)
-    except ValueError:
+    except DomainNotImplemented:
         adapter = None
     domain = item.domain
 
@@ -868,8 +924,8 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
     for problems_of in (integrity, cited_source_problems):
         try:
             v0_problems += problems_of(item)
-        except (OSError, ValueError) as exc:
-            v0_problems.append(f"{problems_of.__name__}: {exc}")
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            v0_problems.append(f"{problems_of.__name__}: {type(exc).__name__}: {exc}")
     v0 = [result("v0.dataset-schemas-and-hashes", GateLevel.V0, Domain.DATA_MANAGEMENT, Layer.DESIGN, v0_problems,
                  inputs, "DATASET_SCHEMAS_VALID", "DATASET_SCHEMA_OR_HASH_INVALID",
                  "every dataset document conforms to its schema and every recorded hash matches")]
@@ -879,34 +935,37 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
     failure: Optional[Tuple[Any, Any, str, str]] = None
     fresh: Optional[Derivation] = None
     v1_problems: List[str] = []
-    try:
-        if adapter is None:
-            raise LookupError(f"no {domain} adapter is registered in this platform")
-        fresh = _derive(item, registry)
-        v1_problems = adapter.sanity_problems(fresh.model)
-    except LookupError as exc:
+    v1_findings: List[str] = []
+    if adapter is None:
+        # Nothing here can read this domain's artefacts. Decided before any
+        # derivation runs, so no error raised while deriving can pose as it.
         failure = (ExecutionStatus.UNAVAILABLE, Verdict.BLOCKED, "DOMAIN_NOT_IMPLEMENTED",
                    f"the {domain} domain is NOT_IMPLEMENTED in this platform")
-        v1_blocked: Optional[str] = str(exc)
-    except ExtractionError as exc:
-        failure = {
-            "rejected": (ExecutionStatus.COMPLETED, Verdict.FAIL, "SOURCE_REJECTED", "the source was read and refused on its content"),
-            "crashed": (ExecutionStatus.CRASHED, Verdict.INCONCLUSIVE, "EXTRACTION_CRASHED", "the parser died or produced no result"),
-            "timed_out": (ExecutionStatus.TIMED_OUT, Verdict.INCONCLUSIVE, "EXTRACTION_TIMED_OUT", "the parser exceeded its time limit"),
-            "unavailable": (ExecutionStatus.UNAVAILABLE, Verdict.BLOCKED, "EXTRACTOR_UNAVAILABLE", "the parser the domain needs is not installed here"),
-        }[exc.kind]
-        v1_blocked = str(exc)
-    except MissingInput as exc:
-        # A value nobody has recorded is a missing input, not a design defect.
-        failure = (ExecutionStatus.SKIPPED, Verdict.BLOCKED, "MISSING_REQUIRED_INPUT",
-                   f"a value the {domain} model needs has no value")
-        v1_blocked = str(exc)
-    except (OSError, ValueError) as exc:
-        # A schema-invalid input or an inconsistent annotation: the item is wrong.
-        failure = (ExecutionStatus.COMPLETED, Verdict.FAIL, "DATASET_INPUT_INVALID", "the item's inputs cannot be built into a model")
-        v1_blocked = str(exc)
+        v1_findings = [f"no {domain} adapter is registered in this platform"]
     else:
-        v1_blocked = None
+        try:
+            fresh = _derive(item, registry)
+            v1_problems = adapter.sanity_problems(fresh.model)
+        except ExtractionError as exc:
+            failure = {
+                "rejected": (ExecutionStatus.COMPLETED, Verdict.FAIL, "SOURCE_REJECTED", "the source was read and refused on its content"),
+                "crashed": (ExecutionStatus.CRASHED, Verdict.INCONCLUSIVE, "EXTRACTION_CRASHED", "the parser died or produced no result"),
+                "timed_out": (ExecutionStatus.TIMED_OUT, Verdict.INCONCLUSIVE, "EXTRACTION_TIMED_OUT", "the parser exceeded its time limit"),
+                "unavailable": (ExecutionStatus.UNAVAILABLE, Verdict.BLOCKED, "EXTRACTOR_UNAVAILABLE", "the parser the domain needs is not installed here"),
+            }[exc.kind]
+            v1_findings = [str(exc)]
+        except MissingInput as exc:
+            # A value nobody has recorded is a missing input, not a design defect.
+            failure = (ExecutionStatus.SKIPPED, Verdict.BLOCKED, "MISSING_REQUIRED_INPUT",
+                       f"a value the {domain} model needs has no value")
+            v1_findings = [f"{entry['status']}: {entry['path']}" for entry in exc.inputs] or [str(exc)]
+        except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:
+            # A schema-invalid input or an inconsistent annotation: the item is
+            # wrong. The item is untrusted input, so an error it provokes in the
+            # builder or the adapter is recorded here, never raised past the receipt.
+            failure = (ExecutionStatus.COMPLETED, Verdict.FAIL, "DATASET_INPUT_INVALID", "the item's inputs cannot be built into a model")
+            v1_findings = [str(exc) if isinstance(exc, (OSError, ValueError)) else f"{type(exc).__name__}: {exc}"]
+    v1_blocked = "; ".join(v1_findings) if failure else None
     contract_domain = Domain(CONTRACT_DOMAIN[domain])
     if failure is None:
         v1 = [result(v1_id, GateLevel.V1, contract_domain, Layer.MODEL,
@@ -918,12 +977,23 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
         v1 = [CheckResult(check_id=v1_id, gate=GateLevel.V1,
                           domain=contract_domain, layer=Layer.MODEL,
                           execution_status=status, verdict=verdict, reason_code=reason, summary=summary,
-                          findings=[v1_blocked or summary], evidence=[*evidence(*source_paths), *refs],
+                          findings=v1_findings or [summary], evidence=[*evidence(*source_paths), *refs],
                           generated_evidence=extra)]
+
+    # The requirements say what V3/V4 must contain. They are untrusted input
+    # too: when they cannot be read, V0 has already said why, and V3/V4 each
+    # record one BLOCKED check instead of the run stopping.
+    requirements: Dict[str, Any] = {"reference_values": [], "requirements": []}
+    requirements_problem: Optional[str] = None
+    try:
+        document = json.loads(item.read(REQUIREMENTS))
+        validate_schema(document, "engineering-model/v1/engineering-requirements")
+        requirements = document
+    except (OSError, ValueError) as exc:
+        requirements_problem = f"{REQUIREMENTS}: {exc}"
 
     # V2: the committed derivation reproduces and every reference resolves (any
     # domain), and the domain model is consistent with the engineering model.
-    requirements = json.loads(item.read(REQUIREMENTS))
     if fresh is not None and adapter is not None:
         derived_paths = list(fresh.files)
         v2 = [
@@ -950,65 +1020,54 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
               for check_id, check_domain in (("v2.dataset-reproduction", Domain.DATA_MANAGEMENT),
                                              (f"v2.{domain}.model-invariants", contract_domain))]
 
-    # V3/V4: the existing case engine, then BLOCKED checks for what rests on a null-status value.
-    blocked: List[Dict[str, Any]] = []
-    committed_model: Optional[Dict[str, Any]] = None
-    if adapter is not None and item.path(MODEL).is_file():
-        committed_model = json.loads(item.read(MODEL))
-        _golden, _corners, blocked = compile_cases(committed_model, requirements, adapter.case_target(item.item_id),
-                                                   adapter.reference_value, adapter.metrics())
-    engineering_ids = {entry["reference_id"] for entry in requirements["reference_values"]} | {
-        entry["requirement_id"] for entry in requirements["requirements"]}
-    illustrative_ids = {entry["requirement_id"] for entry in requirements["requirements"] if entry["illustrative"]}
-    by_requirement = {entry["requirement_id"]: entry for entry in requirements["requirements"]}
     gates: Dict[Any, List[Any]] = {GateLevel.V0: v0, GateLevel.V1: v1, GateLevel.V2: v2}
-    for level, directory_name in ((GateLevel.V3, "golden"), (GateLevel.V4, "corners")):
-        checks = execute_cases(item.root, level, directory_name)
-        for check_result in checks:
-            case_id = check_result.check_id.split(".", 1)[1]
-            if case_id in engineering_ids:
-                check_result.requirement_ids = [*check_result.requirement_ids, case_id]
-            requirement = by_requirement.get(case_id)
-            if level is GateLevel.V4 and requirement and adapter is not None and committed_model is not None:
-                # The inputs decide first: a null-status leaf blocks the check, an
-                # AI_ASSUMPTION leaf makes its verdict INCONCLUSIVE (results.propagate).
-                paths = adapter.dependencies(committed_model, requirement["metric"], requirement["scenario"]) + (
-                    [requirement["limit"]["quantity"]] if "quantity" in requirement["limit"] else [])
-                changed = propagate(input_leaves(committed_model, paths), check_result.verdict.value)
-                if changed:
-                    verdict, reason, findings = changed
-                    check_result.verdict, check_result.reason_code = Verdict(verdict), reason
-                    check_result.summary = f"{check_result.summary}; the inputs make it {verdict}"
-                    check_result.findings = [*findings, *check_result.findings]
-            if case_id in illustrative_ids and check_result.verdict is Verdict.PASS:
-                # Meeting a limit invented to exercise the pipeline qualifies
-                # nothing. The contract's WARNING is advisory and cannot satisfy
-                # a required check, so such a sample is never eligible for ebuild.
-                check_result.verdict = Verdict.WARNING
-                check_result.reason_code = "WITHIN_ILLUSTRATIVE_LIMIT"
-                check_result.summary = "within an illustrative limit, which is not a qualification"
-                check_result.findings = [*check_result.findings,
-                                         f"{case_id} is illustrative: not a customer, safety or certification requirement"]
-        for entry in blocked:
-            if entry["gate"] != level.value:
-                continue
-            refs, extra = generated(f"{level.value.lower()}.{entry['id']}", entry)
-            # A blocked check takes the contract domain of the requirement or
-            # reference it implements; neither is ever missing here.
-            owner = next(r for r in [*requirements["requirements"], *requirements["reference_values"]]
-                         if r.get("requirement_id", r.get("reference_id")) == entry["id"])
-            checks.append(CheckResult(
-                check_id=f"{level.value.lower()}.{entry['id']}", gate=level, domain=Domain(CONTRACT_DOMAIN[owner["domain"]]),
+    entries = {GateLevel.V3: [(r["reference_id"], r) for r in requirements["reference_values"]],
+               GateLevel.V4: [(r["requirement_id"], r) for r in requirements["requirements"]]}
+    policy = {GateLevel.V3: "POLICY:V3-GOLDEN", GateLevel.V4: "POLICY:V4-CORNER"}
+    all_ids = [entry_id for level in entries for entry_id, _ in entries[level]]
+
+    def gate_check(level: Any, reason: str, summary: str, finding: str) -> Any:
+        """The one BLOCKED check that stands in for a whole gate's cases."""
+        name = "golden" if level is GateLevel.V3 else "corners"
+        return CheckResult(
+            check_id=f"{level.value.lower()}.{name}-cases", gate=level, domain=Domain.DATA_MANAGEMENT,
+            layer=Layer.VALIDATION, execution_status=ExecutionStatus.UNAVAILABLE, verdict=Verdict.BLOCKED,
+            reason_code=reason, summary=summary, requirement_ids=[policy[level]],
+            findings=[finding], evidence=evidence(REQUIREMENTS))
+
+    def not_evaluated(level: Any, reason: str, finding: str) -> List[Any]:
+        """V3/V4 when nothing can be compiled: each requirement BLOCKED with the reason,
+        or one gate-level check when there is none to name (or its ids collide)."""
+        if entries[level] and requirements_problem is None and len(set(all_ids)) == len(all_ids):
+            return [CheckResult(
+                check_id=f"{level.value.lower()}.{entry_id}", gate=level, domain=Domain(CONTRACT_DOMAIN[entry["domain"]]),
                 layer=Layer.VALIDATION, execution_status=ExecutionStatus.UNAVAILABLE, verdict=Verdict.BLOCKED,
-                # spec: a missing required input is BLOCKED with MISSING_REQUIRED_INPUT; a
-                # reference whose derivation does not apply to the design has no missing input.
-                reason_code="MISSING_REQUIRED_INPUT" if entry["missing_inputs"] else "REFERENCE_NOT_APPLICABLE",
-                summary=entry["reason"],
-                requirement_ids=[f"POLICY:{level.value}-{'GOLDEN' if level is GateLevel.V3 else 'CORNER'}", entry["id"]],
-                findings=[f"{m['status']}: {m['path']}" for m in entry["missing_inputs"]] or [entry["reason"]],
-                evidence=[*evidence(REQUIREMENTS, MODEL), *refs], generated_evidence=extra,
-            ))
-        gates[level] = checks
+                reason_code=reason, summary=f"{entry_id} was not evaluated: nothing was compiled for it",
+                requirement_ids=[policy[level], entry_id], findings=[finding], evidence=evidence(REQUIREMENTS))
+                for entry_id, entry in entries[level]]
+        return [gate_check(level, reason, "no case of this gate was evaluated", finding)]
+
+    if fresh is None or requirements_problem is not None:
+        # Nothing was derived, so nothing committed can be trusted to implement
+        # the requirements: running its cases would report a verdict on a model
+        # V1 could not reproduce, for a domain V1 may call NOT_IMPLEMENTED.
+        finding = requirements_problem or f"V1 did not derive a model: {v1_blocked}"
+        for level in (GateLevel.V3, GateLevel.V4):
+            gates[level] = not_evaluated(level, "DERIVATION_NOT_AVAILABLE", finding)
+    else:
+        assert adapter is not None
+        committed_model, model_problem = _committed_model(item)
+        if committed_model is None:
+            # The committed cases were compiled from a model that is not there,
+            # or not a valid model, to establish their inputs; V0 and V2 say why.
+            for level in (GateLevel.V3, GateLevel.V4):
+                gates[level] = not_evaluated(
+                    level, "DERIVED_MODEL_NOT_COMMITTED" if not item.path(MODEL).is_file() else "COMMITTED_MODEL_INVALID",
+                    model_problem or MODEL)
+        else:
+            for level in (GateLevel.V3, GateLevel.V4):
+                gates[level] = _run_cases(item, level, fresh, adapter, committed_model, requirements,
+                                          generated, evidence, gate_check)
 
     input_digest_after = hash_tree(item.root, item.files())
     refs, extra = generated("v0.dataset-input-immutability",
@@ -1023,7 +1082,12 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
         else "the dataset item's files changed while validation was running",
         evidence=refs, generated_evidence=extra,
     ))
-    refs, extra = generated("v0.pinned-clean-source", {"commit": commit, "dirty": dirty})
+    # Where the run happens is recorded here, bound into the receipt, so the
+    # per-requirement results describe this run and not whoever regenerates them.
+    constraints = REPOSITORY_ROOT / "tools" / "constraints-cad.txt"
+    refs, extra = generated("v0.pinned-clean-source", {
+        "commit": commit, "dirty": dirty,
+        "environment": run_environment(constraints.read_bytes() if constraints.is_file() else None)})
     gates[GateLevel.V0].append(CheckResult(
         check_id="v0.pinned-clean-source", gate=GateLevel.V0, domain=Domain.DATA_MANAGEMENT,
         layer=Layer.VALIDATION, execution_status=ExecutionStatus.COMPLETED,
@@ -1036,7 +1100,7 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
     gate_results = [GateResult.from_checks(level, gates[level]) for level in GateLevel]
     tools: Dict[str, Dict[str, Any]] = {
         "ecad-validator": {
-            "tool_id": "ecad-validator", "name": "eCAD dataset validator", "version": MODEL_VERSION,
+            "tool_id": "ecad-validator", "name": "eCAD dataset validator", "version": VALIDATOR_VERSION,
             "invocation": ["python3", "tools/cad_dataset.py", "validate", item.repo_relative(item.root),
                            "--output", "<output directory>"],
             # The output path is host-specific; recording it would break portability.
@@ -1063,8 +1127,154 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
     receipt = product.to_receipt()
     _check_references(receipt, requirements)
     validate_document(REPOSITORY_ROOT, "validation-receipt.schema.json", receipt)
-    _write_run(item, output, product, receipt, requirements, adapter)
+    _write_run(item, output, product, receipt, None if requirements_problem else requirements, adapter)
     return receipt
+
+
+def _committed_model(item: Item) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
+    """The committed engineering model, if it is there and valid.
+
+    The committed cases ran on it, and the results read their inputs from
+    it, so a model that does not parse or does not conform to its schema is
+    used for neither.
+
+    Returns:
+        (model, None), or (None, why it cannot be used).
+    """
+    try:
+        model = json.loads(item.read(MODEL))
+        validate_schema(model, "engineering-model/v1/engineering-model")
+    except (OSError, ValueError) as exc:
+        return None, f"{MODEL}: {exc}"
+    return model, None
+
+
+def _run_cases(item: Item, level: Any, fresh: Derivation, adapter: DomainAdapter, committed_model: Dict[str, Any],
+               requirements: Dict[str, Any], generated: Any, evidence: Any, gate_check: Any) -> List[Any]:
+    """One gate's checks on a fresh derivation: exactly one per reference or
+    requirement of the gate, plus any gate-level check the case engine reports.
+
+    The committed case document is what runs -- its bytes are the evidence --
+    but the fresh derivation says what it must contain. Where they disagree
+    (inputs edited without a rebuild; V2 reports the divergence) the fresh
+    derivation wins:
+
+    - a document the fresh derivation no longer produces is not run at all;
+    - a committed case for an entry the fresh derivation blocks is not
+      counted, and the entry is BLOCKED as the fresh derivation says;
+    - a committed case for an entry the fresh derivation does not compile is
+      not counted;
+    - an entry the fresh derivation compiles but the document lacks is
+      BLOCKED with COMMITTED_CASE_MISSING.
+
+    Then each executed check's inputs decide first (results.propagate), in
+    V3 and V4 alike, and an illustrative limit met is a WARNING.
+    """
+    from ecad_validation.cases import execute_cases
+    from ecad_validation.models import CheckResult, Domain, ExecutionStatus, GateLevel, Layer, Verdict
+
+    relative, _gate, name = CASE_DOCUMENTS[0] if level is GateLevel.V3 else CASE_DOCUMENTS[1]
+    policy = f"POLICY:{level.value}-{'GOLDEN' if level is GateLevel.V3 else 'CORNER'}"
+    gate_level_ids = {f"{name}-cases", f"{name}-manifest"}
+    compiled = ({case["id"] for case in json.loads(fresh.files[relative].data)["cases"]}
+                if relative in fresh.files else set())
+    blocked = {entry["id"]: entry for entry in fresh.blocked if entry["gate"] == level.value}
+    try:
+        committed_ids = {case["id"] for case in json.loads(item.read(relative))["cases"]
+                         if isinstance(case, dict) and "id" in case} if os.path.lexists(item.path(relative)) else set()
+    except (OSError, ValueError, KeyError, TypeError):
+        committed_ids = set()
+    # A committed case the fresh derivation blocks, or does not compile, is
+    # stale: it is not counted, whether or not its document ran.
+    stale = committed_ids & set(blocked)
+    if relative in fresh.files:
+        checks = [check for check in execute_cases(item.root, level, name)
+                  if check.check_id.split(".", 1)[1] in compiled | gate_level_ids]
+        for check in checks:
+            if not check.evidence and check.verdict is not Verdict.BLOCKED:
+                # The case engine reports a document it cannot parse as FAIL
+                # without citing it, which the receipt contract forbids; the
+                # document itself is the evidence.
+                check.evidence = evidence(relative)
+    else:
+        checks = [gate_check(level, f"{name.upper()}_EVIDENCE_MISSING", f"no {name} case was compiled",
+                             f"the requirements compile to no {name} case")]
+    owners = {entry.get("requirement_id", entry.get("reference_id")): entry
+              for entry in [*requirements["requirements"], *requirements["reference_values"]]}
+    by_reference = {entry["reference_id"]: entry for entry in requirements["reference_values"]}
+    by_requirement = {entry["requirement_id"]: entry for entry in requirements["requirements"]}
+    illustrative_ids = {entry["requirement_id"] for entry in requirements["requirements"] if entry["illustrative"]}
+    for check_result in checks:
+        case_id = check_result.check_id.split(".", 1)[1]
+        if case_id in owners:
+            check_result.requirement_ids = [*check_result.requirement_ids, case_id]
+        # The inputs decide first (results.propagate): a null-status input
+        # blocks the check, one that does not resolve makes it INCONCLUSIVE,
+        # and an AI_ASSUMPTION withholds the comparator's verdict on a
+        # requirement (a reference's comparison is not a verdict on the design).
+        try:
+            if level is GateLevel.V4 and case_id in by_requirement:
+                requirement = by_requirement[case_id]
+                paths = adapter.dependencies(committed_model, requirement["metric"], requirement["scenario"]) + (
+                    [requirement["limit"]["quantity"]] if "quantity" in requirement["limit"] else [])
+            elif level is GateLevel.V3 and case_id in by_reference:
+                reference = by_reference[case_id]
+                paths = adapter.reference_inputs(committed_model, reference["derivation"], reference["scenario"])
+            else:
+                paths = None
+            if paths is not None:
+                found, unresolved = input_leaves(committed_model, paths)
+                changed = propagate(found, unresolved, check_result.verdict.value, check_result.reason_code)
+            else:
+                changed = None
+        except (KeyError, IndexError, TypeError, ValueError, AttributeError) as exc:
+            changed = propagate([], [f"{type(exc).__name__}: {exc}"], check_result.verdict.value,
+                                check_result.reason_code)
+        if changed:
+            verdict, reason, findings = changed
+            check_result.verdict, check_result.reason_code = Verdict(verdict), reason
+            check_result.summary = f"{check_result.summary}; the inputs make it {verdict}"
+            check_result.findings = [*findings, *check_result.findings]
+        if case_id in illustrative_ids and check_result.verdict is Verdict.PASS:
+            # Meeting a limit invented to exercise the pipeline qualifies
+            # nothing. The contract's WARNING is advisory and cannot satisfy
+            # a required check, so such a sample is never eligible for ebuild.
+            check_result.verdict = Verdict.WARNING
+            check_result.reason_code = "WITHIN_ILLUSTRATIVE_LIMIT"
+            check_result.summary = "within an illustrative limit, which is not a qualification"
+            check_result.findings = [*check_result.findings,
+                                     f"{case_id} is illustrative: not a customer, safety or certification requirement"]
+    executed = {check.check_id.split(".", 1)[1] for check in checks}
+    for entry_id in sorted(compiled - executed):
+        # The requirements compile to this case; the committed document does
+        # not hold it, so nothing ran for it.
+        checks.append(CheckResult(
+            check_id=f"{level.value.lower()}.{entry_id}", gate=level,
+            domain=Domain(CONTRACT_DOMAIN[owners[entry_id]["domain"]]), layer=Layer.VALIDATION,
+            execution_status=ExecutionStatus.UNAVAILABLE, verdict=Verdict.BLOCKED,
+            reason_code="COMMITTED_CASE_MISSING",
+            summary=f"{relative} has no case for {entry_id}, which the requirements compile to",
+            requirement_ids=[policy, entry_id],
+            findings=[f"{relative} has no case {entry_id}; rebuild the item (V2 reports the divergence)"],
+            evidence=evidence(REQUIREMENTS, relative)))
+    for entry_id, entry in blocked.items():
+        refs, extra = generated(f"{level.value.lower()}.{entry_id}", entry)
+        findings = [f"{m['status']}: {m['path']}" for m in entry["missing_inputs"]] or [entry["reason"]]
+        if entry_id in stale:
+            findings.append(f"{relative} still holds a case {entry_id}, compiled before; it was not counted")
+        checks.append(CheckResult(
+            # A blocked check takes the contract domain of the requirement or
+            # reference it implements.
+            check_id=f"{level.value.lower()}.{entry_id}", gate=level,
+            domain=Domain(CONTRACT_DOMAIN[owners[entry_id]["domain"]]),
+            layer=Layer.VALIDATION, execution_status=ExecutionStatus.UNAVAILABLE, verdict=Verdict.BLOCKED,
+            # spec: a missing required input is BLOCKED with MISSING_REQUIRED_INPUT; a
+            # reference whose derivation does not apply to the design has no missing input.
+            reason_code="MISSING_REQUIRED_INPUT" if entry["missing_inputs"] else "REFERENCE_NOT_APPLICABLE",
+            summary=entry["reason"], requirement_ids=[policy, entry_id], findings=findings,
+            evidence=[*evidence(REQUIREMENTS, MODEL), *refs], generated_evidence=extra,
+        ))
+    return checks
 
 
 def _tool_record(tool_id: str, checks: Sequence[Any]) -> Dict[str, Any]:
@@ -1082,7 +1292,7 @@ def _tool_record(tool_id: str, checks: Sequence[Any]) -> Dict[str, Any]:
         >>> from types import SimpleNamespace as C
         >>> a = C(tool_version="3.14.0", tool_invocation=["py", "s.py", "--scenario", "{a}"], tool_settings={"k": 1})
         >>> b = C(tool_version="3.14.0", tool_invocation=["py", "s.py", "--scenario", "{b}"], tool_settings={"k": 1})
-        >>> _tool_record("mujoco", [a, b])["invocation"]
+        >>> _tool_record("simulator", [a, b])["invocation"]
         ['py', 's.py']
     """
     versions = {check.tool_version for check in checks}
@@ -1124,12 +1334,15 @@ def _check_references(receipt: Dict[str, Any], requirements: Dict[str, Any]) -> 
 
 
 def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
-               requirements: Dict[str, Any], adapter: Optional[DomainAdapter]) -> None:
-    """Write the receipt, content-addressed evidence and its index, the trace and the report.
+               requirements: Optional[Dict[str, Any]], adapter: Optional[DomainAdapter]) -> None:
+    """Write content-addressed evidence, the receipt and its evidence index, then the results and the report.
 
     The receipt and evidence index are contract documents, so they follow the
     contract's serialisation rule exactly: canonical JSON (sorted keys,
-    compact separators) plus one final LF, hashed as stored.
+    compact separators) plus one final LF, hashed as stored. They are written
+    before the results are built from the stored evidence, so nothing the
+    results do can cost the run its receipt. When no results can be built,
+    the report says why.
     """
     from ecad_validation.contract import validate_document
     from ecad_validation.hashing import canonical_json_bytes
@@ -1171,7 +1384,6 @@ def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
                 })
     validate_document(REPOSITORY_ROOT, "validation-receipt.schema.json", receipt)
     receipt_bytes = canonical(receipt)
-    (output / "receipt.json").write_bytes(receipt_bytes)
     evidence_index = {
         "$schema": "https://embeddedos.org/schemas/hardware-validation/v1/evidence-index.schema.json",
         "contract_version": receipt["contract_version"],
@@ -1181,58 +1393,131 @@ def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
         "evidence": index,
     }
     validate_document(REPOSITORY_ROOT, "evidence-index.schema.json", evidence_index)
+    (output / "receipt.json").write_bytes(receipt_bytes)
     (output / "evidence-index.json").write_bytes(canonical(evidence_index))
-    if adapter is None or not item.path(MODEL).is_file():
-        (output / "report.md").write_text(_report(receipt, []), encoding="utf-8")
-        return
-    document = _results(item, adapter, receipt, receipt_bytes, requirements, output)
-    (output / "results.json").write_bytes(canonical_json_bytes(document) + b"\n")
-    (output / "report.md").write_text(_report(receipt, document["results"]), encoding="utf-8")
+    document: Optional[Dict[str, Any]] = None
+    why = _no_results_reason(item, adapter, requirements)
+    if why is None:
+        try:
+            document = _results(item, adapter, receipt, receipt_bytes, requirements, output)
+        except Exception as exc:
+            # A defect in the results generator, not in the item: the receipt
+            # stands, the report says what failed, and the error is raised.
+            (output / "report.md").write_text(
+                _report(receipt, None, f"generating them failed: {type(exc).__name__}: {exc}"), encoding="utf-8")
+            raise
+        (output / "results.json").write_bytes(canonical(document))
+    (output / "report.md").write_text(_report(receipt, document["results"] if document else None, why or ""),
+                                      encoding="utf-8")
+
+
+def _no_results_reason(item: Item, adapter: Optional[DomainAdapter], requirements: Optional[Dict[str, Any]]) -> Optional[str]:
+    """Why a run can have no per-requirement results, or None when it can."""
+    if adapter is None:
+        return f"no {item.domain} adapter is registered, so no requirement could be evaluated"
+    if requirements is None:
+        return f"{REQUIREMENTS} could not be read"
+    model, problem = _committed_model(item)
+    if model is None:
+        return f"the committed engineering model cannot be used ({problem})"
+    return None
+
+
+def _stored_evidence(output: Path, reference: Dict[str, Any]) -> bytes:
+    """The bytes of one piece of a run's stored evidence, verified.
+
+    A run directory may be handed over from elsewhere, so what its receipt
+    says is not trusted to name a safe file: the path must be exactly the
+    content address of the recorded digest, the file must be a regular file
+    within the size limit, and its bytes must have that digest.
+
+    Raises:
+        ValueError: The path is not the content address, or the bytes differ.
+        UnsupportedFormat: Not a regular file, or too large.
+        OSError: The file does not exist.
+    """
+    expected = f"evidence/sha256/{reference['sha256']}"
+    if reference["path"] != expected:
+        raise ValueError(f"evidence {reference['evidence_id']}: {reference['path']!r} is not its content address {expected}")
+    path = output / expected
+    regular_file(path)
+    data = path.read_bytes()
+    if _sha256(data) != reference["sha256"]:
+        raise ValueError(f"evidence {expected}: bytes do not match the digest the receipt records")
+    return data
 
 
 def _results(item: Item, adapter: DomainAdapter, receipt: Dict[str, Any], receipt_bytes: bytes,
              requirements: Dict[str, Any], output: Path) -> Dict[str, Any]:
-    """The run's per-requirement results, from its receipt and stored evidence alone."""
-    cases = {}
-    for relative in (GOLDEN, CORNERS):
-        if item.path(relative).is_file():
-            cases.update({case["id"]: case for case in json.loads(item.read(relative))["cases"]})
-    executions = {}
+    """The run's per-requirement results, from its receipt and stored evidence.
+
+    The case documents, each check's execution record and the run's
+    environment are read from the evidence store, verified by digest; the
+    engineering model and requirements are the item's, which the caller
+    ensures are the ones the run validated (validate() by running, and
+    regenerate_results() by comparing the item's digest with the receipt's).
+    """
+    from .requirements import CASES_SCHEMA
+
+    cases: Dict[Tuple[str, str], Dict[str, Any]] = {}
+    executions: Dict[str, Dict[str, Any]] = {}
+    recorded: Optional[Dict[str, Any]] = None
     for gate in receipt["gates"]:
         for check in gate["checks"]:
             for reference in check["evidence"]:
+                data = _stored_evidence(output, reference)
                 try:
-                    record = json.loads((output / reference["path"]).read_bytes())
+                    record = json.loads(data)
                 except ValueError:
                     continue  # not JSON: a source file or a domain model
-                if isinstance(record, dict) and "case_id" in record and "tool_version" in record:
+                if not isinstance(record, dict):
+                    continue
+                if record.get("$schema") == CASES_SCHEMA and gate["gate"] in ("V3", "V4"):
+                    # The case document this check ran, as it was run.
+                    for case in record.get("cases", []):
+                        if isinstance(case, dict) and "id" in case:
+                            cases[(record.get("gate"), case["id"])] = case
+                elif record.get("case_id") == check["check_id"].split(".", 1)[1] and "tool_version" in record:
                     executions[check["check_id"]] = record
+                elif check["check_id"] == "v0.pinned-clean-source" and isinstance(record.get("environment"), dict):
+                    recorded = record["environment"]
+    if recorded is None:
+        raise ValueError("the run recorded no environment (v0.pinned-clean-source evidence)")
+    if not (all(isinstance(recorded.get(key), str) for key in ("os", "machine", "python"))
+            and (recorded.get("constraints_sha256") is None or isinstance(recorded["constraints_sha256"], str))):
+        raise ValueError("the run's environment record is malformed")
     model_bytes = item.read(MODEL)
-    constraints = REPOSITORY_ROOT / "tools" / "constraints-cad.txt"
     document = build_results(
         sample_id=item.item_id, receipt=receipt, receipt_sha256=_sha256(receipt_bytes), requirements=requirements,
         model=json.loads(model_bytes), model_sha256=_sha256(model_bytes), adapter=adapter, cases=cases,
-        executions=executions,
-        environment_record=environment(receipt["tools"], constraints.read_bytes() if constraints.is_file() else None),
+        executions=executions, environment_record=environment(recorded, receipt["tools"]),
     )
     validate_schema(document, "engineering-model/v1/validation-results")
     return document
 
 
 def regenerate_results(directory: Path, output: Path, registry: Optional[Dict[str, DomainAdapter]] = None) -> bytes:
-    """Rebuild a finished run's results.json from its receipt and evidence alone.
+    """Rebuild a finished run's results.json from its receipt and stored evidence.
 
-    The results carry no state of their own: this returns exactly the bytes
-    the run wrote, on the same machine, as long as the item and the run's
-    output directory are unchanged.
+    Refused unless the item is still exactly what the run validated: its
+    input digest must equal the receipt's. Then the results carry no state of
+    their own, and this returns the bytes the run wrote, on any machine.
 
     Args:
         directory: The dataset item the run validated.
-        output: The run's output directory.
+        output: The run's output directory, which is untrusted: its receipt
+            is schema-checked and every piece of evidence read is verified
+            against the digest the receipt records.
         registry: Domain adapters to use in place of the platform's (tests only).
 
     Returns:
         The results document as canonical JSON bytes.
+
+    Raises:
+        ValueError: The item changed since the run, the receipt is invalid or
+            for another item, a piece of evidence does not verify or is
+            malformed, or the run wrote no results.
+        OSError: A file the receipt names is missing.
 
     Example:
         >>> import tempfile
@@ -1242,16 +1527,34 @@ def regenerate_results(directory: Path, output: Path, registry: Optional[Dict[st
         ...     regenerate_results(item, Path(scratch) / "run") == (Path(scratch) / "run" / "results.json").read_bytes()
         True
     """
-    from ecad_validation.hashing import canonical_json_bytes
+    from ecad_validation.contract import validate_document
+    from ecad_validation.hashing import canonical_json_bytes, hash_tree
 
     item = Item(directory)
-    receipt_bytes = (output / "receipt.json").read_bytes()
-    document = _results(item, adapter_for(item.domain, registry), json.loads(receipt_bytes), receipt_bytes,
-                        json.loads(item.read(REQUIREMENTS)), output)
+    adapter = adapter_for(item.domain, registry)
+    receipt_path = output / "receipt.json"
+    regular_file(receipt_path)
+    receipt_bytes = receipt_path.read_bytes()
+    receipt = json.loads(receipt_bytes)
+    validate_document(REPOSITORY_ROOT, "validation-receipt.schema.json", receipt)
+    if receipt["product"]["id"] != f"datasets:{item.item_id}":
+        raise ValueError(f"the receipt is for {receipt['product']['id']}, not datasets:{item.item_id}")
+    if hash_tree(item.root, item.files()) != receipt["source"]["input_sha256"]:
+        raise ValueError(f"{item.item_id} has changed since the run; its results cannot be regenerated from it")
+    try:
+        requirements: Optional[Dict[str, Any]] = json.loads(item.read(REQUIREMENTS))
+        validate_schema(requirements, "engineering-model/v1/engineering-requirements")
+    except (OSError, ValueError):
+        requirements = None
+    why = _no_results_reason(item, adapter, requirements)
+    if why is not None:
+        raise ValueError(f"the run wrote no results to regenerate: {why}")
+    assert requirements is not None
+    document = _results(item, adapter, receipt, receipt_bytes, requirements, output)
     return canonical_json_bytes(document) + b"\n"
 
 
-def _report(receipt: Dict[str, Any], results: List[Dict[str, Any]]) -> str:
+def _report(receipt: Dict[str, Any], results: Optional[List[Dict[str, Any]]], why: str = "") -> str:
     lines = [
         f"# Validation report: {receipt['product']['id']}",
         "",
@@ -1265,13 +1568,18 @@ def _report(receipt: Dict[str, Any], results: List[Dict[str, Any]]) -> str:
     for gate in receipt["gates"]:
         summary = ", ".join(f"{c['check_id']}={c['verdict']}" for c in gate["checks"])
         lines.append(f"| {gate['gate']} | {gate['verdict']} | {summary} |")
+    if results is None:
+        lines += ["", "## Requirements", "", f"No per-requirement results were written: {why}."]
+        return "\n".join(lines) + "\n"
     lines += ["", "## Requirements", "",
               "| Requirement | Kind | Metric | Measured | Verdict | Why |", "|---|---|---|---|---|---|"]
     for row in results:
         measured = "—" if row["measured_value"] is None else f"{row['measured_value']:.6g} {row['unit']}"
-        why = "; ".join(row["findings"]) or row["reason_code"] or ""
+        if row["measured_by"] not in (None, row["check_id"]):
+            measured += f" (measured by {row['measured_by']})"
+        why_row = "; ".join(row["findings"]) or row["reason_code"] or ""
         lines.append(f"| {row['requirement']} | {row['kind']} | `{row['metric']}` | {measured} | "
-                     f"{row['status']} | {why} |")
+                     f"{row['status']} | {why_row} |")
     lines += ["", "An illustrative requirement is an example limit chosen to exercise the pipeline, "
               "not a customer, safety or certification requirement. Meeting one is reported WARNING "
               "(WITHIN_ILLUSTRATIVE_LIMIT), never PASS.",

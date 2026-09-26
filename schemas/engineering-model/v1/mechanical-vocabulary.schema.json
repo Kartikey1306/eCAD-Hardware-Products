@@ -68,7 +68,19 @@
         "payload_component": [
           "payload_mass_kg"
         ]
-      }
+      },
+      "allOf": [
+        {
+          "description": "The rated move is a minimum-jerk profile from start_rad to end_rad over duration_s; the case script and the move derivations read all three.",
+          "if": {"properties": {"name": {"const": "rated_move"}}},
+          "then": {"required": ["start_rad", "end_rad", "duration_s"]}
+        },
+        {
+          "description": "The free swing starts amplitude_rad from equilibrium.",
+          "if": {"properties": {"name": {"const": "free_swing"}}},
+          "then": {"required": ["amplitude_rad"]}
+        }
+      ]
     },
     "derivation": {
       "description": "Name of the independent closed-form derivation that computes the expected value from the engineering model. The value itself is computed, not typed.",
