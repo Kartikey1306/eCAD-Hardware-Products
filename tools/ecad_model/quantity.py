@@ -38,6 +38,15 @@ _NOTE_REQUIRED = frozenset({Status.UNKNOWN, Status.NOT_AVAILABLE, Status.ESTIMAT
 _SOURCE_KIND = {Status.MEASURED: "measurement", Status.SIMULATED: "simulation", Status.AI_ASSUMPTION: "ai"}
 
 
+class MissingInput(ValueError):
+    """A value a domain model needs has a null status.
+
+    That is a missing input, not a defect in the design: validation reports it
+    BLOCKED with MISSING_REQUIRED_INPUT, never FAIL. Domain model writers raise
+    a subclass of it.
+    """
+
+
 def is_null(status: Union[Status, str]) -> bool:
     """True when a quantity of this status has no value.
 

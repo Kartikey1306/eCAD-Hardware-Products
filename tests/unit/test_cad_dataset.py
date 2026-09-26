@@ -276,7 +276,7 @@ class TestCaseScript(unittest.TestCase):
         the golden's tolerance; interpolated it stays within it."""
         import re
 
-        from ecad_model.requirements import reference_value
+        from ecad_model.domains.mechanical import reference_value
 
         script = self._script()
         model = json.loads((ITEM / "derived" / "engineering_model.json").read_text())
@@ -338,7 +338,8 @@ class TestEndToEnd(unittest.TestCase):
         measurable = [*references, *limited]
         self.assertGreaterEqual(len(measurable), 14)
         for check_id in ("v0.dataset-schemas-and-hashes", "v0.dataset-input-immutability",
-                         "v1.cad-extraction-and-physical-sanity", "v2.cad-model-invariants", *references):
+                         "v1.mechanical.extraction-and-sanity", "v2.dataset-reproduction",
+                         "v2.mechanical.model-invariants", *references):
             with self.subTest(check_id):
                 self.assertEqual(checks[check_id]["verdict"], "PASS", checks[check_id]["findings"])
         for check_id, illustrative in limited.items():
@@ -420,7 +421,7 @@ class TestEndToEnd(unittest.TestCase):
         import re
         from unittest import mock
 
-        import ecad_model.dataset as dataset_module
+        import ecad_model.domains.mechanical as mechanical_module
         from ecad_model.mjcf import build_mjcf
 
         def heavy_payload_writer(model, **kwargs):
@@ -430,9 +431,11 @@ class TestEndToEnd(unittest.TestCase):
             return head + '<body name="payload">' + tail
 
         with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
-            with mock.patch.object(dataset_module, "build_mjcf", heavy_payload_writer):
+            with mock.patch.object(mechanical_module, "build_mjcf", heavy_payload_writer):
                 checks = self.run_item(self.copy_and_rebuild(directory, lambda item: None))
-        self.assertEqual(checks["v2.cad-model-invariants"]["verdict"], "PASS")
+        # The drift check cannot see it: the writer is wrong both times.
+        self.assertEqual(checks["v2.dataset-reproduction"]["verdict"], "PASS")
+        self.assertEqual(checks["v2.mechanical.model-invariants"]["verdict"], "PASS")
         for golden in ("v3.REF-MECH-001", "v3.REF-MECH-002", "v3.REF-MECH-003"):
             with self.subTest(golden):
                 self.assertEqual(checks[golden]["verdict"], "FAIL")
@@ -507,8 +510,8 @@ class TestGatesFail(unittest.TestCase):
         def invert(item):
             _edit_json(item / "design" / "annotations.json", lambda a: a["joints"][0]["limits"]["lower"].update(value=1.0))
         checks = self.run_copy(invert, rebuild=True)
-        self.assertEqual(checks["v1.cad-extraction-and-physical-sanity"]["verdict"], "FAIL")
-        self.assertIn("lower limit is not below the upper limit", " ".join(checks["v1.cad-extraction-and-physical-sanity"]["findings"]))
+        self.assertEqual(checks["v1.mechanical.extraction-and-sanity"]["verdict"], "FAIL")
+        self.assertIn("lower limit is not below the upper limit", " ".join(checks["v1.mechanical.extraction-and-sanity"]["findings"]))
 
     def test_v2_fails_on_a_hand_edited_derived_file_even_with_its_hash_updated(self):
         import hashlib
@@ -524,7 +527,7 @@ class TestGatesFail(unittest.TestCase):
             _edit_json(item / "dataset-item.json", rehash)
         checks = self.run_copy(forge)
         self.assertEqual(checks["v0.dataset-schemas-and-hashes"]["verdict"], "PASS", "integrity is satisfied by the forged hash")
-        self.assertEqual(checks["v2.cad-model-invariants"]["verdict"], "FAIL")
+        self.assertEqual(checks["v2.dataset-reproduction"]["verdict"], "FAIL")
 
     def test_a_positive_clearance_below_the_requirement_fails(self):
         """Regression: clearance was only tested with penetration, so a contact-only
@@ -886,7 +889,7 @@ class TestUntrustedInput(unittest.TestCase):
                 from unittest import mock
 
                 from ecad_model.dataset import check
-                with mock.patch("ecad_model.dataset.importer_for", side_effect=AssertionError("parsed")):
+                with mock.patch("ecad_model.domains.mechanical.importer_for", side_effect=AssertionError("parsed")):
                     with self.assertRaisesRegex(ValueError, "git-ignored"):
                         check(item)
         finally:
@@ -902,6 +905,9 @@ class TestUntrustedInput(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
             item = Path(directory) / "fifo_item"
             (item / "source").mkdir(parents=True)
+            provenance = json.loads((ITEM / "source" / "provenance.json").read_text())
+            provenance["artifacts"] = [{"path": "source/part.step", "format": "step"}]
+            (item / "source" / "provenance.json").write_text(json.dumps(provenance))
             os.mkfifo(item / "source" / "part.step")
             with self.assertRaisesRegex(UnsupportedFormat, "not a regular file"):
                 Item(item)
@@ -944,10 +950,10 @@ class TestExtractionFailureVerdicts(unittest.TestCase):
         from ecad_model.importers.step_ocp import StepImporter
 
         expected = {
-            "rejected": ("FAIL", "completed", "CAD_REJECTED"),
-            "crashed": ("INCONCLUSIVE", "crashed", "CAD_EXTRACTION_CRASHED"),
-            "timed_out": ("INCONCLUSIVE", "timed_out", "CAD_EXTRACTION_TIMED_OUT"),
-            "unavailable": ("BLOCKED", "unavailable", "CAD_KERNEL_UNAVAILABLE"),
+            "rejected": ("FAIL", "completed", "SOURCE_REJECTED"),
+            "crashed": ("INCONCLUSIVE", "crashed", "EXTRACTION_CRASHED"),
+            "timed_out": ("INCONCLUSIVE", "timed_out", "EXTRACTION_TIMED_OUT"),
+            "unavailable": ("BLOCKED", "unavailable", "EXTRACTOR_UNAVAILABLE"),
         }
         for kind, (verdict, status, reason) in expected.items():
             with self.subTest(kind), tempfile.TemporaryDirectory() as output, \

@@ -3,12 +3,13 @@
 
 Each mutant is one targeted edit that makes a behaviour the tests claim to
 protect wrong. For every mutant this copies the repository, applies the edit,
-runs the fast engineering-model tests and, only if they stay green, the slower
-CAD-kernel tests. A mutant of a dataset item's own file (its simulation
-script) is followed by a rebuild of that item, so the manifest's hashes cannot
-kill it: a behavioural test must. A mutant the suite does not kill is a test
-gap, and the script exits 1. The unmutated copy runs first and must be green: against a
-failing baseline every mutant would look killed.
+runs the fast engineering-model and domain-adapter tests and, only if they
+stay green, the slower CAD-kernel tests. A mutant of a dataset item's own
+file (its simulation script) is followed by a rebuild of that item, so the
+manifest's hashes cannot kill it: a behavioural test must. A mutant the
+suite does not kill is a test gap, and the script exits 1. The unmutated copy
+runs first and must be green: against a failing baseline every mutant would
+look killed.
 
 Needs the CAD kernel and MuJoCo (tools/requirements-cad.txt), with `python3`
 on PATH able to import mujoco. Not collected by pytest.
@@ -37,8 +38,11 @@ M = "tools/ecad_model/mjcf.py"
 S = "tools/ecad_model/importers/step_ocp.py"
 F = "tools/ecad_model/importers/base.py"
 Q = "tools/ecad_model/quantity.py"
+MA = "tools/ecad_model/domains/mechanical.py"
+DR = "tools/ecad_model/domains/__init__.py"
 J = "datasets/cad/robotic_joint_001/simulation/joint_dynamics.py"
 FAST = "tests/unit/test_engineering_model.py"
+ADAPTER = "tests/unit/test_domain_adapter.py"
 SLOW = "tests/unit/test_cad_dataset.py"
 
 # (name, file, text to replace, replacement). The replaced text must occur
@@ -68,12 +72,12 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("fullinertia-misordered", M, "inertia[0][1], inertia[0][2], inertia[1][2]", "inertia[0][1], inertia[1][2], inertia[0][2]"),
     ("filterparent-left-on", M, '    <flag filterparent="disable"/>', '    <flag filterparent="enable"/>'),
     # requirements: closed forms and compilation
-    ("lever-ignores-origin", R, "arms = [[c - o for c, o in zip(com, origin)] for _, com, _ in bodies]",
+    ("lever-ignores-origin", MA, "arms = [[c - o for c, o in zip(com, origin)] for _, com, _ in bodies]",
      "arms = [list(com) for _, com, _ in bodies]"),
-    ("parallel-axis-dropped", R, "+ mass * _dot(perpendicular, perpendicular)", ""),
-    ("g-perp-is-gravity", R, "g_perp = [g - _dot(gravity, axis) * a for g, a in zip(gravity, axis)]", "g_perp = list(gravity)"),
-    ("payload-override-ignored", R, 'if mass is not None and scenario.get("payload_component") == cid:', "if False:"),
-    ("move-torque-ignores-gravity", R, "abs(inertia_axis * accel - gravity_torque(angle))", "abs(inertia_axis * accel)"),
+    ("parallel-axis-dropped", MA, "+ mass * _dot(perpendicular, perpendicular)", ""),
+    ("g-perp-is-gravity", MA, "g_perp = [g - _dot(gravity, axis) * a for g, a in zip(gravity, axis)]", "g_perp = list(gravity)"),
+    ("payload-override-ignored", MA, 'if mass is not None and scenario.get("payload_component") == cid:', "if False:"),
+    ("move-torque-ignores-gravity", MA, "abs(inertia_axis * accel - gravity_torque(angle))", "abs(inertia_axis * accel)"),
     ("unknown-limit-compiled", R, '            if is_null(item["status"]):\n                blocked.append(',
      '            if False:\n                blocked.append('),
     ("inequality-operator-flipped", R, '"maximum" if requirement["operator"] == "<=" else "minimum"',
@@ -95,27 +99,28 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      "            pass"),
     ("integrity-no-byte-compare", D, 'if _sha256(data) != artifact["sha256"] or len(data) != artifact["size_bytes"]:', "if False:"),
     ("unrecorded-files-allowed", D, "    if unrecorded:\n", "    if False:\n"),
-    ("manifest-check-off", D, "    return same_content(_without_derived_hashes(committed), _without_derived_hashes(fresh), \"dataset-item.json\")",
+    ("manifest-check-off", D, "    return same_content(_without_derived_hashes(committed), _without_derived_hashes(fresh), MANIFEST)",
      "    return []"),
     ("cited-sources-unchecked", D, "                        if _sha256(path.read_bytes()) != origin[\"sha256\"]:",
      "                        if False:"),
     ("citation-outside-repository-read", D, "                if not path.is_relative_to(REPOSITORY_ROOT):", "                if False:"),
-    ("kernel-missing-from-receipt", D, '    if extraction:\n        tools["opencascade"] = {', '    if False:\n        tools["opencascade"] = {'),
+    ("kernel-missing-from-receipt", D, '            tools[tool["tool_id"]] = tool', "            pass"),
     ("validator-invocation-wrong", D, '"invocation": ["python3", "tools/cad_dataset.py", "validate",',
      '"invocation": ["python3", "tools/ecad_model/cli.py", "validate",'),
-    ("v1-sanity-skipped", D, "v1_problems = _sanity_problems(model)", "v1_problems = []"),
-    ("v2-reproducibility-skipped", D, "v2_problems = reproducibility(item, fresh) + manifest_problems(item, fresh) + _invariant_problems(",
-     "v2_problems = [] and reproducibility(item, fresh) + _invariant_problems("),
-    ("triangle-inequality-unchecked", D, "if moments[2] > moments[0] + moments[1] + 1e-9 * scale:", "if False:"),
+    ("v1-sanity-skipped", D, "        v1_problems = adapter.sanity_problems(fresh.model)", "        v1_problems = []"),
+    ("v2-reproducibility-skipped", D, "                   reproducibility(item, fresh) + manifest_problems(item, fresh, registry)",
+     "                   [] and reproducibility(item, fresh) + manifest_problems(item, fresh, registry)"),
+    ("triangle-inequality-unchecked", MA, "if moments[2] > moments[0] + moments[1] + 1e-9 * scale:", "if False:"),
     ("blocked-checks-not-emitted", D, '            if entry["gate"] != level.value:\n                continue', "            continue"),
     ("rejection-reported-unavailable", D,
-     '"rejected": (ExecutionStatus.COMPLETED, Verdict.FAIL, "CAD_REJECTED",',
-     '"rejected": (ExecutionStatus.UNAVAILABLE, Verdict.BLOCKED, "CAD_REJECTED",'),
+     '"rejected": (ExecutionStatus.COMPLETED, Verdict.FAIL, "SOURCE_REJECTED",',
+     '"rejected": (ExecutionStatus.UNAVAILABLE, Verdict.BLOCKED, "SOURCE_REJECTED",'),
     ("provenance-not-required", D, '        raise ValueError(f"{item.item_id}: {PROVENANCE} is missing; licence and origin are never assumed")',
      '        return {"origin": {"kind": "self_authored", "author": "x"}, "license": {}}'),
     ("symlinks-allowed", D, "            if path.is_symlink():\n                raise ValueError(f\"{item.item_id}: {item.root.name}", "            if False:\n                raise ValueError(f\"{item.item_id}: {item.root.name}"),
     ("ignored-item-allowed", D, "        if ignored.returncode == 0:", "        if False:"),
-    ("clearance-trace-one-side", D, 'sorted(moving + fixed) if metric.startswith("rom_") else moving', "moving"),
+    ("clearance-trace-one-side", MA, 'return sorted(moving + fixed) if metric.startswith("rom_") else sorted(moving)',
+     "return sorted(moving)"),
     # importer and input guards
     ("external-references-allowed", S, "    if external:\n        raise ValueError(", "    if False:\n        raise ValueError("),
     ("string-literals-not-stripped", S, "    stripped = _STRING_LITERAL.sub(b\"''\", data)", "    stripped = data"),
@@ -123,13 +128,13 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("duplicate-names-allowed", S, "if not name or name in names:", "if not name:"),
     ("nested-assembly-allowed", S, "        if XCAFDoc_ShapeTool.IsAssembly_s(referred):\n            raise", "        if False:\n            raise"),
     ("item-read-unguarded", D, "        regular_file(path)\n        return path.read_bytes()", "        return path.read_bytes()"),
-    ("check-follows-symlinks", D, "    _refuse_symlinks(item)\n    item.files()\n    derived = _derive(item)",
-     "    item.files()\n    derived = _derive(item)"),
-    ("validate-follows-symlinks", D, "    _refuse_symlinks(item)  # before the input digest or any other read\n", ""),
+    ("check-follows-symlinks", D, "        _refuse_symlinks(self)\n        self.provenance = _provenance(self)",
+     "        self.provenance = _provenance(self)"),
+    ("check-skips-enumeration", D, "    item.files()\n    derived = _derive(item, registry)", "    derived = _derive(item, registry)"),
+    ("status-from-registry-alone", DR, "        if adapter is not None and adapter.formats & formats:", "        if adapter is not None:"),
+    ("empty-case-document-written", D, '        if not document["cases"]:\n            continue', "        pass"),
     ("tool-record-last-writer-wins", D, "        tools[tool_id] = _tool_record(tool_id, tool_checks)",
      "        tools[tool_id] = {**_tool_record(tool_id, tool_checks), \"invocation\": list(tool_checks[-1].tool_invocation)}"),
-    ("check-skips-enumeration", D, "    _refuse_symlinks(item)\n    item.files()\n    derived = _derive(item)",
-     "    _refuse_symlinks(item)\n    derived = _derive(item)"),
     ("reader-extern-files-unchecked", S, "    if reader.ExternFiles().Size():", "    if False:"),
     ("requirement-binding-dropped", D,
      "                check_result.requirement_ids = [*check_result.requirement_ids, case_id]", "                pass"),
@@ -204,7 +209,7 @@ def run(name: str, relative: Optional[str], old: str, new: str) -> Tuple[str, st
                                 "user.email=mutation@localhost", "commit", "-q", "-m", "mutant"]):
                     subprocess.run(command, cwd=copy, check=True, capture_output=True, timeout=300)
         environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", PYTHONDONTWRITEBYTECODE="1")
-        for suite in (FAST, SLOW):
+        for suite in (FAST, ADAPTER, SLOW):
             result = subprocess.run(
                 [sys.executable, "-m", "pytest", suite, "-q", "-x", "-p", "no:cacheprovider"],
                 cwd=copy, env=environment, capture_output=True, text=True, timeout=1800,

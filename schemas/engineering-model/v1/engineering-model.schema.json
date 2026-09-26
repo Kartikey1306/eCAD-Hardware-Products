@@ -39,26 +39,34 @@
     "design": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["design_id", "name", "revision", "source_cad", "gravity"],
+      "required": ["design_id", "name", "revision", "sources"],
       "properties": {
         "design_id": {"$ref": "#/definitions/identifier"},
         "name": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
         "revision": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
-        "source_cad": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["path", "format", "sha256", "length_unit"],
-          "properties": {
-            "path": {"$ref": "common.schema.json#/definitions/relativePath"},
-            "format": {"enum": ["step"]},
-            "sha256": {"$ref": "common.schema.json#/definitions/sha256"},
-            "length_unit": {
-              "description": "Length unit the CAD file declares; the model converts to metres.",
-              "enum": ["mm", "m", "inch"]
+        "sources": {
+          "description": "The source artefacts the model was built from, by repository path and hash. Any domain's artefact: a CAD assembly, a netlist, HDL.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "format", "sha256"],
+            "properties": {
+              "path": {"$ref": "common.schema.json#/definitions/relativePath"},
+              "format": {"$ref": "common.schema.json#/definitions/identifier"},
+              "sha256": {"$ref": "common.schema.json#/definitions/sha256"},
+              "length_unit": {
+                "description": "Length unit a CAD artefact declares; the model converts to metres.",
+                "enum": ["mm", "m", "inch"]
+              }
             }
           }
         },
-        "gravity": {"$ref": "#/definitions/quantity"}
+        "gravity": {
+          "description": "Gravity in assembly axes, for designs whose physics it affects. A digital or electrical design has none.",
+          "$ref": "#/definitions/quantity"
+        }
       }
     },
     "cadRef": {

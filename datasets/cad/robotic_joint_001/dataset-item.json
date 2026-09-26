@@ -17,18 +17,19 @@
       "derived_from": [
         "source/robotic_joint_001.step"
       ],
+      "domain": "mechanical",
       "producer": {
         "tool": "ecad_model.importers.step_ocp",
-        "version": "cadquery-ocp 8.0.1.0.0"
+        "version": "1.0.0 (cadquery-ocp 8.0.1.0.0)"
       },
-      "role": "cad_extraction"
+      "role": "extraction"
     },
     {
       "artifact": {
         "media_type": "application/json",
         "path": "derived/engineering_model.json",
-        "sha256": "290054b5b7f65c2aad905230aaf1c94f372def7992c1bc796354be3468e79267",
-        "size_bytes": 42211
+        "sha256": "84bd8964159842b73f46db93d7de8e21912ff0588a69869659b639398db1fa38",
+        "size_bytes": 42232
       },
       "derived_from": [
         "derived/cad_extraction.json",
@@ -50,11 +51,12 @@
       "derived_from": [
         "derived/engineering_model.json"
       ],
+      "domain": "mechanical",
       "producer": {
         "tool": "ecad_model.mjcf",
         "version": "1.0.0"
       },
-      "role": "mechanical_model"
+      "role": "domain_model"
     },
     {
       "artifact": {
@@ -92,53 +94,55 @@
     }
   ],
   "description": "Single-axis robotic joint: aluminium base plate and pillar, steel shaft in the pillar bore, aluminium link, steel payload block. Authored for the eCAD multi-domain validation pipeline (issue #27).",
+  "domain": "mechanical",
   "domains": [
     {
       "domain": "mechanical",
-      "reason": "joint statics, rated-move dynamics, free oscillation and range-of-motion clearance, simulated with MuJoCo and compared with closed-form references; requirements resting on components/actuator/domains/mechanical/continuous_output_torque, components/actuator/domains/mechanical/gear_ratio are BLOCKED",
-      "status": "implemented"
+      "reason": "joint statics, rated-move dynamics, free oscillation and range-of-motion clearance, simulated with MuJoCo and compared with closed-form references; requirements resting on components/actuator/domains/mechanical/continuous_output_torque (UNKNOWN), components/actuator/domains/mechanical/gear_ratio (UNKNOWN) are BLOCKED",
+      "status": "AVAILABLE"
     },
     {
       "domain": "electrical",
-      "reason": "no electrical validator exists in this platform yet; this sample also lacks components/actuator/domains/electrical/torque_constant, components/actuator/domains/electrical/winding_resistance",
-      "status": "not_implemented"
+      "reason": "no electrical validator exists in this platform yet; this sample also lacks components/actuator/domains/electrical/torque_constant (UNKNOWN), components/actuator/domains/electrical/winding_resistance (UNKNOWN)",
+      "status": "NOT_IMPLEMENTED"
     },
     {
       "domain": "digital",
       "reason": "no digital validator exists in this platform yet",
-      "status": "not_implemented"
+      "status": "NOT_IMPLEMENTED"
     },
     {
       "domain": "pcb",
       "reason": "no pcb validator exists in this platform yet",
-      "status": "not_implemented"
+      "status": "NOT_IMPLEMENTED"
     },
     {
       "domain": "power_electronics",
       "reason": "no power_electronics validator exists in this platform yet",
-      "status": "not_implemented"
+      "status": "NOT_IMPLEMENTED"
     },
     {
       "domain": "control",
       "reason": "no control validator exists in this platform yet",
-      "status": "not_implemented"
+      "status": "NOT_IMPLEMENTED"
     },
     {
       "domain": "electromagnetic",
       "reason": "no electromagnetic validator exists in this platform yet",
-      "status": "not_implemented"
+      "status": "NOT_IMPLEMENTED"
     },
     {
       "domain": "thermal",
-      "reason": "no thermal validator exists in this platform yet; this sample also lacks components/actuator/domains/thermal/maximum_winding_temperature",
-      "status": "not_implemented"
+      "reason": "no thermal validator exists in this platform yet; this sample also lacks components/actuator/domains/thermal/maximum_winding_temperature (UNKNOWN)",
+      "status": "NOT_IMPLEMENTED"
     },
     {
       "domain": "full_system",
       "reason": "no full_system validator exists in this platform yet",
-      "status": "not_implemented"
+      "status": "NOT_IMPLEMENTED"
     }
   ],
+  "hash": "sha256:ad78e179f9d4f0f45f446522665d8010a0bba13a5720c7bd0f9d501b89c29b24",
   "inputs": {
     "annotations": {
       "media_type": "application/json",
@@ -149,8 +153,8 @@
     "provenance": {
       "media_type": "application/json",
       "path": "source/provenance.json",
-      "sha256": "957e28e7c2d762290d8f0aa48a24fb8348ed9ea9a5e8266f4027fd751afb9c04",
-      "size_bytes": 1025
+      "sha256": "0da9a9f3b925b1d530e1cc35c0a84c43a18276c34ac49fc4d725b5edbf5b7b1a",
+      "size_bytes": 1179
     },
     "requirements": {
       "media_type": "application/json",
@@ -169,12 +173,15 @@
   },
   "item_id": "robotic_joint_001",
   "source": {
-    "cad": {
-      "media_type": "application/step",
-      "path": "source/robotic_joint_001.step",
-      "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc",
-      "size_bytes": 78250
-    },
+    "artifacts": [
+      {
+        "format": "step",
+        "media_type": "application/step",
+        "path": "source/robotic_joint_001.step",
+        "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc",
+        "size_bytes": 78250
+      }
+    ],
     "license": {
       "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation",
       "basis": "authored in this repository by source/generate_step.py and committed under the repository's MIT LICENSE",
@@ -202,6 +209,7 @@
     },
     "engineering_model": "1.0.0",
     "extraction": "ecad_model.importers.step_ocp 1.0.0 (cadquery-ocp 8.0.1.0.0)",
+    "simulation": "sha256:a9d171f871ce444c8ed2ddf93b96d0c6fd650dc574561a9a05a6e3eff17e5a03",
     "validation_contract": "hardware-validation v1.0.0"
   }
 }

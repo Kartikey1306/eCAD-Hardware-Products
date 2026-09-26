@@ -14,6 +14,7 @@ from . import MODEL_VERSION
 from .quantity import Status, is_null, quantity, rounded, source, unknown
 
 SCHEMA_ID = "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json"
+VERSION = "1.0.0"  # of the engineering models this builder writes
 LENGTH_TO_METRES = {"mm": 1e-3, "m": 1.0, "inch": 0.0254}
 STANDARD_GRAVITY = 9.80665  # m/s^2, defined exactly by the 3rd CGPM (1901)
 AXIS_SENSE_MIN_COSINE = 0.5  # an annotated sense must lie within 60 degrees of the CAD axis
@@ -369,7 +370,7 @@ def build_engineering_model(
             "design_id": design_id,
             "name": design_name,
             "revision": revision,
-            "source_cad": {"path": cad_path, "format": "step", "sha256": cad_sha256, "length_unit": unit},
+            "sources": [{"path": cad_path, "format": "step", "sha256": cad_sha256, "length_unit": unit}],
             "gravity": quantity(
                 [0.0, 0.0, -STANDARD_GRAVITY], "m/s^2", Status.SPECIFIED,
                 source("handbook", "standard gravity, 3rd CGPM (1901)"),

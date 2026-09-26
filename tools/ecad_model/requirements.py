@@ -1,26 +1,25 @@
-"""Deterministic requirements: closed-form reference values and case compilation.
+"""Deterministic requirements: compilation into the existing V3/V4 case format.
 
-No model decides whether 4.8 N*m satisfies <= 5 N*m. Reference values are
-computed here by closed-form physics from the engineering model, on a code
-path independent of the MJCF writer and the simulator, so a frame, unit or
-inertia-ordering error in the conversion shows up as a golden mismatch.
-Requirements compile into the existing V3/V4 case format, where the contract's
-own comparators decide. A limit that depends on an UNKNOWN quantity is not
-compiled at all: it is reported BLOCKED with the exact missing paths.
+No model decides whether 4.8 N*m satisfies <= 5 N*m. Requirements compile into
+the contract's case format, where its own comparators decide. Reference values
+(V3) come from the domain's closed-form derivations, requirements (V4) bound a
+metric the domain's cases produce. A limit, or a reference input, that has a
+null status is not compiled at all: it is reported BLOCKED with the exact
+missing paths and their statuses.
+
+Nothing here knows a domain: which tool runs a case, on which inputs, and
+which metrics exist with which units, all come from the domain adapter.
 """
 
 from __future__ import annotations
 
-import json
-import math
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Sequence, Tuple
 
 from .builder import resolve
-from .mjcf import rigid_groups
 from .quantity import is_null
 
+VERSION = "1.0.0"  # of the compiled case documents
 CASES_SCHEMA = "https://embeddedos.org/schemas/hardware-validation/v1/validation-cases.schema.json"
-SIMULATION_SCRIPT = "simulation/joint_dynamics.py"
 
 # The v1 receipt contract classifies checks into six domains that predate the
 # engineering domains of issue #27. This mapping is a documented decision, not
@@ -48,184 +47,30 @@ class ReferenceBlocked(ValueError):
         self.paths = list(paths)
 
 
-def _cross(a: Sequence[float], b: Sequence[float]) -> List[float]:
-    return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]
-
-
-def _dot(a: Sequence[float], b: Sequence[float]) -> float:
-    return sum(x * y for x, y in zip(a, b))
-
-
-def _known(model: Dict[str, Any], path: str, missing: List[Dict[str, str]]) -> Any:
-    item = resolve(model, path)
-    if is_null(item["status"]):
-        missing.append({"path": path, "status": item["status"]})
-        return None
-    return item["value"]
-
-
-def _moving(model: Dict[str, Any]) -> List[str]:
-    joint = model["joints"][0]
-    roots = rigid_groups(model)
-    return [
-        c["component_id"]
-        for c in model["components"]
-        if c["cad_ref"] is not None and roots[c["component_id"]] == roots[joint["child"]]
-    ]
-
-
-MOVE_STEP_S = 1e-3  # the rated_move scenario samples its profile at this step
-
-
-def _rotate(vector: Sequence[float], axis: Sequence[float], angle: float) -> List[float]:
-    """Rodrigues: rotate a vector right-handedly about a unit axis."""
-    c, s = math.cos(angle), math.sin(angle)
-    k = _cross(axis, vector)
-    along = _dot(axis, vector)
-    return [v * c + ki * s + a * along * (1 - c) for v, ki, a in zip(vector, k, axis)]
-
-
-def _bodies(model: Dict[str, Any], scenario: Dict[str, Any], used: List[str],
-            missing: List[Dict[str, str]]) -> List[List[Any]]:
-    """(mass, centre of mass, inertia) of every moving body, with any payload override applied."""
-    bodies = []
-    for cid in _moving(model):
-        paths = [f"components/{cid}/physical/{name}" for name in ("mass", "center_of_mass", "inertia_about_com")]
-        used += paths
-        mass, com, inertia = (_known(model, path, missing) for path in paths)
-        if mass is not None and scenario.get("payload_component") == cid:
-            # Same shape at a different uniform density: the centre of mass
-            # stays put and the inertia scales with the mass, exactly as the
-            # scenario script applies the override.
-            ratio = scenario["payload_mass_kg"] / mass
-            mass, inertia = scenario["payload_mass_kg"], [[ratio * item for item in row] for row in inertia]
-        bodies.append([mass, com, inertia])
-    return bodies
-
-
-def reference_value(
-    model: Dict[str, Any], derivation: str, scenario: Optional[Dict[str, Any]] = None
-) -> Tuple[float, List[str]]:
-    """Compute one closed-form reference value from the engineering model.
-
-    For a single revolute joint every one of these is exact: the moment of
-    inertia about a fixed axis does not depend on the angle, and the
-    velocity-dependent terms of the equation of motion vanish. None of them
-    runs the simulator or reads the MJCF.
-
-    Args:
-        model: An engineering model with one joint.
-        derivation: One of "moving_mass", "gravity_torque_as_modelled",
-            "small_oscillation_period", "equilibrium_angle",
-            "min_jerk_peak_speed", "min_jerk_peak_accel",
-            "rated_move_peak_torque".
-        scenario: The case's scenario. Its payload override is applied, and
-            the move derivations read start_rad, end_rad and duration_s.
-
-    Returns:
-        (value in SI units, model paths the value was computed from).
-
-    Raises:
-        ReferenceBlocked: An input is UNKNOWN; its paths are attached.
-        ValueError: The derivation name is not recognised.
-
-    Example:
-        >>> import json; from pathlib import Path
-        >>> item = Path(__file__).resolve().parents[2] / "datasets/cad/robotic_joint_001"
-        >>> model = json.loads((item / "derived/engineering_model.json").read_text())
-        >>> round(reference_value(model, "moving_mass")[0], 6)
-        0.934914
-        >>> round(reference_value(model, "min_jerk_peak_speed",
-        ...                       {"name": "rated_move", "start_rad": 0.0, "end_rad": 1.0, "duration_s": 1.0})[0], 6)
-        1.875
-    """
-    scenario = scenario or {}
-    if derivation in ("min_jerk_peak_speed", "min_jerk_peak_accel"):
-        delta = abs(scenario["end_rad"] - scenario["start_rad"])
-        duration = scenario["duration_s"]
-        # Peaks of 30s^2 - 60s^3 + 30s^4 (at s = 1/2) and of
-        # 60s - 180s^2 + 120s^3 (at s = 1/2 - sqrt(3)/6).
-        if derivation == "min_jerk_peak_speed":
-            return 1.875 * delta / duration, []
-        return (10 / math.sqrt(3)) * delta / duration**2, []
-
-    joint = model["joints"][0]
-    jid = joint["joint_id"]
-    used: List[str] = [f"joints/{jid}/axis", f"joints/{jid}/origin"]
-    missing: List[Dict[str, str]] = []
-    axis = _known(model, f"joints/{jid}/axis", missing)
-    origin = _known(model, f"joints/{jid}/origin", missing)
-    gravity = model["design"]["gravity"]["value"]
-    bodies = _bodies(model, scenario, used, missing)
-    if missing:
-        raise ReferenceBlocked(f"{derivation} needs quantities that have no value", missing)
-    arms = [[c - o for c, o in zip(com, origin)] for _, com, _ in bodies]
-
-    def gravity_torque(angle: float) -> float:
-        """Torque gravity exerts about the axis with the moving group turned by angle."""
-        return sum(
-            _dot(_cross(_rotate(arm, axis, angle), [mass * g for g in gravity]), axis)
-            for (mass, _, _), arm in zip(bodies, arms)
-        )
-
-    inertia_axis = 0.0
-    for (mass, _, inertia), arm in zip(bodies, arms):
-        perpendicular = [ri - _dot(arm, axis) * ai for ri, ai in zip(arm, axis)]
-        inertia_axis += _dot(axis, [_dot(row, axis) for row in inertia]) + mass * _dot(perpendicular, perpendicular)
-
-    if derivation == "moving_mass":
-        return sum(mass for mass, _, _ in bodies), used
-    if derivation == "gravity_torque_as_modelled":
-        return abs(gravity_torque(0.0)), used
-
-    total = sum(mass for mass, _, _ in bodies)
-    combined = [sum(mass * arm[i] for (mass, _, _), arm in zip(bodies, arms)) / total for i in range(3)]
-    radial = [ci - _dot(combined, axis) * ai for ci, ai in zip(combined, axis)]
-    g_perp = [g - _dot(gravity, axis) * a for g, a in zip(gravity, axis)]
-    if _dot(radial, radial) == 0 or _dot(g_perp, g_perp) == 0:
-        raise ReferenceBlocked("the moving group's centre of mass lies on the joint axis, or the axis is vertical", [])
-
-    if derivation == "equilibrium_angle":
-        # The rotation, right-handed about the axis, that carries the centre
-        # of mass directly "below" the axis along the perpendicular gravity.
-        return math.atan2(_dot(_cross(radial, g_perp), axis), _dot(radial, g_perp)), used
-
-    if derivation == "small_oscillation_period":
-        # Linearised pendulum about the stable equilibrium:
-        #   I_axis * theta'' = -M * |g_perp| * d * theta
-        restoring = total * math.sqrt(_dot(g_perp, g_perp)) * math.sqrt(_dot(radial, radial))
-        return 2 * math.pi * math.sqrt(inertia_axis / restoring), used
-
-    if derivation == "rated_move_peak_torque":
-        start, end, duration = scenario["start_rad"], scenario["end_rad"], scenario["duration_s"]
-        delta, peak = end - start, 0.0
-        for step in range(int(round(duration / MOVE_STEP_S)) + 1):
-            s = min(1.0, step * MOVE_STEP_S / duration)
-            angle = start + delta * (10 * s**3 - 15 * s**4 + 6 * s**5)
-            accel = delta * (60 * s - 180 * s**2 + 120 * s**3) / duration**2
-            # Required joint torque: inertia times acceleration, minus the
-            # torque gravity already supplies.
-            peak = max(peak, abs(inertia_axis * accel - gravity_torque(angle)))
-        return peak, used
-
-    raise ValueError(f"unknown derivation {derivation!r}")
-
-
-def _case(case_id: str, domain: str, mjcf_path: str, scenario: Dict[str, Any], requirement_id: str) -> Dict[str, Any]:
+def _case(case_id: str, domain: str, target: Any, scenario: Dict[str, Any], requirement_id: str) -> Dict[str, Any]:
     return {
         "id": case_id,
-        "adapter": "mujoco",
+        "adapter": target.adapter,
         "domain": CONTRACT_DOMAIN[domain],
-        "inputs": [SIMULATION_SCRIPT, mjcf_path],
-        "arguments": ["--model", mjcf_path, "--scenario", json.dumps(scenario, sort_keys=True, separators=(",", ":"))],
-        "timeout_seconds": 300,
+        "inputs": list(target.inputs),
+        "arguments": target.arguments(scenario),
+        "timeout_seconds": target.timeout_seconds,
         "seed": 0,
         "requirement_ids": [requirement_id],
     }
 
 
+def _check_unit(entry_id: str, metric: str, unit: str, metrics: Mapping[str, Any]) -> None:
+    if metric not in metrics:
+        raise ValueError(f"{entry_id}: the domain produces no metric {metric!r}")
+    if metrics[metric].unit != unit:
+        raise ValueError(f"{entry_id}: unit {unit} != the unit of {metric}, {metrics[metric].unit}")
+
+
 def compile_cases(
-    model: Dict[str, Any], requirements: Dict[str, Any], mjcf_path: str
+    model: Dict[str, Any], requirements: Dict[str, Any], target: Any,
+    reference_value: Callable[[Dict[str, Any], str, Dict[str, Any]], Tuple[float, List[str]]],
+    metrics: Mapping[str, Any],
 ) -> Tuple[Dict[str, Any], Dict[str, Any], List[Dict[str, Any]]]:
     """Compile requirements into V3 golden and V4 corner case documents.
 
@@ -236,7 +81,10 @@ def compile_cases(
     Args:
         model: The engineering model the limits and references resolve in.
         requirements: An engineering-requirements document.
-        mjcf_path: Item-relative path of the mechanical model the cases run.
+        target: The domain's CaseTarget: tool adapter, inputs, arguments.
+        reference_value: The domain's closed-form derivations.
+        metrics: The domain's metric vocabulary; every requirement's and
+            reference's unit must match its metric's.
 
     Returns:
         (golden cases, corner cases, blocked items). A blocked item names the
@@ -244,14 +92,18 @@ def compile_cases(
         its status; a reference whose derivation does not apply has none.
 
     Raises:
-        ValueError: A quantity limit's unit differs from its requirement's.
+        ValueError: A unit differs from its metric's or its limit quantity's,
+            or a metric is one the domain does not produce.
 
     Example:
         >>> import json; from pathlib import Path
+        >>> from ecad_model.domains import adapter_for
         >>> item = Path(__file__).resolve().parents[2] / "datasets/cad/robotic_joint_001"
         >>> model = json.loads((item / "derived/engineering_model.json").read_text())
         >>> requirements = json.loads((item / "requirements/requirements.json").read_text())
-        >>> golden, corners, blocked = compile_cases(model, requirements, "m.xml")
+        >>> mechanical = adapter_for("mechanical")
+        >>> golden, corners, blocked = compile_cases(model, requirements, mechanical.case_target("joint"),
+        ...                                          mechanical.reference_value, mechanical.metrics())
         >>> len(golden["cases"]) == len(requirements["reference_values"])
         True
         >>> unknown_limits = [r["requirement_id"] for r in requirements["requirements"]
@@ -263,6 +115,7 @@ def compile_cases(
     blocked: List[Dict[str, Any]] = []
     golden = []
     for reference in requirements["reference_values"]:
+        _check_unit(reference["reference_id"], reference["metric"], reference["unit"], metrics)
         try:
             value, _used = reference_value(model, reference["derivation"], reference["scenario"])
         except ReferenceBlocked as exc:
@@ -270,7 +123,7 @@ def compile_cases(
                 {"id": reference["reference_id"], "gate": "V3", "reason": str(exc), "missing_inputs": exc.paths}
             )
             continue
-        case = _case(reference["reference_id"], reference["domain"], mjcf_path, reference["scenario"], "POLICY:V3-GOLDEN")
+        case = _case(reference["reference_id"], reference["domain"], target, reference["scenario"], "POLICY:V3-GOLDEN")
         case["expected_metrics"] = {
             reference["metric"]: {"value": float(f"{value:.12g}"), "absolute_tolerance": reference["absolute_tolerance"]}
         }
@@ -278,6 +131,7 @@ def compile_cases(
 
     corners = []
     for requirement in requirements["requirements"]:
+        _check_unit(requirement["requirement_id"], requirement["metric"], requirement["unit"], metrics)
         limit = requirement["limit"]
         if "quantity" in limit:
             item = resolve(model, limit["quantity"])
@@ -299,7 +153,7 @@ def compile_cases(
         else:
             bound = limit["value"]
         case = _case(
-            requirement["requirement_id"], requirement["domain"], mjcf_path, requirement["scenario"], "POLICY:V4-CORNER"
+            requirement["requirement_id"], requirement["domain"], target, requirement["scenario"], "POLICY:V4-CORNER"
         )
         case["metric_limits"] = {
             requirement["metric"]: {"maximum" if requirement["operator"] == "<=" else "minimum": bound}

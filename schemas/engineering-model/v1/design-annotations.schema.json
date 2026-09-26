@@ -27,8 +27,8 @@
       "$ref": "common.schema.json#/definitions/identifier"
     },
     "materials": {
+      "description": "Keyed by material id. Empty for a sample whose artefacts carry no geometry.",
       "type": "object",
-      "minProperties": 1,
       "propertyNames": {
         "pattern": "^[a-z][a-z0-9_]*$"
       },
@@ -50,9 +50,8 @@
       }
     },
     "parts": {
-      "description": "Keyed by the CAD part name exactly as the STEP file names it.",
+      "description": "Keyed by the CAD part name exactly as the STEP file names it. Empty for a sample with no CAD; a CAD part left unannotated has no material, so its mass is UNKNOWN and what rests on it is BLOCKED.",
       "type": "object",
-      "minProperties": 1,
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,

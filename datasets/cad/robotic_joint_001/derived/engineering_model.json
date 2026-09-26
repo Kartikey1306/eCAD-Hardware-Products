@@ -1135,12 +1135,14 @@
     },
     "name": "robotic joint 001",
     "revision": "1.0",
-    "source_cad": {
-      "format": "step",
-      "length_unit": "mm",
-      "path": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
-      "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
-    }
+    "sources": [
+      {
+        "format": "step",
+        "length_unit": "mm",
+        "path": "datasets/cad/robotic_joint_001/source/robotic_joint_001.step",
+        "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc"
+      }
+    ]
   },
   "joints": [
     {

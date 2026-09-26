@@ -1,6 +1,11 @@
 {
   "$schema": "https://embeddedos.org/schemas/cad-dataset/v1/source-provenance.schema.json",
   "provenance_version": "1.0.0",
+  "domain": "mechanical",
+  "artifacts": [
+    {"path": "source/robotic_joint_001.step", "format": "step"}
+  ],
+  "generator": "source/generate_step.py",
   "description": "Single-axis robotic joint: aluminium base plate and pillar, steel shaft in the pillar bore, aluminium link, steel payload block. Authored for the eCAD multi-domain validation pipeline (issue #27).",
   "artifact_type": "step_assembly",
   "artifact_version": "1.0",

@@ -25,7 +25,7 @@ import math
 from typing import Any, Dict, List, Sequence, Set, Tuple
 from xml.sax.saxutils import quoteattr
 
-from .quantity import is_null
+from .quantity import MissingInput as _MissingInput, is_null
 
 Matrix = Sequence[Sequence[float]]
 
@@ -34,7 +34,7 @@ class ModelIncomplete(ValueError):
     """The engineering model cannot be represented as a mechanical model."""
 
 
-class MissingInput(ModelIncomplete):
+class MissingInput(ModelIncomplete, _MissingInput):
     """A value the mechanical model needs has a null status.
 
     That is a missing input, not a defect in the design: validation reports

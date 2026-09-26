@@ -25,17 +25,26 @@ from ecad_model.builder import (  # noqa: E402
     index_unknowns,
     resolve,
 )
-from ecad_model.dataset import inertia_problems, same_content, same_text  # noqa: E402
+from ecad_model.dataset import same_content, same_text  # noqa: E402
+from ecad_model.domains import adapter_for  # noqa: E402
+from ecad_model.domains.mechanical import inertia_problems, reference_value  # noqa: E402
 from ecad_model.importers import UnsupportedFormat, detect_format, importer_for  # noqa: E402
 from ecad_model.importers import base as importer_base  # noqa: E402
 from ecad_model.mjcf import ModelIncomplete, build_mjcf, rotation_to_quaternion  # noqa: E402
 from ecad_model.quantity import NULL_STATUSES, Status, is_null, quantity, source, unknown  # noqa: E402
-from ecad_model.requirements import ReferenceBlocked, compile_cases, reference_value  # noqa: E402
+from ecad_model.requirements import ReferenceBlocked, compile_cases  # noqa: E402
 from ecad_model.schemas import validate  # noqa: E402
 
 ITEM = REPO_ROOT / "datasets" / "cad" / "robotic_joint_001"
 IDENTITY = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 ANNOTATION = source("design_annotation", "fixture")
+MECHANICAL = adapter_for("mechanical")
+
+
+def compile_mechanical(model, requirements):
+    """compile_cases for the mechanical domain, as the dataset runner calls it."""
+    return compile_cases(model, requirements, MECHANICAL.case_target("fixture"),
+                         MECHANICAL.reference_value, MECHANICAL.metrics())
 CITED = source("datasheet", "fixture.md", "0" * 64)
 
 
@@ -399,7 +408,7 @@ class TestRequirementCompilation(unittest.TestCase):
         self.requirements = json.loads((ITEM / "requirements" / "requirements.json").read_text())
 
     def test_limits_compile_to_the_contract_case_format(self):
-        golden, corners, blocked = compile_cases(self.model, self.requirements, "derived/m.xml")
+        golden, corners, blocked = compile_mechanical(self.model, self.requirements)
         validate(golden, "hardware-validation/v1/validation-cases")
         validate(corners, "hardware-validation/v1/validation-cases")
         limits = {case["id"]: case["metric_limits"] for case in corners["cases"]}
@@ -408,7 +417,7 @@ class TestRequirementCompilation(unittest.TestCase):
         self.assertTrue(all(case["requirement_ids"] == ["POLICY:V4-CORNER"] for case in corners["cases"]))
 
     def test_a_limit_resting_on_an_unknown_is_blocked_with_its_path(self):
-        _golden, corners, blocked = compile_cases(self.model, self.requirements, "derived/m.xml")
+        _golden, corners, blocked = compile_mechanical(self.model, self.requirements)
         self.assertNotIn("REQ-XD-001", [case["id"] for case in corners["cases"]])
         entry = next(item for item in blocked if item["id"] == "REQ-XD-001")
         self.assertEqual(entry["missing_inputs"],
@@ -420,7 +429,7 @@ class TestRequirementCompilation(unittest.TestCase):
                 model = copy.deepcopy(self.model)
                 torque = component(model, "actuator")["domains"]["mechanical"]
                 torque["continuous_output_torque"] = null_quantity("N*m", status)
-                _golden, corners, blocked = compile_cases(model, self.requirements, "derived/m.xml")
+                _golden, corners, blocked = compile_mechanical(model, self.requirements)
                 self.assertNotIn("REQ-XD-001", [case["id"] for case in corners["cases"]])
                 entry = next(item for item in blocked if item["id"] == "REQ-XD-001")
                 self.assertEqual(entry["missing_inputs"],
@@ -431,12 +440,12 @@ class TestRequirementCompilation(unittest.TestCase):
         model = copy.deepcopy(self.model)
         torque = component(model, "actuator")["domains"]["mechanical"]["continuous_output_torque"]
         torque.update(quantity(6.0, "N*m", Status.SPECIFIED, source("datasheet", "fixture")))
-        _golden, corners, blocked = compile_cases(model, self.requirements, "derived/m.xml")
+        _golden, corners, blocked = compile_mechanical(model, self.requirements)
         case = next(case for case in corners["cases"] if case["id"] == "REQ-XD-001")
         self.assertEqual(case["metric_limits"], {"static_torque_max_abs_nm": {"maximum": 6.0}})
         torque["unit"] = "kN*m"
         with self.assertRaisesRegex(ValueError, "unit"):
-            compile_cases(model, self.requirements, "derived/m.xml")
+            compile_mechanical(model, self.requirements)
 
 
 class TestMechanicalModel(unittest.TestCase):
@@ -779,7 +788,8 @@ class TestDocumentationExamples(unittest.TestCase):
         import doctest
         import importlib
 
-        for name in ("quantity", "schemas", "importers.base", "importers", "builder", "mjcf", "requirements"):
+        for name in ("quantity", "schemas", "importers.base", "importers", "builder", "mjcf", "requirements",
+                     "domains", "domains.mechanical"):
             with self.subTest(name):
                 module = importlib.import_module(f"ecad_model.{name}")
                 result = doctest.testmod(module, optionflags=doctest.ELLIPSIS)
