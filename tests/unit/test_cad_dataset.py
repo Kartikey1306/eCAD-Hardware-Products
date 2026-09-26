@@ -254,6 +254,51 @@ class TestCaseScript(unittest.TestCase):
                 worst = max(worst, abs(float(reference.qfrc_bias[0])))
         self.assertAlmostEqual(metrics["static_torque_max_abs_nm"], worst, places=9)
 
+    def _script(self):
+        require("mujoco")
+        import importlib.util as util
+
+        sys.dont_write_bytecode = True  # keep __pycache__ out of the dataset item
+        spec = util.spec_from_file_location("joint_dynamics", ITEM / "simulation" / "joint_dynamics.py")
+        script = util.module_from_spec(spec)
+        spec.loader.exec_module(script)
+        return script
+
+    def _model_file(self, directory: str, edit) -> str:
+        xml = (ITEM / "derived" / "mechanical" / "robotic_joint_001.mjcf.xml").read_text()
+        path = Path(directory) / "model.xml"
+        path.write_text(edit(xml))
+        return str(path)
+
+    def test_the_free_swing_period_does_not_depend_on_the_time_step(self):
+        """The zero crossings are interpolated within a step. Quantised to the
+        step instead, the period at a 2 ms step is off by about 7e-5 s, beyond
+        the golden's tolerance; interpolated it stays within it."""
+        import re
+
+        from ecad_model.requirements import reference_value
+
+        script = self._script()
+        model = json.loads((ITEM / "derived" / "engineering_model.json").read_text())
+        requirements = json.loads((ITEM / "requirements" / "requirements.json").read_text())
+        golden = next(r for r in requirements["reference_values"] if r["derivation"] == "small_oscillation_period")
+        expected = reference_value(model, "small_oscillation_period", golden["scenario"])[0]
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._model_file(directory, lambda xml: re.sub(r'timestep="[^"]+"', 'timestep="0.002"', xml))
+            period = script.free_swing(script.load(path, {}), golden["scenario"])["small_oscillation_period_s"]
+        self.assertLessEqual(abs(period - expected), golden["absolute_tolerance"])
+
+    def test_a_joint_pair_that_cannot_be_checked_reports_no_clearance(self):
+        """When the joint's own parent-child pair is excluded -- a joint realised by
+        its own child -- the clearance cannot be measured, and the script says so
+        instead of reporting a clearance for the other pairs."""
+        script = self._script()
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._model_file(directory, lambda xml: xml.replace(
+                "<contact>", '<contact>\n    <exclude body1="base_plate" body2="link"/>', 1))
+            metrics = script.rom_sweep(script.load(path, {}), {})
+        self.assertEqual(metrics, {"rom_joint_pair_unchecked": 1.0})
+
 
 class TestEndToEnd(unittest.TestCase):
     """The full pipeline, and proof that its checks can fail."""
@@ -314,6 +359,10 @@ class TestEndToEnd(unittest.TestCase):
         self.assertTrue((REPO_ROOT / validator[1]).is_file())
         extraction = json.loads((ITEM / "derived" / "cad_extraction.json").read_text())
         self.assertEqual(tools["opencascade"]["version"], extraction["importer"]["kernel_version"])
+        # One record per tool: what every mujoco check shares, not the last check's scenario.
+        mujoco = tools["mujoco"]
+        self.assertTrue(mujoco["invocation"][-1].endswith(".mjcf.xml"), mujoco["invocation"])
+        self.assertFalse(any("--scenario" in part or part.startswith("{") for part in mujoco["invocation"]))
 
     def test_only_a_real_requirement_can_pass(self):
         """An illustrative limit met is WARNING, which blocks ebuild eligibility;
@@ -761,8 +810,9 @@ class TestUntrustedInput(unittest.TestCase):
 
     def test_check_refuses_a_symlinked_directory_before_reading_through_it(self):
         """Path: design/ is a symlink -> every annotation read is redirected outside the
-        item, and each file there is still a regular file, so a per-file guard passes."""
-        from ecad_model.dataset import check
+        item, and each file there is still a regular file, so a per-file guard passes.
+        Both check and validate refuse it."""
+        from ecad_model.dataset import check, validate
 
         with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
             item = _copy_item(directory)
@@ -770,8 +820,10 @@ class TestUntrustedInput(unittest.TestCase):
             shutil.move(str(item / "design"), outside / "design")
             (item / "design").symlink_to(outside / "design", target_is_directory=True)
             try:
-                with self.assertRaisesRegex(ValueError, "dataset items may not contain symlinks"):
-                    check(item)
+                for name, run in (("check", lambda: check(item)),
+                                  ("validate", lambda: validate(item, Path(outside) / "run"))):
+                    with self.subTest(name), self.assertRaisesRegex(ValueError, "dataset items may not contain symlinks"):
+                        run()
             finally:
                 shutil.rmtree(outside)
 

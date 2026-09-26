@@ -829,6 +829,7 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
     from ecad_validation.hashing import hash_tree
 
     item = Item(directory)
+    _refuse_symlinks(item)  # before the input digest or any other read
     started = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     commit, dirty = repository_state(REPOSITORY_ROOT)
     input_digest_before = hash_tree(item.root, item.files())
@@ -1020,15 +1021,13 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
             "settings": {"document_length_unit": "mm", "timeout_seconds": 120,
                          "address_space_limit_bytes": 2 * 1024 * 1024 * 1024, "isolation": "run_process workspace copy"},
         }
+    runs: Dict[str, List[Any]] = {}
     for gate in gate_results:
         for check_result in gate.checks:
             if check_result.tool_id != "ecad-validator" and check_result.tool_version:
-                tools[check_result.tool_id] = {
-                    "tool_id": check_result.tool_id, "name": check_result.tool_id,
-                    "version": check_result.tool_version,
-                    "invocation": check_result.tool_invocation or [check_result.tool_id],
-                    "settings": check_result.tool_settings,
-                }
+                runs.setdefault(check_result.tool_id, []).append(check_result)
+    for tool_id, tool_checks in runs.items():
+        tools[tool_id] = _tool_record(tool_id, tool_checks)
     product = ProductRunResult(
         product_id=f"datasets:{item.item_id}", product_path=item.repo_relative(item.root),
         source_commit=commit, source_dirty=dirty,
@@ -1041,6 +1040,42 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
     validate_document(REPOSITORY_ROOT, "validation-receipt.schema.json", receipt)
     _write_run(item, output, product, receipt, requirements)
     return receipt
+
+
+def _tool_record(tool_id: str, checks: Sequence[Any]) -> Dict[str, Any]:
+    """One receipt record for a tool, stating only what all its checks share.
+
+    Each check runs the tool with its own arguments, which its hash-bound
+    execution record keeps. The receipt keeps one record per tool, so it
+    holds the common part of the invocations and the settings every check
+    agrees on -- never one check's arguments presented as the tool's.
+
+    Raises:
+        ValueError: The checks report different versions of one tool.
+
+    Example:
+        >>> from types import SimpleNamespace as C
+        >>> a = C(tool_version="3.14.0", tool_invocation=["py", "s.py", "--scenario", "{a}"], tool_settings={"k": 1})
+        >>> b = C(tool_version="3.14.0", tool_invocation=["py", "s.py", "--scenario", "{b}"], tool_settings={"k": 1})
+        >>> _tool_record("mujoco", [a, b])["invocation"]
+        ['py', 's.py']
+    """
+    versions = {check.tool_version for check in checks}
+    if len(versions) != 1:
+        raise ValueError(f"tool {tool_id} reported different versions in one run: {sorted(versions)}")
+    invocations = [list(check.tool_invocation or [tool_id]) for check in checks]
+    common: List[str] = []
+    for parts in zip(*invocations):
+        if len(set(parts)) != 1:
+            break
+        common.append(parts[0])
+    while len(common) > 1 and common[-1].startswith("-"):
+        common.pop()  # an option whose value differs between checks
+    settings = {key: value for key, value in checks[0].tool_settings.items()
+                if all(check.tool_settings.get(key) == value for check in checks)}
+    settings["per_check_invocation"] = "each check's execution record"
+    return {"tool_id": tool_id, "name": tool_id, "version": versions.pop(),
+            "invocation": common or [tool_id], "settings": settings}
 
 
 def _check_references(receipt: Dict[str, Any], requirements: Dict[str, Any]) -> None:

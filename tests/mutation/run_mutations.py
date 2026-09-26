@@ -4,8 +4,10 @@
 Each mutant is one targeted edit that makes a behaviour the tests claim to
 protect wrong. For every mutant this copies the repository, applies the edit,
 runs the fast engineering-model tests and, only if they stay green, the slower
-CAD-kernel tests. A mutant the suite does not kill is a test gap, and the
-script exits 1. The unmutated copy runs first and must be green: against a
+CAD-kernel tests. A mutant of a dataset item's own file (its simulation
+script) is followed by a rebuild of that item, so the manifest's hashes cannot
+kill it: a behavioural test must. A mutant the suite does not kill is a test
+gap, and the script exits 1. The unmutated copy runs first and must be green: against a
 failing baseline every mutant would look killed.
 
 Needs the CAD kernel and MuJoCo (tools/requirements-cad.txt), with `python3`
@@ -121,6 +123,9 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("item-read-unguarded", D, "        regular_file(path)\n        return path.read_bytes()", "        return path.read_bytes()"),
     ("check-follows-symlinks", D, "    _refuse_symlinks(item)\n    item.files()\n    derived = _derive(item)",
      "    item.files()\n    derived = _derive(item)"),
+    ("validate-follows-symlinks", D, "    _refuse_symlinks(item)  # before the input digest or any other read\n", ""),
+    ("tool-record-last-writer-wins", D, "        tools[tool_id] = _tool_record(tool_id, tool_checks)",
+     "        tools[tool_id] = {**_tool_record(tool_id, tool_checks), \"invocation\": list(tool_checks[-1].tool_invocation)}"),
     ("check-skips-enumeration", D, "    _refuse_symlinks(item)\n    item.files()\n    derived = _derive(item)",
      "    _refuse_symlinks(item)\n    derived = _derive(item)"),
     ("reader-extern-files-unchecked", S, "    if reader.ExternFiles().Size():", "    if False:"),
@@ -175,6 +180,18 @@ def run(name: str, relative: Optional[str], old: str, new: str) -> Tuple[str, st
             if text.count(old) != 1:
                 return name, "ANCHOR", f"expected the anchor once in {relative}, found {text.count(old)}"
             target.write_bytes(text.replace(old, new).encode("utf-8"))
+            if relative.startswith("datasets/"):
+                # The manifest hashes every file of a dataset item, so without a
+                # rebuild any edit there is "killed" by the integrity check
+                # alone. Re-hashing makes a behavioural test catch it, or not.
+                item = "/".join(Path(relative).parts[:3])
+                rebuilt = subprocess.run([sys.executable, "tools/cad_dataset.py", "build", item], cwd=copy,
+                                         capture_output=True, text=True, timeout=1800)
+                if rebuilt.returncode != 0:
+                    return name, "HARNESS", f"rebuilding {item} failed: {rebuilt.stderr.strip()[-200:]}"
+                for command in (["git", "add", "-A"], ["git", "-c", "user.name=mutation", "-c",
+                                "user.email=mutation@localhost", "commit", "-q", "-m", "mutant"]):
+                    subprocess.run(command, cwd=copy, check=True, capture_output=True, timeout=300)
         environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", PYTHONDONTWRITEBYTECODE="1")
         for suite in (FAST, SLOW):
             result = subprocess.run(
