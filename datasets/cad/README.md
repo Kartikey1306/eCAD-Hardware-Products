@@ -12,7 +12,7 @@ Items are not products. Product discovery only scans `e*_CAD_Design/` and
 
 | Item | Design | Domains |
 |---|---|---|
-| [`robotic_joint_001`](robotic_joint_001) | Single revolute joint: base plate, pillar, shaft, link, payload; eServo-200 drive; actuator not selected | mechanical implemented; electrical and thermal blocked on the unselected motor; others not started |
+| [`robotic_joint_001`](robotic_joint_001) | Single revolute joint: base plate, pillar, shaft, link, payload; eServo-200 drive; actuator not selected | mechanical implemented; the other eight not implemented (electrical and thermal would also need the unselected motor's data) |
 
 ## Commands
 
@@ -37,17 +37,21 @@ validator. Run with the interpreter that has `mujoco` installed first on
 ## Adding an item
 
 1. Create `datasets/cad/<item_id>/source/` with exactly one STEP file.
-2. Establish the licence before anything else. The item records its licence,
-   attribution, whether redistribution and training use are permitted, and the
-   basis for believing so. A third-party file needs its source URL and an
-   upstream licence that permits both uses. If that cannot be established, do
-   not add the file.
+2. Establish the licence before anything else, and record it by hand in
+   `source/provenance.json` (schema `cad-dataset/v1/source-provenance`): the
+   origin, the SPDX licence, the attribution exactly as the licence requires,
+   whether redistribution and training use are permitted, and the basis for
+   believing so. A third-party file also needs its source URL, what was
+   modified, and the SHA-256 of the upstream licence text. `build` refuses an
+   item without this file; it never supplies a licence. If the licence cannot
+   be established, do not add the file.
 3. Write `design/annotations.json`: map every CAD part name to a component and
-   material, declare joints, rigid attachments, and components that exist in
-   the design but not in the CAD. A value nobody knows is `UNKNOWN` with a note
-   saying why. Never fill one in to make a check run.
-4. Write `requirements/requirements.json`. Label illustrative limits as
-   illustrative in their `source.ref`.
+   material, declare joints (with the `axis_sense` of a positive angle),
+   rigid attachments, and components that exist in the design but not in the
+   CAD. A value nobody knows is `UNKNOWN` with a note saying why. Never fill
+   one in to make a check run.
+4. Write `requirements/requirements.json`. Set `illustrative: true` on any
+   limit not taken from a customer, standard or certificate.
 5. `build`, then `check`, then `validate`, then commit the whole directory.
 
 ## Traps
@@ -59,7 +63,14 @@ validator. Run with the interpreter that has `mujoco` installed first on
   committed example is stored as a regular blob.
 - **Derived files are never hand-edited.** An edit is detected by `check` as
   drift. Change the input and rebuild.
+- **No symlinks.** `build`, `check` and `validate` refuse an item containing a
+  symlink anywhere. They also refuse an item under a git-ignored path, whose
+  files git would not list.
 - **Committed derived files come from one platform** (macOS arm64). `check`
-  compares numbers within a relative tolerance of 1e-9 so that last-digit
-  kernel differences between platforms do not fail it. Reproduction on Linux
-  has not yet been run; the `cad-dataset` CI job is the first place it will be.
+  compares numbers within a relative tolerance of 1e-9, one tolerance per
+  array, so last-digit kernel differences between platforms do not fail it.
+  Verified 2026-09-25: `check` passes on Linux aarch64 and, under emulation, on
+  Linux x86_64; the complete suite and `validate` also pass on Linux aarch64.
+  The MuJoCo stages have not run on native x86_64.
+- **Linux needs `libgl1`.** OpenCASCADE's wheel links `libGL.so.1`, which a
+  bare Debian image lacks: `apt-get install libgl1`.

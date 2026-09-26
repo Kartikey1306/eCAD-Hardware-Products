@@ -143,8 +143,8 @@ Risks
 
 Owner: unassigned
 Mode: build
-Status: review
-Depends on: `fix/adapter-timeout-decode` (the feature branch is stacked on it); independent review
+Status: review (local branch `wip/stack`; not pushed)
+Depends on: `fix/adapter-timeout-decode` and `fix/producer-cross-reference-checks` (cherry-picked as `3639778`, patch-identical); both are in the stack below this work
 
 Goal
 : A STEP design becomes an engineering model whose every value states its
@@ -159,29 +159,41 @@ Acceptance criteria (verbatim from the issue #27 implementation plan)
 
 Files in scope
 : `schemas/engineering-model/v1/`, `schemas/cad-dataset/v1/`, `tools/ecad_model/`,
-  `tools/cad_dataset.py`, `tools/requirements-cad.txt`, `datasets/cad/`,
-  `tests/unit/test_engineering_model.py`, `tests/unit/test_cad_dataset.py`,
-  the `cad-dataset` job in `.github/workflows/ci.yml`, documentation.
+  `tools/cad_dataset.py`, `tools/requirements-cad.txt`, `tools/constraints-cad.txt`,
+  `datasets/cad/`, `tests/unit/test_engineering_model.py`,
+  `tests/unit/test_cad_dataset.py`, `tests/mutation/run_mutations.py`, the
+  `cad-dataset` job in `.github/workflows/ci.yml`, documentation,
+  `ECAD_MULTI_DOMAIN_DATASET_PLAN.md`.
 
 Out of scope
 : Every domain other than mechanical; importers other than STEP; the v1
-  receipt contract, which is reused unchanged; the product inventory.
+  receipt contract, which is reused unchanged; the product inventory. The
+  multi-domain foundation is planned in `ECAD_MULTI_DOMAIN_DATASET_PLAN.md`
+  §21 item 3 and in progress on the local branch
+  `feat/multi-domain-foundation`, which builds on this one.
 
 Risks
-: Committed derived files come from macOS arm64 and have not been reproduced
-  on Linux -- the `cad-dataset` job would reveal a divergence as a `check`
-  failure. `cadquery-ocp` cannot be installed on the Python 3.10 legs, where
-  the dataset tests skip by design.
+: MuJoCo stages have not run on native Linux x86_64: under emulation on Apple
+  silicon the CPU has no AVX and `import mujoco` aborts, so only OpenCASCADE
+  reproduction was verified there. Whether the `ubuntu-22.04` runner image
+  ships `libGL.so.1` is unknown; the job installs `libgl1`. `cadquery-ocp`
+  cannot be installed on the Python 3.10 legs, where the dataset tests skip by
+  design. Push access is read-only for this account.
 
-Verification
+Verification (code at `bd999d5`, 2026-09-26)
 : | Check | Command | Result |
   |-------|---------|--------|
-  | Complete suite, CAD tests mandatory | `ECAD_REQUIRE_CAD_TOOLS=1 python3 -m pytest tests -q` | `PASS` -- 190 passed, 1793 subtests (macOS, Python 3.14) |
+  | Complete suite, CAD tests mandatory | `ECAD_REQUIRE_CAD_TOOLS=1 python3 run_all_tests.py` | `PASS` -- 245 passed, 0 skipped (macOS arm64, Python 3.14.4) |
+  | Lint, new code | `ruff check tools/ecad_model tools/cad_dataset.py tests/unit/test_cad_dataset.py tests/unit/test_engineering_model.py tests/unit/test_ci_and_runner.py tests/mutation datasets/cad --select=E,F,W --ignore=E501` | `PASS` -- no findings |
+  | Type check | `mypy tools run_all_tests.py tests/mutation/run_mutations.py --ignore-missing-imports --no-strict-optional` | `PASS` for new code -- the 11 errors reported are the same set as on `fea3fc4`, all in existing modules |
   | Derivation reproduces from the CAD | `python3 tools/cad_dataset.py check datasets/cad/robotic_joint_001` | `PASS` -- exit 0 |
-  | Test discrimination | 16 single-edit mutations of the new code | `PASS` -- 16 of 16 killed |
-  | Skip cannot go silent | tests with `OCP`/`mujoco` hidden, with and without `ECAD_REQUIRE_CAD_TOOLS=1` | `PASS` -- 17 skipped with reason / 7 failed + 10 errors |
-  | Linux reproduction | the `cad-dataset` CI job | `NOT RUN` -- no Linux runner used |
-  | Independent review | -- | `NOT RUN` |
+  | V0-V4 receipt on a clean clone | `python3 tools/cad_dataset.py validate datasets/cad/robotic_joint_001 --output <dir>` | `PASS` as designed -- V0-V3 PASS; V4 BLOCKED: five illustrative limits met (WARNING) and REQ-XD-001 BLOCKED on the unselected actuator; not eligible for ebuild; 76 evidence digests re-hash |
+  | Test discrimination | `python3 tests/mutation/run_mutations.py --workers 3` | `PASS` -- 68 of 68 mutants killed, after the unmutated baseline passed; each kill names the failing test |
+  | Skip cannot go silent | the two dataset test files with `OCP`/`mujoco` absent, with and without `ECAD_REQUIRE_CAD_TOOLS=1` | `PASS` -- 45 skipped, each with a reason / all 45 red (25 failed, 20 errors) |
+  | Linux aarch64 | the CI job's steps in `python:3.12-slim` with only `git` and `libgl1` added, offline from the pinned wheels | `PASS` -- `check` exit 0; 245 passed; `validate` gives the same gate verdicts as macOS |
+  | Linux x86_64 | `check` in `python:3.12-slim` under emulation | `PASS` for OpenCASCADE reproduction (`check` exit 0, at `c9be0b6`). MuJoCo stages `NOT RUN`: the emulated CPU has no AVX and `import mujoco` aborts |
+  | Pinned set resolves on Linux | `pip download -r tools/requirements.txt -r tools/requirements-cad.txt -c tools/constraints-cad.txt` for x86_64 and aarch64, Python 3.12 | `PASS` -- all 23 pins resolve unchanged |
+  | Independent review | two reviews and a check of the plan's claims against the code, each finding checked by a separate verifier | `PASS` -- every confirmed finding within this task is fixed on the stack (`f4398f4`, `c9be0b6`, `bd999d5`); five in existing merged code or later domains are open, each listed with its owner in the plan §7.2 |
 
 ## Completed
 

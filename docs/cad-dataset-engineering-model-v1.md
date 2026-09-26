@@ -27,7 +27,8 @@ design/annotations.json ──────────────────�
 | Concept | Where | Owns |
 |---|---|---|
 | Design | `source/*.step` | Physical structure. The only source of geometry. |
-| Design intent | `design/annotations.json` | What the CAD cannot carry: which part is which component, materials, joints and limits, components with no geometry. |
+| Origin | `source/provenance.json` | Hand-written: where the CAD came from, its licence and attribution, whether redistribution and training use are permitted, and why that is believed. `build` refuses an item without it and never fills it in. |
+| Design intent | `design/annotations.json` | What the CAD cannot carry: which part is which component, materials, joints and their axis sense and limits, components with no geometry. |
 | Model | `derived/engineering_model.json` | Everything above, in SI, with provenance on every value. |
 | Domain model | `derived/mechanical/*.mjcf.xml` | The mechanical view of the model, for MuJoCo. |
 | Simulation | `simulation/joint_dynamics.py` | Produces metrics. Never decides pass or fail. |
@@ -70,15 +71,24 @@ inputs.
   (`mechanical`, `electrical`, `thermal`, …) of quantities. A component with
   no geometry, such as the unselected actuator, has `cad_ref: null`.
 - **Joints** name parent, child, and the component whose cylindrical faces
-  define the axis. The axis and origin are extracted from that geometry and
-  are `DERIVED`; they are never typed in. Non-coaxial or missing cylinders
-  make the axis `UNKNOWN`.
+  define the axis. The axis line and origin are extracted from that geometry
+  and are `DERIVED`; they are never typed in. Non-coaxial or missing
+  cylinders make the axis `UNKNOWN`. Geometry fixes a line, not a direction,
+  so the annotation's `axis_sense` states which way a positive angle turns.
+  The axis is the CAD line oriented to agree with `axis_sense`, and it
+  derives from both. An `axis_sense` more than 60° from the CAD line is a
+  contradiction, not a hint, and makes the axis `UNKNOWN`.
 - **Relationships** form the graph issue #27 §28 asks for: `contains`,
   `mounted_to`, `connected_to`, `drives`, `powered_by`, `controls`, `senses`,
   `attached_to`, `constrained_by`, `thermally_connected_to`.
-- **`unknowns`** indexes every `UNKNOWN` quantity by path, with the domains
-  that need it. `dataset-item.json` derives each domain's status from it, so
-  a domain is reported `blocked` because of what is missing, not by assertion.
+- **`unknowns`** indexes every `UNKNOWN` quantity by path, sorted, with the
+  domains that need it.
+
+`dataset-item.json` reports each domain as `implemented` or
+`not_implemented`. That comes from the platform, which has a validator for
+mechanical only, never from the item's data. Each reason also lists the
+unknowns the item has for that domain, so a missing motor constant is
+reported against electrical even though no electrical validator exists yet.
 
 ## Requirements
 
@@ -86,17 +96,37 @@ inputs.
 
 **Reference values** (V3 golden) verify a domain model against an independent
 closed-form derivation computed from the engineering model:
-`gravity_torque_as_modelled` (lever-arm cross product about the joint axis),
-`small_oscillation_period` (linearised pendulum with the parallel-axis
-theorem), and `moving_mass`. These run on a code path separate from the MJCF
-writer and the simulator, so a frame, unit or inertia-ordering error in the
-conversion becomes a golden mismatch rather than a silently wrong answer.
+
+| Derivation | Closed form |
+|---|---|
+| `moving_mass` | Sum of the moving bodies' masses |
+| `gravity_torque_as_modelled` | Lever-arm cross product about the joint axis |
+| `small_oscillation_period` | Linearised pendulum, parallel-axis theorem |
+| `equilibrium_angle` | Rotation about the axis that brings the centre of mass directly below it (`atan2`) |
+| `min_jerk_peak_speed` | 1.875 · Δθ / T |
+| `min_jerk_peak_accel` | (10/√3) · Δθ / T² |
+| `rated_move_peak_torque` | Peak of \|I·α − τ_gravity(θ)\| over the minimum-jerk profile, sampled every 1 ms |
+
+A reference may name a scenario. A payload override then applies to the
+reference and the simulation alike. These derivations run on a code path
+separate from the MJCF writer and the simulator. A frame, unit or
+inertia-ordering error in the conversion therefore shows up as a golden
+mismatch rather than a silently wrong answer.
 
 **Requirements** (V4 corner) bound a simulated metric under a scenario, with
 `<=` or `>=`. A limit is a number or the path of a model quantity. A limit
 that resolves to an `UNKNOWN` quantity is not compiled into a case; it is
 reported `BLOCKED` with the missing path. No model decides whether a number
 satisfies a limit: the contract's existing comparators do.
+
+Every requirement carries a required `illustrative` flag. The example's limits
+are `true`: invented to exercise the pipeline, not taken from a customer,
+standard or certificate. Meeting an illustrative limit is recorded as
+`WARNING` with `WITHIN_ILLUSTRATIVE_LIMIT`, never `PASS`. The contract defines
+`WARNING` as advisory: it cannot satisfy a required check, so a sample whose
+limits are all illustrative is never eligible for ebuild, however well it
+does. Failing an illustrative limit is still `FAIL`. The flag is also carried
+into the trace and the report.
 
 The v1 receipt contract predates the engineering domains of issue #27 and
 classifies checks into six domains. The mapping used is a documented
@@ -120,18 +150,40 @@ additionally records the engineering requirement each check implements.
 
 | Gate | Checks |
 |---|---|
-| V0 | Every dataset document conforms to its schema and every recorded hash matches exactly; inputs unchanged during the run; source tree clean and pinned. |
+| V0 | Every dataset document conforms to its schema; every recorded hash matches exactly, including provenance and simulation scripts; no file is unrecorded; every source a value cites exists; inputs unchanged during the run; source tree clean and pinned. |
 | V1 | The CAD re-extracts, and every mass, inertia tensor (symmetric, positive definite, triangle inequality), axis and limit is physically possible. |
-| V2 | The committed derivation reproduces from the CAD; every `cad_ref`, relationship endpoint and requirement subject resolves; MJCF bodies correspond one to one with CAD components. |
+| V2 | The committed derivation reproduces from the CAD; `dataset-item.json` matches the one a rebuild would write; every `cad_ref`, relationship endpoint and requirement subject resolves; MJCF bodies correspond one to one with CAD components. |
 | V3 | Golden cases, run by the existing case engine and MuJoCo adapter. |
-| V4 | Corner cases, plus `BLOCKED` checks for requirements that rest on an `UNKNOWN`. |
+| V4 | Corner cases, plus `BLOCKED` checks for requirements that rest on an `UNKNOWN`. A limit met that is illustrative is `WARNING`. |
+
+A V1 extraction that does not finish is classified, not lumped together:
+
+| Extraction outcome | V1 verdict | Reason code |
+|---|---|---|
+| The file was read and refused on its content | `FAIL` | `CAD_REJECTED` |
+| The parser crashed or produced nothing usable | `INCONCLUSIVE` | `CAD_EXTRACTION_CRASHED` |
+| The parser exceeded its time limit | `INCONCLUSIVE` | `CAD_EXTRACTION_TIMED_OUT` |
+| OpenCASCADE is not installed | `BLOCKED` | `CAD_KERNEL_UNAVAILABLE` |
+| A value the mechanical model needs is `UNKNOWN` (a missing input) | `BLOCKED` | `MISSING_REQUIRED_INPUT` |
+| The annotations or requirements cannot be built into a model | `FAIL` | `DATASET_INPUT_INVALID` |
 
 **Integrity and reproducibility are deliberately separate.** Hashes in
 `dataset-item.json` must match committed bytes exactly. Rebuilding from the
-CAD must reproduce the committed derived content within a relative tolerance
-of 1e-9: kernel builds differ in their last floating-point digits across
-platforms, and a byte comparison there would fail a Linux runner for no
-engineering reason.
+CAD must reproduce the committed derived content within a tolerance. Kernel
+builds differ in their last floating-point digits across platforms, and a
+byte comparison would fail a Linux runner for no engineering reason.
+A scalar compares within a relative 1e-9, with an absolute floor of 1e-12. A
+vector or matrix compares with one tolerance scaled by its largest element: a
+physically zero product of inertia next to a large principal moment is kernel
+noise, and comparing it element by element would call that noise a
+difference. MJCF text compares exactly outside attribute values.
+
+The receipt and evidence index are contract documents. They are written the
+way the contract serialises them: canonical JSON with one final LF. Evidence
+files are stored under `evidence/sha256/<digest>`, and the index records each
+file's origin, either a repository path at the pinned commit or the tool that
+generated it. `trace.json` and `report.md` are for people and are not
+contract documents.
 
 ## Mechanical model
 
@@ -152,36 +204,83 @@ engineering reason.
 
 ## Security
 
-CAD files are untrusted input, and the STEP parser is native code. Extraction
-runs as a child process through the repository's hardened `run_process`: a
-copy of the one STEP file in a throwaway workspace, a scrubbed environment, a
-120 s timeout, and a 2 GiB address-space limit where the platform enforces it.
-On macOS `setrlimit(RLIMIT_AS)` is refused (verified: `ValueError`), and the
-child reports that on stderr; Linux enforces the limit (inferred from
-standard kernel behaviour, not run here). The parent
-refuses the result unless the child hashed exactly the bytes it was given.
-Detection reads content, not the file extension, refuses files over 256 MiB,
-and names a Git LFS pointer as such.
+CAD files and the items around them are untrusted input, and the STEP parser
+is native code.
+
+- **Process hardening, not a sandbox.** Extraction runs as a child process
+  through the repository's hardened `run_process`. The child gets a copy of
+  the one STEP file in a throwaway workspace, a scrubbed environment, a 120 s
+  timeout, and a 2 GiB address-space limit where the platform enforces it.
+  macOS refuses `setrlimit(RLIMIT_AS)` (verified: `ValueError`), and the child
+  reports that on stderr. Linux enforces the limit (inferred from standard
+  kernel behaviour, not measured here). The parent refuses the result unless
+  the child hashed exactly the bytes it was given. Nothing confines the child's
+  filesystem or network access, so this protects against a crashing or
+  hanging parser, not against a malicious one. The case scripts under
+  `simulation/` run the same way and must be authored in this repository,
+  never taken from a third-party sample.
+- **No external references.** OpenCASCADE resolves a STEP `DOCUMENT_FILE`
+  reference by opening the named file during transfer (verified), which
+  would read outside the throwaway workspace. The child refuses a file that
+  declares `DOCUMENT_FILE`, `EXTERNAL_SOURCE`,
+  `APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT` or
+  `PRODUCT_DEFINITION_WITH_ASSOCIATED_DOCUMENTS`, and it does so before
+  parsing. The scan ignores string literals, so a part named after an entity
+  is not refused. After transfer, the child also refuses any result whose
+  reader reports an external file. Either refusal is a `CAD_REJECTED` FAIL.
+- **Only regular files.** Every file is checked with `lstat` before it is
+  opened. A FIFO, device or symlink is refused, and so is anything over
+  256 MiB. Detection reads content, not the file extension, and names a Git
+  LFS pointer as such.
+- **No symlinks in an item.** Git tracks symlinks. One inside an item could
+  redirect a read past the hashes, or redirect a build's write to any file
+  the user can modify. `build`, `check` and `validate` refuse an item that
+  contains a symlink anywhere, before reading it. Each derived-file write also
+  refuses a symlink on its path and any target that resolves outside the
+  item.
+- **No silent skips.** An item under a git-ignored path is refused, and so is
+  one whose own CAD file git does not list. Either would otherwise make the
+  file list, and every check built on it, silently empty.
+
+## Versioning
+
+`engineering-model/v1` and `cad-dataset/v1` are **pre-release**. Nothing
+outside this pipeline consumes them yet, and the multi-domain foundation
+(`ECAD_MULTI_DOMAIN_DATASET_PLAN.md` §21 item 3) still changes them in place:
+new value statuses, artefact-neutral sources, and the manifest's metadata.
+When that foundation merges, both families become stable: a compatible
+addition stays in v1, and an incompatible change needs a new versioned
+directory, as the V0–V4 contract already requires of itself.
 
 ## Limitations
 
-- One importer: STEP, through OpenCASCADE. STL and glTF are recognised and
-  refused by name — STL carries no assembly. IGES and native formats are not
-  implemented.
+- One importer: STEP, through OpenCASCADE. ASCII STL and binary glTF (`.glb`)
+  are recognised by content and refused by name; STL carries no assembly.
+  Binary STL has no signature and is refused as unrecognised. IGES and native
+  formats are not implemented.
 - Sub-assemblies are refused; the importer reads one flat assembly level.
 - One joint per design, revolute only.
 - Materials come from annotations. STEP can carry material data; reading it
   is not implemented.
 - The example's requirement limits are illustrative, labelled as such in
   every entry, and are not customer, safety or certification requirements.
-- Material densities are nominal handbook values, not supplier certificates.
+- Material densities are `ESTIMATED` nominal values, each with the source of
+  the estimate. They are not supplier certificates, so every mass derived
+  from them is only as good as that estimate.
+- Committed derived files come from one platform (macOS arm64). They
+  reproduce on Linux aarch64, and under emulation on Linux x86_64, within the
+  tolerance above (verified); the MuJoCo stages have not run on native
+  x86_64.
 
 ## Adding a domain
 
 A domain attaches in four places and changes none of the above: facets on
 components (`domains.<name>`), a domain-model writer beside `mjcf.py`, a case
-script and adapter, and entries in `requirements.json`. The robotic joint's
-electrical and thermal domains are reported `blocked` today because the motor
-is not selected, so its torque constant, winding resistance and winding
-temperature limit are `UNKNOWN`. Selecting a motor and recording its
-datasheet values unblocks both, and turns `REQ-XD-001` into a numeric check.
+script and adapter, entries in `requirements.json`, and an entry in
+`VALIDATED_DOMAINS` once its validator exists. The robotic joint's electrical
+and thermal domains are `not_implemented` today: this platform has no
+validator for either. The item would also be missing their inputs, because
+the motor is not selected, so its torque constant, winding resistance and
+winding temperature limit are `UNKNOWN`. Selecting a motor and recording
+its datasheet values supplies those inputs and turns `REQ-XD-001` into a
+numeric check. The domains themselves still need their validators.
