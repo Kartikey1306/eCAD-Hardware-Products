@@ -1044,6 +1044,14 @@ class TestRequirementRefusals(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "must be unique: REF-MECH-001 repeat"):
             compile_mechanical(self.model, requirements)
 
+    def test_an_id_the_case_engine_uses_for_a_whole_gate_is_refused(self):
+        for reserved in ("golden-cases", "golden-manifest", "corners-cases", "corners-manifest"):
+            with self.subTest(reserved):
+                requirements = copy.deepcopy(self.requirements)
+                requirements["requirements"][0]["requirement_id"] = reserved
+                with self.assertRaisesRegex(ValueError, f"{reserved}: reserved"):
+                    compile_mechanical(self.model, requirements)
+
     def test_a_limit_quantity_that_is_not_one_number_is_refused(self):
         requirements = copy.deepcopy(self.requirements)
         clearance = next(r for r in requirements["requirements"] if r["requirement_id"] == "REQ-MECH-005")

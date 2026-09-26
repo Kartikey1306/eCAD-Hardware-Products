@@ -9,8 +9,9 @@ artefacts, annotations and requirements. check exits 1 if any recorded hash is
 wrong or any committed derived file no longer reproduces from the sources.
 validate runs V0-V4 and writes a v1 receipt, evidence, per-requirement results
 and a report; it
-exits 0 when the run completed, whatever the verdicts, and 1 only when it
-could not produce a receipt.
+exits 0 when the run completed, whatever the verdicts; 2 when the receipt,
+evidence index and report were written but the per-requirement results could
+not be (the report says why); and 1 when no receipt could be produced.
 """
 
 from __future__ import annotations
@@ -43,6 +44,9 @@ def _cmd_validate(args: argparse.Namespace) -> int:
     output = Path(args.output)
     try:
         receipt = dataset.validate(Path(args.item), output)
+    except dataset.ResultsNotWritten as exc:
+        print(f"error: {exc}; see {output / 'report.md'}", file=sys.stderr)
+        return 2
     except (OSError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

@@ -72,6 +72,12 @@ RELATIVE_TOLERANCE = 1e-9
 ABSOLUTE_TOLERANCE = 1e-12
 
 
+class ResultsNotWritten(RuntimeError):
+    """The run's receipt, evidence index and report were written, but its
+    per-requirement results could not be: a defect in the results generator
+    or an input it does not expect. The report says what failed."""
+
+
 class Item:
     """Paths, identity and source artefacts of one dataset item directory.
 
@@ -175,6 +181,16 @@ class Item:
         return files
 
 
+def _json(data: Any) -> Any:
+    """json.loads for untrusted content: nesting too deep for the parser is
+    malformed input, a ValueError like any other, not a RecursionError that
+    no handler expects."""
+    try:
+        return json.loads(data)
+    except RecursionError as exc:
+        raise ValueError("the JSON is nested too deeply to parse") from exc
+
+
 def _json_bytes(value: Any) -> bytes:
     """Reviewable, deterministic JSON: sorted keys, two-space indent, one final LF."""
     return (json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8")
@@ -228,8 +244,8 @@ def _derive(item: Item, registry: Optional[Dict[str, DomainAdapter]] = None) -> 
     """
     adapter = adapter_for(item.domain, registry)
     annotations_bytes = item.read(ANNOTATIONS)
-    annotations = json.loads(annotations_bytes)
-    requirements = json.loads(item.read(REQUIREMENTS))
+    annotations = _json(annotations_bytes)
+    requirements = _json(item.read(REQUIREMENTS))
     validate_schema(annotations, "engineering-model/v1/design-annotations")
     validate_schema(requirements, "engineering-model/v1/engineering-requirements")
     foreign = sorted({entry["domain"] for entry in (*requirements["reference_values"], *requirements["requirements"])}
@@ -291,7 +307,7 @@ def _provenance(item: Item) -> Dict[str, Any]:
     provenance is where the sample declares its domain and sources."""
     if not os.path.lexists(item.path(PROVENANCE)):
         raise ValueError(f"{item.item_id}: {PROVENANCE} is missing; licence and origin are never assumed")
-    document = json.loads(item.read(PROVENANCE))
+    document = _json(item.read(PROVENANCE))
     validate_schema(document, "cad-dataset/v1/source-provenance")
     return document
 
@@ -599,7 +615,7 @@ def integrity(item: Item) -> List[str]:
         >>> integrity(Item(REPOSITORY_ROOT / "datasets/cad/robotic_joint_001"))
         []
     """
-    manifest = json.loads(item.read(MANIFEST))
+    manifest = _json(item.read(MANIFEST))
     inputs = manifest["inputs"]
     recorded = [*manifest["source"]["artifacts"], inputs["provenance"], inputs["annotations"], inputs["requirements"],
                 *inputs["simulation"]]
@@ -666,12 +682,12 @@ def reproducibility(item: Item, derived: Optional[Derivation] = None) -> List[st
         committed = item.read(relative)
         try:
             if fresh.comparator == "json":
-                problems += same_content(json.loads(committed), json.loads(fresh.data), relative)
+                problems += same_content(_json(committed), _json(fresh.data), relative)
             elif fresh.comparator == "numeric_attributes":
                 problems += same_text(committed.decode("utf-8"), fresh.data.decode("utf-8"), relative)
             elif committed != fresh.data:
                 problems.append(f"{relative}: bytes differ from a fresh derivation")
-        except ValueError as exc:  # JSONDecodeError and UnicodeDecodeError are ValueErrors
+        except (ValueError, RecursionError) as exc:  # JSONDecodeError and UnicodeDecodeError are ValueErrors
             problems.append(f"{relative}: the committed file cannot be read as its producer wrote it: {exc}")
     return problems
 
@@ -707,10 +723,10 @@ def manifest_problems(item: Item, derived: Optional[Derivation] = None,
     """
     fresh = _item_manifest(item, _derive(item, registry) if derived is None else derived, registry)
     try:
-        committed = _without_derived_hashes(json.loads(item.read(MANIFEST)))
+        committed = _without_derived_hashes(_json(item.read(MANIFEST)))
     except ValueError as exc:
         return [f"{MANIFEST}: not valid JSON: {exc}"]
-    except (KeyError, TypeError, AttributeError) as exc:
+    except (KeyError, TypeError, AttributeError, RecursionError) as exc:
         return [f"{MANIFEST}: does not have the shape build writes ({type(exc).__name__}: {exc})"]
     return same_content(committed, _without_derived_hashes(fresh), MANIFEST)
 
@@ -748,7 +764,7 @@ def cited_source_problems(item: Item) -> List[str]:
             for value in node:
                 walk(value)
 
-    walk(json.loads(item.read(ANNOTATIONS)))
+    walk(_json(item.read(ANNOTATIONS)))
     licence = item.provenance["license"].get("license_text")
     if licence:
         problem = _citation_problem("licence text", licence["path"], licence["sha256"])
@@ -918,13 +934,13 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
         (MODEL, "engineering-model/v1/engineering-model"),
     ):
         try:
-            validate_schema(json.loads(item.read(relative)), schema)
+            validate_schema(_json(item.read(relative)), schema)
         except (OSError, ValueError) as exc:
             v0_problems.append(f"{relative}: {exc}")
     for problems_of in (integrity, cited_source_problems):
         try:
             v0_problems += problems_of(item)
-        except (OSError, ValueError, KeyError, TypeError) as exc:
+        except (OSError, ValueError, KeyError, TypeError, RecursionError) as exc:
             v0_problems.append(f"{problems_of.__name__}: {type(exc).__name__}: {exc}")
     v0 = [result("v0.dataset-schemas-and-hashes", GateLevel.V0, Domain.DATA_MANAGEMENT, Layer.DESIGN, v0_problems,
                  inputs, "DATASET_SCHEMAS_VALID", "DATASET_SCHEMA_OR_HASH_INVALID",
@@ -986,7 +1002,7 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
     requirements: Dict[str, Any] = {"reference_values": [], "requirements": []}
     requirements_problem: Optional[str] = None
     try:
-        document = json.loads(item.read(REQUIREMENTS))
+        document = _json(item.read(REQUIREMENTS))
         validate_schema(document, "engineering-model/v1/engineering-requirements")
         requirements = document
     except (OSError, ValueError) as exc:
@@ -1142,7 +1158,7 @@ def _committed_model(item: Item) -> Tuple[Optional[Dict[str, Any]], Optional[str
         (model, None), or (None, why it cannot be used).
     """
     try:
-        model = json.loads(item.read(MODEL))
+        model = _json(item.read(MODEL))
         validate_schema(model, "engineering-model/v1/engineering-model")
     except (OSError, ValueError) as exc:
         return None, f"{MODEL}: {exc}"
@@ -1160,15 +1176,21 @@ def _run_cases(item: Item, level: Any, fresh: Derivation, adapter: DomainAdapter
     derivation wins:
 
     - a document the fresh derivation no longer produces is not run at all;
-    - a committed case for an entry the fresh derivation blocks is not
-      counted, and the entry is BLOCKED as the fresh derivation says;
-    - a committed case for an entry the fresh derivation does not compile is
-      not counted;
+    - a committed case for an entry the fresh derivation blocks, or does not
+      compile, is not counted; the entry is BLOCKED as the fresh derivation
+      says, and its check notes the stale case;
+    - a committed case whose content differs from the fresh derivation's case
+      of the same id (a limit, a metric, the arguments) is not counted either:
+      BLOCKED with COMMITTED_CASE_STALE, naming what differs;
     - an entry the fresh derivation compiles but the document lacks is
-      BLOCKED with COMMITTED_CASE_MISSING.
+      BLOCKED with COMMITTED_CASE_MISSING;
+    - if the case engine stops on the document, one gate-level INCONCLUSIVE
+      check cites it, and every compiled entry is BLOCKED CASE_ENGINE_ERROR.
 
-    Then each executed check's inputs decide first (results.propagate), in
-    V3 and V4 alike, and an illustrative limit met is a WARNING.
+    Then each counted check's inputs decide first (results.propagate), in V3
+    and V4 alike, read from both the fresh and the committed model so that
+    neither a stale value nor a stale status passes; an illustrative limit met
+    is a WARNING.
     """
     from ecad_validation.cases import execute_cases
     from ecad_validation.models import CheckResult, Domain, ExecutionStatus, GateLevel, Layer, Verdict
@@ -1176,26 +1198,50 @@ def _run_cases(item: Item, level: Any, fresh: Derivation, adapter: DomainAdapter
     relative, _gate, name = CASE_DOCUMENTS[0] if level is GateLevel.V3 else CASE_DOCUMENTS[1]
     policy = f"POLICY:{level.value}-{'GOLDEN' if level is GateLevel.V3 else 'CORNER'}"
     gate_level_ids = {f"{name}-cases", f"{name}-manifest"}
-    compiled = ({case["id"] for case in json.loads(fresh.files[relative].data)["cases"]}
-                if relative in fresh.files else set())
+    fresh_cases = ({case["id"]: case for case in json.loads(fresh.files[relative].data)["cases"]}
+                   if relative in fresh.files else {})
+    compiled = set(fresh_cases)
     blocked = {entry["id"]: entry for entry in fresh.blocked if entry["gate"] == level.value}
     try:
-        committed_ids = {case["id"] for case in json.loads(item.read(relative))["cases"]
-                         if isinstance(case, dict) and "id" in case} if os.path.lexists(item.path(relative)) else set()
+        committed_cases = {case["id"]: case for case in _json(item.read(relative))["cases"]
+                           if isinstance(case, dict) and "id" in case} if os.path.lexists(item.path(relative)) else {}
     except (OSError, ValueError, KeyError, TypeError):
-        committed_ids = set()
+        committed_cases = {}
     # A committed case the fresh derivation blocks, or does not compile, is
     # stale: it is not counted, whether or not its document ran.
-    stale = committed_ids & set(blocked)
+    stale = set(committed_cases) & set(blocked)
+    # One it compiles differently is stale too: its limits or arguments are
+    # not the requirement's any more.
+    differs = {}
+    for entry_id in compiled & set(committed_cases):
+        try:
+            differs[entry_id] = same_content(committed_cases[entry_id], fresh_cases[entry_id], f"{relative}#{entry_id}")
+        except RecursionError:
+            differs[entry_id] = [f"{relative}#{entry_id}: nested too deeply to compare"]
+    differs = {entry_id: problems for entry_id, problems in differs.items() if problems}
+    engine_error: Optional[str] = None
     if relative in fresh.files:
-        checks = [check for check in execute_cases(item.root, level, name)
-                  if check.check_id.split(".", 1)[1] in compiled | gate_level_ids]
+        try:
+            ran = execute_cases(item.root, level, name)
+        except (OSError, ValueError) as exc:
+            # The case engine is merged code that does not expect every
+            # document an item can hold (one not in UTF-8; a metric that is
+            # not a finite number). The run goes on and says so.
+            ran, engine_error = [], f"{type(exc).__name__}: {exc}"
+        checks = [check for check in ran
+                  if check.check_id.split(".", 1)[1] in (compiled - set(differs)) | gate_level_ids]
         for check in checks:
             if not check.evidence and check.verdict is not Verdict.BLOCKED:
                 # The case engine reports a document it cannot parse as FAIL
                 # without citing it, which the receipt contract forbids; the
                 # document itself is the evidence.
                 check.evidence = evidence(relative)
+        if engine_error is not None:
+            checks.append(CheckResult(
+                check_id=f"{level.value.lower()}.{name}-manifest", gate=level, domain=Domain.DATA_MANAGEMENT,
+                layer=Layer.VALIDATION, execution_status=ExecutionStatus.CRASHED, verdict=Verdict.INCONCLUSIVE,
+                reason_code="CASE_ENGINE_ERROR", summary=f"the case engine stopped on {relative}",
+                requirement_ids=[policy], findings=[engine_error], evidence=evidence(relative) or evidence(REQUIREMENTS)))
     else:
         checks = [gate_check(level, f"{name.upper()}_EVIDENCE_MISSING", f"no {name} case was compiled",
                              f"the requirements compile to no {name} case")]
@@ -1212,21 +1258,25 @@ def _run_cases(item: Item, level: Any, fresh: Derivation, adapter: DomainAdapter
         # blocks the check, one that does not resolve makes it INCONCLUSIVE,
         # and an AI_ASSUMPTION withholds the comparator's verdict on a
         # requirement (a reference's comparison is not a verdict on the design).
+        found: List[Dict[str, str]] = []
+        unresolved: List[str] = []
         try:
-            if level is GateLevel.V4 and case_id in by_requirement:
-                requirement = by_requirement[case_id]
-                paths = adapter.dependencies(committed_model, requirement["metric"], requirement["scenario"]) + (
-                    [requirement["limit"]["quantity"]] if "quantity" in requirement["limit"] else [])
-            elif level is GateLevel.V3 and case_id in by_reference:
-                reference = by_reference[case_id]
-                paths = adapter.reference_inputs(committed_model, reference["derivation"], reference["scenario"])
-            else:
-                paths = None
-            if paths is not None:
-                found, unresolved = input_leaves(committed_model, paths)
-                changed = propagate(found, unresolved, check_result.verdict.value, check_result.reason_code)
-            else:
-                changed = None
+            for model in (committed_model, fresh.model):
+                if level is GateLevel.V4 and case_id in by_requirement:
+                    requirement = by_requirement[case_id]
+                    paths: Optional[List[str]] = adapter.dependencies(model, requirement["metric"], requirement["scenario"]) + (
+                        [requirement["limit"]["quantity"]] if "quantity" in requirement["limit"] else [])
+                elif level is GateLevel.V3 and case_id in by_reference:
+                    reference = by_reference[case_id]
+                    paths = adapter.reference_inputs(model, reference["derivation"], reference["scenario"])
+                else:
+                    paths = None
+                if paths is not None:
+                    model_found, model_unresolved = input_leaves(model, paths)
+                    found += [leaf for leaf in model_found if leaf not in found]
+                    unresolved += [path for path in model_unresolved if path not in unresolved]
+            changed = (propagate(found, unresolved, check_result.verdict.value, check_result.reason_code)
+                       if found or unresolved else None)
         except (KeyError, IndexError, TypeError, ValueError, AttributeError) as exc:
             changed = propagate([], [f"{type(exc).__name__}: {exc}"], check_result.verdict.value,
                                 check_result.reason_code)
@@ -1244,18 +1294,23 @@ def _run_cases(item: Item, level: Any, fresh: Derivation, adapter: DomainAdapter
             check_result.summary = "within an illustrative limit, which is not a qualification"
             check_result.findings = [*check_result.findings,
                                      f"{case_id} is illustrative: not a customer, safety or certification requirement"]
-    executed = {check.check_id.split(".", 1)[1] for check in checks}
-    for entry_id in sorted(compiled - executed):
-        # The requirements compile to this case; the committed document does
-        # not hold it, so nothing ran for it.
+    counted = {check.check_id.split(".", 1)[1] for check in checks}
+    for entry_id in sorted(compiled - counted):
+        if engine_error is not None:
+            reason, summary, finding = ("CASE_ENGINE_ERROR", f"the case engine stopped on {relative} before {entry_id}",
+                                        f"the case engine stopped on {relative}: {engine_error}")
+        elif entry_id in differs:
+            reason, summary = "COMMITTED_CASE_STALE", f"{relative} holds a case {entry_id} the requirements no longer compile to"
+            finding = (f"the committed case {entry_id} differs from what the requirements compile to "
+                       f"(rebuild the item; V2 reports the divergence): " + "; ".join(differs[entry_id][:3]))
+        else:
+            reason, summary = "COMMITTED_CASE_MISSING", f"{relative} has no case for {entry_id}, which the requirements compile to"
+            finding = f"{relative} has no case {entry_id}; rebuild the item (V2 reports the divergence)"
         checks.append(CheckResult(
             check_id=f"{level.value.lower()}.{entry_id}", gate=level,
             domain=Domain(CONTRACT_DOMAIN[owners[entry_id]["domain"]]), layer=Layer.VALIDATION,
-            execution_status=ExecutionStatus.UNAVAILABLE, verdict=Verdict.BLOCKED,
-            reason_code="COMMITTED_CASE_MISSING",
-            summary=f"{relative} has no case for {entry_id}, which the requirements compile to",
-            requirement_ids=[policy, entry_id],
-            findings=[f"{relative} has no case {entry_id}; rebuild the item (V2 reports the divergence)"],
+            execution_status=ExecutionStatus.UNAVAILABLE, verdict=Verdict.BLOCKED, reason_code=reason,
+            summary=summary, requirement_ids=[policy, entry_id], findings=[finding],
             evidence=evidence(REQUIREMENTS, relative)))
     for entry_id, entry in blocked.items():
         refs, extra = generated(f"{level.value.lower()}.{entry_id}", entry)
@@ -1401,11 +1456,11 @@ def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
         try:
             document = _results(item, adapter, receipt, receipt_bytes, requirements, output)
         except Exception as exc:
-            # A defect in the results generator, not in the item: the receipt
-            # stands, the report says what failed, and the error is raised.
+            # The receipt stands; the report says what failed, and the caller
+            # learns that a receipt exists without its results.
             (output / "report.md").write_text(
                 _report(receipt, None, f"generating them failed: {type(exc).__name__}: {exc}"), encoding="utf-8")
-            raise
+            raise ResultsNotWritten(f"the receipt was written, but not the results: {type(exc).__name__}: {exc}") from exc
         (output / "results.json").write_bytes(canonical(document))
     (output / "report.md").write_text(_report(receipt, document["results"] if document else None, why or ""),
                                       encoding="utf-8")
@@ -1467,16 +1522,21 @@ def _results(item: Item, adapter: DomainAdapter, receipt: Dict[str, Any], receip
             for reference in check["evidence"]:
                 data = _stored_evidence(output, reference)
                 try:
-                    record = json.loads(data)
+                    record = _json(data)
                 except ValueError:
                     continue  # not JSON: a source file or a domain model
                 if not isinstance(record, dict):
                     continue
                 if record.get("$schema") == CASES_SCHEMA and gate["gate"] in ("V3", "V4"):
-                    # The case document this check ran, as it was run.
-                    for case in record.get("cases", []):
-                        if isinstance(case, dict) and "id" in case:
-                            cases[(record.get("gate"), case["id"])] = case
+                    # The case document this check ran, as it was run -- if it
+                    # is one: the engine refuses a document that breaks its
+                    # schema, and so do the results.
+                    try:
+                        validate_schema(record, "hardware-validation/v1/validation-cases")
+                    except ValueError:
+                        continue
+                    for case in record["cases"]:
+                        cases[(record["gate"], case["id"])] = case
                 elif record.get("case_id") == check["check_id"].split(".", 1)[1] and "tool_version" in record:
                     executions[check["check_id"]] = record
                 elif check["check_id"] == "v0.pinned-clean-source" and isinstance(record.get("environment"), dict):
@@ -1489,7 +1549,7 @@ def _results(item: Item, adapter: DomainAdapter, receipt: Dict[str, Any], receip
     model_bytes = item.read(MODEL)
     document = build_results(
         sample_id=item.item_id, receipt=receipt, receipt_sha256=_sha256(receipt_bytes), requirements=requirements,
-        model=json.loads(model_bytes), model_sha256=_sha256(model_bytes), adapter=adapter, cases=cases,
+        model=_json(model_bytes), model_sha256=_sha256(model_bytes), adapter=adapter, cases=cases,
         executions=executions, environment_record=environment(recorded, receipt["tools"]),
     )
     validate_schema(document, "engineering-model/v1/validation-results")
@@ -1535,14 +1595,20 @@ def regenerate_results(directory: Path, output: Path, registry: Optional[Dict[st
     receipt_path = output / "receipt.json"
     regular_file(receipt_path)
     receipt_bytes = receipt_path.read_bytes()
-    receipt = json.loads(receipt_bytes)
+    receipt = _json(receipt_bytes)
     validate_document(REPOSITORY_ROOT, "validation-receipt.schema.json", receipt)
     if receipt["product"]["id"] != f"datasets:{item.item_id}":
         raise ValueError(f"the receipt is for {receipt['product']['id']}, not datasets:{item.item_id}")
-    if hash_tree(item.root, item.files()) != receipt["source"]["input_sha256"]:
+    files = item.files()
+    if hash_tree(item.root, files) != receipt["source"]["input_sha256"]:
         raise ValueError(f"{item.item_id} has changed since the run; its results cannot be regenerated from it")
+    unlisted = [relative for relative in (MODEL, REQUIREMENTS) if item.path(relative) not in files]
+    if unlisted:
+        # Only the files git lists are under the receipt's digest; one it
+        # ignores could have changed since the run without that showing.
+        raise ValueError(f"{', '.join(unlisted)} not among the files the receipt's digest covers")
     try:
-        requirements: Optional[Dict[str, Any]] = json.loads(item.read(REQUIREMENTS))
+        requirements: Optional[Dict[str, Any]] = _json(item.read(REQUIREMENTS))
         validate_schema(requirements, "engineering-model/v1/engineering-requirements")
     except (OSError, ValueError):
         requirements = None
@@ -1587,4 +1653,4 @@ def _report(receipt: Dict[str, Any], results: Optional[List[Dict[str, Any]]], wh
     return "\n".join(lines) + "\n"
 
 
-__all__ = ["Item", "build", "check", "integrity", "regenerate_results", "reproducibility", "same_content", "same_text", "validate"]
+__all__ = ["Item", "ResultsNotWritten", "build", "check", "integrity", "regenerate_results", "reproducibility", "same_content", "same_text", "validate"]

@@ -37,6 +37,11 @@ CONTRACT_DOMAIN = {
 }
 
 
+# The case engine's gate-level check ids end in these; an entry named after
+# one would collide with the check that stands in for its whole gate.
+RESERVED_IDS = frozenset({"golden-cases", "golden-manifest", "corners-cases", "corners-manifest"})
+
+
 class ReferenceBlocked(ValueError):
     """A reference cannot be computed. paths lists the inputs that have no
     value, each {"path", "status"}; it is empty when the derivation itself does
@@ -119,6 +124,9 @@ def compile_cases(
     duplicated = sorted({entry_id for entry_id in ids if ids.count(entry_id) > 1})
     if duplicated:
         raise ValueError(f"reference and requirement ids must be unique: {', '.join(duplicated)} repeat")
+    reserved = sorted(set(ids) & RESERVED_IDS)
+    if reserved:
+        raise ValueError(f"{', '.join(reserved)}: reserved for the case engine's gate-level checks")
     blocked: List[Dict[str, Any]] = []
     golden = []
     for reference in requirements["reference_values"]:

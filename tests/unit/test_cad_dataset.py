@@ -698,6 +698,30 @@ class TestHonestOutcomes(unittest.TestCase):
                     self.assertEqual(check["findings"],
                                      [f"{value}: components/actuator/domains/mechanical/continuous_output_torque"])
 
+    def test_a_limit_tightened_without_a_rebuild_is_not_judged_against_the_old_one(self):
+        """The committed case still holds 2.5 N*m and would pass; the requirement
+        now says 1.0 N*m. No verdict is given against a limit nobody states."""
+        from ecad_model.dataset import validate
+
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as d:
+            item = _copy_item(d)
+
+            def tighten(requirements):
+                holding = next(r for r in requirements["requirements"] if r["requirement_id"] == "REQ-MECH-001")
+                holding.update(illustrative=False, limit={"value": 1.0})
+            _edit_json(item / "requirements" / "requirements.json", tighten)
+            with tempfile.TemporaryDirectory() as output:
+                receipt = validate(item, Path(output) / "run")
+                row = next(r for r in json.loads((Path(output) / "run" / "results.json").read_text())["results"]
+                           if r["requirement"] == "REQ-MECH-001")
+        checks = {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]}
+        self.assertEqual((checks["v4.REQ-MECH-001"]["verdict"], checks["v4.REQ-MECH-001"]["reason_code"]),
+                         ("BLOCKED", "COMMITTED_CASE_STALE"))
+        self.assertEqual(checks["v2.dataset-reproduction"]["verdict"], "FAIL")
+        self.assertEqual((row["status"], row["expected_value"], row["applied_bound"]), ("BLOCKED", 1.0, None))
+        # The other requirements' committed cases are what the requirements compile to, and still count.
+        self.assertEqual(checks["v4.REQ-MECH-002"]["reason_code"], "WITHIN_ILLUSTRATIVE_LIMIT")
+
     def test_the_results_name_both_sides_for_clearance_and_mark_illustrative_limits(self):
         from ecad_model.dataset import validate
 

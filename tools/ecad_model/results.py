@@ -260,15 +260,22 @@ def build_results(
             if check_id is None:
                 raise ValueError(f"no check in the receipt decided {entry_id}")
             check = checks[check_id]
-            case = cases.get((gate, entry_id))
+            # A compiled case describes this result only if its own check ran
+            # it: a check the fresh derivation blocked, or one that stands in
+            # for a stale or missing case, ran nothing.
+            case = cases.get((gate, entry_id)) if check_id == own and own in executions else None
             measured = _number((check.get("metrics") or {}).get(metric))
             measured_by: Optional[str] = check_id if measured is not None else None
             findings = list(check.get("findings", []))
             if measured is None and (check.get("metrics") or {}).get(metric) is not None:
                 findings.append(f"metric {metric} is not a number: {check['metrics'][metric]!r}")
             limit = entry.get("limit", {})
-            null_limit = ("quantity" in limit and not _unresolvable(model, limit["quantity"])
-                          and is_null(resolve(model, limit["quantity"])["status"]))
+            # The limit has no value if the committed model says so, or if the
+            # check itself was blocked on it (the fresh derivation's finding).
+            null_limit = "quantity" in limit and (
+                (not _unresolvable(model, limit["quantity"]) and is_null(resolve(model, limit["quantity"])["status"]))
+                or any(finding.split(": ", 1) == [status, limit["quantity"]]
+                       for finding in check.get("findings", []) for status in ("UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE")))
             if measured is None and gate == "V4" and check.get("verdict") == "BLOCKED" and null_limit:
                 # A requirement blocked only on its limit still has a measured side
                 # when another check ran the same metric with the same arguments.
@@ -280,7 +287,7 @@ def build_results(
                     gate_name, _, other_case_id = other_id.partition(".")
                     other_case = cases.get((gate_name.upper(), other_case_id))
                     value = _number((other.get("metrics") or {}).get(metric))
-                    if (other_id != check_id and value is not None and other_case
+                    if (other_id != check_id and value is not None and other_case and other_id in executions
                             and other_case.get("arguments") == arguments):
                         measured, measured_by = value, other_id
                         break
@@ -297,7 +304,7 @@ def build_results(
                 bound = (case.get("metric_limits") or {}).get(metric) if case else None
                 if "value" in limit:
                     expected_value = limit["value"]
-                elif _unresolvable(model, limit["quantity"]):
+                elif null_limit or _unresolvable(model, limit["quantity"]):
                     expected_value = None
                 else:
                     expected_value = _number(resolve(model, limit["quantity"])["value"])

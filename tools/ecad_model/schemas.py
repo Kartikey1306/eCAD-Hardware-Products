@@ -58,10 +58,15 @@ def validate(document: Dict[str, Any], schema: str) -> None:
         resolver=RefResolver.from_schema(by_name[key], store=by_id),
         format_checker=FormatChecker(),
     )
-    errors = sorted(validator.iter_errors(document), key=lambda error: list(error.absolute_path))
-    if errors:
+    try:
+        errors = sorted(validator.iter_errors(document), key=lambda error: list(error.absolute_path))
         detail = "; ".join(
             f"{'/'.join(str(item) for item in error.absolute_path) or '<root>'}: {error.message}"
             for error in errors[:10]
         )
+    except RecursionError:
+        # A document nested deeper than the validator can walk (or describe) is
+        # malformed input, reported like any other violation.
+        raise ValueError(f"{key} validation failed: the document is nested too deeply to check") from None
+    if errors:
         raise ValueError(f"{key} validation failed: {detail}")
