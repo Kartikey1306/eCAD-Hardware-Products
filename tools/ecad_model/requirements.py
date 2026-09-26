@@ -155,8 +155,12 @@ def compile_cases(
         case = _case(
             requirement["requirement_id"], requirement["domain"], target, requirement["scenario"], "POLICY:V4-CORNER"
         )
+        # The contract's limits are bare bounds, so a tolerance is folded into
+        # the bound here; the requirement keeps the limit it states.
+        tolerance = requirement.get("tolerance", 0.0)
         case["metric_limits"] = {
-            requirement["metric"]: {"maximum" if requirement["operator"] == "<=" else "minimum": bound}
+            requirement["metric"]: ({"maximum": bound + tolerance} if requirement["operator"] == "<="
+                                    else {"minimum": bound - tolerance})
         }
         corners.append(case)
 

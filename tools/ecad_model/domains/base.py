@@ -121,4 +121,6 @@ class DomainAdapter(Protocol):
 
     def document_schemas(self) -> Dict[str, str]: ...  # schema of each extraction file, checked at V0
 
+    def check_requirements(self, requirements: Dict[str, Any]) -> None: ...  # raises on scenarios or derivations it lacks
+
     def components_for(self, model: Dict[str, Any], metric: str) -> List[str]: ...  # source parts a metric depends on

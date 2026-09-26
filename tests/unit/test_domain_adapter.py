@@ -104,6 +104,10 @@ class VerilogFixtureAdapter:
     def document_schemas(self) -> Dict[str, str]:
         return {}
 
+    def check_requirements(self, requirements: Dict[str, Any]) -> None:
+        if requirements["reference_values"] or requirements["requirements"]:
+            raise ValueError("the fixture implements no scenarios")
+
     def components_for(self, model: Dict[str, Any], metric: str) -> List[str]:
         return []
 
@@ -170,6 +174,19 @@ class TestArtefactFirstDomain(unittest.TestCase):
             # No references or requirements: nothing to run, and the receipt says so.
             self.assertEqual(checks["v3.golden-cases"]["verdict"], "BLOCKED")
             self.assertFalse(receipt["eligible_for_ebuild"])
+
+    def test_a_requirement_of_another_domain_is_refused_not_compiled(self):
+        from ecad_model.dataset import build
+
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
+            item = _digital_sample(directory)
+            path = item / "requirements" / "requirements.json"
+            requirements = json.loads(path.read_text())
+            mechanical = json.loads((MECHANICAL_ITEM / "requirements" / "requirements.json").read_text())
+            requirements["requirements"] = mechanical["requirements"][:1]
+            path.write_text(json.dumps(requirements, indent=2) + "\n")
+            with self.assertRaisesRegex(ValueError, "requirements for mechanical cannot be compiled by the digital adapter"):
+                build(item, self.registry)
 
     def test_without_its_adapter_the_domain_is_not_implemented(self):
         from ecad_model.dataset import build, validate

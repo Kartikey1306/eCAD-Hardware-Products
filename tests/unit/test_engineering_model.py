@@ -436,6 +436,55 @@ class TestRequirementCompilation(unittest.TestCase):
                                  [{"path": "components/actuator/domains/mechanical/continuous_output_torque",
                                    "status": status.value}])
 
+    def test_tolerance_moves_each_bound_by_exactly_its_value(self):
+        """<= gets maximum = limit + tolerance, >= gets minimum = limit - tolerance;
+        the contract's comparator then flips exactly at the moved bound."""
+        import math
+
+        from ecad_validation.cases import _compare_corner
+
+        requirements = copy.deepcopy(self.requirements)
+        entries = {r["requirement_id"]: r for r in requirements["requirements"]}
+        entries["REQ-MECH-001"]["tolerance"] = 0.25   # static_torque_max_abs_nm <= 2.5
+        entries["REQ-MECH-005"]["tolerance"] = 0.002  # rom_min_clearance_m >= 0.005
+        validate(requirements, "engineering-model/v1/engineering-requirements")
+        _golden, corners, _blocked = compile_mechanical(self.model, requirements)
+        limits = {case["id"]: case["metric_limits"] for case in corners["cases"]}
+        self.assertEqual(limits["REQ-MECH-001"], {"static_torque_max_abs_nm": {"maximum": 2.75}})
+        self.assertEqual(limits["REQ-MECH-005"], {"rom_min_clearance_m": {"minimum": 0.003}})
+        at_bound = {"static_torque_max_abs_nm": 2.75, "rom_min_clearance_m": 0.003}
+        for case_id, metric, beyond in (("REQ-MECH-001", "static_torque_max_abs_nm", math.nextafter(2.75, 3)),
+                                        ("REQ-MECH-005", "rom_min_clearance_m", math.nextafter(0.003, 0))):
+            with self.subTest(case_id):
+                self.assertEqual(_compare_corner(at_bound, limits[case_id])[0].value, "PASS")
+                self.assertEqual(_compare_corner({metric: beyond}, limits[case_id])[0].value, "FAIL")
+        entries["REQ-MECH-001"]["tolerance"] = -0.1
+        with self.assertRaisesRegex(ValueError, "tolerance"):
+            validate(requirements, "engineering-model/v1/engineering-requirements")
+
+    def test_a_literal_limit_must_be_in_the_metric_s_unit(self):
+        for field, value, message in (("unit", "mN*m", "unit mN\\*m != the unit of static_torque_max_abs_nm"),
+                                      ("metric", "made_up_metric", "produces no metric 'made_up_metric'")):
+            with self.subTest(field):
+                requirements = copy.deepcopy(self.requirements)
+                next(r for r in requirements["requirements"] if r["requirement_id"] == "REQ-MECH-001")[field] = value
+                with self.assertRaisesRegex(ValueError, message):
+                    compile_mechanical(self.model, requirements)
+
+    def test_scenarios_and_derivations_come_from_the_domain_vocabulary(self):
+        MECHANICAL.check_requirements(self.requirements)
+        for label, edit in (
+                ("unknown scenario", lambda r: r["requirements"][0]["scenario"].update(name="thermal_soak")),
+                ("unknown parameter", lambda r: r["requirements"][0]["scenario"].update(ambient_k=300.0)),
+                ("unknown derivation", lambda r: r["reference_values"][0].update(derivation="made_up"))):
+            requirements = copy.deepcopy(self.requirements)
+            edit(requirements)
+            with self.subTest(label):
+                # The generic schema leaves the vocabulary open; the domain closes it.
+                validate(requirements, "engineering-model/v1/engineering-requirements")
+                with self.assertRaises(ValueError):
+                    MECHANICAL.check_requirements(requirements)
+
     def test_a_known_quantity_limit_is_used_and_its_unit_checked(self):
         model = copy.deepcopy(self.model)
         torque = component(model, "actuator")["domains"]["mechanical"]["continuous_output_torque"]

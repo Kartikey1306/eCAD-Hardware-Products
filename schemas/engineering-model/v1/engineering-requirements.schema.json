@@ -41,49 +41,15 @@
       "pattern": "^[a-z][a-z0-9_]*$"
     },
     "scenario": {
+      "description": "What the case runs. The name and its parameters belong to the domain: each domain adapter validates them against its own vocabulary (for the mechanical domain, mechanical-vocabulary.schema.json).",
       "type": "object",
-      "additionalProperties": false,
       "required": [
         "name"
       ],
       "properties": {
         "name": {
-          "enum": [
-            "static_sweep",
-            "rated_move",
-            "rom_sweep",
-            "free_swing"
-          ]
-        },
-        "payload_mass_kg": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        },
-        "start_rad": {
-          "type": "number"
-        },
-        "end_rad": {
-          "type": "number"
-        },
-        "duration_s": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        },
-        "amplitude_rad": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        },
-        "payload_component": {
           "$ref": "common.schema.json#/definitions/identifier"
         }
-      },
-      "dependencies": {
-        "payload_mass_kg": [
-          "payload_component"
-        ],
-        "payload_component": [
-          "payload_mass_kg"
-        ]
       }
     },
     "referenceValue": {
@@ -125,16 +91,8 @@
           "minimum": 0
         },
         "derivation": {
-          "description": "Name of the independent closed-form derivation that computes the expected value from the engineering model. The value itself is computed, not typed.",
-          "enum": [
-            "moving_mass",
-            "gravity_torque_as_modelled",
-            "small_oscillation_period",
-            "equilibrium_angle",
-            "min_jerk_peak_speed",
-            "min_jerk_peak_accel",
-            "rated_move_peak_torque"
-          ]
+          "description": "Name of the independent closed-form derivation, one the domain adapter implements, that computes the expected value from the engineering model. The value itself is computed, not typed.",
+          "$ref": "common.schema.json#/definitions/identifier"
         },
         "source": {
           "$ref": "common.schema.json#/definitions/source"
@@ -210,6 +168,11 @@
               }
             }
           ]
+        },
+        "tolerance": {
+          "description": "How far the metric may pass the limit and still meet it, in the requirement's unit. Applied as maximum = limit + tolerance for <=, minimum = limit - tolerance for >=. Absent means 0.",
+          "type": "number",
+          "minimum": 0
         },
         "unit": {
           "type": "string",

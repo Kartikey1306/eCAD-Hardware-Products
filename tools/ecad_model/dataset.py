@@ -222,6 +222,14 @@ def _derive(item: Item, registry: Optional[Dict[str, DomainAdapter]] = None) -> 
     requirements = json.loads(item.read(REQUIREMENTS))
     validate_schema(annotations, "engineering-model/v1/design-annotations")
     validate_schema(requirements, "engineering-model/v1/engineering-requirements")
+    foreign = sorted({entry["domain"] for entry in (*requirements["reference_values"], *requirements["requirements"])}
+                     - {adapter.domain})
+    if foreign:
+        # Each sample's requirements are compiled by its primary domain's adapter;
+        # a requirement of another domain waits for cross-domain rules.
+        raise ValueError(f"{item.item_id}: requirements for {', '.join(foreign)} cannot be compiled by the "
+                         f"{adapter.domain} adapter")
+    adapter.check_requirements(requirements)
 
     extraction = adapter.extract(item.root, item.sources, annotations, {
         "sample": item.repo_relative(item.root),

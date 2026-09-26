@@ -322,6 +322,18 @@ class MechanicalAdapter:
     def metrics(self) -> Dict[str, Metric]:
         return dict(METRICS)
 
+    def check_requirements(self, requirements: Dict[str, Any]) -> None:
+        """Every scenario and derivation must be one this domain implements.
+
+        Raises:
+            ValueError: A scenario or derivation is not in the mechanical
+                vocabulary (schemas/engineering-model/v1/mechanical-vocabulary).
+        """
+        validate_schema({
+            "scenarios": [entry["scenario"] for entry in (*requirements["reference_values"], *requirements["requirements"])],
+            "derivations": [entry["derivation"] for entry in requirements["reference_values"]],
+        }, "engineering-model/v1/mechanical-vocabulary")
+
     def document_schemas(self) -> Dict[str, str]:
         return {EXTRACTION: "cad-dataset/v1/cad-extraction"}
 
