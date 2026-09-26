@@ -140,7 +140,9 @@ its domain; a sample's entries are compiled by its primary domain's adapter,
 and an entry of another domain is refused rather than compiled (cross-domain
 rules are later work). Each entry's unit must be its metric's, as the
 adapter's metric vocabulary states, and ids are unique across both kinds,
-since each becomes a check id.
+since each becomes a check id; the four ids the case engine uses for a whole
+gate (`golden-cases`, `golden-manifest`, `corners-cases`, `corners-manifest`)
+are reserved.
 
 **Reference values** (V3 golden) verify a domain model against an independent
 closed-form derivation computed from the engineering model. The mechanical
@@ -265,15 +267,31 @@ reports every such divergence):
 - a committed case for an entry the fresh derivation blocks, or does not
   compile, is not counted; a blocked entry's check says the stale case was
   there;
+- a committed case whose content differs from the freshly compiled case of
+  the same id — a limit, a tolerance, a metric, the arguments — is not
+  counted either: `BLOCKED` with `COMMITTED_CASE_STALE`, naming what differs;
 - an entry the fresh derivation compiles but the committed document lacks is
-  `BLOCKED` with `COMMITTED_CASE_MISSING`.
+  `BLOCKED` with `COMMITTED_CASE_MISSING`;
+- when the case engine stops on the document (one not in UTF-8, a metric
+  that is not a finite number), one gate-level `INCONCLUSIVE`
+  `CASE_ENGINE_ERROR` check cites it, and every compiled entry is `BLOCKED`
+  with the same reason.
 
-So each reference and requirement has exactly one check. A case document the
-engine cannot parse is cited as the evidence of its `FAIL`, which the engine
-itself omits. `validate` writes a schema-valid receipt when the inputs cannot
-be built into a model, when the requirements cannot be read or compiled, and
-when committed derived files have drifted from the inputs or do not parse;
-each of these is tested.
+So each reference and requirement has exactly one check, and a verdict is
+only ever given against the limits the requirements state now. A case
+document the engine cannot parse is cited as the evidence of its `FAIL`,
+which the engine itself omits. Input statuses are read from both the fresh
+and the committed model, and the stricter decides, so a value relabelled
+(say to `AI_ASSUMPTION`) without a rebuild is judged as what it is now.
+
+`validate` writes a schema-valid receipt when the inputs cannot be built into
+a model, when the requirements cannot be read or compiled, when committed
+derived files have drifted from the inputs or do not parse, and when a
+document is nested too deeply to parse; each of these is tested. It writes
+none, and says why, for an item it refuses before any gate runs: one with no
+or an invalid `source/provenance.json`, a declared artefact that is missing
+or not a regular file, a symlink, a directory outside the repository, or a
+git-ignored path.
 
 **Integrity and reproducibility are deliberately separate.** Hashes in
 `dataset-item.json` must match committed bytes exactly. Rebuilding from the
@@ -300,11 +318,14 @@ generated it. `report.md` is for people and is not a contract document.
 result per reference and requirement. Each names the receipt check that
 decided it — its own `v3.<id>` or `v4.<id>`, or the gate-level check that
 stood in — and its status is that check's verdict. Nothing is filled in: a
-result no check decided is an error, not a default. The results are written
-after the receipt and the evidence index, so nothing they do can cost a run
-its receipt. None are written when no adapter is registered, the requirements
-cannot be read, or the committed model is missing or invalid; the report
-says which.
+result no check decided is an error, not a default. A result uses a compiled
+case (its bound, its seed) only when its own check ran that case. The results
+are written after the receipt and the evidence index, so nothing they do can
+cost a run its receipt; if they cannot be built, `validate` raises
+`ResultsNotWritten` and the command line exits 2. None are written when no
+adapter is registered, the requirements cannot be read, or the committed
+model is missing or invalid; the report says which. They read a case
+document only if it conforms to its schema.
 
 | Field | Where it comes from |
 |---|---|
@@ -325,7 +346,9 @@ requirement resting on an `AI_ASSUMPTION`.
 A run's results can be rebuilt from its receipt and stored evidence
 (`dataset.regenerate_results`), byte for byte and on any machine, but only
 while the item is exactly what the run validated: the item's input digest
-must equal the receipt's, and the run must have written results. The run
+must equal the receipt's, the model and requirements must be among the files
+that digest covers (not ignored by git), and the run must have written
+results. The run
 directory is treated as untrusted: the receipt is schema-checked and must be
 for this item, every piece of evidence read must sit at the content address
 of its recorded digest and have that digest, an execution record counts only
