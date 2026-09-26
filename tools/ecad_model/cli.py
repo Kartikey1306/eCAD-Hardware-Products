@@ -4,10 +4,11 @@
     python3 tools/cad_dataset.py check    <item-dir>
     python3 tools/cad_dataset.py validate <item-dir> --output <dir>
 
-build writes every derived file and dataset-item.json from the item's CAD,
-annotations and requirements. check exits 1 if any recorded hash is wrong or
-any committed derived file no longer reproduces from the CAD. validate runs
-V0-V4 and writes a v1 receipt, evidence, a requirement trace and a report; it
+build writes every derived file and dataset-item.json from the item's source
+artefacts, annotations and requirements. check exits 1 if any recorded hash is
+wrong or any committed derived file no longer reproduces from the sources.
+validate runs V0-V4 and writes a v1 receipt, evidence, per-requirement results
+and a report; it
 exits 0 when the run completed, whatever the verdicts, and 1 only when it
 could not produce a receipt.
 """
@@ -34,7 +35,7 @@ def _cmd_check(args: argparse.Namespace) -> int:
     for problem in problems:
         print(f"drift: {problem}")
     if not problems:
-        print(f"{args.item}: every hash matches and every derived file reproduces from the CAD")
+        print(f"{args.item}: every hash matches and every derived file reproduces from the sources")
     return 1 if problems else 0
 
 
@@ -71,8 +72,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="CAD dataset items: build, check, validate")
     commands = parser.add_subparsers(dest="command", required=True)
     for name, handler, help_text in (
-        ("build", _cmd_build, "write derived files and dataset-item.json from the CAD"),
-        ("check", _cmd_check, "verify hashes and that derived files reproduce from the CAD"),
+        ("build", _cmd_build, "write derived files and dataset-item.json from the sources"),
+        ("check", _cmd_check, "verify hashes and that derived files reproduce from the sources"),
         ("validate", _cmd_validate, "run V0-V4 and write a receipt"),
     ):
         command = commands.add_parser(name, help=help_text)
@@ -94,7 +95,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     Example:
         >>> main(["check", str(dataset.REPOSITORY_ROOT / "datasets/cad/robotic_joint_001")])  # doctest: +ELLIPSIS
-        /.../datasets/cad/robotic_joint_001: every hash matches and every derived file reproduces from the CAD
+        /.../datasets/cad/robotic_joint_001: every hash matches and every derived file reproduces from the sources
         0
     """
     args = build_parser().parse_args(argv)

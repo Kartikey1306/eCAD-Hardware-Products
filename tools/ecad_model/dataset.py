@@ -22,7 +22,7 @@ Two properties are kept deliberately separate:
 
     integrity        every hash in dataset-item.json matches the committed bytes
                      exactly;
-    reproducibility  rebuilding from the CAD reproduces the committed derived
+    reproducibility  rebuilding from the sources reproduces the committed derived
                      content to within a numeric tolerance. Kernel builds differ
                      in their last floating-point digits across platforms, so a
                      byte comparison here would fail on a CI runner for no

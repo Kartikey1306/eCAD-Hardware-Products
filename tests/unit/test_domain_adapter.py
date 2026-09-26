@@ -410,7 +410,9 @@ class TestArtefactFirstDomain(unittest.TestCase):
 
 
 class TestHonestOutcomesWithoutCad(unittest.TestCase):
-    """validate always writes a receipt that says what happened, whatever the item does."""
+    """validate writes a receipt that says what happened when the inputs cannot be built into a
+    model, when the requirements cannot be read or compiled, and when committed files have drifted
+    from the inputs or do not parse."""
 
     def setUp(self):
         self.registry = {**REGISTRY, "digital": VerilogFixtureAdapter()}
@@ -527,6 +529,40 @@ class TestHonestOutcomesWithoutCad(unittest.TestCase):
         self.assertIn("validation/corners/cases.json: the committed file cannot be read as its producer wrote it", findings)
         self.assertIn("dataset-item.json: does not have the shape build writes", findings)
         self.assertEqual(checks["v4.REQ-DIG-001"]["reason_code"], "COMMITTED_CASE_MISSING")
+
+    def test_a_stale_case_in_a_document_still_compiled_is_not_counted(self):
+        """The fresh derivation still compiles the corner document, but one of
+        its committed cases is stale: for an entry now blocked, or one that no
+        longer exists. The engine runs the whole document; the stale case must
+        not be counted beside, or instead of, what the fresh derivation says."""
+        from ecad_model.dataset import build, validate
+
+        class Unknowable(VerilogFixtureAdapter):
+            def extract(self, *args, **kwargs):
+                extraction = super().extract(*args, **kwargs)
+                for component in extraction.model["components"]:
+                    component["domains"]["digital"]["port_count"] = quantity(
+                        None, "1", Status.UNKNOWN, source("computation", "fixture"), note="no longer read")
+                return extraction
+
+        limited = {**REQUIREMENT, "requirement_id": "REQ-DIG-002",
+                   "limit": {"quantity": "components/blinker/domains/digital/port_count"}}
+        for label, registry, requirements in (
+                ("now blocked", {**REGISTRY, "digital": Unknowable()}, [REQUIREMENT, limited]),
+                ("no longer required", self.registry, [REQUIREMENT])):
+            with self.subTest(label), _scratch() as directory, tempfile.TemporaryDirectory() as output:
+                item = _digital_sample(directory, [REQUIREMENT, limited])
+                build(item, self.registry)  # the committed document holds REQ-DIG-001 and REQ-DIG-002
+                _write_requirements(item, requirements)
+                with _passing_icarus():
+                    receipt = validate(item, Path(output) / "run", registry)
+                ids = [c["check_id"] for g in receipt["gates"] for c in g["checks"] if c["check_id"].startswith("v4.")]
+                self.assertEqual(ids.count("v4.REQ-DIG-001"), 1)
+                if label == "now blocked":
+                    [stale] = [c for g in receipt["gates"] for c in g["checks"] if c["check_id"] == "v4.REQ-DIG-002"]
+                    self.assertEqual((stale["verdict"], stale["reason_code"]), ("BLOCKED", "MISSING_REQUIRED_INPUT"))
+                else:
+                    self.assertNotIn("v4.REQ-DIG-002", ids, "a requirement that no longer exists has no check")
 
     def test_a_failure_to_build_the_results_still_leaves_the_receipt(self):
         from ecad_model.dataset import build, validate

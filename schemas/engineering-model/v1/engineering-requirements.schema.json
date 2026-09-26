@@ -182,7 +182,7 @@
           "$ref": "common.schema.json#/definitions/source"
         },
         "illustrative": {
-          "description": "True for an example limit chosen to exercise the pipeline rather than a real requirement. Carried into every trace and report row.",
+          "description": "True for an example limit chosen to exercise the pipeline rather than a real requirement. Carried into every result and report row.",
           "type": "boolean"
         }
       }
