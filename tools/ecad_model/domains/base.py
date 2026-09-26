@@ -123,4 +123,10 @@ class DomainAdapter(Protocol):
 
     def check_requirements(self, requirements: Dict[str, Any]) -> None: ...  # raises on scenarios or derivations it lacks
 
+    def dependencies(self, model: Dict[str, Any], metric: str,
+                     scenario: Dict[str, Any]) -> List[str]: ...  # model paths a simulated metric depends on
+
+    def reference_inputs(self, model: Dict[str, Any], derivation: str,
+                         scenario: Dict[str, Any]) -> List[str]: ...  # model paths a reference derivation reads
+
     def components_for(self, model: Dict[str, Any], metric: str) -> List[str]: ...  # source parts a metric depends on

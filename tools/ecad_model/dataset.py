@@ -53,6 +53,7 @@ from .domains.base import MEDIA_TYPES
 from .importers import ExtractionError, UnsupportedFormat, regular_file
 from .quantity import MissingInput
 from .requirements import CONTRACT_DOMAIN, VERSION as COMPILER_VERSION, compile_cases
+from .results import build_results, environment, input_leaves, propagate
 from .schemas import REPOSITORY_ROOT, validate as validate_schema
 
 ITEM_SCHEMA = "https://embeddedos.org/schemas/cad-dataset/v1/dataset-item.schema.json"
@@ -767,7 +768,7 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
     Args:
         directory: The dataset item directory.
         output: A missing or empty directory for receipt.json, evidence/,
-            evidence-index.json, trace.json and report.md.
+            evidence-index.json, results.json and report.md.
         registry: Domain adapters to use in place of the platform's (tests only).
 
     Returns:
@@ -939,6 +940,7 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
 
     # V3/V4: the existing case engine, then BLOCKED checks for what rests on a null-status value.
     blocked: List[Dict[str, Any]] = []
+    committed_model: Optional[Dict[str, Any]] = None
     if adapter is not None and item.path(MODEL).is_file():
         committed_model = json.loads(item.read(MODEL))
         _golden, _corners, blocked = compile_cases(committed_model, requirements, adapter.case_target(item.item_id),
@@ -946,6 +948,7 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
     engineering_ids = {entry["reference_id"] for entry in requirements["reference_values"]} | {
         entry["requirement_id"] for entry in requirements["requirements"]}
     illustrative_ids = {entry["requirement_id"] for entry in requirements["requirements"] if entry["illustrative"]}
+    by_requirement = {entry["requirement_id"]: entry for entry in requirements["requirements"]}
     gates: Dict[Any, List[Any]] = {GateLevel.V0: v0, GateLevel.V1: v1, GateLevel.V2: v2}
     for level, directory_name in ((GateLevel.V3, "golden"), (GateLevel.V4, "corners")):
         checks = execute_cases(item.root, level, directory_name)
@@ -953,6 +956,18 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
             case_id = check_result.check_id.split(".", 1)[1]
             if case_id in engineering_ids:
                 check_result.requirement_ids = [*check_result.requirement_ids, case_id]
+            requirement = by_requirement.get(case_id)
+            if level is GateLevel.V4 and requirement and adapter is not None and committed_model is not None:
+                # The inputs decide first: a null-status leaf blocks the check, an
+                # AI_ASSUMPTION leaf makes its verdict INCONCLUSIVE (results.propagate).
+                paths = adapter.dependencies(committed_model, requirement["metric"], requirement["scenario"]) + (
+                    [requirement["limit"]["quantity"]] if "quantity" in requirement["limit"] else [])
+                changed = propagate(input_leaves(committed_model, paths), check_result.verdict.value)
+                if changed:
+                    verdict, reason, findings = changed
+                    check_result.verdict, check_result.reason_code = Verdict(verdict), reason
+                    check_result.summary = f"{check_result.summary}; the inputs make it {verdict}"
+                    check_result.findings = [*findings, *check_result.findings]
             if case_id in illustrative_ids and check_result.verdict is Verdict.PASS:
                 # Meeting a limit invented to exercise the pipeline qualifies
                 # nothing. The contract's WARNING is advisory and cannot satisfy
@@ -1155,42 +1170,76 @@ def _write_run(item: Item, output: Path, product: Any, receipt: Dict[str, Any],
     }
     validate_document(REPOSITORY_ROOT, "evidence-index.schema.json", evidence_index)
     (output / "evidence-index.json").write_bytes(canonical(evidence_index))
-    model = json.loads(item.read(MODEL)) if item.path(MODEL).is_file() else {}
-    trace = _requirement_trace(receipt, requirements, model, adapter if model else None)
-    (output / "trace.json").write_bytes(_json_bytes(trace))
-    (output / "report.md").write_text(_report(receipt, trace), encoding="utf-8")
+    if adapter is None or not item.path(MODEL).is_file():
+        (output / "report.md").write_text(_report(receipt, []), encoding="utf-8")
+        return
+    document = _results(item, adapter, receipt, receipt_bytes, requirements, output)
+    (output / "results.json").write_bytes(canonical_json_bytes(document) + b"\n")
+    (output / "report.md").write_text(_report(receipt, document["results"]), encoding="utf-8")
 
 
-def _requirement_trace(receipt: Dict[str, Any], requirements: Dict[str, Any],
-                      model: Dict[str, Any], adapter: Optional[DomainAdapter]) -> List[Dict[str, Any]]:
-    """Requirement -> check -> measurement -> verdict -> source components, for every requirement."""
-    checks = {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]}
-    rows = []
-    for gate, entries, key in (("V3", requirements["reference_values"], "reference_id"),
-                               ("V4", requirements["requirements"], "requirement_id")):
-        for entry in entries:
-            check_result = checks.get(f"{gate.lower()}.{entry[key]}")
-            metric = entry["metric"]
-            rows.append({
-                "requirement_id": entry[key],
-                "title": entry["title"],
-                "gate": gate,
-                "metric": metric,
-                "unit": entry["unit"],
-                "measured": (check_result or {}).get("metrics", {}).get(metric),
-                "verdict": (check_result or {}).get("verdict", "NOT_RUN"),
-                "reason_code": (check_result or {}).get("reason_code"),
-                "check_id": (check_result or {}).get("check_id"),
-                "findings": (check_result or {}).get("findings", []),
-                "kind": "reference" if gate == "V3" else (
-                    "illustrative requirement" if entry.get("illustrative") else "requirement"),
-                "source": entry["source"],
-                "cad_components": adapter.components_for(model, metric) if adapter else [],
-            })
-    return rows
+def _results(item: Item, adapter: DomainAdapter, receipt: Dict[str, Any], receipt_bytes: bytes,
+             requirements: Dict[str, Any], output: Path) -> Dict[str, Any]:
+    """The run's per-requirement results, from its receipt and stored evidence alone."""
+    cases = {}
+    for relative in (GOLDEN, CORNERS):
+        if item.path(relative).is_file():
+            cases.update({case["id"]: case for case in json.loads(item.read(relative))["cases"]})
+    executions = {}
+    for gate in receipt["gates"]:
+        for check in gate["checks"]:
+            for reference in check["evidence"]:
+                try:
+                    record = json.loads((output / reference["path"]).read_bytes())
+                except ValueError:
+                    continue  # not JSON: a source file or a domain model
+                if isinstance(record, dict) and "case_id" in record and "tool_version" in record:
+                    executions[check["check_id"]] = record
+    model_bytes = item.read(MODEL)
+    constraints = REPOSITORY_ROOT / "tools" / "constraints-cad.txt"
+    document = build_results(
+        sample_id=item.item_id, receipt=receipt, receipt_sha256=_sha256(receipt_bytes), requirements=requirements,
+        model=json.loads(model_bytes), model_sha256=_sha256(model_bytes), adapter=adapter, cases=cases,
+        executions=executions,
+        environment_record=environment(receipt["tools"], constraints.read_bytes() if constraints.is_file() else None),
+    )
+    validate_schema(document, "engineering-model/v1/validation-results")
+    return document
 
 
-def _report(receipt: Dict[str, Any], trace: List[Dict[str, Any]]) -> str:
+def regenerate_results(directory: Path, output: Path, registry: Optional[Dict[str, DomainAdapter]] = None) -> bytes:
+    """Rebuild a finished run's results.json from its receipt and evidence alone.
+
+    The results carry no state of their own: this returns exactly the bytes
+    the run wrote, on the same machine, as long as the item and the run's
+    output directory are unchanged.
+
+    Args:
+        directory: The dataset item the run validated.
+        output: The run's output directory.
+        registry: Domain adapters to use in place of the platform's (tests only).
+
+    Returns:
+        The results document as canonical JSON bytes.
+
+    Example:
+        >>> import tempfile
+        >>> item = REPOSITORY_ROOT / "datasets/cad/robotic_joint_001"
+        >>> with tempfile.TemporaryDirectory() as scratch:
+        ...     _ = validate(item, Path(scratch) / "run")
+        ...     regenerate_results(item, Path(scratch) / "run") == (Path(scratch) / "run" / "results.json").read_bytes()
+        True
+    """
+    from ecad_validation.hashing import canonical_json_bytes
+
+    item = Item(directory)
+    receipt_bytes = (output / "receipt.json").read_bytes()
+    document = _results(item, adapter_for(item.domain, registry), json.loads(receipt_bytes), receipt_bytes,
+                        json.loads(item.read(REQUIREMENTS)), output)
+    return canonical_json_bytes(document) + b"\n"
+
+
+def _report(receipt: Dict[str, Any], results: List[Dict[str, Any]]) -> str:
     lines = [
         f"# Validation report: {receipt['product']['id']}",
         "",
@@ -1206,16 +1255,16 @@ def _report(receipt: Dict[str, Any], trace: List[Dict[str, Any]]) -> str:
         lines.append(f"| {gate['gate']} | {gate['verdict']} | {summary} |")
     lines += ["", "## Requirements", "",
               "| Requirement | Kind | Metric | Measured | Verdict | Why |", "|---|---|---|---|---|---|"]
-    for row in trace:
-        measured = "—" if row["measured"] is None else f"{row['measured']:.6g} {row['unit']}"
+    for row in results:
+        measured = "—" if row["measured_value"] is None else f"{row['measured_value']:.6g} {row['unit']}"
         why = "; ".join(row["findings"]) or row["reason_code"] or ""
-        lines.append(f"| {row['requirement_id']} | {row['kind']} | `{row['metric']}` | {measured} | "
-                     f"{row['verdict']} | {why} |")
+        lines.append(f"| {row['requirement']} | {row['kind']} | `{row['metric']}` | {measured} | "
+                     f"{row['status']} | {why} |")
     lines += ["", "An illustrative requirement is an example limit chosen to exercise the pipeline, "
               "not a customer, safety or certification requirement. Meeting one is reported WARNING "
               "(WITHIN_ILLUSTRATIVE_LIMIT), never PASS.",
-              "Every row traces to the CAD occurrences it depends on in `trace.json`."]
+              "Every row's inputs, simulator, evidence and CAD occurrences are in `results.json`."]
     return "\n".join(lines) + "\n"
 
 
-__all__ = ["Item", "build", "check", "integrity", "reproducibility", "same_content", "same_text", "validate"]
+__all__ = ["Item", "build", "check", "integrity", "regenerate_results", "reproducibility", "same_content", "same_text", "validate"]

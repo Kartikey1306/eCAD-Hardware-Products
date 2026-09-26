@@ -104,6 +104,12 @@ class VerilogFixtureAdapter:
     def document_schemas(self) -> Dict[str, str]:
         return {}
 
+    def dependencies(self, model: Dict[str, Any], metric: str, scenario: Dict[str, Any]) -> List[str]:
+        return []
+
+    def reference_inputs(self, model: Dict[str, Any], derivation: str, scenario: Dict[str, Any]) -> List[str]:
+        return []
+
     def check_requirements(self, requirements: Dict[str, Any]) -> None:
         if requirements["reference_values"] or requirements["requirements"]:
             raise ValueError("the fixture implements no scenarios")

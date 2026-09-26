@@ -39,6 +39,7 @@ S = "tools/ecad_model/importers/step_ocp.py"
 F = "tools/ecad_model/importers/base.py"
 Q = "tools/ecad_model/quantity.py"
 MA = "tools/ecad_model/domains/mechanical.py"
+RS = "tools/ecad_model/results.py"
 DR = "tools/ecad_model/domains/__init__.py"
 J = "datasets/cad/robotic_joint_001/simulation/joint_dynamics.py"
 FAST = "tests/unit/test_engineering_model.py"
@@ -134,6 +135,15 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("unit-unchecked", R, "    if metrics[metric].unit != unit:", "    if False:"),
     ("vocabulary-unchecked", MA, '        validate_schema({\n            "scenarios"', '        return None\n        validate_schema({\n            "scenarios"'),
     ("foreign-requirement-compiled", D, "    if foreign:\n", "    if False:\n"),
+    ("ai-rule-dropped", RS, '    if assumed and verdict in ("PASS", "FAIL"):', "    if False:"),
+    ("ai-rule-spares-a-pass", RS, '    if assumed and verdict in ("PASS", "FAIL"):', '    if assumed and verdict == "FAIL":'),
+    ("inputs-not-transitive", RS, "        if parents:\n            stack.extend(parents)\n        else:\n            leaves[path] = quantity[\"status\"]",
+     "        leaves[path] = quantity[\"status\"]"),
+    ("limit-not-an-input", D, '[requirement["limit"]["quantity"]] if "quantity" in requirement["limit"] else [])', '[])'),
+    ("result-status-recomputed", RS, '"status": check.get("verdict", "NOT_RUN"),', '"status": "PASS",'),
+    ("fidelity-per-domain", RS, '"model_fidelity": metrics[metric].fidelity,', '"model_fidelity": "EXACT_GEOMETRY",'),
+    ("measured-side-dropped", RS, "if other_id != check_id and value is not None and other_case", "if False and other_case"),
+    ("simulator-version-inferred", RS, '"simulator_version": (execution or {}).get("tool_version") or None,', '"simulator_version": "3.14.0",'),
     ("check-skips-enumeration", D, "    item.files()\n    derived = _derive(item, registry)", "    derived = _derive(item, registry)"),
     ("status-from-registry-alone", DR, "        if adapter is not None and adapter.formats & formats:", "        if adapter is not None:"),
     ("empty-case-document-written", D, '        if not document["cases"]:\n            continue', "        pass"),

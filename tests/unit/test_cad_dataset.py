@@ -11,6 +11,7 @@ source/generate_step.py, never by calling the extractor.
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import math
@@ -665,19 +666,112 @@ class TestHonestOutcomes(unittest.TestCase):
                     self.assertEqual(check["findings"],
                                      [f"{value}: components/actuator/domains/mechanical/continuous_output_torque"])
 
-    def test_the_trace_names_both_sides_for_clearance_and_marks_illustrative_limits(self):
+    def test_the_results_name_both_sides_for_clearance_and_mark_illustrative_limits(self):
         from ecad_model.dataset import validate
 
         with tempfile.TemporaryDirectory() as output:
             validate(ITEM, Path(output) / "run")
-            trace = {row["requirement_id"]: row for row in json.loads((Path(output) / "run" / "trace.json").read_text())}
+            results = {row["requirement"]: row for row in json.loads((Path(output) / "run" / "results.json").read_text())["results"]}
             report = (Path(output) / "run" / "report.md").read_text()
-        clearance = trace["REQ-MECH-005"]["cad_components"]
+        clearance = results["REQ-MECH-005"]["cad_components"]
         self.assertTrue(any(c.startswith("pillar") for c in clearance) and any(c.startswith("link") for c in clearance))
-        self.assertFalse(any(c.startswith("pillar") for c in trace["REQ-MECH-001"]["cad_components"]))
-        self.assertEqual(trace["REQ-MECH-001"]["kind"], "illustrative requirement")
-        self.assertEqual(trace["REF-MECH-001"]["kind"], "reference")
+        self.assertFalse(any(c.startswith("pillar") for c in results["REQ-MECH-001"]["cad_components"]))
+        self.assertEqual(results["REQ-MECH-001"]["kind"], "illustrative requirement")
+        self.assertEqual(results["REF-MECH-001"]["kind"], "reference")
         self.assertIn("illustrative requirement", report)
+
+    def test_each_check_has_one_result_that_copies_the_receipt_and_cites_its_evidence(self):
+        """Spec §17: the per-requirement result contract, generated from the run."""
+        from ecad_model.dataset import regenerate_results, validate
+        from ecad_model.schemas import validate as validate_schema
+
+        requirements = json.loads((ITEM / "requirements" / "requirements.json").read_text())
+        with tempfile.TemporaryDirectory() as output:
+            run = Path(output) / "run"
+            receipt = validate(ITEM, run)
+            written = (run / "results.json").read_bytes()
+            document = json.loads(written)
+            validate_schema(document, "engineering-model/v1/validation-results")
+            self.assertEqual(document["receipt_sha256"], hashlib.sha256((run / "receipt.json").read_bytes()).hexdigest())
+            checks = {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]}
+            results = {r["check_id"]: r for r in document["results"]}
+            expected = {f"v3.{r['reference_id']}" for r in requirements["reference_values"]} | {
+                f"v4.{r['requirement_id']}" for r in requirements["requirements"]}
+            self.assertEqual(set(results), expected)
+            for check_id, result in results.items():
+                with self.subTest(check_id):
+                    check = checks[check_id]
+                    self.assertEqual((result["status"], result["reason_code"], result["findings"]),
+                                     (check["verdict"], check["reason_code"], check["findings"]))
+                    self.assertEqual([e["sha256"] for e in result["evidence"]], [e["sha256"] for e in check["evidence"]])
+                    for evidence in result["evidence"]:
+                        stored = run / "evidence" / "sha256" / evidence["sha256"]
+                        self.assertEqual(hashlib.sha256(stored.read_bytes()).hexdigest(), evidence["sha256"])
+                    if result["status"] == "PASS":
+                        self.assertTrue(result["simulator_version"])
+                    self.assertEqual(result["model_fidelity"],
+                                     "SIMPLIFIED" if result["metric"].startswith("rom_") else "EXACT_GEOMETRY")
+            # A requirement blocked only on its limit still reports what was measured, and by which check.
+            xd = results["v4.REQ-XD-001"]
+            self.assertEqual(xd["status"], "BLOCKED")
+            self.assertIsNone(xd["expected_value"])
+            self.assertEqual((xd["simulator"], xd["simulator_version"]), (None, None), "nothing ran it; no version is inferred")
+            self.assertEqual(xd["measured_value"], checks[xd["measured_by"]]["metrics"]["static_torque_max_abs_nm"])
+            self.assertIn({"path": "components/actuator/domains/mechanical/continuous_output_torque", "status": "UNKNOWN"},
+                          xd["inputs"])
+            # The inputs show what a DERIVED mass rests on.
+            self.assertIn("ESTIMATED", {i["status"] for i in results["v4.REQ-MECH-002"]["inputs"]})
+            self.assertEqual(regenerate_results(ITEM, run), written)
+
+    def test_an_ai_assumption_input_makes_a_met_or_violated_limit_inconclusive(self):
+        """A value a model proposed can neither qualify nor condemn a design:
+        with real (non-illustrative) requirements, a met and a violated limit
+        resting on an AI_ASSUMPTION are both INCONCLUSIVE, whether the
+        assumption is a density the metric depends on or the limit itself."""
+        from ecad_model.dataset import build, validate
+
+        def assumed(value, unit, note):
+            return {"value": value, "unit": unit, "status": "AI_ASSUMPTION",
+                    "source": {"kind": "ai", "ref": "fixture"}, "note": note}
+
+        def real(requirements, violated):
+            for requirement in requirements["requirements"]:
+                requirement["illustrative"] = False
+            by_id = {r["requirement_id"]: r for r in requirements["requirements"]}
+            by_id[violated]["limit"] = {"value": 0.5}
+            return requirements
+
+        def density_case(item):
+            _edit_json(item / "design" / "annotations.json",
+                       lambda a: a["materials"]["steel_1045"].update(density=assumed(7850.0, "kg/m^3", "proposed")))
+            _edit_json(item / "requirements" / "requirements.json", lambda r: real(r, "REQ-MECH-002"))
+            return "v4.REQ-MECH-001", "v4.REQ-MECH-002"
+
+        def limit_case(item):
+            def torque(a):
+                actuator = next(c for c in a["components_without_cad"] if c["component_id"] == "actuator")
+                actuator["domains"]["mechanical"]["continuous_output_torque"] = assumed(5.0, "N*m", "proposed motor")
+            _edit_json(item / "design" / "annotations.json", torque)
+
+            def two_limits(r):
+                real(r, "REQ-MECH-002")
+                xd = next(x for x in r["requirements"] if x["requirement_id"] == "REQ-XD-001")
+                r["requirements"].append({**xd, "requirement_id": "REQ-XD-002", "operator": ">="})
+            _edit_json(item / "requirements" / "requirements.json", two_limits)
+            return "v4.REQ-XD-001", "v4.REQ-XD-002"
+
+        for label, prepare in (("AI_ASSUMPTION density", density_case), ("AI_ASSUMPTION limit", limit_case)):
+            with self.subTest(label), tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as d:
+                item = _copy_item(d)
+                met, violated = prepare(item)
+                build(item)
+                with tempfile.TemporaryDirectory() as output:
+                    receipt = validate(item, Path(output) / "run")
+                checks = {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]}
+                for check_id in (met, violated):
+                    self.assertEqual((checks[check_id]["verdict"], checks[check_id]["reason_code"]),
+                                     ("INCONCLUSIVE", "INPUT_IS_AI_ASSUMPTION"), checks[check_id]["findings"])
+                    self.assertTrue(any(f.startswith("AI_ASSUMPTION: ") for f in checks[check_id]["findings"]))
 
 
 class TestImporterRefusals(unittest.TestCase):

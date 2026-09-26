@@ -334,6 +334,38 @@ class MechanicalAdapter:
             "derivations": [entry["derivation"] for entry in requirements["reference_values"]],
         }, "engineering-model/v1/mechanical-vocabulary")
 
+    def dependencies(self, model: Dict[str, Any], metric: str, scenario: Dict[str, Any]) -> List[str]:
+        """The model quantities a simulated metric depends on.
+
+        Coarse on purpose, and a superset of what any one metric reads: every
+        moving body's mass properties and placement, the joint and gravity;
+        for clearance, every body on both sides, their bounding boxes and the
+        joint's range.
+        """
+        joint = model["joints"][0]
+        jid = joint["joint_id"]
+        roots = rigid_groups(model)
+        geometric = [c["component_id"] for c in model["components"] if c["cad_ref"] is not None]
+        clearance = metric.startswith("rom_")
+        bodies = geometric if clearance else [cid for cid in geometric if roots[cid] == roots[joint["child"]]]
+        paths = [f"joints/{jid}/axis", f"joints/{jid}/origin"]
+        paths += [f"joints/{jid}/limits/lower", f"joints/{jid}/limits/upper"] if clearance else ["design/gravity"]
+        for cid in sorted(bodies):
+            paths += [f"components/{cid}/placement/translation", f"components/{cid}/placement/rotation"]
+            if clearance:
+                paths += [f"components/{cid}/geometry/bounding_box_local/min",
+                          f"components/{cid}/geometry/bounding_box_local/max"]
+            else:
+                paths += [f"components/{cid}/physical/{name}" for name in ("mass", "center_of_mass", "inertia_about_com")]
+        return paths
+
+    def reference_inputs(self, model: Dict[str, Any], derivation: str, scenario: Dict[str, Any]) -> List[str]:
+        """The model paths a reference derivation reads (those it lacks, when it cannot run)."""
+        try:
+            return reference_value(model, derivation, scenario)[1]
+        except ReferenceBlocked as exc:
+            return [missing["path"] for missing in exc.paths]
+
     def document_schemas(self) -> Dict[str, str]:
         return {EXTRACTION: "cad-dataset/v1/cad-extraction"}
 

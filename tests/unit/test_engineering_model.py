@@ -360,7 +360,10 @@ class TestBuilder(unittest.TestCase):
     def test_resolve_refuses_paths_that_are_not_quantities(self):
         model = json.loads((ITEM / "derived" / "engineering_model.json").read_text())
         self.assertEqual(resolve(model, "components/link/physical/mass")["unit"], "kg")
-        for bad in ("components/nope/physical/mass", "components/link/physical", "design/gravity"):
+        # Design-level quantities resolve (gravity is an input of statics and dynamics);
+        # a design field that is not a quantity, or an unsupported root, does not.
+        self.assertEqual(resolve(model, "design/gravity")["unit"], "m/s^2")
+        for bad in ("components/nope/physical/mass", "components/link/physical", "design/name", "materials/steel"):
             with self.subTest(bad), self.assertRaises(KeyError):
                 resolve(model, bad)
 
@@ -838,7 +841,7 @@ class TestDocumentationExamples(unittest.TestCase):
         import importlib
 
         for name in ("quantity", "schemas", "importers.base", "importers", "builder", "mjcf", "requirements",
-                     "domains", "domains.mechanical"):
+                     "domains", "domains.mechanical", "results"):
             with self.subTest(name):
                 module = importlib.import_module(f"ecad_model.{name}")
                 result = doctest.testmod(module, optionflags=doctest.ELLIPSIS)

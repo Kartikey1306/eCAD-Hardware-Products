@@ -441,7 +441,8 @@ def resolve(model: Dict[str, Any], path: str) -> Dict[str, Any]:
 
     Args:
         model: An engineering model.
-        path: e.g. "components/link/physical/mass" or "joints/j1/axis".
+        path: e.g. "components/link/physical/mass", "joints/j1/axis" or
+            "design/gravity".
 
     Returns:
         The quantity dict at that path.
@@ -458,13 +459,18 @@ def resolve(model: Dict[str, Any], path: str) -> Dict[str, Any]:
         'DERIVED'
     """
     parts = path.split("/")
-    if len(parts) < 2 or parts[0] not in ("components", "joints"):
+    if len(parts) < 2 or parts[0] not in ("components", "joints", "design"):
         raise KeyError(f"unsupported model path: {path}")
-    key = "component_id" if parts[0] == "components" else "joint_id"
-    node: Any = next((item for item in model[parts[0]] if item[key] == parts[1]), None)
-    if node is None:
-        raise KeyError(f"no {parts[0][:-1]} {parts[1]!r} in the model")
-    for part in parts[2:]:
+    node: Any
+    if parts[0] == "design":
+        node, rest = model["design"], parts[1:]
+    else:
+        key = "component_id" if parts[0] == "components" else "joint_id"
+        node = next((item for item in model[parts[0]] if item[key] == parts[1]), None)
+        if node is None:
+            raise KeyError(f"no {parts[0][:-1]} {parts[1]!r} in the model")
+        rest = parts[2:]
+    for part in rest:
         if not isinstance(node, dict) or part not in node:
             raise KeyError(f"model path does not exist: {path}")
         node = node[part]

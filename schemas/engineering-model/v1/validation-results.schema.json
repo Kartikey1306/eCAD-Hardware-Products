@@ -1,0 +1,134 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/validation-results.schema.json",
+  "title": "eCAD Per-Requirement Validation Results v1",
+  "description": "One result per V3/V4 check of one run: what was measured against what, by which simulator at which version, on which inputs with which statuses, with which evidence. Generated from the run's receipt, compiled cases, execution records and engineering model; nothing in it is synthesised. Bound to its receipt by the receipt's full digest.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "results_version", "sample_id", "receipt_sha256", "results"],
+  "properties": {
+    "$schema": {"const": "https://embeddedos.org/schemas/engineering-model/v1/validation-results.schema.json"},
+    "results_version": {"const": "1.0.0"},
+    "sample_id": {"$ref": "common.schema.json#/definitions/identifier"},
+    "receipt_sha256": {"$ref": "common.schema.json#/definitions/sha256"},
+    "results": {"type": "array", "items": {"$ref": "#/definitions/result"}}
+  },
+  "definitions": {
+    "nullableNumber": {"oneOf": [{"type": "null"}, {"type": "number"}]},
+    "nullableString": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/definitions/nonEmptyString"}]},
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "status"],
+      "properties": {
+        "path": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "status": {"$ref": "common.schema.json#/definitions/status"},
+        "source": {"$ref": "common.schema.json#/definitions/nonEmptyString"}
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validation_id", "check_id", "domain", "kind", "requirement", "title", "source", "metric", "component",
+        "cad_components", "illustrative", "status", "reason_code", "findings", "measured_value", "measured_by",
+        "expected_value", "operator", "applied_bound", "unit", "tolerance", "simulator", "simulator_version",
+        "configuration", "model_version", "model_sha256", "model_fidelity", "inputs", "timestamp", "input_hash",
+        "source_dirty", "environment", "receipt_sha256", "evidence"
+      ],
+      "properties": {
+        "validation_id": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "check_id": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "domain": {"$ref": "common.schema.json#/definitions/engineeringDomain"},
+        "kind": {"enum": ["reference", "requirement", "illustrative requirement"]},
+        "requirement": {"$ref": "common.schema.json#/definitions/identifier"},
+        "title": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "source": {"$ref": "common.schema.json#/definitions/source"},
+        "metric": {"$ref": "common.schema.json#/definitions/identifier"},
+        "component": {
+          "description": "The component a requirement constrains; null for a reference, which constrains nothing.",
+          "oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/definitions/identifier"}]
+        },
+        "cad_components": {"type": "array", "items": {"$ref": "common.schema.json#/definitions/nonEmptyString"}},
+        "illustrative": {"type": "boolean"},
+        "status": {"enum": ["PASS", "FAIL", "WARNING", "NOT_RUN", "BLOCKED", "INCONCLUSIVE"]},
+        "reason_code": {"$ref": "#/definitions/nullableString"},
+        "findings": {"type": "array", "items": {"type": "string"}},
+        "measured_value": {"description": "Null when no metric was recorded.", "$ref": "#/definitions/nullableNumber"},
+        "measured_by": {"description": "The check that measured it: this one, or for a requirement blocked only on its limit, the check that ran the same metric with the same arguments.", "$ref": "#/definitions/nullableString"},
+        "expected_value": {"description": "The reference value, or the limit the requirement states; null when the limit has a null status.", "$ref": "#/definitions/nullableNumber"},
+        "operator": {"enum": ["within", "<=", ">="]},
+        "applied_bound": {
+          "description": "The bound actually compiled, tolerance folded in; null when nothing was compiled.",
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "properties": {"minimum": {"type": "number"}, "maximum": {"type": "number"}}
+            }
+          ]
+        },
+        "unit": {"type": "string", "minLength": 1},
+        "tolerance": {"type": "number", "minimum": 0},
+        "simulator": {"$ref": "#/definitions/nullableString"},
+        "simulator_version": {"description": "From the check's own execution record, never inferred; null when there is none.", "$ref": "#/definitions/nullableString"},
+        "configuration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["command", "scenario", "seed"],
+          "properties": {
+            "command": {"oneOf": [{"type": "null"}, {"type": "array", "items": {"type": "string"}}]},
+            "scenario": {"type": "object"},
+            "seed": {"oneOf": [{"type": "null"}, {"type": "integer"}]}
+          }
+        },
+        "model_version": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "model_sha256": {"$ref": "common.schema.json#/definitions/sha256"},
+        "model_fidelity": {"enum": ["EXACT_GEOMETRY", "REDUCED_ORDER", "SIMPLIFIED", "EMPIRICAL"]},
+        "inputs": {"type": "array", "items": {"$ref": "#/definitions/input"}},
+        "timestamp": {"type": "string", "minLength": 1},
+        "input_hash": {"$ref": "common.schema.json#/definitions/sha256"},
+        "source_dirty": {"type": "boolean"},
+        "environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["os", "machine", "python", "constraints_sha256", "tools"],
+          "properties": {
+            "os": {"type": "string"},
+            "machine": {"type": "string"},
+            "python": {"type": "string"},
+            "constraints_sha256": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/definitions/sha256"}]},
+            "tools": {"type": "object", "additionalProperties": {"type": "string"}}
+          }
+        },
+        "receipt_sha256": {"$ref": "common.schema.json#/definitions/sha256"},
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["evidence_id", "sha256"],
+            "properties": {
+              "evidence_id": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+              "sha256": {"$ref": "common.schema.json#/definitions/sha256"}
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "description": "A PASS rests on a simulator whose version its own execution recorded.",
+          "if": {"properties": {"status": {"const": "PASS"}}},
+          "then": {"properties": {"simulator_version": {"$ref": "common.schema.json#/definitions/nonEmptyString"}}}
+        },
+        {
+          "description": "A reference is computed, not chosen, so it is never illustrative.",
+          "if": {"properties": {"kind": {"const": "reference"}}},
+          "then": {"properties": {"illustrative": {"const": false}, "operator": {"const": "within"}}}
+        }
+      ]
+    }
+  }
+}
