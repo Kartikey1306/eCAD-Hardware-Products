@@ -2,7 +2,8 @@
 
 A quantity is a plain dict so it serialises canonically, but it is only ever
 built through these constructors, which enforce the rules the schema states:
-UNKNOWN if and only if the value is null, and DERIVED only with named inputs.
+the value is null if and only if the status is a null status, each status
+carries what makes it checkable, and DERIVED names its inputs.
 """
 
 from __future__ import annotations
@@ -22,7 +23,35 @@ class Status(str, Enum):
     SIMULATED = "SIMULATED"
     ESTIMATED = "ESTIMATED"
     AI_ASSUMPTION = "AI_ASSUMPTION"
-    UNKNOWN = "UNKNOWN"
+    UNKNOWN = "UNKNOWN"              # nobody has established it, including "not yet selected"
+    UNSPECIFIED = "UNSPECIFIED"      # the governing source was consulted and is silent
+    NOT_AVAILABLE = "NOT_AVAILABLE"  # exists in a source this project cannot access or use
+
+
+# The statuses whose value is null. Every "is this value missing?" test in the
+# package goes through is_null(), so a new null status cannot slip past one site.
+NULL_STATUSES = frozenset({Status.UNKNOWN, Status.UNSPECIFIED, Status.NOT_AVAILABLE})
+
+# What each status must carry for a checker, not only its author, to tell the
+# statuses apart. Mirrored in engineering-model/v1/common.schema.json.
+_NOTE_REQUIRED = frozenset({Status.UNKNOWN, Status.NOT_AVAILABLE, Status.ESTIMATED})
+_SOURCE_KIND = {Status.MEASURED: "measurement", Status.SIMULATED: "simulation", Status.AI_ASSUMPTION: "ai"}
+
+
+def is_null(status: Union[Status, str]) -> bool:
+    """True when a quantity of this status has no value.
+
+    Args:
+        status: A Status, or its string form as serialised.
+
+    Returns:
+        Whether the status is one of UNKNOWN, UNSPECIFIED and NOT_AVAILABLE.
+
+    Example:
+        >>> [is_null(s) for s in ("UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE", "ESTIMATED")]
+        [True, True, True, False]
+    """
+    return Status(status) in NULL_STATUSES
 
 
 def source(kind: str, ref: str, sha256: Optional[str] = None) -> Dict[str, str]:
@@ -30,7 +59,10 @@ def source(kind: str, ref: str, sha256: Optional[str] = None) -> Dict[str, str]:
 
     Args:
         kind: One of the source kinds in engineering-model/v1/common.schema.json
-            (cad, datasheet, design_annotation, requirement, handbook, ...).
+            (cad, datasheet, product_specification, design_annotation,
+            requirement, handbook, ...). A datasheet is a manufacturer's; a
+            product_specification is a first-party product sheet in this
+            repository, which is design intent, not measured part data.
         ref: What was consulted: a repository path, or a named reference.
         sha256: Digest of the referenced bytes, when they are a file.
 
@@ -69,20 +101,25 @@ def quantity(
     """Build a quantity, refusing any combination the contract forbids.
 
     Args:
-        value: A finite number, vector or matrix; None only when UNKNOWN.
+        value: A finite number, vector or matrix; None exactly when the
+            status is a null status (UNKNOWN, UNSPECIFIED, NOT_AVAILABLE).
         unit: Unit symbol, e.g. "kg", "N*m", "1" for dimensionless.
         status: Epistemic status of the value.
         origin: Where it came from, from source().
         derived_from: Model paths or artifact references it was computed
             from. Required, and non-empty, when status is DERIVED.
-        note: Free-text context, e.g. why a value is UNKNOWN.
+        note: Free-text context. Required for UNKNOWN and NOT_AVAILABLE
+            (why there is no value) and for ESTIMATED (what the estimate
+            rests on).
 
     Returns:
         The quantity as a plain dict, ready to serialise.
 
     Raises:
-        ValueError: value is None without UNKNOWN (or the reverse), DERIVED
-            names no inputs, or the value is not finite.
+        ValueError: value is None without a null status (or the reverse),
+            DERIVED names no inputs, a status lacks what makes it checkable
+            (a note; UNSPECIFIED's cited document hash; the source kind of
+            MEASURED, SIMULATED or AI_ASSUMPTION), or the value is not finite.
 
     Example:
         >>> quantity(2.5, "kg", Status.SPECIFIED, source("datasheet", "d.md"))["status"]
@@ -90,13 +127,20 @@ def quantity(
         >>> quantity(None, "kg", Status.SPECIFIED, source("datasheet", "d.md"))
         Traceback (most recent call last):
         ...
-        ValueError: a value is null if and only if its status is UNKNOWN (got SPECIFIED)
+        ValueError: a value is null if and only if its status is UNKNOWN, UNSPECIFIED or NOT_AVAILABLE (got SPECIFIED)
     """
     inputs = list(dict.fromkeys(derived_from))
-    if (value is None) != (status is Status.UNKNOWN):
-        raise ValueError(f"a value is null if and only if its status is UNKNOWN (got {status.value})")
+    if (value is None) != (status in NULL_STATUSES):
+        raise ValueError("a value is null if and only if its status is UNKNOWN, UNSPECIFIED or NOT_AVAILABLE "
+                         f"(got {status.value})")
     if status is Status.DERIVED and not inputs:
         raise ValueError("a DERIVED quantity must name the values it was derived from")
+    if status in _NOTE_REQUIRED and not note:
+        raise ValueError(f"a {status.value} quantity must say why in its note")
+    if status is Status.UNSPECIFIED and "sha256" not in origin:
+        raise ValueError("an UNSPECIFIED quantity must cite, by hash, the document that is silent on it")
+    if status in _SOURCE_KIND and origin.get("kind") != _SOURCE_KIND[status]:
+        raise ValueError(f"a {status.value} quantity must have source kind {_SOURCE_KIND[status]!r}")
     if not _finite(value):
         raise ValueError(f"quantity value must be finite numbers, got {value!r}")
     result: Dict[str, Any] = {"value": value, "unit": unit, "status": status.value, "source": origin}

@@ -23,7 +23,8 @@ Two properties are kept deliberately separate:
 
 validate() maps the item onto the existing V0-V4 receipt contract: V0 schemas
 and hashes, V1 physical sanity, V2 CAD/model/MJCF invariants, V3/V4 the
-existing case engine plus BLOCKED checks for anything that rests on an UNKNOWN.
+existing case engine plus BLOCKED checks for anything that rests on a value
+with a null status (UNKNOWN, UNSPECIFIED or NOT_AVAILABLE).
 """
 
 from __future__ import annotations
@@ -42,6 +43,7 @@ from . import MODEL_VERSION
 from .builder import build_engineering_model, index_unknowns, resolve
 from .importers import ExtractionError, UnsupportedFormat, importer_for, regular_file
 from .mjcf import MissingInput, build_mjcf, rigid_groups
+from .quantity import is_null
 from .requirements import CONTRACT_DOMAIN, compile_cases
 from .schemas import REPOSITORY_ROOT, validate as validate_schema
 
@@ -740,17 +742,17 @@ def _sanity_problems(model: Dict[str, Any]) -> List[str]:
         physical = component["physical"]
         if physical is None:
             continue
-        if physical["mass"]["status"] != "UNKNOWN" and physical["mass"]["value"] <= 0:
+        if not is_null(physical["mass"]["status"]) and physical["mass"]["value"] <= 0:
             problems.append(f"{cid}: mass is not positive")
-        if physical["inertia_about_com"]["status"] != "UNKNOWN":
+        if not is_null(physical["inertia_about_com"]["status"]):
             problems += inertia_problems(cid, physical["inertia_about_com"]["value"])
     for joint in model["joints"]:
-        if joint["axis"]["status"] != "UNKNOWN":
+        if not is_null(joint["axis"]["status"]):
             length = math.sqrt(sum(item * item for item in joint["axis"]["value"]))
             if abs(length - 1.0) > 1e-9:
                 problems.append(f"{joint['joint_id']}: axis is not a unit vector (length {length})")
         lower, upper = joint["limits"]["lower"], joint["limits"]["upper"]
-        if lower["status"] != "UNKNOWN" and upper["status"] != "UNKNOWN" and not lower["value"] < upper["value"]:
+        if not is_null(lower["status"]) and not is_null(upper["status"]) and not lower["value"] < upper["value"]:
             problems.append(f"{joint['joint_id']}: lower limit is not below the upper limit")
     return problems
 
@@ -793,7 +795,7 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
     """Run V0-V4 on a dataset item and write a v1 receipt plus evidence.
 
     Nothing is PASS without hash-bound evidence, and anything that depends on
-    an UNKNOWN is BLOCKED with the missing paths.
+    a value with a null status is BLOCKED with the missing paths.
 
     Args:
         directory: The dataset item directory.
@@ -903,7 +905,7 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
         # A value nobody has recorded is a missing input, not a design defect.
         fresh, model, extraction, v1_problems = {}, {}, {}, []
         failure = (ExecutionStatus.SKIPPED, Verdict.BLOCKED, "MISSING_REQUIRED_INPUT",
-                   "a value the mechanical model needs is UNKNOWN")
+                   "a value the mechanical model needs has no value")
         v1_blocked = str(exc)
     except (OSError, ValueError) as exc:
         # A schema-invalid input or an inconsistent annotation: the item is wrong.
@@ -973,9 +975,12 @@ def validate(directory: Path, output: Path) -> Dict[str, Any]:
             checks.append(CheckResult(
                 check_id=f"{level.value.lower()}.{entry['id']}", gate=level, domain=Domain(domain),
                 layer=Layer.VALIDATION, execution_status=ExecutionStatus.UNAVAILABLE, verdict=Verdict.BLOCKED,
-                reason_code="REQUIREMENT_INPUT_UNKNOWN", summary=entry["reason"],
+                # spec: a missing required input is BLOCKED with MISSING_REQUIRED_INPUT; a
+                # reference whose derivation does not apply to the design has no missing input.
+                reason_code="MISSING_REQUIRED_INPUT" if entry["missing_inputs"] else "REFERENCE_NOT_APPLICABLE",
+                summary=entry["reason"],
                 requirement_ids=[f"POLICY:{level.value}-{'GOLDEN' if level is GateLevel.V3 else 'CORNER'}", entry["id"]],
-                findings=[f"UNKNOWN: {path}" for path in entry["unknown_paths"]],
+                findings=[f"{m['status']}: {m['path']}" for m in entry["missing_inputs"]] or [entry["reason"]],
                 evidence=[*evidence(REQUIREMENTS, MODEL), *refs], generated_evidence=extra,
             ))
         gates[level] = checks

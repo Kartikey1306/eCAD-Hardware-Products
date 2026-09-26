@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from . import MODEL_VERSION
-from .quantity import Status, quantity, rounded, source, unknown
+from .quantity import Status, is_null, quantity, rounded, source, unknown
 
 SCHEMA_ID = "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json"
 LENGTH_TO_METRES = {"mm": 1e-3, "m": 1.0, "inch": 0.0254}
@@ -205,9 +205,9 @@ def build_engineering_model(
         density_path = f"{base}/material/density"
         volume_path = f"{base}/geometry/volume"
 
-        if density["status"] == Status.UNKNOWN.value:
-            mass = unknown("kg", computation, "mass = density x volume, and density is UNKNOWN")
-            inertia = unknown("kg*m^2", computation, "inertia scales with density, which is UNKNOWN")
+        if is_null(density["status"]):
+            mass = unknown("kg", computation, f"mass = density x volume, and density is {density['status']}")
+            inertia = unknown("kg*m^2", computation, f"inertia scales with density, which is {density['status']}")
         else:
             rho = density["value"]
             mass = quantity(
@@ -395,7 +395,7 @@ def _needed_by(path: str) -> List[str]:
 
 
 def index_unknowns(model: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Every UNKNOWN quantity, by path, with the domains that need it.
+    """Every quantity with a null status, by path, with its status and the domains that need it.
 
     Args:
         model: An engineering model.
@@ -416,8 +416,8 @@ def index_unknowns(model: Dict[str, Any]) -> List[Dict[str, Any]]:
     def walk(node: Any, path: str) -> None:
         if isinstance(node, dict):
             if {"value", "unit", "status", "source"} <= node.keys():
-                if node["status"] == Status.UNKNOWN.value:
-                    entry = {"path": path, "needed_by": _needed_by(path)}
+                if is_null(node["status"]):
+                    entry = {"path": path, "status": node["status"], "needed_by": _needed_by(path)}
                     if node.get("note"):
                         entry["note"] = node["note"]
                     found.append(entry)

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://embeddedos.org/schemas/engineering-model/v1/engineering-requirements.schema.json",
   "title": "eCAD Machine-Readable Engineering Requirements v1",
-  "description": "Numeric requirements evaluated deterministically. reference_values verify a domain model against an independent derivation (V3 golden); requirements bound a simulated metric under a scenario (V4 corner). A limit may be a number or a path to a model quantity; an UNKNOWN limit makes the requirement BLOCKED, never assumed.",
+  "description": "Numeric requirements evaluated deterministically. reference_values verify a domain model against an independent derivation (V3 golden); requirements bound a simulated metric under a scenario (V4 corner). A limit may be a number or a path to a model quantity; a limit with a null status (UNKNOWN, UNSPECIFIED, NOT_AVAILABLE) makes the requirement BLOCKED, never assumed.",
   "type": "object",
   "additionalProperties": false,
   "required": [

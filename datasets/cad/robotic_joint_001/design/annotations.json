@@ -182,7 +182,7 @@
             "unit": "V",
             "status": "SPECIFIED",
             "source": {
-              "kind": "datasheet",
+              "kind": "product_specification",
               "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
               "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
             }
@@ -192,7 +192,7 @@
             "unit": "A",
             "status": "SPECIFIED",
             "source": {
-              "kind": "datasheet",
+              "kind": "product_specification",
               "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
               "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
             },
@@ -203,7 +203,7 @@
             "unit": "W",
             "status": "SPECIFIED",
             "source": {
-              "kind": "datasheet",
+              "kind": "product_specification",
               "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
               "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
             }
@@ -215,7 +215,7 @@
             "unit": "Hz",
             "status": "SPECIFIED",
             "source": {
-              "kind": "datasheet",
+              "kind": "product_specification",
               "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
               "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
             }

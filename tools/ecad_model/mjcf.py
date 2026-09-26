@@ -25,7 +25,7 @@ import math
 from typing import Any, Dict, List, Sequence, Set, Tuple
 from xml.sax.saxutils import quoteattr
 
-from .quantity import Status
+from .quantity import is_null
 
 Matrix = Sequence[Sequence[float]]
 
@@ -35,7 +35,7 @@ class ModelIncomplete(ValueError):
 
 
 class MissingInput(ModelIncomplete):
-    """A value the mechanical model needs is UNKNOWN.
+    """A value the mechanical model needs has a null status.
 
     That is a missing input, not a defect in the design: validation reports
     it BLOCKED with MISSING_REQUIRED_INPUT, never FAIL.
@@ -83,8 +83,8 @@ def rotation_to_quaternion(r: Matrix) -> List[float]:
 
 
 def _known(item: Dict[str, Any], label: str) -> Any:
-    if item["status"] == Status.UNKNOWN.value:
-        raise MissingInput(f"{label} is UNKNOWN: {item.get('note', 'no value recorded')}")
+    if is_null(item["status"]):
+        raise MissingInput(f"{label} is {item['status']}: {item.get('note', 'no value recorded')}")
     return item["value"]
 
 

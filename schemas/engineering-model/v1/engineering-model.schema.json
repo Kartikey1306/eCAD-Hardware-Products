@@ -28,7 +28,7 @@
     "joints": {"type": "array", "items": {"$ref": "#/definitions/joint"}},
     "relationships": {"type": "array", "items": {"$ref": "#/definitions/relationship"}},
     "unknowns": {
-      "description": "Index of every UNKNOWN quantity in the model, with the domains that need it. Generated; never hand-edited.",
+      "description": "Index of every quantity with a null status (UNKNOWN, UNSPECIFIED, NOT_AVAILABLE), with its status and the domains that need it. Generated; never hand-edited.",
       "type": "array",
       "items": {"$ref": "#/definitions/unknown"}
     }
@@ -238,9 +238,10 @@
     "unknown": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "needed_by"],
+      "required": ["path", "status", "needed_by"],
       "properties": {
         "path": {"$ref": "common.schema.json#/definitions/nonEmptyString"},
+        "status": {"enum": ["UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE"]},
         "needed_by": {
           "type": "array",
           "uniqueItems": true,

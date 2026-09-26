@@ -29,13 +29,19 @@ from ecad_model.dataset import inertia_problems, same_content, same_text  # noqa
 from ecad_model.importers import UnsupportedFormat, detect_format, importer_for  # noqa: E402
 from ecad_model.importers import base as importer_base  # noqa: E402
 from ecad_model.mjcf import ModelIncomplete, build_mjcf, rotation_to_quaternion  # noqa: E402
-from ecad_model.quantity import Status, quantity, source, unknown  # noqa: E402
+from ecad_model.quantity import NULL_STATUSES, Status, is_null, quantity, source, unknown  # noqa: E402
 from ecad_model.requirements import ReferenceBlocked, compile_cases, reference_value  # noqa: E402
 from ecad_model.schemas import validate  # noqa: E402
 
 ITEM = REPO_ROOT / "datasets" / "cad" / "robotic_joint_001"
 IDENTITY = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 ANNOTATION = source("design_annotation", "fixture")
+CITED = source("datasheet", "fixture.md", "0" * 64)
+
+
+def null_quantity(unit, status):
+    """A quantity with the given null status, carrying what that status requires."""
+    return quantity(None, unit, status, CITED if status is Status.UNSPECIFIED else ANNOTATION, note=f"fixture {status.value}")
 
 
 def box_part(name, dims_mm, translation_mm, cylinders=()):
@@ -120,6 +126,33 @@ class TestQuantity(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "null if and only if"):
             quantity(1.0, "kg", Status.UNKNOWN, ANNOTATION)
 
+    def test_every_null_status_has_a_null_value_and_nothing_else_does(self):
+        self.assertEqual(NULL_STATUSES, {Status.UNKNOWN, Status.UNSPECIFIED, Status.NOT_AVAILABLE})
+        for status in Status:
+            with self.subTest(status=status.value):
+                self.assertEqual(is_null(status), status in NULL_STATUSES)
+                self.assertEqual(is_null(status.value), status in NULL_STATUSES)
+        for status in NULL_STATUSES:
+            with self.subTest(null=status.value), self.assertRaisesRegex(ValueError, "null if and only if"):
+                quantity(1.0, "kg", status, CITED, note="x")
+
+    def test_each_status_carries_what_makes_it_checkable(self):
+        refused = {
+            "UNKNOWN without a note": lambda: quantity(None, "kg", Status.UNKNOWN, ANNOTATION),
+            "NOT_AVAILABLE without a note": lambda: quantity(None, "kg", Status.NOT_AVAILABLE, ANNOTATION),
+            "ESTIMATED without a note": lambda: quantity(1.0, "kg", Status.ESTIMATED, source("estimation", "x")),
+            "UNSPECIFIED without the silent document's hash": lambda: quantity(None, "kg", Status.UNSPECIFIED, ANNOTATION, note="x"),
+            "MEASURED from a datasheet": lambda: quantity(1.0, "kg", Status.MEASURED, source("datasheet", "x")),
+            "SIMULATED from a datasheet": lambda: quantity(1.0, "kg", Status.SIMULATED, source("datasheet", "x")),
+            "AI_ASSUMPTION from a datasheet": lambda: quantity(1.0, "kg", Status.AI_ASSUMPTION, source("datasheet", "x")),
+        }
+        for label, build_it in refused.items():
+            with self.subTest(label), self.assertRaises(ValueError):
+                build_it()
+        for status in NULL_STATUSES:
+            self.assertIsNone(null_quantity("kg", status)["value"])
+        self.assertEqual(quantity(1.0, "kg", Status.MEASURED, source("measurement", "scale.csv"))["status"], "MEASURED")
+
     def test_derived_must_name_its_inputs(self):
         with self.assertRaisesRegex(ValueError, "must name"):
             quantity(1.0, "kg", Status.DERIVED, ANNOTATION)
@@ -149,8 +182,17 @@ class TestQuantity(unittest.TestCase):
         base = {"value": 1.0, "unit": "kg", "status": "SPECIFIED", "source": ANNOTATION}
         cases = {
             "unknown with a value": {**base, "status": "UNKNOWN"},
+            "unspecified with a value": {**base, "status": "UNSPECIFIED", "source": CITED, "note": "x"},
+            "not available with a value": {**base, "status": "NOT_AVAILABLE", "note": "x"},
             "null claimed as specified": {**base, "value": None},
             "derived without inputs": {**base, "status": "DERIVED"},
+            "unknown without a note": {**base, "value": None, "status": "UNKNOWN"},
+            "not available without a note": {**base, "value": None, "status": "NOT_AVAILABLE"},
+            "unspecified without a cited hash": {**base, "value": None, "status": "UNSPECIFIED", "note": "x"},
+            "estimated without a note": {**base, "status": "ESTIMATED"},
+            "measured from an annotation": {**base, "status": "MEASURED"},
+            "simulated from an annotation": {**base, "status": "SIMULATED"},
+            "ai assumption from an annotation": {**base, "status": "AI_ASSUMPTION"},
         }
         annotations = json.loads((ITEM / "design" / "annotations.json").read_text())
         for label, bad in cases.items():
@@ -159,6 +201,11 @@ class TestQuantity(unittest.TestCase):
             with self.subTest(label), self.assertRaises(ValueError):
                 validate(broken, "engineering-model/v1/design-annotations")
         validate(annotations, "engineering-model/v1/design-annotations")
+        for status in NULL_STATUSES:
+            accepted = copy.deepcopy(annotations)
+            accepted["materials"]["steel_1045"]["density"] = null_quantity("kg/m^3", status)
+            with self.subTest(accepted=status.value):
+                validate(accepted, "engineering-model/v1/design-annotations")
 
 
 class TestFormatDetection(unittest.TestCase):
@@ -236,6 +283,19 @@ class TestBuilder(unittest.TestCase):
         paths = [entry["path"] for entry in model["unknowns"]]
         self.assertIn("components/bob/physical/mass", paths)
         self.assertIn("components/bob/material/density", paths)
+
+    def test_every_null_density_makes_mass_unknown_and_is_indexed_with_its_status(self):
+        for status in NULL_STATUSES:
+            with self.subTest(status=status.value):
+                extraction, annotations = pendulum()
+                annotations["materials"]["water"]["density"] = null_quantity("kg/m^3", status)
+                model = build(extraction, annotations)
+                mass = component(model, "bob")["physical"]["mass"]
+                self.assertEqual((mass["status"], mass["value"]), ("UNKNOWN", None))
+                self.assertIn(status.value, mass["note"])
+                index = {entry["path"]: entry["status"] for entry in model["unknowns"]}
+                self.assertEqual(index["components/bob/material/density"], status.value)
+                self.assertEqual(index["components/bob/physical/mass"], "UNKNOWN")
 
     def test_annotation_for_a_part_the_cad_lacks_is_an_error(self):
         extraction, annotations = pendulum()
@@ -321,7 +381,16 @@ class TestReferenceValues(unittest.TestCase):
         model = build(*pendulum(bob_material="not_a_material"))
         with self.assertRaises(ReferenceBlocked) as caught:
             reference_value(model, "gravity_torque_as_modelled")
-        self.assertIn("components/bob/physical/mass", caught.exception.paths)
+        self.assertIn({"path": "components/bob/physical/mass", "status": "UNKNOWN"}, caught.exception.paths)
+
+    def test_any_null_axis_blocks_every_derivation_with_its_status(self):
+        for status in NULL_STATUSES:
+            with self.subTest(status=status.value):
+                model = build(*pendulum())
+                model["joints"][0]["axis"] = null_quantity("1", status)
+                with self.assertRaises(ReferenceBlocked) as caught:
+                    reference_value(model, "small_oscillation_period")
+                self.assertIn({"path": "joints/j1/axis", "status": status.value}, caught.exception.paths)
 
 
 class TestRequirementCompilation(unittest.TestCase):
@@ -342,7 +411,21 @@ class TestRequirementCompilation(unittest.TestCase):
         _golden, corners, blocked = compile_cases(self.model, self.requirements, "derived/m.xml")
         self.assertNotIn("REQ-XD-001", [case["id"] for case in corners["cases"]])
         entry = next(item for item in blocked if item["id"] == "REQ-XD-001")
-        self.assertEqual(entry["unknown_paths"], ["components/actuator/domains/mechanical/continuous_output_torque"])
+        self.assertEqual(entry["missing_inputs"],
+                         [{"path": "components/actuator/domains/mechanical/continuous_output_torque", "status": "UNKNOWN"}])
+
+    def test_a_limit_with_any_null_status_is_blocked_with_its_status(self):
+        for status in NULL_STATUSES:
+            with self.subTest(status=status.value):
+                model = copy.deepcopy(self.model)
+                torque = component(model, "actuator")["domains"]["mechanical"]
+                torque["continuous_output_torque"] = null_quantity("N*m", status)
+                _golden, corners, blocked = compile_cases(model, self.requirements, "derived/m.xml")
+                self.assertNotIn("REQ-XD-001", [case["id"] for case in corners["cases"]])
+                entry = next(item for item in blocked if item["id"] == "REQ-XD-001")
+                self.assertEqual(entry["missing_inputs"],
+                                 [{"path": "components/actuator/domains/mechanical/continuous_output_torque",
+                                   "status": status.value}])
 
     def test_a_known_quantity_limit_is_used_and_its_unit_checked(self):
         model = copy.deepcopy(self.model)
@@ -395,6 +478,14 @@ class TestMechanicalModel(unittest.TestCase):
         component(model, "payload")["physical"]["mass"] = unknown("kg", ANNOTATION, "fixture")
         with self.assertRaisesRegex(ModelIncomplete, "payload mass is UNKNOWN"):
             build_mjcf(model)
+
+    def test_any_null_mass_makes_the_mechanical_model_incomplete(self):
+        for status in NULL_STATUSES:
+            with self.subTest(status=status.value):
+                model = copy.deepcopy(self.model)
+                component(model, "payload")["physical"]["mass"] = null_quantity("kg", status)
+                with self.assertRaisesRegex(ModelIncomplete, f"payload mass is {status.value}"):
+                    build_mjcf(model)
 
     def test_rotation_to_quaternion_round_trips(self):
         for angle in (0.0, 0.3, math.pi / 2, math.pi - 1e-3, math.pi):

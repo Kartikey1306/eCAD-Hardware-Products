@@ -385,7 +385,7 @@ class TestEndToEnd(unittest.TestCase):
         checks = self.run_item(ITEM)
         blocked = checks["v4.REQ-XD-001"]
         self.assertEqual(blocked["verdict"], "BLOCKED")
-        self.assertEqual(blocked["reason_code"], "REQUIREMENT_INPUT_UNKNOWN")
+        self.assertEqual(blocked["reason_code"], "MISSING_REQUIRED_INPUT")
         self.assertIn("REQ-XD-001", blocked["requirement_ids"])
         self.assertEqual(checks["_receipt"]["gates"][4]["verdict"], "BLOCKED")
         self.assertFalse(checks["_receipt"]["eligible_for_ebuild"])
@@ -449,6 +449,29 @@ def _edit_json(path: Path, mutate) -> None:
     document = json.loads(path.read_text())
     mutate(document)
     path.write_text(json.dumps(document, indent=2) + "\n")
+
+
+def _null_quantities(unit: str) -> dict:
+    """One quantity per null status, each carrying what its status requires.
+
+    UNSPECIFIED cites a real repository file by its real hash -- the eServo-200
+    product sheet, which is silent on the actuator -- so V0's cited-source
+    check stays green and only the missing value is under test.
+    """
+    import hashlib
+
+    sheet = "eRobotics_CAD_Design/robot_components/product_datasheet.md"
+    return {
+        "UNKNOWN": {"value": None, "unit": unit, "status": "UNKNOWN",
+                    "source": {"kind": "design_annotation", "ref": "fixture"}, "note": "not selected"},
+        "UNSPECIFIED": {"value": None, "unit": unit, "status": "UNSPECIFIED",
+                        "source": {"kind": "product_specification", "ref": sheet,
+                                   "sha256": hashlib.sha256((REPO_ROOT / sheet).read_bytes()).hexdigest()},
+                        "note": "the product sheet is silent on it"},
+        "NOT_AVAILABLE": {"value": None, "unit": unit, "status": "NOT_AVAILABLE",
+                          "source": {"kind": "datasheet", "ref": "a manufacturer datasheet this project may not use"},
+                          "note": "licence terms forbid redistribution"},
+    }
 
 
 class TestGatesFail(unittest.TestCase):
@@ -618,14 +641,13 @@ class TestHonestOutcomes(unittest.TestCase):
             def mutate(annotations):
                 actuator = next(c for c in annotations["components_without_cad"] if c["component_id"] == "actuator")
                 actuator["domains"]["mechanical"]["continuous_output_torque"] = (
-                    {"value": None, "unit": "N*m", "status": "UNKNOWN",
-                     "source": {"kind": "design_annotation", "ref": "fixture"}, "note": "not selected"}
-                    if value is None else
+                    _null_quantities("N*m")[value] if isinstance(value, str) else
                     {"value": value, "unit": "N*m", "status": "SPECIFIED", "source": {"kind": "datasheet", "ref": "fixture"}})
             return mutate
 
-        # REQ-XD-001 is illustrative, so meeting it is WARNING, never PASS.
-        for value, expected in ((None, "BLOCKED"), (5.0, "WARNING"), (3.0, "FAIL")):
+        # Every null status blocks; REQ-XD-001 is illustrative, so meeting it is WARNING, never PASS.
+        for value, expected in (("UNKNOWN", "BLOCKED"), ("UNSPECIFIED", "BLOCKED"), ("NOT_AVAILABLE", "BLOCKED"),
+                                (5.0, "WARNING"), (3.0, "FAIL")):
             with self.subTest(torque=value), tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as d:
                 item = _copy_item(d)
                 _edit_json(item / "design" / "annotations.json", with_torque(value))
@@ -635,6 +657,10 @@ class TestHonestOutcomes(unittest.TestCase):
                 check = {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]}["v4.REQ-XD-001"]
                 self.assertEqual(check["verdict"], expected)
                 self.assertIn("REQ-XD-001", check["requirement_ids"])
+                if isinstance(value, str):
+                    self.assertEqual(check["reason_code"], "MISSING_REQUIRED_INPUT")
+                    self.assertEqual(check["findings"],
+                                     [f"{value}: components/actuator/domains/mechanical/continuous_output_torque"])
 
     def test_the_trace_names_both_sides_for_clearance_and_marks_illustrative_limits(self):
         from ecad_model.dataset import validate
@@ -890,24 +916,25 @@ class TestExtractionFailureVerdicts(unittest.TestCase):
         mujoco_on_path()
 
     def test_a_missing_input_is_blocked_not_a_design_failure(self):
-        """A part whose material density nobody has recorded cannot be simulated:
-        that is BLOCKED with MISSING_REQUIRED_INPUT, not a FAIL of the design."""
+        """A part whose material density has no value cannot be simulated: that
+        is BLOCKED with MISSING_REQUIRED_INPUT, not a FAIL of the design, for
+        every null status."""
+        from ecad_validation.contract import validate_document
+
         from ecad_model.dataset import validate
 
-        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
-            item = _copy_item(directory)
-
-            def forget_density(annotations):
-                annotations["materials"]["steel_1045"]["density"] = {
-                    "value": None, "unit": "kg/m^3", "status": "UNKNOWN",
-                    "source": {"kind": "design_annotation", "ref": "design/annotations.json"},
-                    "note": "not recorded"}
-            _edit_json(item / "design" / "annotations.json", forget_density)
-            with tempfile.TemporaryDirectory() as output:
-                receipt = validate(item, Path(output) / "run")
-            v1 = next(c for g in receipt["gates"] for c in g["checks"] if c["check_id"].startswith("v1."))
-            self.assertEqual((v1["verdict"], v1["reason_code"]), ("BLOCKED", "MISSING_REQUIRED_INPUT"), v1["findings"])
-            self.assertTrue(any("UNKNOWN" in finding for finding in v1["findings"]))
+        for status, density in _null_quantities("kg/m^3").items():
+            with self.subTest(status=status), \
+                    tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as directory:
+                item = _copy_item(directory)
+                _edit_json(item / "design" / "annotations.json",
+                           lambda annotations: annotations["materials"]["steel_1045"].update(density=density))
+                with tempfile.TemporaryDirectory() as output:
+                    receipt = validate(item, Path(output) / "run")
+                validate_document(REPO_ROOT, "validation-receipt.schema.json", receipt)
+                v1 = next(c for g in receipt["gates"] for c in g["checks"] if c["check_id"].startswith("v1."))
+                self.assertEqual((v1["verdict"], v1["reason_code"]), ("BLOCKED", "MISSING_REQUIRED_INPUT"), v1["findings"])
+                self.assertTrue(any(status in finding for finding in v1["findings"]), v1["findings"])
 
     def test_each_failure_kind_has_its_own_verdict(self):
         from unittest import mock

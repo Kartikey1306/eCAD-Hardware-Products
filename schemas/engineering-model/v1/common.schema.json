@@ -17,8 +17,8 @@
       "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/sha256"
     },
     "status": {
-      "description": "Epistemic status. DERIVED is a deterministic function of other recorded values and must name them in derived_from. AI_ASSUMPTION must never be presented as SPECIFIED or MEASURED.",
-      "enum": ["MEASURED", "SPECIFIED", "DERIVED", "SIMULATED", "ESTIMATED", "AI_ASSUMPTION", "UNKNOWN"]
+      "description": "Epistemic status. DERIVED is a deterministic function of other recorded values and must name them in derived_from. AI_ASSUMPTION must never be presented as SPECIFIED or MEASURED. Three statuses have no value: UNKNOWN (nobody has established it, including not yet selected), UNSPECIFIED (the governing source was consulted and is silent) and NOT_AVAILABLE (it exists in a source this project cannot access or use).",
+      "enum": ["MEASURED", "SPECIFIED", "DERIVED", "SIMULATED", "ESTIMATED", "AI_ASSUMPTION", "UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE"]
     },
     "engineeringDomain": {
       "enum": [
@@ -42,6 +42,7 @@
           "enum": [
             "cad",
             "datasheet",
+            "product_specification",
             "design_annotation",
             "requirement",
             "handbook",
@@ -87,12 +88,34 @@
       },
       "allOf": [
         {
-          "if": {"properties": {"status": {"const": "UNKNOWN"}}},
+          "if": {"properties": {"status": {"enum": ["UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE"]}}},
           "then": {"properties": {"value": {"type": "null"}}}
         },
         {
           "if": {"properties": {"value": {"type": "null"}}},
-          "then": {"properties": {"status": {"const": "UNKNOWN"}}}
+          "then": {"properties": {"status": {"enum": ["UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE"]}}}
+        },
+        {
+          "description": "Why there is no value, or what an estimate rests on, is always stated.",
+          "if": {"properties": {"status": {"enum": ["UNKNOWN", "NOT_AVAILABLE", "ESTIMATED"]}}},
+          "then": {"required": ["note"]}
+        },
+        {
+          "description": "UNSPECIFIED cites, by hash, the document that is silent on the value.",
+          "if": {"properties": {"status": {"const": "UNSPECIFIED"}}},
+          "then": {"properties": {"source": {"required": ["sha256"]}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "MEASURED"}}},
+          "then": {"properties": {"source": {"properties": {"kind": {"const": "measurement"}}}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "SIMULATED"}}},
+          "then": {"properties": {"source": {"properties": {"kind": {"const": "simulation"}}}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "AI_ASSUMPTION"}}},
+          "then": {"properties": {"source": {"properties": {"kind": {"const": "ai"}}}}}
         },
         {
           "if": {"properties": {"status": {"const": "DERIVED"}}},

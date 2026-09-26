@@ -27,8 +27,8 @@
       "artifact": {
         "media_type": "application/json",
         "path": "derived/engineering_model.json",
-        "sha256": "d981b5f511473450ba1178cb7ecf734b10c7a2a956a62fcf1ac45a1cf2b95069",
-        "size_bytes": 42028
+        "sha256": "290054b5b7f65c2aad905230aaf1c94f372def7992c1bc796354be3468e79267",
+        "size_bytes": 42211
       },
       "derived_from": [
         "derived/cad_extraction.json",
@@ -143,8 +143,8 @@
     "annotations": {
       "media_type": "application/json",
       "path": "design/annotations.json",
-      "sha256": "415e314b6a7345169c5524a353f30ac8da47deb5b88fb53097583b6aea6608fa",
-      "size_bytes": 7169
+      "sha256": "8a3634b34bd70f55c2f3d94f1c4000a47ee97e539ccdad8cdcfa42713d5ddf45",
+      "size_bytes": 7217
     },
     "provenance": {
       "media_type": "application/json",

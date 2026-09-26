@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from .builder import resolve
 from .mjcf import rigid_groups
-from .quantity import Status
+from .quantity import is_null
 
 CASES_SCHEMA = "https://embeddedos.org/schemas/hardware-validation/v1/validation-cases.schema.json"
 SIMULATION_SCRIPT = "simulation/joint_dynamics.py"
@@ -39,7 +39,11 @@ CONTRACT_DOMAIN = {
 
 
 class ReferenceBlocked(ValueError):
-    def __init__(self, message: str, paths: Sequence[str]):
+    """A reference cannot be computed. paths lists the inputs that have no
+    value, each {"path", "status"}; it is empty when the derivation itself does
+    not apply to this design."""
+
+    def __init__(self, message: str, paths: Sequence[Dict[str, str]]):
         super().__init__(message)
         self.paths = list(paths)
 
@@ -52,10 +56,10 @@ def _dot(a: Sequence[float], b: Sequence[float]) -> float:
     return sum(x * y for x, y in zip(a, b))
 
 
-def _known(model: Dict[str, Any], path: str, missing: List[str]) -> Any:
+def _known(model: Dict[str, Any], path: str, missing: List[Dict[str, str]]) -> Any:
     item = resolve(model, path)
-    if item["status"] == Status.UNKNOWN.value:
-        missing.append(path)
+    if is_null(item["status"]):
+        missing.append({"path": path, "status": item["status"]})
         return None
     return item["value"]
 
@@ -81,7 +85,8 @@ def _rotate(vector: Sequence[float], axis: Sequence[float], angle: float) -> Lis
     return [v * c + ki * s + a * along * (1 - c) for v, ki, a in zip(vector, k, axis)]
 
 
-def _bodies(model: Dict[str, Any], scenario: Dict[str, Any], used: List[str], missing: List[str]) -> List[List[Any]]:
+def _bodies(model: Dict[str, Any], scenario: Dict[str, Any], used: List[str],
+            missing: List[Dict[str, str]]) -> List[List[Any]]:
     """(mass, centre of mass, inertia) of every moving body, with any payload override applied."""
     bodies = []
     for cid in _moving(model):
@@ -147,13 +152,13 @@ def reference_value(
     joint = model["joints"][0]
     jid = joint["joint_id"]
     used: List[str] = [f"joints/{jid}/axis", f"joints/{jid}/origin"]
-    missing: List[str] = []
+    missing: List[Dict[str, str]] = []
     axis = _known(model, f"joints/{jid}/axis", missing)
     origin = _known(model, f"joints/{jid}/origin", missing)
     gravity = model["design"]["gravity"]["value"]
     bodies = _bodies(model, scenario, used, missing)
     if missing:
-        raise ReferenceBlocked(f"{derivation} needs quantities that are UNKNOWN", missing)
+        raise ReferenceBlocked(f"{derivation} needs quantities that have no value", missing)
     arms = [[c - o for c, o in zip(com, origin)] for _, com, _ in bodies]
 
     def gravity_torque(angle: float) -> float:
@@ -235,7 +240,8 @@ def compile_cases(
 
     Returns:
         (golden cases, corner cases, blocked items). A blocked item names the
-        requirement and the UNKNOWN model paths it rests on.
+        requirement and the null-status model paths it rests on, each with
+        its status; a reference whose derivation does not apply has none.
 
     Raises:
         ValueError: A quantity limit's unit differs from its requirement's.
@@ -250,7 +256,7 @@ def compile_cases(
         True
         >>> unknown_limits = [r["requirement_id"] for r in requirements["requirements"]
         ...                   if "quantity" in r["limit"]
-        ...                   and resolve(model, r["limit"]["quantity"])["status"] == "UNKNOWN"]
+        ...                   and is_null(resolve(model, r["limit"]["quantity"])["status"])]
         >>> [entry["id"] for entry in blocked] == unknown_limits
         True
     """
@@ -261,7 +267,7 @@ def compile_cases(
             value, _used = reference_value(model, reference["derivation"], reference["scenario"])
         except ReferenceBlocked as exc:
             blocked.append(
-                {"id": reference["reference_id"], "gate": "V3", "reason": str(exc), "unknown_paths": exc.paths}
+                {"id": reference["reference_id"], "gate": "V3", "reason": str(exc), "missing_inputs": exc.paths}
             )
             continue
         case = _case(reference["reference_id"], reference["domain"], mjcf_path, reference["scenario"], "POLICY:V3-GOLDEN")
@@ -275,13 +281,13 @@ def compile_cases(
         limit = requirement["limit"]
         if "quantity" in limit:
             item = resolve(model, limit["quantity"])
-            if item["status"] == Status.UNKNOWN.value:
+            if is_null(item["status"]):
                 blocked.append(
                     {
                         "id": requirement["requirement_id"],
                         "gate": "V4",
-                        "reason": f"the limit is the model quantity {limit['quantity']}, which is UNKNOWN",
-                        "unknown_paths": [limit["quantity"]],
+                        "reason": f"the limit is the model quantity {limit['quantity']}, which is {item['status']}",
+                        "missing_inputs": [{"path": limit["quantity"], "status": item["status"]}],
                     }
                 )
                 continue
