@@ -35,7 +35,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -235,6 +235,33 @@ def _checks(receipt: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
 
 def _scratch():
     return tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-")
+
+
+def _parses_but_cannot_be_printed() -> Optional[int]:
+    """A list depth this Python's json parses but repr cannot print, or None
+    when the two limits are too close to build one reliably. Measured, not
+    assumed: CPython 3.14 parses about 116 000 levels and prints about 70 000;
+    3.12 stops both at about 10 000."""
+    def deepest(works: Callable[[int], object]) -> int:
+        low, high = 1, 1 << 18
+        while low < high:
+            middle = (low + high + 1) // 2
+            try:
+                works(middle)
+                low = middle
+            except RecursionError:
+                high = middle - 1
+        return low
+
+    def nested(depth: int) -> List[Any]:
+        value: List[Any] = []
+        for _ in range(depth):
+            value = [value]
+        return value
+
+    parsed = deepest(lambda depth: json.loads("[" * depth + "]" * depth))
+    printed = deepest(lambda depth: repr(nested(depth)))
+    return (parsed + printed) // 2 if parsed - printed > 1000 else None
 
 
 class TestArtefactFirstDomain(unittest.TestCase):
@@ -594,10 +621,14 @@ class TestHonestOutcomesWithoutCad(unittest.TestCase):
 
         from ecad_model.dataset import build, validate
 
-        def nested_adapter(document):
-            # Parses, then overflows the engine's schema check.
-            document["cases"][0]["adapter"] = json.loads("[" * 100000 + "]" * 100000)
-            return json.dumps(document)
+        def nested_adapter(text, depth):
+            # Parses, then overflows the engine's schema check. Built as text:
+            # json itself cannot build a list this deep on every Python.
+            document = json.loads(text)
+            document["cases"][0]["adapter"] = None
+            text = json.dumps(document)
+            self.assertEqual(text.count('"adapter": null'), 1)
+            return text.replace('"adapter": null', '"adapter": ' + "[" * depth + "]" * depth)
 
         for label in ("not UTF-8", "a metric that is not a finite number", "nested too deeply to parse",
                       "nested too deeply to check"):
@@ -610,7 +641,11 @@ class TestHonestOutcomesWithoutCad(unittest.TestCase):
                 elif label == "nested too deeply to parse":
                     corners.write_text("[" * 1000000 + "]" * 1000000)
                 elif label == "nested too deeply to check":
-                    corners.write_text(nested_adapter(json.loads(corners.read_text())))
+                    depth = _parses_but_cannot_be_printed()
+                    if depth is None:
+                        self.skipTest("this Python parses JSON barely deeper than it can print it, so no "
+                                      "document both parses and overflows the check")
+                    corners.write_text(nested_adapter(corners.read_text(), depth))
                 with _passing_icarus(float("nan")):
                     receipt = validate(item, Path(output) / "run", self.registry)
                 validate_document(REPO_ROOT, "validation-receipt.schema.json", receipt)
