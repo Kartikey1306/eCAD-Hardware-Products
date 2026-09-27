@@ -3,9 +3,9 @@
 
 Each mutant is one targeted edit that makes a behaviour the tests claim to
 protect wrong. For every mutant this copies the repository, applies the edit,
-runs the fast engineering-model, domain-adapter, netlist, ngspice-adapter
-and electrical tests, then the electrical tests that run ngspice and, only if
-they all stay green, the slower CAD-kernel tests. A mutant of a dataset
+runs the fast engineering-model, domain-adapter, netlist, ngspice-adapter,
+electrical and hdl-adapter tests, then the electrical tests that run ngspice
+and, if they all stay green, the slower CAD-kernel tests. A mutant of a dataset
 item's own file (a simulation script, a netlist, its annotations,
 requirements or provenance) is followed by a rebuild of that item, so the
 manifest's hashes cannot kill it: a behavioural test must. A mutant the
@@ -47,6 +47,8 @@ DR = "tools/ecad_model/domains/__init__.py"
 J = "datasets/cad/robotic_joint_001/simulation/joint_dynamics.py"
 NG = "tools/ecad_validation/adapters/ngspice.py"
 CP = "tools/ecad_validation/adapters/capabilities.py"
+HD = "tools/ecad_validation/adapters/hdl.py"
+PR = "tools/ecad_validation/adapters/process.py"
 SP = "tools/ecad_model/spice.py"
 EL = "tools/ecad_model/domains/electrical.py"
 EN = "datasets/cad/servo_supply_001/source/servo_supply_001.cir"
@@ -59,6 +61,7 @@ ADAPTER = "tests/unit/test_domain_adapter.py"
 NETLIST = "tests/unit/test_spice_netlist.py"
 NGSPICE = "tests/unit/test_ngspice_adapter.py"
 ELECTRICAL = "tests/unit/test_electrical_domain.py"
+HDLAD = "tests/unit/test_hdl_adapter.py"
 SPICE = "tests/unit/test_electrical_spice.py"
 SLOW = "tests/unit/test_cad_dataset.py"
 
@@ -605,6 +608,94 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      'values[("fault", "threshold_voltage")], 0.0)'),
     ("el-closing-time-ignores-hysteresis", EL, "(times[2] - times[1]) * (threshold + hysteresis) / levels[2]",
      "(times[2] - times[1]) * threshold / levels[2]"),
+    # run_process: declared outputs copied out before the workspace is deleted; an empty stdin on request
+    ("process-collect-skipped", PR, "    for name in names:\n", "    for name in ():\n"),
+    ("process-collect-follows-symlink", PR, "            status = candidate.lstat()\n",
+     "            status = candidate.stat()\n"),
+    ("process-collect-unbounded", PR, "        elif status.st_size > MAX_COLLECT_BYTES:\n", "        elif False:\n"),
+    ("process-collect-after-timeout", PR, '                reason_code="TOOL_TIMED_OUT",\n                argv=argv,\n',
+     '                reason_code="TOOL_TIMED_OUT",\n                argv=argv,\n'
+     "                collected=_collect(workspace, request.collect, request.collect_into)[0] if request.collect_into else [],\n"),
+    ("process-collect-name-unchecked", PR, "            if not _plain_file_name(name):\n", "            if False:\n"),
+    ("process-collect-by-default", PR,
+     "        if request.collect and request.collect_into is not None:\n"
+     "            collected, collect_problems = _collect(workspace, request.collect, request.collect_into)\n",
+     "        if True:\n"
+     "            collected, collect_problems = _collect(workspace, request.collect or tuple(p.as_posix() for p in outputs),\n"
+     '                                                   request.collect_into or workspace / ".home")\n'),
+    ("process-stdin-inherited", PR, "                stdin=subprocess.DEVNULL if request.stdin_devnull else None,\n",
+     "                stdin=None,\n"),
+    # iverilog: both steps on run_process, the program carried between them, arguments refused, declared markers
+    ("hdl-compile-inherits-environment", HD,
+     "                timeout_seconds=request.timeout_seconds, stdin_devnull=True,\n                collect=(PROGRAM,)",
+     "                timeout_seconds=request.timeout_seconds, stdin_devnull=True,\n"
+     '                environment=dict(__import__("os").environ), collect=(PROGRAM,)'),
+    ("hdl-run-inherits-environment", HD, "                timeout_seconds=request.timeout_seconds, stdin_devnull=True))\n",
+     "                timeout_seconds=request.timeout_seconds, stdin_devnull=True,\n"
+     '                environment=dict(__import__("os").environ)))\n'),
+    ("hdl-compile-stdin-inherited", HD,
+     "                timeout_seconds=request.timeout_seconds, stdin_devnull=True,\n                collect=(PROGRAM,)",
+     "                timeout_seconds=request.timeout_seconds,\n                collect=(PROGRAM,)"),
+    ("hdl-run-stdin-inherited", HD, "                timeout_seconds=request.timeout_seconds, stdin_devnull=True))\n",
+     "                timeout_seconds=request.timeout_seconds))\n"),
+    ("hdl-compile-bypasses-run-process", HD,
+     "            compiled = run_process(ProcessRequest(\n"
+     "                argv=compile_command, input_root=request.product_root, input_files=request.input_files,\n"
+     "                timeout_seconds=request.timeout_seconds, stdin_devnull=True,\n"
+     "                collect=(PROGRAM,), collect_into=Path(stage)))\n",
+     "            for source, relative in zip(request.input_files, relatives):\n"
+     "                (Path(stage) / relative).parent.mkdir(parents=True, exist_ok=True)\n"
+     "                shutil.copyfile(source, Path(stage) / relative)\n"
+     '            done = __import__("subprocess").run(\n'
+     "                [shutil.which(compile_command[0]) or compile_command[0], *compile_command[1:]], cwd=stage,\n"
+     "                capture_output=True, text=True, timeout=request.timeout_seconds, shell=False,\n"
+     '                stdin=__import__("subprocess").DEVNULL)\n'
+     "            compiled = ProcessResult(\n"
+     "                execution_status=ExecutionStatus.COMPLETED, argv=list(done.args), returncode=done.returncode,\n"
+     '                reason_code="TOOL_EXITED_ZERO" if done.returncode == 0 else "TOOL_EXITED_NONZERO",\n'
+     "                stdout=done.stdout, stderr=done.stderr,\n"
+     "                collected=[Path(stage) / PROGRAM] if (Path(stage) / PROGRAM).is_file() else [])\n"),
+    ("hdl-run-bypasses-run-process", HD,
+     "            executed = run_process(ProcessRequest(\n"
+     '                argv=["vvp", PROGRAM], input_root=Path(stage), input_files=list(compiled.collected),\n'
+     "                timeout_seconds=request.timeout_seconds, stdin_devnull=True))\n",
+     '            done = __import__("subprocess").run(\n'
+     '                [shutil.which("vvp") or "vvp", PROGRAM], cwd=stage, capture_output=True, text=True,\n'
+     '                timeout=request.timeout_seconds, shell=False, stdin=__import__("subprocess").DEVNULL)\n'
+     "            executed = ProcessResult(\n"
+     "                execution_status=ExecutionStatus.COMPLETED, argv=list(done.args), returncode=done.returncode,\n"
+     '                reason_code="TOOL_EXITED_ZERO" if done.returncode == 0 else "TOOL_EXITED_NONZERO",\n'
+     "                stdout=done.stdout, stderr=done.stderr)\n"),
+    ("hdl-program-not-carried", HD, "collect=(PROGRAM,), collect_into=Path(stage)))", "collect=(), collect_into=Path(stage)))"),
+    ("hdl-program-missing-passes", HD, "            if not compiled.collected:\n", "            if False:\n"),
+    ("hdl-arguments-passed", HD,
+     "        if request.arguments:\n"
+     "            return self._blocked(\n"
+     '                "RTL_ARGUMENTS_REFUSED",\n'
+     '                f"case arguments are not passed to Icarus Verilog and nothing was run: {list(request.arguments)!r}",\n'
+     "            )\n"
+     "        relatives = [relative_input_path(request.product_root, source).as_posix() for source in request.input_files]\n",
+     "        relatives = [relative_input_path(request.product_root, source).as_posix() for source in request.input_files]\n"
+     "        relatives += list(request.arguments)\n"),
+    ("hdl-truncation-ignored", HD, "            if executed.stdout.endswith(TRUNCATED):\n", "            if False:\n"),
+    ("hdl-metrics-parsed-on-failure", HD, "        if verdict is Verdict.PASS:\n",
+     "        if executed.returncode is not None:\n"),
+    ("hdl-undeclared-metrics-read", HD, "    for name in declared:\n", "    for name in [*declared, *reported]:\n"),
+    ("hdl-duplicate-report-kept", HD, "reported.setdefault(found.group(1), []).append(found.group(2))",
+     "reported.setdefault(found.group(1), [found.group(2)])"),
+    ("hdl-non-finite-kept", HD, "        elif not math.isfinite(float(values[0])):\n", "        elif False:\n"),
+    ("hdl-python-number-spellings", HD, "        elif not NUMBER.match(values[0]):\n", "        elif False:\n"),
+    ("hdl-declared-twice-read", HD, "    return ([name for name, count in counts.items() if count == 1],\n",
+     "    return ([name for name, count in counts.items() if count >= 1],\n"),
+    ("hdl-oversize-input-read", HD, "            if source.stat().st_size > MAX_INPUT_BYTES:\n", "            if False:\n"),
+    ("hdl-reason-unsanitised", HD, "    if RECEIPT_CODE.match(reason):\n", "    if True:\n"),
+    ("hdl-timeout-names-compile-step", HD, '        unfinished = self._unfinished("RTL testbench execution", executed)\n',
+     '        unfinished = self._unfinished("RTL compilation", __import__("dataclasses").replace(executed, argv=compile_command))\n'),
+    # iverilog's version: the first line of `iverilog -V`, never an invented one
+    ("iverilog-version-pattern-added", CP, r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)")}',
+     r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)"), "iverilog": re.compile(r"version ([0-9.]+)")}'),
+    ("silent-probe-version-invented", CP, "        return output.splitlines()[0].strip() if output else None\n",
+     '        return output.splitlines()[0].strip() if output else "unknown"\n'),
 ]
 
 
@@ -655,7 +746,7 @@ def run(name: str, relative: Optional[str], old: str, new: str) -> Tuple[str, st
                     subprocess.run(command, cwd=copy, check=True, capture_output=True, timeout=300)
         environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", ECAD_REQUIRE_SPICE_TOOLS="1",
                            PYTHONDONTWRITEBYTECODE="1")
-        for suite in (FAST, ADAPTER, NETLIST, NGSPICE, ELECTRICAL, SPICE, SLOW):
+        for suite in (FAST, ADAPTER, NETLIST, NGSPICE, ELECTRICAL, HDLAD, SPICE, SLOW):
             result = subprocess.run(
                 [sys.executable, "-m", "pytest", suite, "-q", "-x", "-p", "no:cacheprovider"],
                 cwd=copy, env=environment, capture_output=True, text=True, timeout=1800,
