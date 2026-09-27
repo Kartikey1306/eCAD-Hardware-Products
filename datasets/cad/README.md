@@ -31,10 +31,12 @@ python3 tools/cad_dataset.py validate datasets/cad/robotic_joint_001 --output /t
 compile. `check` exits 1 if a hash is wrong or a derived file no longer
 reproduces from the sources. `validate` runs V0–V4 and writes a receipt,
 content-addressed evidence, one result per requirement and reference
-(`results.json`) and a report. It exits 0 when all of them were written,
-whatever the verdicts; 2 when the receipt and report were written but the
-results could not be (the report says why); and 1 when no receipt was
-written. It writes one even when the item's inputs cannot be built into a
+(`results.json`) and a report. It exits 0 when the run completed, whatever
+the verdicts -- including a run that writes no results by design (no adapter
+for the domain, requirements that cannot be read, a committed model that
+cannot be used; the report says which); 3 when the receipt and report were
+written but generating the results failed (the report says why); and 1 when
+no receipt was written. It writes one even when the item's inputs cannot be built into a
 model, or committed files have drifted from them. It writes none for an item
 it refuses before any gate runs: no or an invalid `source/provenance.json`, a
 declared artefact that is missing or not a regular file, a symlink, a
@@ -96,7 +98,8 @@ validator. Run with the interpreter that has `mujoco` installed first on
   array, so last-digit kernel differences between platforms do not fail it.
   Verified 2026-09-26: on Linux aarch64, `check`, the complete suite and
   `validate` pass, on the mechanical pipeline (`bd999d5`) and again with the
-  domain adapters (`bb43124`); under emulation on Linux x86_64, `check` passes
+  domain adapters (`bb43124`, again at `000309b` on 2026-09-27); under
+  emulation on Linux x86_64, `check` passes
   (verified on the mechanical pipeline only). The MuJoCo stages have not run
   on native x86_64.
 - **Linux needs `libgl1`.** OpenCASCADE's wheel links `libGL.so.1`, which a

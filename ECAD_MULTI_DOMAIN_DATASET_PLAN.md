@@ -77,7 +77,7 @@ These are labels for this document only. Data uses the spec §34 vocabulary
 | `fix/portable-evidence-paths` | `e4b6513` | No host paths in hash-bound legacy evidence |
 | `fix/producer-cross-reference-checks` | `6e6aae3` | Producer refuses bundles its own verifier rejects |
 | `wip/stack` | the documentation commit carrying this file | `fea3fc4` → `3639778` (the cross-reference fix, cherry-picked; patch-identical to `6e6aae3`) → the mechanical pipeline (`b965aa4`, `17a4770`) → review fixes `f4398f4`, mutation suite `8db907e`, pins `9c5b890`, second-review fixes `c9be0b6`, harness `be63d19`, fixes from a check of this plan's claims `bd999d5` (§7), then the documentation commit |
-| `feat/multi-domain-foundation` | code at `7b58a76`, then its documentation | Forked from the stack's documentation commit: five feature commits, the fixes of two reviews (`2beb77a`), one test (`b4fca10`), documentation (`793c770`), the fixes of a third review (`bb43124`), one test (`7b58a76`); §21 item 3 (each item marked there) |
+| `feat/multi-domain-foundation` | code at `000309b`, then its documentation | Forked from the stack's documentation commit: five feature commits, the fixes of two reviews (`2beb77a`), one test (`b4fca10`), documentation (`793c770`), the fixes of a third review (`bb43124`), one test (`7b58a76`), documentation (`7d16314`), the fixes of a fourth review (`dbf73e1`), one test fixture made portable to Python 3.12 (`000309b`); §21 item 3 (each item marked there) |
 | `fix/version-probe-reason-codes` | not written | RESULT-2 (§7.2); planned for §21 item 1 |
 
 `feat/cad-dataset-engineering-model` (`50a8557`) is the pre-review version of
@@ -247,7 +247,7 @@ Nothing here has landed.
 | ARCH-7 | `python_control` reports the validator's interpreter version, not the model's packages, and may run a different interpreter; receipt tool records were last-writer-wins per `tool_id` | Tool records fixed on the stack: one record per tool keeps only what all its checks share · `test_committed_item_meets_every_measurable_check` · `tool-record-last-writer-wins`. The `python_control` half is open: a prerequisite of the first Python-model domain (§21 item 7) |
 | RESULT-8 | Version probes take the first output line; ngspice's is a banner (**Inferred**, ngspice not installed here) | Open; prerequisite of the electrical domain |
 | MAP-1 | A `BLOCKED` V3 reference falls back to contract domain `integrated_physics` because only `requirements[]` is searched | Fixed on `feat/multi-domain-foundation` (the lookup covers references); no observable effect for mechanical |
-| ENGINE-1 | The case engine does not survive every case document: it reports one it cannot parse as `FAIL` with no evidence (`cases.py:157-170`), which the receipt contract forbids, so the receipt fails its own schema; it reads the document as UTF-8 and catches only `OSError` and `JSONDecodeError`, so a document in UTF-16 raises out of it; and a metric that is not a finite number makes `canonical_json_bytes` raise (`cases.py:410`). In each case no receipt is written (**Verified** through the dataset runner, 2026-09-26) | Open in merged code. The dataset runner on `feat/multi-domain-foundation` cites the document as the evidence, and turns an engine exception into a gate-level `INCONCLUSIVE` `CASE_ENGINE_ERROR`; the product pipeline still has the defect. Fix belongs with §21 item 1 |
+| ENGINE-1 | The case engine does not survive every case document: it reports one it cannot parse as `FAIL` with no evidence (`cases.py:157-170`), which the receipt contract forbids, so the receipt fails its own schema; it reads the document as UTF-8 and catches only `OSError` and `JSONDecodeError`, so a document in UTF-16 raises out of it; a document nested deeply enough raises `RecursionError` from its parse or its schema check; and a metric that is not a finite number makes `canonical_json_bytes` raise (`cases.py:410`). In each case no receipt is written, and an exception loses the verdicts of every case in the document (**Verified** through the dataset runner, 2026-09-26/27) | Open in merged code. The dataset runner on `feat/multi-domain-foundation` cites the document as the evidence, and turns an engine exception into a gate-level `INCONCLUSIVE` `CASE_ENGINE_ERROR` with each entry `INCONCLUSIVE` (crashed); the product pipeline still has the defect. Fix belongs with §21 item 1 |
 
 ### 7.3 Missing (spec capabilities with no code)
 
@@ -355,16 +355,39 @@ closed them:
 | IDs | Finding (as confirmed) | State | Test · mutant |
 |---|---|---|---|
 | R-2, R-3, S-1, S-3, D-1, D-3 | A committed case with the right id but other content (limit, tolerance, metric) was counted; with a changed metric the results then failed their own schema and the command line exited 1 though a receipt existed | Fixed: `BLOCKED` `COMMITTED_CASE_STALE`, naming what differs | `test_a_committed_case_the_requirements_no_longer_compile_to_is_not_counted`, `test_a_limit_tightened_without_a_rebuild_is_not_judged_against_the_old_one` · `content-stale-case-counted` |
-| R-1 | The case engine raised out of `validate` on a document not in UTF-8, or on a non-finite metric | Fixed: gate-level `INCONCLUSIVE` `CASE_ENGINE_ERROR`, every compiled entry `BLOCKED`; ENGINE-1 widened (§7.2) | `test_a_case_document_the_engine_cannot_run_still_gives_a_receipt` · `engine-error-crashes` |
+| R-1 | The case engine raised out of `validate` on a document not in UTF-8, or on a non-finite metric | Fixed here for those two; a `RecursionError` from the engine was closed in round 4 (below): gate-level `INCONCLUSIVE` `CASE_ENGINE_ERROR`, every compiled entry `BLOCKED`; ENGINE-1 widened (§7.2) | `test_a_case_document_the_engine_cannot_run_still_gives_a_receipt` · `engine-error-crashes` |
 | R-5, S-5 | A result took a bound and seed from a case its check never ran, and a limit value the fresh derivation found missing | Fixed: a case only when the result's own check ran it; a limit is null when the check was blocked on it | `test_a_committed_case_the_requirements_no_longer_compile_to_is_not_counted`, `test_a_stale_case_for_a_requirement_now_blocked_is_discarded_not_duplicated` · `case-without-execution-used`, `null-limit-from-findings-ignored` |
-| S-2 | The AI rule read only the committed model's statuses: a relabel without a rebuild was missed | Fixed: statuses from both models, the stricter decides | `test_an_input_relabelled_without_a_rebuild_is_judged_by_what_it_is_now` · `fresh-statuses-ignored` |
+| S-2 | The AI rule read only the committed model's statuses: a relabel without a rebuild was missed | Fixed: statuses from both models, the stricter decides; the result's listed inputs followed in round 4 (below) | `test_an_input_relabelled_without_a_rebuild_is_judged_by_what_it_is_now` · `fresh-statuses-ignored` |
 | S-4, D-2 | The results read a case document the engine had refused on its schema, and crashed on its shape | Fixed: only schema-valid documents are read | `test_a_case_document_that_breaks_its_schema_is_not_read_for_results`; `test_a_forged_case_document_is_not_read_for_results` (added after the full mutation run left it alive: in a real run no executed check cites such a document, so only regeneration from a forged run reaches the check) · `results-cases-schema-unchecked` |
 | R-3 (exit code) | A results failure after the receipt exited 1, which means "no receipt" | Fixed: `ResultsNotWritten`, exit 2 | `test_the_command_line_says_when_the_receipt_was_written_without_its_results` · `results-failure-exit-code` |
-| R-4 | The four gate-level check ids could be an entry's id, colliding with the check that stands in for the gate | Fixed: reserved | `test_an_id_the_case_engine_uses_for_a_whole_gate_is_refused` · `reserved-ids-allowed` |
-| S-6 | JSON nested too deeply raised `RecursionError` from parsing, schema checking or comparison | Fixed: malformed input, a `ValueError` or a reported problem | `test_json_nested_too_deeply_is_malformed_input_not_a_crash` · `deep-json-crashes` |
+| R-4 | The four gate-level check ids could be an entry's id, colliding with the check that stands in for the gate | Fixed: reserved; a committed case under such an id was still counted until round 4 (below) | `test_an_id_the_case_engine_uses_for_a_whole_gate_is_refused` · `reserved-ids-allowed` |
+| S-6 | JSON nested too deeply raised `RecursionError` from parsing, schema checking or comparison | Fixed for the item's own documents; case documents (through the engine), the manifest comparison and the receipt were closed in round 4 (below): malformed input, a `ValueError` or a reported problem | `test_json_nested_too_deeply_is_malformed_input_not_a_crash` · `deep-json-crashes` |
 | S-7 | Regeneration trusted the item digest for a model git ignores, which the digest does not cover | Fixed: refused | `test_a_model_outside_the_receipt_s_digest_is_not_regenerated_from` · `regenerate-unlisted-model` |
 | D-4 | MEMORY.md still promised a receipt "whatever the item does"; the refusals before any gate were not listed | Fixed: the refusals are listed in the README and the architecture document | *doc change* |
 | D-5, D-6, D-7 | Three names in this section were wrong or stale | Fixed | *doc change* |
+
+A fourth review then examined the third round and the documentation: 22
+findings, all confirmed, none refuted. The substantive one: a case whose
+limits still matched was counted even when the domain model it runs on no
+longer reproduced (on `robotic_joint_001` with the densities doubled and no
+rebuild, REQ-MECH-001 was judged on the old MJCF). Round 4 (`dbf73e1`)
+closed them. Its own fixes have not had a review of their own.
+
+| IDs | Finding (as confirmed) | State | Test · mutant |
+|---|---|---|---|
+| R4-2 | A committed case whose derived input (the MJCF) no longer reproduces was counted | Fixed: `COMMITTED_CASE_STALE`, naming the input | `test_a_case_whose_derived_input_no_longer_reproduces_is_not_counted`, `test_a_design_edited_without_a_rebuild_is_not_judged_on_the_old_model` · `input-staleness-ignored` |
+| R4-1, S4-1, D4-1 | A `RecursionError` from the case engine (a case document nested too deeply to parse or to check) lost the receipt | Fixed: `CASE_ENGINE_ERROR` | `test_a_case_document_the_engine_cannot_run_still_gives_a_receipt` · `engine-recursion-crashes` |
+| R4-3 | An engine exception marked every entry `BLOCKED` though nothing was missing, and the loss of their verdicts was not said | Fixed: `INCONCLUSIVE` (crashed); ENGINE-1 says the verdicts are lost | the same test · `engine-error-marked-blocked` |
+| R4-4 | An infinity was "within tolerance" of any number, in V2 and in case reconciliation | Fixed: untrusted JSON refuses `Infinity`/`NaN`; non-finite comparisons are exact | `TestNonFiniteNumbers` · `infinite-constants-accepted`, `infinity-equals-anything` |
+| R4-5, S4-7, D4-3 | A result's inputs came from the committed model only, so a relabel did not show | Fixed: the inputs each check was judged on are recorded with it and listed | `test_an_input_relabelled_without_a_rebuild_is_judged_by_what_it_is_now` · `inputs-not-recorded`, `recorded-inputs-ignored` |
+| R4-6, S4-4 | A failure serialising the results escaped the `ResultsNotWritten` guard | Fixed: inside the guard (no input reaches it now that non-finite numbers are refused) | *no trigger left; no mutant* |
+| R4-7 | Entries of a document the engine refused as a whole were called missing | Fixed: `CASE_DOCUMENT_REFUSED` | `test_a_case_document_the_engine_refuses_is_named_not_called_missing` · `refusal-unlabelled` |
+| S4-2 | A manifest nested too deeply crashed V2's comparison | Fixed: a reported divergence | `test_a_manifest_nested_too_deeply_is_a_divergence_not_a_crash` · `manifest-deep-crash` |
+| S4-3, D4-2 | A receipt nested too deeply raised `RecursionError` from regeneration | Fixed: `ValueError` | `test_a_receipt_nested_too_deeply_is_refused_not_a_crash` · `regenerate-deep-receipt` |
+| S4-5 | Exit 2 for "receipt without results" is argparse's usage-error code | Fixed: 3 | `test_the_command_line_says_when_the_receipt_was_written_without_its_results` · `results-failure-exit-code` |
+| S4-6, D4-4 | A committed case under a gate-level id was counted | Fixed: only the engine's own gate-level verdicts count | `test_a_committed_case_under_a_gate_level_id_is_not_counted` · `gate-level-id-counted` |
+| S4-8 | A V3 result whose adapter crashed lost the bound its case was compiled to | Fixed | `test_a_reference_whose_adapter_crashed_still_shows_its_compiled_bound` · `crashed-case-bound-dropped` |
+| D4-5, D4-6, D4-7 | The README's exit codes, MEMORY.md's refusal list, and this section's rows overstated what was closed | Fixed | *doc change* |
 
 ---
 
@@ -825,7 +848,11 @@ From `TESTING.md` and from both reviews:
   review, 210 mutants at `bb43124`, after a green baseline: 209 killed; the
   survivor, `results-cases-schema-unchecked`, was again a missing test, which
   `7b58a76` adds and a targeted re-run shows killing it (**Verified**,
-  2026-09-26/27). Each kill names its test.
+  2026-09-26/27). After the fourth review, 222 mutants at `dbf73e1`, in two
+  runs that each began with a green baseline (54, then the other 168 on seven
+  workers): 222 killed, none surviving -- 96 by `test_engineering_model.py`,
+  84 by `test_domain_adapter.py`, 42 by `test_cad_dataset.py` (**Verified**,
+  2026-09-27). Each kill names its test.
 - Property tests: rigid transforms of a whole design leave every physical
   metric unchanged.
 - Reference values for every simulated metric with a closed form.
@@ -922,7 +949,7 @@ An MVP with no real part can therefore never `PASS` on a part rating.
 | Q8 | Dataset layout: by primary domain (spec §3) or one directory per sample with domains in metadata? | Maintainer decision, before the first non-mechanical sample |
 | Q9 | New simulators (Verilator, Elmer, FMI) need the merged cases contract's adapter enum amended, or an open adapter ID checked against the registry | Maintainer decision |
 | Q10 | The spec orders mechanical after the foundation; this plan lands the existing mechanical work first, because spec §35 asks to preserve it and the review evidence is tied to it | Confirm |
-| R1 | Cross-platform reproduction. **Verified** at `bd999d5`: Linux aarch64 (`python:3.12-slim`, pinned wheels, only `git` and `libgl1` added) passes `check`, the complete suite (245) and gives the same `validate` verdicts as macOS; and again on the foundation at `bb43124` (322 tests). **Verified** at `c9be0b6`: Linux x86_64 under emulation passes `check`. **Not run**: MuJoCo stages on native x86_64, because the emulated CPU has no AVX | A native x86_64 run, which the `cad-dataset` CI job provides on its first execution |
+| R1 | Cross-platform reproduction. **Verified** at `bd999d5`: Linux aarch64 (`python:3.12-slim`, pinned wheels, only `git` and `libgl1` added) passes `check`, the complete suite (245) and gives the same `validate` verdicts as macOS; and again on the foundation at `bb43124` (322 tests) and at `000309b` (332 tests). **Verified** at `c9be0b6`: Linux x86_64 under emulation passes `check`. **Not run**: MuJoCo stages on native x86_64, because the emulated CPU has no AVX | A native x86_64 run, which the `cad-dataset` CI job provides on its first execution |
 | R2 | Several domains need system tools CI must install; install time and flakiness are unknown | CI trial |
 | R3 | Push access is read-only for this account; nothing can land without a fork or restored access | Access decision |
 | R4 | PR 3 regenerates mutation and reproduction evidence and re-anchors the mutation suite | Budgeted in §21 |
@@ -937,9 +964,10 @@ An MVP with no real part can therefore never `PASS` on a part rating.
    departure from spec §30 for the reason in Q10. Its documentation declares
    the two schema families pre-release (§9.3).
 3. **Foundation** (spec §32; the first stage to implement). Each item is
-   marked with its state on `feat/multi-domain-foundation` at `7b58a76`: the
-   findings of three independent reviews are closed (§7.5), and the tests have
-   been seen killing the mutants of §16:
+   marked with its state on `feat/multi-domain-foundation` at `000309b`: the
+   findings of four independent reviews are closed (§7.5; the fourth round's
+   fixes have had no review of their own), and the tests have been seen
+   killing the mutants of §16:
    - versioning (§9.3): per-producer version constants, and the rule that
      replaces the pre-release declaration — PARTIAL: both exist, but no test
      has been seen failing when a producer's version is not recorded or not

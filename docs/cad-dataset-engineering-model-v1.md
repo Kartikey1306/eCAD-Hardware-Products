@@ -268,21 +268,30 @@ reports every such divergence):
   compile, is not counted; a blocked entry's check says the stale case was
   there;
 - a committed case whose content differs from the freshly compiled case of
-  the same id — a limit, a tolerance, a metric, the arguments — is not
+  the same id — a limit, a tolerance, a metric, the arguments — or whose
+  derived inputs (the domain model it runs on) no longer reproduce, is not
   counted either: `BLOCKED` with `COMMITTED_CASE_STALE`, naming what differs;
 - an entry the fresh derivation compiles but the committed document lacks is
-  `BLOCKED` with `COMMITTED_CASE_MISSING`;
-- when the case engine stops on the document (one not in UTF-8, a metric
-  that is not a finite number), one gate-level `INCONCLUSIVE`
-  `CASE_ENGINE_ERROR` check cites it, and every compiled entry is `BLOCKED`
-  with the same reason.
+  `BLOCKED` with `COMMITTED_CASE_MISSING`; one whose case is there, in a
+  document the engine refuses as a whole, is `BLOCKED` with
+  `CASE_DOCUMENT_REFUSED`;
+- a committed case filed under one of the engine's gate-level ids is not
+  counted: only the engine's own verdict on the whole document is;
+- when the case engine stops on the document (one not in UTF-8, one nested
+  too deeply, a metric that is not a finite number), one gate-level
+  `INCONCLUSIVE` `CASE_ENGINE_ERROR` check cites it; the engine returns
+  nothing for the document, so every compiled entry's verdict is lost and
+  each is `INCONCLUSIVE` (crashed) with the same reason.
 
 So each reference and requirement has exactly one check, and a verdict is
 only ever given against the limits the requirements state now. A case
 document the engine cannot parse is cited as the evidence of its `FAIL`,
 which the engine itself omits. Input statuses are read from both the fresh
 and the committed model, and the stricter decides, so a value relabelled
-(say to `AI_ASSUMPTION`) without a rebuild is judged as what it is now.
+(say to `AI_ASSUMPTION`) without a rebuild is judged as what it is now; the
+inputs a check was judged on are recorded with it, and its result lists
+them. Untrusted JSON may not carry `Infinity` or `NaN`, which JSON does not
+define, and a comparison in which anything is not finite is exact.
 
 `validate` writes a schema-valid receipt when the inputs cannot be built into
 a model, when the requirements cannot be read or compiled, when committed
@@ -322,7 +331,8 @@ result no check decided is an error, not a default. A result uses a compiled
 case (its bound, its seed) only when its own check ran that case. The results
 are written after the receipt and the evidence index, so nothing they do can
 cost a run its receipt; if they cannot be built, `validate` raises
-`ResultsNotWritten` and the command line exits 2. None are written when no
+`ResultsNotWritten` and the command line exits 3 (2 is argparse's usage
+error). None are written when no
 adapter is registered, the requirements cannot be read, or the committed
 model is missing or invalid; the report says which. They read a case
 document only if it conforms to its schema.
@@ -334,7 +344,7 @@ document only if it conforms to its schema.
 | `expected_value`, `operator`, `applied_bound`, `tolerance` | The requirement, and the bound as compiled: a V4 minimum or maximum with the tolerance folded in, or a V3 value and absolute tolerance (\|measured − value\| ≤ tolerance, as the golden comparator evaluates it). |
 | `simulator`, `simulator_version`, `configuration` | The check's own hash-bound execution record and compiled case (command, scenario, seed); never inferred. The time step is fixed in the domain model, which the case cites as evidence. |
 | `model_version`, `model_sha256`, `model_fidelity` | The committed model and the adapter's metric vocabulary (mechanical: `rom_` clearance metrics are `SIMPLIFIED`, bounding-box proxies; the others `EXACT_GEOMETRY`); the fidelity is `null` for a metric the domain does not produce. |
-| `inputs` | Every quantity the metric rests on whose status is not `DERIVED`, and every `DERIVED` one with no model inputs, each with its status; plus the scenario's numeric parameters, `SPECIFIED` by the entry that states them. |
+| `inputs` | Every quantity the check rests on whose status is not `DERIVED`, and every `DERIVED` one with no model inputs, each with its status, as the run recorded them from the fresh and the committed model (the stricter status where they differ); plus the scenario's numeric parameters, `SPECIFIED` by the entry that states them. |
 | `environment` | The OS, architecture, interpreter and pinned-dependency digest the run recorded in its `v0.pinned-clean-source` evidence, and every tool the receipt records. |
 
 The schema also refuses what the contract forbids: a `PASS` without a
