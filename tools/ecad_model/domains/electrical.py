@@ -347,8 +347,10 @@ def write_deck(model: Dict[str, Any]) -> bytes:
 
     A title comment, a comment saying what wrote it, one line per circuit
     component in model order, each switch's .model card, `.options noacct`
-    (which removes the run statistics, so stdout is identical run to run),
-    one transient to T_END with a fixed TMAX, the nine measurements, `.end`.
+    (which removes the operating-point table and the run statistics; a slow
+    run can still print a progress report, so stdout is identical run to run
+    only apart from that), one transient to T_END with a fixed TMAX, the nine
+    measurements, `.end`.
     Every number is a model value, or a sum or product of model values and
     this module's constants, written with repr.
 

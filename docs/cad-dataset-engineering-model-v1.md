@@ -6,9 +6,11 @@ simulators produce measurements, and the existing V0–V4 contract decides
 whether the measurements meet the requirements. Each engineering domain
 attaches through a domain adapter (`tools/ecad_model/domains/`); the dataset
 runner (`tools/ecad_model/dataset.py`) knows no domain, file format or
-simulator. One domain is implemented end to end — mechanical, on
-`datasets/cad/robotic_joint_001` — and a test-only adapter for Verilog shows
-that a sample with no CAD file runs through the same runner.
+simulator. Two domains are implemented end to end: mechanical, on
+`datasets/cad/robotic_joint_001` (a STEP assembly, MuJoCo), and electrical,
+on `datasets/cad/servo_supply_001` (a SPICE netlist, ngspice; see
+[electrical-domain-v1.md](electrical-domain-v1.md)). A test-only adapter for
+Verilog also runs a sample with no CAD file through the same runner.
 
 ```
 source/provenance.json ── domain + artefacts ──► the domain's adapter
@@ -17,7 +19,7 @@ design/annotations.json ──────────────────�
                                               ▼            ▼
                                    derived/engineering_model.json
                                               │
-        requirements/requirements.json ──┐    ├─► derived/<domain>/…  (mechanical: <item>.mjcf.xml)
+        requirements/requirements.json ──┐    ├─► derived/<domain>/…  (mechanical: <item>.mjcf.xml; electrical: <item>.cir)
                                           ▼    ▼
                       validation/{golden,corners}/cases.json
                                           │
@@ -31,11 +33,11 @@ design/annotations.json ──────────────────�
 | Concept | Where | Owns |
 |---|---|---|
 | Origin | `source/provenance.json` | Hand-written: the sample's primary domain, its source artefacts by path and format, the script that authored them, where they came from, their licence and attribution, whether redistribution and training use are permitted, and why that is believed. `build` refuses an item without it and never fills it in. |
-| Design | `source/<artefacts>` | The source of truth. For mechanical, one STEP assembly: the only source of geometry. |
+| Design | `source/<artefacts>` | The source of truth. For mechanical, one STEP assembly: the only source of geometry. For electrical, one SPICE netlist: the only source of values and connectivity. |
 | Design intent | `design/annotations.json` | What the artefacts cannot carry: which part is which component, materials, joints and their axis sense and limits, components with no geometry. |
 | Model | `derived/engineering_model.json` | Everything above, in SI, with provenance on every value. |
-| Domain model | `derived/<domain>/…` | The domain's view of the model, for its simulator (mechanical: MJCF for MuJoCo). |
-| Simulation | `simulation/*.py` | Produces metrics. Never decides pass or fail. |
+| Domain model | `derived/<domain>/…` | The domain's view of the model, for its simulator (mechanical: MJCF for MuJoCo; electrical: the ngspice deck). |
+| Simulation | `simulation/*.py`, or the domain's simulator on its domain model | Produces metrics. Never decides pass or fail. The electrical domain has no scripts: ngspice runs the deck. |
 | Validation | `validation/*/cases.json`, the V0–V4 contract | Compares metrics against requirements, deterministically. |
 | Results | `results.json` of a run | One record per requirement and reference: what was measured against what, on which inputs, by which simulator. |
 
@@ -90,6 +92,17 @@ A value from the repository's own product sheets has source kind
   (`mechanical`, `electrical`, `thermal`, `digital`, …) of quantities. A
   component with no geometry, such as the unselected actuator, has
   `cad_ref: null`.
+- **Circuit elements** (format 1.1.0). A component that stands for a netlist
+  element carries a `circuit` member: its `designator`, its `element`
+  (`resistor`, `capacitor`, `voltage_source`, `current_source`,
+  `voltage_controlled_switch`), its `terminals` (`p` and `n`, plus `cp` and
+  `cn` for a switch), each the name of a node, `"0"` being ground, and a
+  switch's `model`. Nets are derived from the terminals and never stored.
+  The component kinds gain `fuse`, `resistor`, `capacitor`, `switch`,
+  `voltage_source` and `current_source`. A model that uses either addition
+  must declare format 1.1.0 (Versioning). Topology is in the model because
+  the protocol hands the deck writer, V1, V2 and the closed forms only the
+  model; this amends ARCH-1 of the plan (§8.2).
 - **Joints** name parent, child, and the component whose cylindrical faces
   define the axis. The axis line and origin are extracted from that geometry
   and are `DERIVED`; they are never typed in. Non-coaxial or missing
@@ -121,8 +134,9 @@ words of the specification (§34), plus `NOT_APPLICABLE`:
 The status comes from the platform's adapter registry
 (`ecad_model.domains.REGISTRY`), never from the item's data, and `check`
 regenerates the manifest to catch a hand edit. Each reason also lists the
-null-status inputs the item has for that domain, so a missing motor constant
-is reported against electrical even though no electrical adapter exists yet.
+null-status inputs the item has for that domain, so the robotic joint's
+missing motor constants are reported against electrical, which is
+`NOT_APPLICABLE` there because the sample has no netlist.
 
 The manifest also carries the specification's metadata (§4): `domain`,
 `source_url` (from the provenance's origin; `null` only for a self-authored
@@ -145,8 +159,9 @@ gate (`golden-cases`, `golden-manifest`, `corners-cases`, `corners-manifest`)
 are reserved.
 
 **Reference values** (V3 golden) verify a domain model against an independent
-closed-form derivation computed from the engineering model. The mechanical
-derivations:
+closed-form derivation computed from the engineering model. The electrical
+derivations are listed in [electrical-domain-v1.md](electrical-domain-v1.md);
+the mechanical derivations:
 
 | Derivation | Closed form | Scenario |
 |---|---|---|
@@ -179,7 +194,12 @@ Scenario names and their parameters belong to the domain. The generic
 requirements schema leaves them open; the mechanical adapter checks every
 entry against `engineering-model/v1/mechanical-vocabulary.schema.json`, which
 requires what each scenario's case reads (a rated move's start, end and
-duration; a free swing's amplitude).
+duration; a free swing's amplitude). The electrical adapter checks them
+against `engineering-model/v1/electrical-vocabulary.schema.json`: three
+scenarios that are windows of one transient and carry only their name, and
+nine derivations; it also refuses a metric asked for under another scenario
+than the one it is measured in, and a derivation paired with another
+metric.
 
 **What an input's status does to a verdict.** A check's inputs are what the
 model quantities it depends on ultimately rest on: for a requirement, its
@@ -187,7 +207,8 @@ metric's dependencies and its limit when that is a model quantity; for a
 reference, the quantities its derivation reads. The mechanical adapter's
 dependencies are coarse on purpose: the joint's axis, origin and range for
 every metric, and the moving bodies' mass properties and gravity for
-dynamics, or every body's bounding box for clearance. The rules apply to V3
+dynamics, or every body's bounding box for clearance; the electrical
+adapter's are every value the netlist states. The rules apply to V3
 and V4 checks alike; applied in order, the first that applies wins:
 
 1. A null-status input makes the check `BLOCKED` with
@@ -234,8 +255,8 @@ additionally records the engineering requirement each check implements.
 | Gate | Checks |
 |---|---|
 | V0 `v0.dataset-schemas-and-hashes` | Every dataset document conforms to its schema, including the adapter's extraction files; every recorded hash matches exactly, including provenance, simulation scripts and the licence text; no file is unrecorded; every source a value cites exists. Also `v0.dataset-input-immutability` (inputs unchanged during the run) and `v0.pinned-clean-source` (source tree clean and pinned; its evidence also records where the run happened). |
-| V1 `v1.<domain>.extraction-and-sanity` | The sources re-extract, and the domain's sanity checks pass (mechanical: every mass, inertia tensor — symmetric, positive definite, triangle inequality — axis and limit is physically possible). |
-| V2 `v2.dataset-reproduction`, `v2.<domain>.model-invariants` | The committed derivation reproduces from the sources, and a committed file that does not parse is a divergence, not a crash; `dataset-item.json` matches the one a rebuild would write; no committed case document is one the requirements no longer compile; every relationship endpoint, requirement subject and design source resolves, and each design source is an artefact the provenance declares. Then the domain's invariants (mechanical: every `cad_ref` resolves to a CAD occurrence, and MJCF bodies correspond one to one with CAD components). |
+| V1 `v1.<domain>.extraction-and-sanity` | The sources re-extract, and the domain's sanity checks pass (mechanical: every mass, inertia tensor — symmetric, positive definite, triangle inequality — axis and limit is physically possible; electrical: facet units, positive values, switches that start open and close, and the sequence the measurement windows assume). |
+| V2 `v2.dataset-reproduction`, `v2.<domain>.model-invariants` | The committed derivation reproduces from the sources, and a committed file that does not parse is a divergence, not a crash; `dataset-item.json` matches the one a rebuild would write; no committed case document is one the requirements no longer compile; every relationship endpoint, requirement subject and design source resolves, and each design source is an artefact the provenance declares. Then the domain's invariants (mechanical: every `cad_ref` resolves to a CAD occurrence, and MJCF bodies correspond one to one with CAD components; electrical: the deck reads back as the model's circuit plus exactly the adapter's analysis and measurements, every netlist value cites the netlist by hash, and a supply matches the stated supply voltage of what it powers). |
 | V3 | Golden cases, run by the existing case engine and the domain's simulator adapter. |
 | V4 | Corner cases, the input-status rules above, and `BLOCKED` checks for requirements whose limit has a null status. A limit met that is illustrative is `WARNING`. |
 
@@ -244,7 +265,7 @@ V1 is classified by what happened, not lumped together:
 | V1 outcome | Verdict | Reason code |
 |---|---|---|
 | No adapter for the item's primary domain is registered | `BLOCKED` | `DOMAIN_NOT_IMPLEMENTED` |
-| The parser read the source and refused it (an external reference, a sub-assembly, a mirrored placement, duplicate part names) | `FAIL` | `SOURCE_REJECTED` |
+| The parser read the source and refused it (an external reference, a sub-assembly, a mirrored placement, duplicate part names; a netlist outside the grammar or the electrical network class) | `FAIL` | `SOURCE_REJECTED` |
 | The parser crashed or produced nothing usable | `INCONCLUSIVE` | `EXTRACTION_CRASHED` |
 | The parser exceeded its time limit | `INCONCLUSIVE` | `EXTRACTION_TIMED_OUT` |
 | The parser the domain needs is not installed | `BLOCKED` | `EXTRACTOR_UNAVAILABLE` |
@@ -387,7 +408,8 @@ for the check it belongs to, and a malformed environment record is refused.
 ## Security
 
 Source artefacts, the items around them and the run directories validate
-writes are untrusted input, and the STEP parser is native code.
+writes are untrusted input, and the STEP parser is native code. A SPICE
+netlist is text that ngspice would partly execute.
 
 - **Process hardening, not a sandbox.** Extraction runs as a child process
   through the repository's hardened `run_process`. The child gets a copy of
@@ -400,7 +422,27 @@ writes are untrusted input, and the STEP parser is native code.
   filesystem or network access, so this protects against a crashing or
   hanging parser, not against a malicious one. The case scripts under
   `simulation/` run the same way and must be authored in this repository,
-  never taken from a third-party sample.
+  never taken from a third-party sample. So does ngspice, on a copy of the
+  deck, as `ngspice -b <deck>` with no other argument.
+- **A netlist is read, never run.** ngspice executes much that looks inert
+  (**Verified**, ngspice-47, 2026-09-27): a `.control` block runs `shell`
+  under `-b`; a `.spiceinit` in the working directory runs (`-n` stops
+  that); a `*#` comment line runs as a command even with `-n`; a file whose
+  title starts with `*ng_script` runs as a script; and `par()` in a `.meas`
+  creates nodes `pa_00`, `pa_01`, …, taking over a netlist node of that
+  name (1 V across 2 Ω read as 1 A). The netlist parser
+  (`ecad_model/spice.py`) is an allow-list that refuses each of these a
+  netlist can carry, every directive but `.model` and `.end`, and every
+  character ngspice reads as a comment, expression, quote or escape; ngspice
+  only ever runs the deck the adapter regenerates from the model, in a
+  workspace holding only the case's inputs (the deck) and an empty `HOME`. V2 and `check` report a deck edited by
+  hand.
+- **What is still open (SEC-2).** The runner executes a committed case
+  document before it decides which of its cases count. A hand-edited
+  committed deck, or a forged case whose inputs include a `.spiceinit`,
+  would therefore run before it is marked stale. The proposed guard (run a
+  committed document only if the fresh derivation vouches for every case
+  in it) is its own change (plan §7.2).
 - **No external references.** OpenCASCADE resolves a STEP `DOCUMENT_FILE`
   reference by opening the named file during transfer (verified), which
   would read outside the throwaway workspace. The child refuses a file that
@@ -437,32 +479,51 @@ added the domain adapters, the null statuses and the per-requirement results.
 A compatible addition stays in v1; an incompatible change needs a new
 versioned directory, as the V0–V4 contract already requires of itself.
 
+A compatible addition to a document format raises that document's minor
+version; the v1 schema accepts every minor version of v1, and requires the
+new one for a document that uses the addition. `model_version` and
+`annotations_version` accept 1.0.0 and 1.1.0, and 1.1.0 is required for a
+`circuit` member, an electrical component kind, or `circuit_elements`. The
+builder writes none of these, so mechanical models stay 1.0.0
+(`ecad_model.MODEL_VERSION`); the electrical adapter writes 1.1.0
+(`ecad_model.CIRCUIT_MODEL_VERSION`).
+
 Each producer carries its own version, so a change to one bumps one: the
-builder (`builder.VERSION`, recorded as `versions.engineering_model` and the
-model's producer), the STEP importer, each domain adapter's derived outputs
-(`domains.mechanical.VERSION`), the case compiler (`requirements.VERSION`),
-the results generator (`results.VERSION`) and the validator
+producer of each engineering model, which its adapter names
+(`Extraction.producer`) and the manifest records as the model's producer and
+as `versions.engineering_model` (mechanical: the builder, `builder.VERSION`;
+electrical: `domains.electrical.MODEL_BUILDER_VERSION` with the netlist
+parser's `spice.VERSION`, recorded as `1.0.0 (ecad_model.spice 1.0.0)`), the
+STEP importer, each domain adapter's derived outputs
+(`domains.mechanical.VERSION`, `domains.electrical.VERSION`), the case
+compiler (`requirements.VERSION`), the results generator (`results.VERSION`,
+which is also the results document's `results_version`, a constant in its
+schema, so bumping one means amending the other) and the validator
 (`dataset.VALIDATOR_VERSION`, the receipt's `ecad-validator` tool). A
 model's `model_version` is the version of the engineering-model document
 format; a result also identifies the model by the SHA-256 of its bytes.
 
 ## Limitations
 
-- One production adapter: mechanical. The adapter protocol
-  (`domains/base.py`) is provisional until the first real second domain uses
-  it; the Verilog adapter that exercises it is test-only and validates
-  nothing about HDL.
+- Two production adapters: mechanical (CAD-first) and electrical
+  (artefact-first, one network class; its own limitations are in
+  [electrical-domain-v1.md](electrical-domain-v1.md)). The adapter protocol
+  (`domains/base.py`) is stable: the electrical domain forced one change,
+  `Extraction.producer`, and a further change lists its reason and the
+  matching change to every registered adapter and to the test fixture. The
+  Verilog adapter that also exercises it is test-only and validates nothing
+  about HDL.
 - Only a sample's primary domain is validated. Another artefact in the same
   sample that a different adapter could read is recorded, hashed and marked
   `NOT_APPLICABLE`, but not validated.
 - A requirement of another domain is refused; cross-domain rules beyond a
   limit that is a model quantity are not implemented.
-- One importer: STEP, through OpenCASCADE. ASCII STL and binary glTF (`.glb`)
-  are recognised by content and refused by name; STL carries no assembly.
-  Binary STL has no signature and is refused as unrecognised. IGES and native
-  formats are not implemented.
+- One CAD importer: STEP, through OpenCASCADE. ASCII STL and binary glTF
+  (`.glb`) are recognised by content and refused by name; STL carries no
+  assembly. Binary STL has no signature and is refused as unrecognised. IGES
+  and native formats are not implemented.
 - Sub-assemblies are refused; the importer reads one flat assembly level.
-- One joint per design, revolute only.
+- One joint per mechanical design, revolute only.
 - Materials come from annotations. STEP can carry material data; reading it
   is not implemented.
 - The example's requirement limits are illustrative, labelled as such in
@@ -476,7 +537,9 @@ format; a result also identifies the model by the SHA-256 of its bytes.
   reproduce within the tolerance above on Linux aarch64, where the complete
   suite and `validate` also pass (verified with the adapters in place), and
   under emulation on Linux x86_64 (verified before the adapters were added);
-  the MuJoCo stages have not run on native x86_64.
+  the MuJoCo stages have not run on native x86_64. The electrical sample
+  has been built, checked and validated on macOS arm64 only; its Linux run
+  and the CI `spice` job have not run.
 
 ## Adding a domain
 
@@ -486,7 +549,7 @@ in `domains.REGISTRY`. The runner calls nothing else:
 | Method | What it supplies |
 |---|---|
 | `domain`, `formats`, `description` | The domain's name, the artefact formats it reads, and what it validates (the manifest's `AVAILABLE` reason) |
-| `extract` | The engineering model, and any raw extraction files, from the sample's artefacts; native parsers run isolated |
+| `extract` | The engineering model, and any raw extraction files, from the sample's artefacts, and the model's producer (`Extraction.producer`, required, with no default, so no adapter inherits another domain's); native parsers run isolated |
 | `write_models` | The domain model files its simulator runs on, each with its comparator |
 | `document_schemas` | The schema of each extraction file, checked at V0 |
 | `sanity_problems`, `invariant_problems` | The domain's V1 and V2 checks |
@@ -498,10 +561,13 @@ in `domains.REGISTRY`. The runner calls nothing else:
 | `components_for` | The source parts a metric depends on |
 | `simulation_files` | The committed scripts its cases run, hashed as `versions.simulation` |
 
-The robotic joint's electrical and thermal domains are `NOT_IMPLEMENTED`
-today: this platform has no adapter for either. The item would also be missing
-their inputs, because the motor is not selected, so its torque constant,
-winding resistance and winding temperature limit are `UNKNOWN`. Selecting a
-motor and recording its datasheet values supplies those inputs and turns
-`REQ-XD-001` into a numeric check. The domains themselves still need their
-adapters.
+The robotic joint's electrical domain is `NOT_APPLICABLE`: the electrical
+adapter reads a SPICE netlist, which that sample does not have. Its thermal
+domain is `NOT_IMPLEMENTED`: this platform has no thermal adapter. The item
+would also be missing their inputs, because the motor is not selected, so its
+torque constant, winding resistance and winding temperature limit are
+`UNKNOWN`. Selecting a motor and recording its datasheet values supplies
+those inputs and turns `REQ-XD-001` into a numeric check. The electrical
+adapter validates only its supply-input network class, so checking the motor
+electrically would need a netlist of a kind it reads, and thermal still
+needs an adapter.

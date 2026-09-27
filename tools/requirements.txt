@@ -48,3 +48,13 @@ numpy>=1.26
 # KiCad itself is not required for the structural V0-V2 parser checks because
 # kiutils reads board files in pure Python. Declared V3/V4 `kicad` cases do run
 # kicad-cli; if it is unavailable, the required case is reported as BLOCKED.
+#
+# ngspice runs the electrical dataset item's deck
+# (datasets/cad/servo_supply_001) for its V3/V4 cases, and the version each
+# receipt records is read from its --version banner:
+#     sudo apt install ngspice
+#     brew install ngspice
+# Without it those cases are reported as BLOCKED (TOOL_NOT_INSTALLED), never
+# as passes, and the real-ngspice tests skip with the reason;
+# ECAD_REQUIRE_SPICE_TOOLS=1, set by the CI spice job, makes that skip a
+# failure.
