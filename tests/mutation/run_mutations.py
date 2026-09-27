@@ -526,6 +526,8 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("ngspice-version-first-line", CP, r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)")}', "= {}"),
     ("ngspice-version-invented", CP, "    return match.group(1) if match else None\n",
      '    return match.group(1) if match else "unknown"\n'),
+    ("ngspice-version-minor-dropped", CP, r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)")}',
+     r'= {"ngspice": re.compile(r"\bngspice-([0-9]+)")}'),
     ("probe-pattern-for-every-tool", CP, "    pattern = VERSION_PATTERNS.get(adapter)\n",
      '    pattern = VERSION_PATTERNS.get("ngspice")\n'),
     # the domain adapter names its model's producer

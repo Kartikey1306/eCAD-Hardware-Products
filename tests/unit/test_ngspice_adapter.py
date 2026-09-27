@@ -13,6 +13,13 @@ deck they came from:
 - DUPLICATE_DECK / DUPLICATE_STDOUT: a name declared twice, printed twice;
 - BANNER: the output of `ngspice --version`.
 
+Two other versions, as the logs of arm64 containers recorded them on the same
+day: ngspice 36+ds-1ubuntu0.1 from the apt of ubuntu:22.04 (the release the
+CI runner uses) and 44.2+ds-1 from that of python:3.12-slim (Debian 13). For
+RECORDED_DECK they give NGSPICE_36_STDOUT with NGSPICE_36_STDERR, and
+NGSPICE_44_STDOUT with an empty stderr (each exit 0, stdout identical over two
+runs); BANNER_36 and BANNER_44 are the first three lines of their banners.
+
 A value written inline in a test (a `nan`, a `1_0`, a kicad-cli version) is
 constructed for that test and says so. Expected values are typed by hand from
 these texts, never obtained by calling the code under test.
@@ -216,6 +223,91 @@ BANNER = (
     "** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n"
     "******\n"
 )
+# ngspice 36+ds-1ubuntu0.1, ubuntu:22.04 arm64, 2026-09-27: `ngspice -b` on RECORDED_DECK.
+NGSPICE_36_STDOUT = (
+    "\n"
+    "No compatibility mode selected!\n"
+    "\n"
+    "\n"
+    "Circuit: * servo_supply_001: 48 v servo-drive supply input -- fuse, precharge limiter with bypass, bulk capacitor, drive load\n"
+    "\n"
+    "Doing analysis at TEMP = 27.000000 and TNOM = 27.000000\n"
+    "\n"
+    "\n"
+    "No. of Data Rows : 110053\n"
+    "\n"
+    "  Measurements for Transient Analysis\n"
+    "\n"
+    "inrush_peak_current_a=  4.716630e+00 at=  1.000000e-04\n"
+    "inrush_i2t_a2s      =   5.33906e-02 from=  0.00000e+00 to=  3.00000e-02\n"
+    "bus_charge_time_s   =   1.09244e-02\n"
+    "bus_voltage_at_bypass_v=  4.791472e+01\n"
+    "bus_peak_voltage_v  =  4.800000e+01 at=  4.000000e-02\n"
+    "steady_bus_voltage_v=  4.787504e+01\n"
+    "steady_input_current_a=  4.166670e+00\n"
+    "steady_fuse_power_w =  3.472228e-01\n"
+    "fault_input_current_a=  3.724645e+02\n"
+    "\n"
+    "\n"
+)
+NGSPICE_36_STDERR = (
+    "Warning: i_load: no DC value, transient time 0 value used\n"
+    "Warning: v_flt: no DC value, transient time 0 value used\n"
+    "Warning: v_byp: no DC value, transient time 0 value used\n"
+    "Warning: v_in: no DC value, transient time 0 value used\n"
+)
+# ngspice 44.2+ds-1, python:3.12-slim (Debian 13) arm64, 2026-09-27: `ngspice -b` on RECORDED_DECK.
+NGSPICE_44_STDOUT = (
+    "\n"
+    "Note: No compatibility mode selected!\n"
+    "\n"
+    "\n"
+    "Circuit: * servo_supply_001: 48 v servo-drive supply input -- fuse, precharge limiter with bypass, bulk capacitor, drive load\n"
+    "\n"
+    "Doing analysis at TEMP = 27.000000 and TNOM = 27.000000\n"
+    "\n"
+    "Using SPARSE 1.3 as Direct Linear Solver\n"
+    "\n"
+    "No. of Data Rows : 110053\n"
+    "\n"
+    "  Measurements for Transient Analysis\n"
+    "\n"
+    "inrush_peak_current_a=  4.716630e+00 at=  1.000000e-04\n"
+    "inrush_i2t_a2s      =   5.33906e-02 from=  0.00000e+00 to=  3.00000e-02\n"
+    "bus_charge_time_s   =   1.09244e-02\n"
+    "bus_voltage_at_bypass_v=  4.791472e+01\n"
+    "bus_peak_voltage_v  =  4.800000e+01 at=  4.000000e-02\n"
+    "steady_bus_voltage_v=  4.787504e+01\n"
+    "steady_input_current_a=  4.166670e+00\n"
+    "steady_fuse_power_w =  3.472228e-01\n"
+    "fault_input_current_a=  3.724645e+02\n"
+    "\n"
+    "\n"
+)
+# The nine values both print, typed from the lines above: seven of them to
+# seven significant digits, where ngspice-47 prints six.
+SEVEN_DIGIT_METRICS = {
+    "inrush_peak_current_a": 4.71663,
+    "inrush_i2t_a2s": 0.0533906,
+    "bus_charge_time_s": 0.0109244,
+    "bus_voltage_at_bypass_v": 47.91472,
+    "bus_peak_voltage_v": 48.0,
+    "steady_bus_voltage_v": 47.87504,
+    "steady_input_current_a": 4.16667,
+    "steady_fuse_power_w": 0.3472228,
+    "fault_input_current_a": 372.4645,
+}
+# The first three lines of `ngspice --version`: 36+ds-1ubuntu0.1 and 44.2+ds-1, as above.
+BANNER_36 = (
+    "******\n"
+    "** ngspice-36 : Circuit level simulation program\n"
+    "** The U. C. Berkeley CAD Group\n"
+)
+BANNER_44 = (
+    "******\n"
+    "** ngspice-44.2 : Circuit level simulation program\n"
+    "** Compiled with KLU Direct Linear Solver\n"
+)
 # Icarus Verilog 13.0 and Verilator 5.052, macOS arm64, 2026-09-27: the first
 # lines of `iverilog -V` and the whole of `verilator --version`, both exit 0.
 ICARUS_BANNER = (
@@ -339,6 +431,31 @@ class TestMeasurements(unittest.TestCase):
         self.assertEqual(result.metrics, RECORDED_METRICS)
         self.assertEqual(result.summary, "ngspice batch run completed: 9 of 9 declared measurements read")
         self.assertEqual((result.stdout, result.stderr, result.tool_version), (RECORDED_STDOUT, "", "47"))
+
+    def test_measurements_are_read_as_ngspice_36_and_44_print_them(self):
+        """Seven significant digits, other header lines, and on 36 a warning on
+        stderr for each PWL source, which is not a failed measurement."""
+        from ecad_validation.adapters.ngspice import parse_measurements
+        from ecad_validation.cases import execute_cases
+        from ecad_validation.models import GateLevel
+
+        for version, stdout, stderr in (("36", NGSPICE_36_STDOUT, NGSPICE_36_STDERR), ("44.2", NGSPICE_44_STDOUT, "")):
+            with self.subTest(version):
+                self.assertEqual(parse_measurements(stdout, stderr, NINE), (SEVEN_DIGIT_METRICS, {}))
+                with tempfile.TemporaryDirectory() as directory, _installed(version), _process(stdout, stderr):
+                    # 47.91472 to within 1e-6: a reader that kept six digits (47.9147) fails it.
+                    product = _product(Path(directory), RECORDED_DECK, [_golden(
+                        "at-bypass", {"bus_voltage_at_bypass_v": {"value": 47.91472, "absolute_tolerance": 1e-6}})])
+                    result = _run(product)
+                    [check] = execute_cases(product, GateLevel.V3, "golden")
+                self.assertEqual((result.verdict.value, result.reason_code, result.metrics),
+                                 ("PASS", "TOOL_EXITED_ZERO", SEVEN_DIGIT_METRICS))
+                self.assertEqual(result.summary, "ngspice batch run completed: 9 of 9 declared measurements read")
+                self.assertEqual((result.stderr, result.tool_version), (stderr, version))
+                self.assertEqual((check.verdict.value, check.reason_code, check.tool_version),
+                                 ("PASS", "GOLDEN_COMPARISON_PASSED", version))
+                # The case engine keeps what ngspice said on stderr among the check's findings.
+                self.assertEqual(stderr in check.findings, bool(stderr))
 
     def test_a_declared_measurement_that_failed_is_absent_and_named(self):
         from ecad_validation.adapters.ngspice import declared_measurements, parse_measurements
@@ -487,6 +604,8 @@ class TestVersionProbe(unittest.TestCase):
 
         for label, banner, version in (
             ("recorded ngspice-47", BANNER, "47"),
+            ("recorded ngspice-36, ubuntu:22.04", BANNER_36, "36"),
+            ("recorded ngspice-44.2, python:3.12-slim", BANNER_44, "44.2"),
             ("constructed: the same banner for 36", "******\n** ngspice-36 : Circuit level simulation program\n******\n", "36"),
             ("constructed: no ngspice-<version>", "******\n** Circuit level simulation program\n******\n", None),
         ):

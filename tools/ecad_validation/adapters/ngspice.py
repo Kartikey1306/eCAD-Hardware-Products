@@ -28,7 +28,8 @@ DECLARED = re.compile(r"^[ \t]*\.meas(?:ure)?[ \t]+(?:tran|dc|ac)[ \t]+([A-Za-z]
                       re.IGNORECASE | re.MULTILINE)
 # A result line as ngspice-47 prints it: the lower-cased name, padded to 20
 # characters (a longer name has no space before "="), the value, then the
-# `at=`, or `from=` and `to=`, of the measurement's window.
+# `at=`, or `from=` and `to=`, of the measurement's window. ngspice-36 and
+# 44.2 print the same form, some values to seven significant digits, not six.
 REPORTED = re.compile(r"^([a-z][a-z0-9_]*)[ \t]*=[ \t]*(\S+)(?:[ \t]+(?:at|from|to)=[ \t]*\S+)*[ \t]*$")
 # Checked before float(), which also reads "1_0", "nan" and "infinity".
 NUMBER = re.compile(r"^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$")

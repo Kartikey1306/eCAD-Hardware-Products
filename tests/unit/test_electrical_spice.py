@@ -37,6 +37,15 @@ DECK = "derived/electrical/servo_supply_001.cir"
 # more; the design's two lone runs printed none. run_process reads stdout as
 # text, so the CR arrives as a line end.
 PROGRESS = re.compile(r"^ Reference value : +\S+$")
+# All ngspice may print on stderr for the committed deck. ngspice-47 and 44.2
+# print nothing; ngspice-36 warns once for each of the deck's four PWL
+# sources that it has no DC value and uses the source's value at time 0,
+# which is what the deck means, and still exits 0 (Verified 2026-09-27:
+# 36+ds-1ubuntu0.1 in an ubuntu:22.04 container, 44.2+ds-1 in
+# python:3.12-slim, both arm64). Any other line, such as an error or a failed
+# measurement, fails the test.
+DC_VALUE_WARNINGS = frozenset(f"Warning: {source}: no DC value, transient time 0 value used"
+                              for source in ("v_in", "v_byp", "i_load", "v_flt"))
 # The closed forms of the design (§5.3), to 12 significant figures, and each
 # reference's absolute tolerance, from requirements/requirements.json.
 CLOSED_FORMS = {
@@ -142,7 +151,9 @@ class TestRealNgspice(unittest.TestCase):
         for result in runs:
             with self.subTest(result.summary):
                 self.assertEqual((result.verdict.value, result.reason_code), ("PASS", "TOOL_EXITED_ZERO"))
-                self.assertEqual(result.stderr, "")
+                unexpected = [line for line in result.stderr.splitlines()
+                              if line.strip() and line not in DC_VALUE_WARNINGS]
+                self.assertEqual(unexpected, [], "stderr carries nothing but ngspice-36's no-DC-value warnings")
                 self.assertNotIn("/", result.stdout, "no host path in the hash-bound stdout")
                 self.assertEqual(set(result.metrics), set(CLOSED_FORMS))
                 for metric, (expected, tolerance) in CLOSED_FORMS.items():
@@ -265,7 +276,7 @@ class TestRealNgspice(unittest.TestCase):
         for n, form in enumerate(forms, start=1):
             with self.subTest(form):
                 expected = 1 / parse_value(form, "forms.cir")
-                # ngspice prints six significant digits.
+                # ngspice-47 prints six significant digits; 36 and 44.2 print six or seven.
                 self.assertLessEqual(abs(result.metrics[f"i{n}"] - expected), 1e-5 * expected)
 
     def test_a_measurement_ngspice_cannot_make_is_named(self):
