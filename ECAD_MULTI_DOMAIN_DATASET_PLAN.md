@@ -924,7 +924,12 @@ From `TESTING.md` and from both reviews:
   and 1 of the registry. All 63 new ones were killed, each naming its test,
   after a green baseline on the same code and tests (**Verified**,
   2026-09-27: the harness killed 13 before a wall-clock limit stopped it,
-  and its `run()` killed the other 50). The run of all 285 is NOT RUN.
+  and its `run()` killed the other 50). At `57f4fee`, which adds docstrings,
+  their examples and two tests, one run of all 285 after a green baseline
+  killed all 285, none surviving -- 114 by `test_engineering_model.py`, 84
+  by `test_domain_adapter.py`, 37 by `test_cad_dataset.py`, 20 by
+  `test_electrical_domain.py`, 17 by `test_ngspice_adapter.py`, 13 by
+  `test_spice_netlist.py` (**Verified**, 2026-09-27).
 - Property tests: rigid transforms of a whole design leave every physical
   metric unchanged.
 - Reference values for every simulated metric with a closed form.
@@ -1029,7 +1034,7 @@ An MVP with no real part can therefore never `PASS` on a part rating.
 | Q8 | Dataset layout: by primary domain (spec §3) or one directory per sample with domains in metadata? The first non-mechanical sample, `servo_supply_001` (`feat/domain-electrical`), stays at `datasets/cad/servo_supply_001/`: the brief for that change kept the layout, against §21's rule that the move goes with that sample (an explicit instruction wins, `CLAUDE.md` precedence 1). The layout question itself is still open | Maintainer decision, now before the move rather than before the first non-mechanical sample |
 | Q9 | New simulators (Verilator, Elmer, FMI) need the merged cases contract's adapter enum amended, or an open adapter ID checked against the registry | Maintainer decision |
 | Q10 | The spec orders mechanical after the foundation; this plan lands the existing mechanical work first, because spec §35 asks to preserve it and the review evidence is tied to it | Confirm |
-| Q11 | Add `.options norefvalue` to the electrical deck? On ngspice-47 it removes the progress report (` Reference value : <t>`) that a slowed run writes to stdout, so two runs of one deck would print identical stdout (Verified, 28 parallel runs, 2026-09-27). Whether ngspice-36 (what apt installs on ubuntu:22.04, the CI runner's release) and 44.2 (python:3.12-slim) accept the option is Unknown: not run. It changes the committed deck's bytes, `spice.read_deck`'s section marker and the recorded-deck test fixtures | Maintainer decision, after a run on ngspice-36 and 44.2 |
+| Q11 | Add `.options norefvalue` to the electrical deck? On ngspice-47 it removes the progress report (` Reference value : <t>`) that a slowed run writes to stdout, so two runs of one deck would print identical stdout (Verified, 28 parallel runs, 2026-09-27). ngspice-36 (what apt installs on ubuntu:22.04, the CI runner's release) and 44.2 (python:3.12-slim) accept it: under load, without it 36 wrote two or three progress reports per run to stderr and 44.2 two to stdout, with it neither wrote any, and the nine measurement lines were identical across three runs of each deck (Observed, arm64 containers, 2026-09-27; `TASKS.md`). It changes the committed deck's bytes, `spice.read_deck`'s section marker and the recorded-deck test fixtures | Maintainer decision; the runs on ngspice-36 and 44.2 it waited for are made |
 | Q12 | Accept ARCH-1 as amended by the electrical domain (§8.2): a component's `circuit` member, nets derived and never stored? | Maintainer decision |
 | Q13 | Accept the in-document minor-version rule (§9.3): format 1.1.0 required for a document that uses an addition of 1.1.0? | Maintainer decision |
 | Q14 | Land the SEC-2 guard (§7.2) as its own foundation change, before `validate` runs on anything unreviewed? It narrows the recorded decision that committed case documents run | Maintainer decision |
@@ -1162,20 +1167,26 @@ An MVP with no real part can therefore never `PASS` on a part rating.
    domain forced with the matching change to the mechanical adapter
    (SCOPE-15). Each item is marked with its state on `feat/domain-electrical`
    (code at `37b2de7`, plus the docstring fix of the documentation commit
-   that carries this text), as run on macOS arm64 with ngspice-47; nothing
-   here has had an independent review (`CLAUDE.md` rule 4):
+   that carries this text), as run on macOS arm64 with ngspice-47, and as
+   the review fixes `57f4fee` and `f6dee36` left it where an item names
+   them. One verification pass by a separate agent, at `816e625`, found no
+   blocking problem and one gap, fixed in `57f4fee`; the fixes have had no
+   review of their own (`CLAUDE.md` rule 4):
    - ngspice supply sample, `datasets/cad/servo_supply_001` — IMPLEMENTED:
      `check`, `build` and `validate` on a clean copy give V0–V3 `PASS` and
-     V4 `BLOCKED` as designed (`docs/electrical-domain-v1.md`, Example); the
-     Linux run is NOT RUN;
+     V4 `BLOCKED` as designed (`docs/electrical-domain-v1.md`, Example); so
+     do the `spice` job's steps at `f6dee36` in arm64 Linux containers on
+     ngspice-36 and 44.2; the run on the x86_64 runner is NOT RUN;
    - output capture and metric parsing (ARCH-2, the ngspice half) —
      IMPLEMENTED; the `run_process` output copy is not needed by ngspice and
      stays PLANNED for items 5 and 6;
    - version parsing (RESULT-8) — IMPLEMENTED; RESULT-2 — PARTIAL, the
      ngspice path only (the general fix is item 1);
    - `spice` CI job — PARTIAL: written, placed and tested
-     (`test_spice_job_cannot_skip_silently`), never run; pinning ngspice —
-     BLOCKED on the runner's unknown version (§20 Q16);
+     (`test_spice_job_cannot_skip_silently`), never run on a runner; its
+     steps pass in the arm64 containers above, after `f6dee36` fixed the
+     real-ngspice test that ngspice-36's progress report on stderr failed;
+     pinning ngspice — BLOCKED on the runner's unknown version (§20 Q16);
    - the protocol stops being provisional, with the change list (SCOPE-15)
      — IMPLEMENTED (§11);
    - the §10 list: a sample — IMPLEMENTED; a met limit — IMPLEMENTED as
@@ -1185,9 +1196,8 @@ An MVP with no real part can therefore never `PASS` on a part rating.
      (test-built copies, real ngspice); a `BLOCKED` from a missing input —
      IMPLEMENTED (the committed sample); an invalid-input and a boundary
      sample — PARTIAL: test-built copies, not committed items (§20 Q17);
-     negative tests — IMPLEMENTED; mutants — PARTIAL: the 63 new mutants
-     are killed after a green baseline, and the run of all 285 is NOT RUN
-     (§16);
+     negative tests — IMPLEMENTED; mutants — IMPLEMENTED: all 285 are
+     killed in one run after a green baseline at `57f4fee` (§16);
      per-domain documentation (spec §28) — IMPLEMENTED; a CI job that makes
      a skip a failure — PARTIAL, as above;
    - part-rating checks that can pass, steady ripple, the fuse's I²t

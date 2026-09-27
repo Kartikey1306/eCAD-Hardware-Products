@@ -284,9 +284,9 @@ State of each criterion (the plan §21 item 4 carries the same markers)
 : 1. IMPLEMENTED: `datasets/cad/servo_supply_001` builds, checks and validates as designed (Verification).
   2. IMPLEMENTED for ngspice (ARCH-2, the ngspice half); the `run_process` output copy is not needed by ngspice and stays open for the HDL and KiCad domains.
   3. IMPLEMENTED (RESULT-8); RESULT-2 is PARTIAL, fixed on the ngspice path only.
-  4. PARTIAL: the job is written and its shape is tested; it has never run, and ngspice is not pinned (BLOCKED until the runner's version is known).
+  4. PARTIAL: the job is written and its shape is tested; it has never run on a runner, and ngspice is not pinned (BLOCKED until the runner's version is known). Its steps pass in arm64 Linux containers on ngspice-36 and 44.2 (Verification of the review fixes, below), after the fix of a test that failed on ngspice-36.
   5. IMPLEMENTED: `domains/base.py` and the plan §11 state the protocol stable and list its one change, `Extraction.producer`.
-  6. Sample IMPLEMENTED. Met limit: `WARNING` against the illustrative limits IMPLEMENTED; `PASS` against a real requirement only on a test-built copy with a fixture rating, since no real part is selected. `FAIL` from a mutated input IMPLEMENTED (test-built copies, real ngspice). `BLOCKED` from a missing input IMPLEMENTED (the committed sample). Invalid-input and boundary samples PARTIAL: test-built copies, not committed items (plan §20 Q17). Negative tests IMPLEMENTED; mutants PARTIAL: the 63 new ones were run (Verification), the full run of all 285 was not. Documentation IMPLEMENTED (`docs/electrical-domain-v1.md`). CI job PARTIAL, as in 4.
+  6. Sample IMPLEMENTED. Met limit: `WARNING` against the illustrative limits IMPLEMENTED; `PASS` against a real requirement only on a test-built copy with a fixture rating, since no real part is selected. `FAIL` from a mutated input IMPLEMENTED (test-built copies, real ngspice). `BLOCKED` from a missing input IMPLEMENTED (the committed sample). Invalid-input and boundary samples PARTIAL: test-built copies, not committed items (plan §20 Q17). Negative tests IMPLEMENTED; mutants IMPLEMENTED: all 285 killed in one run after a green baseline at `57f4fee` (Verification of the review fixes). Documentation IMPLEMENTED (`docs/electrical-domain-v1.md`). CI job PARTIAL, as in 4.
 
 Files in scope
 : `tools/ecad_model/spice.py`, `tools/ecad_model/domains/` (electrical.py,
@@ -310,11 +310,14 @@ Out of scope
 
 Risks
 : The CI runner's ngspice is Unknown until the `spice` job runs: ngspice-36
-  and 44.2 were checked only through their recorded output, and a version
-  that prints differently makes cases `INCONCLUSIVE` or `BLOCKED`, loudly.
-  The reference tolerances rest on ngspice-47 on macOS arm64. ngspice's stdout
-  can differ run to run in its progress report (plan §20 Q11). A committed
-  case document still runs before the runner decides what counts (SEC-2).
+  and 44.2 were run for real only in arm64 containers, not on the x86_64
+  runner, and a version that prints differently makes cases `INCONCLUSIVE`
+  or `BLOCKED`, loudly. The reference tolerances were set on ngspice-47 on
+  macOS arm64; every reference also passed on 36 and 44.2 in those
+  containers. ngspice's output can differ run to run in its progress
+  report, which 47 and 44.2 write to stdout and 36 to stderr (plan §20
+  Q11). A committed case document still runs before the runner decides what
+  counts (SEC-2).
   The mutation harness now needs ngspice, the CAD kernel and MuJoCo on one
   machine. Push access is read-only for this account.
 
@@ -333,11 +336,27 @@ Verification (2026-09-27, macOS arm64, Python 3.14.4, ngspice-47; code at `37b2d
   | Mechanical sample unchanged | `git diff 042f934 HEAD -- datasets/cad/robotic_joint_001/`; `check datasets/cad/robotic_joint_001` on the clean copy | `PASS` -- one entry changed (electrical `NOT_IMPLEMENTED` -> `NOT_APPLICABLE`); `check` exit 0 |
   | ngspice behaviour the grammar and the docs rely on | probe decks run with `ngspice -b ... </dev/null`, each in its own directory | `PASS` -- reproduced on ngspice-47: `-r` makes no `.meas` and `-o` moves them to the log; `numdgt=12` still prints six digits; a failed `.meas` goes to stderr with exit 0; a duplicate name prints twice; `1M`, `1MEG`, `10uF`, `10F`, `2kohm`, `1ms`, `1mil` read as the traps say; `gnd` is ground; a `pa_00` node is taken over; the title line swallows a card; `+` joins lines; a card after `.end` is read and a missing `.end` accepted; a dangling node is accepted; `.control` `shell`, a working-directory `.spiceinit` (not with `-n`), a `*#` line (even with `-n`) and a `*ng_script` title all ran; `noacct` removes the operating-point table and statistics but not the progress report, and `norefvalue` removes that |
   | Test discrimination, the 63 new mutants | `python3 tests/mutation/run_mutations.py --workers 4 --only <21 names>`, then a scratch driver calling the harness's `run()` for the other 50 (two runs of 25, 5 workers) | `PASS` -- 63 of 63 killed, none survived, each kill naming its test. The harness reported "baseline green" and killed 13 before a 470 s wall-clock limit stopped it; `run()` (the same copy, edit, rebuild and suites, without a second baseline, on the same code and tests) killed 25 of 25 and 25 of 25. Several are killed first by a module's doctests, which run first, rather than by the test the design names |
-  | Test discrimination, all 285 mutants | `python3 tests/mutation/run_mutations.py` | `NOT RUN` -- only the 63 new mutants were run in this change; the 222 of the foundation were last run at `dbf73e1` (T-011) |
+  | Test discrimination, all 285 mutants | `python3 tests/mutation/run_mutations.py` | `NOT RUN` -- only the 63 new mutants were run in this change; the 222 of the foundation were last run at `dbf73e1` (T-011). Run for the review fixes, below |
   | CI `spice` job | the job itself | `NOT RUN` -- push access is read-only; its shape is tested by `test_spice_job_cannot_skip_silently` |
-  | ngspice-36 and 44.2 | a real run of either | `NOT RUN` in this session; the adapter tests replay their output as recorded in arm64 containers earlier on 2026-09-27 (`MEMORY.md`) |
-  | Linux | the `spice` job's steps in a container | `NOT RUN` |
-  | Independent review | CLAUDE.md rule 4 | `NOT RUN` |
+  | ngspice-36 and 44.2 | a real run of either | `NOT RUN` in this session; the adapter tests replay their output as recorded in arm64 containers earlier on 2026-09-27 (`MEMORY.md`). Run for the review fixes, below |
+  | Linux | the `spice` job's steps in a container | `NOT RUN` here; run for the review fixes, below |
+  | Independent review | CLAUDE.md rule 4: one verification pass by a separate agent at `816e625`, which re-ran the suite, lint, types, `check` and `validate` of both samples, compared the mechanical receipt with `042f934`'s, and re-derived the closed forms and every model value's source | `PARTIAL` -- no blocking problem found; its one finding, public adapter methods without a run example, is fixed in `57f4fee`. The fixes (`57f4fee`, `f6dee36`) have had no review of their own |
+
+Verification of the review fixes (2026-09-27 UTC; code at `f6dee36` unless a row names `57f4fee`. `57f4fee` adds docstrings, their examples and two tests to `816e625`, and touches code files only in docstrings; `f6dee36` changes one assertion of the real-ngspice test S1. Neither changes what the pipeline does)
+: | Check | Command | Result |
+  |-------|---------|--------|
+  | Complete suite, CAD and ngspice tests mandatory, macOS arm64, Python 3.14.4, ngspice-47, clean clone | `ECAD_REQUIRE_CAD_TOOLS=1 ECAD_REQUIRE_SPICE_TOOLS=1 python3 run_all_tests.py -q -p no:cacheprovider --tb=short` | `PASS` -- 399 passed, 0 failed, 0 skipped, exit 0 (779 s, on a machine the mutation run loaded); the tree unchanged afterwards. The 64 electrical tests (16 parser, 15 ngspice adapter, 26 domain, 7 real ngspice) are among them. At `57f4fee`: 399 passed, exit 0 (213 s) |
+  | The example tests fail without an example | in a scratch copy of the working tree that became `57f4fee`: the examples of `ElectricalAdapter.metrics` and `NgspiceAdapter.run` removed; then that of `ElectricalAdapter.document_schemas`; then a public function with no example added to `spice.py` | `PASS` -- each run exit 1, naming each function; before the examples were written, the electrical test named all 14 `ElectricalAdapter` methods |
+  | Lint, changed Python | `ruff check <the 17 Python files changed since 042f934> --select=E,F,W --ignore=E501 --no-cache` | `PASS` -- "All checks passed!" |
+  | Type check | `mypy tools run_all_tests.py tests/mutation/run_mutations.py --ignore-missing-imports --no-strict-optional` | `PASS` for new code -- "Found 11 errors in 7 files (checked 44 source files)", the baseline set, none in a file this branch changed |
+  | Derivation reproduces and V0-V4 receipt, macOS, clean clone | `python3 tools/cad_dataset.py check` of both samples; `validate datasets/cad/servo_supply_001` | `PASS` as designed -- both `check` exit 0; `validate` exit 0: V0-V3 `PASS`, V4 `BLOCKED` (4 `WARNING WITHIN_ILLUSTRATIVE_LIMIT`, 3 `BLOCKED MISSING_REQUIRED_INPUT`), overall `BLOCKED`, not eligible, 16 results, source `f6dee36` not dirty, ngspice `47` |
+  | The `spice` job's steps on Linux, ngspice-36 | an ubuntu:22.04 arm64 container, a clean clone: apt `ngspice git python3.11` (ngspice 36+ds-1ubuntu0.1; Python 3.11.0rc1, where the job uses 3.12), `pip install -r tools/requirements.txt pytest`, then with `ECAD_REQUIRE_SPICE_TOOLS=1` the job's `run_all_tests.py --tb=short`, `check` and `validate` | `PASS` -- 348 passed, 52 skipped, 0 failed; all 64 electrical tests passed. The skips are the 51 tests of `test_cad_dataset.py` (the job installs no CAD kernel) and the subtest of `test_domain_adapter.py` that skips where Python's JSON parse and print depths are too close (its probe returned `None` on 3.11.0rc1 and 3.12.14). `check` exit 0; `validate` exit 0 with the designed receipt, ngspice `36`, source not dirty. At `57f4fee` the same run failed S1's two subtests, below |
+  | The `spice` job's steps on Linux, ngspice-44.2 | a python:3.12-slim (Debian 13) arm64 container, the same steps (ngspice 44.2+ds-1, Python 3.12.14) | `PASS` -- 348 passed, 52 skipped (the same), 0 failed; `check` exit 0; `validate` exit 0 with the designed receipt, ngspice `44.2`. The same at `57f4fee` |
+  | S1 on ngspice-36, before and after `f6dee36` | the ubuntu:22.04 container at `57f4fee` with two busy loops per CPU: two adapter runs; S1 as committed; S1 with the fix, three times; two adapter runs; the 7 real-ngspice tests | `PASS` for the fix -- every adapter run wrote two or three ` Reference value : <t>` lines to stderr and none to stdout, and read 9 of 9 measurements; S1 as committed failed both subtests on those lines; with the fix it passed 3 runs of 3; the 7 tests passed |
+  | `.options norefvalue` on ngspice-36 and 44.2 (plan §20 Q11) | the committed deck and a copy with `.options noacct norefvalue`, three runs of each per version, under load | Observed -- without it 36 wrote two or three progress reports per run to stderr and 44.2 two to stdout; with it neither wrote any. Every run exit 0, with no stderr line but 36's four warnings; the nine measurement lines were identical across the six runs of each version. The deck is unchanged: that is Q11, the maintainer's call |
+  | Test discrimination, all 285 mutants | `python3 tests/mutation/run_mutations.py --workers 8` on a clean clone of `57f4fee`, with ngspice-47, the CAD kernel and MuJoCo | `PASS` -- "baseline green", then "285 of 285 mutants killed", exit 0, in 61 minutes. None survived, and each kill names its test: 114 by `test_engineering_model.py`, 84 by `test_domain_adapter.py`, 37 by `test_cad_dataset.py`, 20 by `test_electrical_domain.py`, 17 by `test_ngspice_adapter.py`, 13 by `test_spice_netlist.py`. `f6dee36` only lets S1 accept more on stderr, so a mutant that passed S1 at `57f4fee` still passes it and every kill stands (Inferred; not re-run at `f6dee36`) |
+  | CI `spice` job, and Linux x86_64 | the job itself | `NOT RUN` -- push access is read-only; the containers above are arm64 |
+  | Coverage of new and changed code | a coverage tool | `NOT RUN` -- none is installed in this environment (no `coverage`, no `pytest-cov`) |
 
 ## Completed
 

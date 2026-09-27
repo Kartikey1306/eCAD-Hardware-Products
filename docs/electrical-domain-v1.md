@@ -246,7 +246,10 @@ byte (comparator `exact`).
   printed `3.33333e-01`). The recorded outputs of ngspice-36 and 44.2 in
   `tests/unit/test_ngspice_adapter.py` print seven of the nine values to
   seven digits. The tolerances are at least 21 times the deviation measured
-  on ngspice-47 (Example, below) and rest on that one platform.
+  on ngspice-47 (Example, below) and were set on that one platform; every
+  reference also passed on real ngspice-36 and 44.2 in arm64 Linux
+  containers (**Verified** at `f6dee36`, `TASKS.md`), not on the x86_64 CI
+  runner.
 - **No part rating can pass.** Every rating is `UNKNOWN` because no part is
   selected, and every limit is illustrative, so the sample's receipt is at
   best `BLOCKED` and never eligible for ebuild.
@@ -257,8 +260,13 @@ byte (comparator `exact`).
   progress report, ` Reference value : <time>`, whose value differs between
   runs; `.options noacct` does not remove it (**Verified**: two sequential
   runs of the committed deck printed `7.83155e-02` and `8.02525e-02`, their
-  measurement lines identical). The execution records of two runs can
-  therefore differ in that line. Whether to add `norefvalue` is plan §20 Q11.
+  measurement lines identical). ngspice-36 writes the report to stderr
+  instead, and the case engine keeps a run's stderr among its check's
+  findings (**Observed** in an ubuntu:22.04 arm64 container under load:
+  two or three lines on every run). The execution records of two runs, and
+  on 36 their findings, can therefore differ in that line. Whether to add
+  `norefvalue`, which removed the report on 36, 44.2 and 47 alike, is plan
+  §20 Q11.
 - **SEC-1 and SEC-2 residual.** `run_process` is process hardening, not a
   sandbox. The parser and the regenerated deck close the netlist path, and
   V2 and `check` report an edited deck, but the runner executes a committed
@@ -456,5 +464,6 @@ PLANNED, none started:
   drive's input ripple is stated; a fuse model that opens;
 - the SEC-2 runner guard and an ngspice `-n` / deck screen in the tool
   adapter (SEC-1), both open questions in the plan;
-- pinning ngspice in CI after its first run, and a Linux reproduction;
+- pinning ngspice in CI after its first run, and a reproduction on the x86_64
+  runner (arm64 Linux containers reproduce the `spice` job's steps);
 - LTspice and PSpice as optional adapters that report `BLOCKED` when absent.
