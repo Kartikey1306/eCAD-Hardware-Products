@@ -594,21 +594,37 @@ class TestHonestOutcomesWithoutCad(unittest.TestCase):
 
         from ecad_model.dataset import build, validate
 
-        for label in ("not UTF-8", "a metric that is not a finite number"):
+        def nested_adapter(document):
+            # Parses, then overflows the engine's schema check.
+            document["cases"][0]["adapter"] = json.loads("[" * 100000 + "]" * 100000)
+            return json.dumps(document)
+
+        for label in ("not UTF-8", "a metric that is not a finite number", "nested too deeply to parse",
+                      "nested too deeply to check"):
             with self.subTest(label), _scratch() as directory, tempfile.TemporaryDirectory() as output:
                 item = _digital_sample(directory, [REQUIREMENT])
                 build(item, self.registry)
                 corners = item / "validation" / "corners" / "cases.json"
                 if label == "not UTF-8":
                     corners.write_bytes(corners.read_text().encode("utf-16"))  # still JSON to json.loads
+                elif label == "nested too deeply to parse":
+                    corners.write_text("[" * 1000000 + "]" * 1000000)
+                elif label == "nested too deeply to check":
+                    corners.write_text(nested_adapter(json.loads(corners.read_text())))
                 with _passing_icarus(float("nan")):
                     receipt = validate(item, Path(output) / "run", self.registry)
                 validate_document(REPO_ROOT, "validation-receipt.schema.json", receipt)
                 checks = _checks(receipt)
-                self.assertEqual((checks["v4.corners-manifest"]["verdict"], checks["v4.corners-manifest"]["reason_code"]),
-                                 ("INCONCLUSIVE", "CASE_ENGINE_ERROR"))
-                self.assertEqual((checks["v4.REQ-DIG-001"]["verdict"], checks["v4.REQ-DIG-001"]["reason_code"]),
-                                 ("BLOCKED", "CASE_ENGINE_ERROR"))
+                self.assertEqual(checks["v4.REQ-DIG-001"]["verdict"] in ("INCONCLUSIVE", "BLOCKED"), True)
+                if label in ("not UTF-8", "a metric that is not a finite number"):
+                    self.assertEqual(
+                        (checks["v4.corners-manifest"]["verdict"], checks["v4.corners-manifest"]["reason_code"]),
+                        ("INCONCLUSIVE", "CASE_ENGINE_ERROR"))
+                    # The engine returns nothing for the document: the entry has no
+                    # verdict, which is not the same as a missing input.
+                    self.assertEqual((checks["v4.REQ-DIG-001"]["verdict"], checks["v4.REQ-DIG-001"]["execution_status"],
+                                      checks["v4.REQ-DIG-001"]["reason_code"]),
+                                     ("INCONCLUSIVE", "crashed", "CASE_ENGINE_ERROR"))
 
     def test_an_input_relabelled_without_a_rebuild_is_judged_by_what_it_is_now(self):
         """The committed model says DERIVED; the sources now say AI_ASSUMPTION.
@@ -630,8 +646,11 @@ class TestHonestOutcomesWithoutCad(unittest.TestCase):
             build(item, self.registry)
             with _passing_icarus():
                 receipt = validate(item, Path(output) / "run", {**REGISTRY, "digital": Assuming()})
+            [row] = json.loads((Path(output) / "run" / "results.json").read_text())["results"]
         check = _checks(receipt)["v4.REQ-DIG-001"]
         self.assertEqual((check["verdict"], check["reason_code"]), ("INCONCLUSIVE", "INPUT_IS_AI_ASSUMPTION"))
+        # The result lists the inputs the verdict rests on, as the run recorded them.
+        self.assertIn({"path": "components/blinker/domains/digital/port_count", "status": "AI_ASSUMPTION"}, row["inputs"])
 
     def test_a_case_document_that_breaks_its_schema_is_not_read_for_results(self):
         from ecad_model.dataset import build, validate
@@ -671,8 +690,102 @@ class TestHonestOutcomesWithoutCad(unittest.TestCase):
             with _no_icarus(), mock.patch.dict(REGISTRY, {"digital": VerilogFixtureAdapter()}), \
                     mock.patch("ecad_model.dataset._results", side_effect=RuntimeError("fixture defect")):
                 status = cli.main(["validate", str(item), "--output", str(Path(output) / "run")])
-            self.assertEqual(status, 2, "exit 1 means no receipt; here one was written")
+            self.assertEqual(status, 3, "exit 1 means no receipt, 2 is argparse's usage error; here a receipt was written")
             self.assertTrue((Path(output) / "run" / "receipt.json").is_file())
+
+    def test_a_case_whose_derived_input_no_longer_reproduces_is_not_counted(self):
+        """The case object still matches, but the domain model it runs on was
+        edited: a verdict from it would be about a model the inputs no longer
+        produce."""
+        from ecad_model.dataset import build, validate
+
+        class ModelFed(VerilogFixtureAdapter):
+            def case_target(self, sample_id):
+                return CaseTarget(adapter="iverilog",
+                                  inputs=("source/blinker.v", f"derived/digital/{sample_id}.modules.json"),
+                                  arguments=lambda scenario: [])
+
+        registry = {**REGISTRY, "digital": ModelFed()}
+        real = {**REQUIREMENT, "illustrative": False}
+        with _scratch() as directory, tempfile.TemporaryDirectory() as output:
+            item = _digital_sample(directory, [real])
+            build(item, registry)
+            (item / "derived" / "digital" / "blinker_001.modules.json").write_text('{"blinker": 9}\n')
+            with _passing_icarus():
+                receipt = validate(item, Path(output) / "run", registry)
+        check = _checks(receipt)["v4.REQ-DIG-001"]
+        self.assertEqual((check["verdict"], check["reason_code"]), ("BLOCKED", "COMMITTED_CASE_STALE"))
+        self.assertIn("its input derived/digital/blinker_001.modules.json no longer reproduces", " ".join(check["findings"]))
+
+    def test_a_case_document_the_engine_refuses_is_named_not_called_missing(self):
+        from ecad_model.dataset import build, validate
+
+        with _scratch() as directory, tempfile.TemporaryDirectory() as output:
+            item = _digital_sample(directory, [REQUIREMENT])
+            build(item, self.registry)
+            corners = item / "validation" / "corners" / "cases.json"
+            corners.write_bytes(b"\xef\xbb\xbf" + corners.read_bytes())  # a UTF-8 BOM: JSON to us, not to the engine
+            with _passing_icarus():
+                receipt = validate(item, Path(output) / "run", self.registry)
+        checks = _checks(receipt)
+        self.assertEqual(checks["v4.corners-manifest"]["reason_code"], "CASE_MANIFEST_INVALID")
+        self.assertEqual((checks["v4.REQ-DIG-001"]["verdict"], checks["v4.REQ-DIG-001"]["reason_code"]),
+                         ("BLOCKED", "CASE_DOCUMENT_REFUSED"))
+
+    def test_a_committed_case_under_a_gate_level_id_is_not_counted(self):
+        from ecad_model.dataset import build, validate
+
+        with _scratch() as directory, tempfile.TemporaryDirectory() as output:
+            item = _digital_sample(directory, [REQUIREMENT])
+            build(item, self.registry)
+            corners = item / "validation" / "corners" / "cases.json"
+            document = json.loads(corners.read_text())
+            document["cases"].append({**document["cases"][0], "id": "corners-manifest"})
+            corners.write_text(json.dumps(document))
+            with _passing_icarus():
+                receipt = validate(item, Path(output) / "run", self.registry)
+        checks = _checks(receipt)
+        self.assertNotIn("v4.corners-manifest", checks, "no requirement states that case's limits")
+        self.assertEqual(checks["v4.REQ-DIG-001"]["reason_code"], "WITHIN_ILLUSTRATIVE_LIMIT")
+
+    def test_a_reference_whose_adapter_crashed_still_shows_its_compiled_bound(self):
+        from ecad_validation.adapters.base import Adapter, Capability
+
+        from ecad_model.dataset import build, validate
+
+        class CrashingIcarus(Adapter):
+            name = "iverilog"
+
+            def capability(self):
+                return Capability(adapter="iverilog", available=True, version="stand-in 0")
+
+            def run(self, request):
+                raise ValueError("fixture: the simulator refused the case")
+
+        with _scratch() as directory, tempfile.TemporaryDirectory() as output:
+            item = _digital_sample(directory, [REQUIREMENT])
+            _write_requirements(item, [REQUIREMENT], [REFERENCE])
+            build(item, self.registry)
+            with mock.patch.dict("ecad_validation.cases.ADAPTERS", {"iverilog": CrashingIcarus}):
+                receipt = validate(item, Path(output) / "run", self.registry)
+            rows = {r["requirement"]: r for r in json.loads((Path(output) / "run" / "results.json").read_text())["results"]}
+        self.assertEqual(_checks(receipt)["v3.REF-DIG-001"]["reason_code"], "ADAPTER_EXECUTION_ERROR")
+        self.assertEqual((rows["REF-DIG-001"]["expected_value"], rows["REF-DIG-001"]["applied_bound"]),
+                         (3.0, {"value": 3.0, "absolute_tolerance": 0.5}),
+                         "the case ran and crashed; what it was compiled to compare is still what it was")
+
+    def test_a_manifest_nested_too_deeply_is_a_divergence_not_a_crash(self):
+        from ecad_model.dataset import build, validate
+
+        with _scratch() as directory, tempfile.TemporaryDirectory() as output:
+            item = _digital_sample(directory, [REQUIREMENT])
+            build(item, self.registry)
+            path = item / "dataset-item.json"
+            manifest = json.loads(path.read_text())
+            path.write_text(json.dumps(manifest)[:-1] + ', "source_url": ' + "[" * 100000 + "]" * 100000 + "}")
+            with _no_icarus():
+                receipt = validate(item, Path(output) / "run", self.registry)
+        self.assertEqual(_checks(receipt)["v2.dataset-reproduction"]["verdict"], "FAIL")
 
     def test_a_failure_to_build_the_results_still_leaves_the_receipt(self):
         from ecad_model.dataset import build, validate
@@ -1006,6 +1119,18 @@ class TestUntrustedRunsAndItems(unittest.TestCase):
             del receipt["gates"]
             (run / "receipt.json").write_bytes(json.dumps(receipt).encode())
             with self.assertRaises(ValueError, msg="a receipt is schema-checked before it is used"):
+                regenerate_results(item, run, self.registry)
+
+    def test_a_receipt_nested_too_deeply_is_refused_not_a_crash(self):
+        from ecad_model.dataset import regenerate_results
+
+        with _scratch() as directory, tempfile.TemporaryDirectory() as output:
+            item, run = self._run(directory, output)
+            receipt = json.loads((run / "receipt.json").read_bytes())
+            receipt["gates"][0]["checks"][0]["summary"] = "x"
+            text = json.dumps(receipt)
+            (run / "receipt.json").write_text(text.replace('"summary": "x"', '"summary": ' + "[" * 100000 + "]" * 100000, 1))
+            with self.assertRaises(ValueError):
                 regenerate_results(item, run, self.registry)
 
     def test_a_malformed_environment_record_is_refused(self):

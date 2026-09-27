@@ -722,6 +722,28 @@ class TestHonestOutcomes(unittest.TestCase):
         # The other requirements' committed cases are what the requirements compile to, and still count.
         self.assertEqual(checks["v4.REQ-MECH-002"]["reason_code"], "WITHIN_ILLUSTRATIVE_LIMIT")
 
+    def test_a_design_edited_without_a_rebuild_is_not_judged_on_the_old_model(self):
+        """Doubled densities: every case object still matches, but the MJCF the
+        cases run on no longer reproduces, so none of them is counted."""
+        from ecad_model.dataset import validate
+
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix="tmp-cad-dataset-test-") as d:
+            item = _copy_item(d)
+
+            def heavier(annotations):
+                for material in annotations["materials"].values():
+                    material["density"]["value"] *= 2
+            _edit_json(item / "design" / "annotations.json", heavier)
+            with tempfile.TemporaryDirectory() as output:
+                receipt = validate(item, Path(output) / "run")
+        checks = {c["check_id"]: c for g in receipt["gates"] for c in g["checks"]}
+        for check_id in ("v4.REQ-MECH-001", "v4.REQ-MECH-002", "v4.REQ-MECH-005"):
+            with self.subTest(check_id):
+                self.assertEqual((checks[check_id]["verdict"], checks[check_id]["reason_code"]),
+                                 ("BLOCKED", "COMMITTED_CASE_STALE"))
+                self.assertIn("derived/mechanical/robotic_joint_001.mjcf.xml no longer reproduces",
+                              " ".join(checks[check_id]["findings"]))
+
     def test_the_results_name_both_sides_for_clearance_and_mark_illustrative_limits(self):
         from ecad_model.dataset import validate
 

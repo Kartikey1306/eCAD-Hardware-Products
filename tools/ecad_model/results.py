@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import hashlib
 import platform
+import reprlib
 from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple
 
 from .builder import resolve
@@ -29,6 +30,12 @@ from .quantity import is_null
 
 VERSION = "1.0.0"
 RESULTS_SCHEMA = "https://embeddedos.org/schemas/engineering-model/v1/validation-results.schema.json"
+
+# Checks the dataset runner writes for an entry whose committed case did not
+# run (or was not counted): no compiled case describes such a result.
+NOT_RUN_REASONS = frozenset({"COMMITTED_CASE_STALE", "COMMITTED_CASE_MISSING", "CASE_ENGINE_ERROR",
+                             "CASE_DOCUMENT_REFUSED", "DERIVATION_NOT_AVAILABLE", "COMMITTED_MODEL_INVALID",
+                             "DERIVED_MODEL_NOT_COMMITTED", "REFERENCE_NOT_APPLICABLE", "MISSING_REQUIRED_INPUT"})
 
 # The case engine's reason codes for a corner case whose metrics it compared
 # with the limits. Only such a verdict is a judgement on the design, so only
@@ -220,6 +227,7 @@ def build_results(
     *, sample_id: str, receipt: Dict[str, Any], receipt_sha256: str, requirements: Dict[str, Any],
     model: Dict[str, Any], model_sha256: str, adapter: Any, cases: Dict[Tuple[str, str], Dict[str, Any]],
     executions: Dict[str, Dict[str, Any]], environment_record: Dict[str, Any],
+    recorded_inputs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """One result per requirement and reference, each from the receipt check that decided it.
 
@@ -240,6 +248,9 @@ def build_results(
         cases: Compiled case by (gate, case id), from the committed case documents.
         executions: Execution record by check id, from the checks' evidence.
         environment_record: environment() of the run.
+        recorded_inputs: The inputs each check was judged on, by check id, as
+            the run recorded them (from both the fresh and the committed
+            model); a result without one reads the committed model.
 
     Returns:
         A document conforming to engineering-model/v1/validation-results.
@@ -262,13 +273,16 @@ def build_results(
             check = checks[check_id]
             # A compiled case describes this result only if its own check ran
             # it: a check the fresh derivation blocked, or one that stands in
-            # for a stale or missing case, ran nothing.
-            case = cases.get((gate, entry_id)) if check_id == own and own in executions else None
+            # for a stale or missing case, ran nothing. (A case whose adapter
+            # crashed ran, and has no execution record.)
+            case = (cases.get((gate, entry_id))
+                    if check_id == own and (own in executions or check.get("reason_code") not in NOT_RUN_REASONS)
+                    else None)
             measured = _number((check.get("metrics") or {}).get(metric))
             measured_by: Optional[str] = check_id if measured is not None else None
             findings = list(check.get("findings", []))
             if measured is None and (check.get("metrics") or {}).get(metric) is not None:
-                findings.append(f"metric {metric} is not a number: {check['metrics'][metric]!r}")
+                findings.append(f"metric {metric} is not a number: {reprlib.repr(check['metrics'][metric])}")
             limit = entry.get("limit", {})
             # The limit has no value if the committed model says so, or if the
             # check itself was blocked on it (the fresh derivation's finding).
@@ -311,10 +325,14 @@ def build_results(
                 kind = "illustrative requirement" if entry["illustrative"] else "requirement"
                 illustrative, component = entry["illustrative"], entry["component"]
                 label = f"requirement {entry_id}" + (" (illustrative)" if illustrative else "")
+            recorded = _recorded(recorded_inputs, check_id if check_id == own else None)
             try:
                 # The adapter reads the committed model and the entry; for an
                 # entry V1 refused, or a model it cannot read, it may fail.
-                inputs, unresolved = input_leaves(model, _input_paths(adapter, model, gate, entry))
+                if recorded is not None:
+                    inputs, unresolved = recorded
+                else:
+                    inputs, unresolved = input_leaves(model, _input_paths(adapter, model, gate, entry))
                 cad_components = adapter.components_for(model, metric)
             except (KeyError, IndexError, TypeError, ValueError, AttributeError) as exc:
                 inputs, unresolved, cad_components = [], [], []
@@ -361,6 +379,21 @@ def build_results(
             })
     return {"$schema": RESULTS_SCHEMA, "results_version": VERSION, "sample_id": sample_id,
             "receipt_sha256": receipt_sha256, "results": results}
+
+
+def _recorded(recorded_inputs: Optional[Dict[str, Dict[str, Any]]],
+              check_id: Optional[str]) -> Optional[Tuple[List[Dict[str, str]], List[str]]]:
+    """The inputs the run recorded for a check, if it recorded well-formed ones."""
+    record = (recorded_inputs or {}).get(check_id) if check_id else None
+    if not isinstance(record, dict):
+        return None
+    inputs, unresolved = record.get("inputs"), record.get("unresolved")
+    if not (isinstance(inputs, list) and isinstance(unresolved, list)
+            and all(isinstance(i, dict) and isinstance(i.get("path"), str) and isinstance(i.get("status"), str)
+                    and set(i) == {"path", "status"} for i in inputs)
+            and all(isinstance(u, str) for u in unresolved)):
+        return None
+    return sorted(inputs, key=lambda i: (i["path"], i["status"])), sorted(unresolved)
 
 
 def _input_paths(adapter: Any, model: Dict[str, Any], gate: str, entry: Dict[str, Any]) -> List[str]:

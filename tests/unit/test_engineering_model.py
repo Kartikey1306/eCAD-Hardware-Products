@@ -1076,6 +1076,26 @@ class TestRequirementRefusals(unittest.TestCase):
                 MECHANICAL.check_requirements(requirements)
 
 
+class TestNonFiniteNumbers(unittest.TestCase):
+    """JSON has no Infinity or NaN; a comparison with one proves nothing."""
+
+    def test_an_infinity_is_not_close_to_a_number(self):
+        for committed, fresh in (({"m": math.inf}, {"m": 1.0}), ({"m": [math.inf, 0.0]}, {"m": [1.0, 0.0]}),
+                                 ({"m": 1.0}, {"m": -math.inf}), ({"m": math.nan}, {"m": math.nan})):
+            with self.subTest(committed=committed):
+                self.assertTrue(same_content(committed, fresh))
+        self.assertTrue(same_text('pos="inf 2"', 'pos="1 2"', "m"))
+        self.assertEqual(same_content({"m": [1.0, 2.0]}, {"m": [1.0, 2.0]}), [])
+
+    def test_untrusted_json_may_not_carry_them(self):
+        from ecad_model.dataset import _json
+
+        for text in ("[Infinity]", "{\"m\": -Infinity}", "[NaN]"):
+            with self.subTest(text), self.assertRaisesRegex(ValueError, "not a JSON number"):
+                _json(text)
+        self.assertEqual(_json("[1.5]"), [1.5])
+
+
 class TestContractSchemas(unittest.TestCase):
     """Rules the manifest and results schemas state, each shown refusing on its own."""
 
