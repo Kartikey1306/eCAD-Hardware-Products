@@ -438,6 +438,9 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      '    return match.group(1) if match else "unknown"\n'),
     ("probe-pattern-for-every-tool", CP, "    pattern = VERSION_PATTERNS.get(adapter)\n",
      '    pattern = VERSION_PATTERNS.get("ngspice")\n'),
+    # the domain adapter names its model's producer
+    ("model-producer-hard-coded", D, "producer=extraction.producer[0], version=extraction.producer[1],",
+     'producer="ecad_model.builder", version="1.0.0",'),
 ]
 
 

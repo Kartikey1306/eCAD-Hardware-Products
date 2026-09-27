@@ -78,9 +78,15 @@ class Metric:
 
 @dataclass
 class Extraction:
-    """What a domain reads from a sample: its raw extraction files and the model."""
+    """What a domain reads from a sample: its raw extraction files and the model.
+
+    producer is the (tool, version) that wrote the model, recorded as the
+    model's producer and as the manifest's versions.engineering_model. It
+    has no default, so no adapter inherits another domain's producer.
+    """
 
     model: Dict[str, Any]
+    producer: Tuple[str, str]
     files: List[DerivedFile] = field(default_factory=list)
     tools: List[Dict[str, Any]] = field(default_factory=list)  # receipt tool records of what shaped it
 

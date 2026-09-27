@@ -8,7 +8,7 @@ needs no CAD kernel and no simulator, and proves the claim on a sample with
 no STEP file:
 
 - the base types carry a non-CAD source, and build writes a schema-valid
-  model and manifest;
+  model and manifest, which names the fixture as the model's producer;
 - domain status comes from the registry: the fixture's domain is AVAILABLE,
   mechanical is NOT_APPLICABLE (an adapter exists, but it does not run for
   this sample), every other domain NOT_IMPLEMENTED;
@@ -95,7 +95,7 @@ class VerilogFixtureAdapter:
                                     "sha256": hashlib.sha256((root / hdl.path).read_bytes()).hexdigest()}]},
             "components": components, "joints": [], "relationships": [], "unknowns": [],
         }
-        return Extraction(model=model)
+        return Extraction(model=model, producer=("tests.unit.test_domain_adapter", "0"))
 
     def write_models(self, model: Dict[str, Any], sample_id: str) -> List[DerivedFile]:
         modules = {c["component_id"]: c["domains"]["digital"]["port_count"]["value"] for c in model["components"]}
@@ -320,6 +320,30 @@ class TestArtefactFirstDomain(unittest.TestCase):
                              ("SIMPLIFIED", "iverilog", None))
             self.assertEqual(row["inputs"], [{"path": "components/blinker/domains/digital/port_count", "status": "DERIVED"}])
             self.assertEqual((row["expected_value"], row["applied_bound"]), (3, {"minimum": 3}))
+
+    def test_the_manifest_names_the_fixture_as_its_model_producer(self):
+        """The adapter that built a model names its producer. The runner used to
+        record the mechanical builder for every model, whatever built it."""
+        from ecad_model.dataset import build
+
+        # No default: an adapter that names no producer cannot inherit one.
+        without_producer: Dict[str, Any] = {"model": {}}
+        with self.assertRaisesRegex(TypeError, "producer"):
+            Extraction(**without_producer)
+        with _scratch() as directory:
+            item = _digital_sample(directory, [REQUIREMENT])
+            build(item, self.registry)
+            manifest = json.loads((item / "dataset-item.json").read_text())
+        [model] = [d for d in manifest["derived"] if d["artifact"]["path"] == "derived/engineering_model.json"]
+        self.assertEqual((model["role"], model["producer"]),
+                         ("engineering_model", {"tool": "tests.unit.test_domain_adapter", "version": "0"}))
+        self.assertEqual(manifest["versions"]["engineering_model"], "0")
+        # The mechanical adapter names the builder, so the committed mechanical
+        # manifest, which check regenerates, still says what it said.
+        mechanical = json.loads((MECHANICAL_ITEM / "dataset-item.json").read_text())
+        [model] = [d for d in mechanical["derived"] if d["artifact"]["path"] == "derived/engineering_model.json"]
+        self.assertEqual(model["producer"], {"tool": "ecad_model.builder", "version": "1.0.0"})
+        self.assertEqual(mechanical["versions"]["engineering_model"], "1.0.0")
 
     def test_a_requirement_of_another_domain_is_refused_not_compiled(self):
         from ecad_model.dataset import build

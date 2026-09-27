@@ -47,7 +47,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from .builder import VERSION as BUILDER_VERSION, index_unknowns, resolve
+from .builder import index_unknowns, resolve
 from .domains import (
     DerivedFile, DomainAdapter, DomainNotImplemented, Extraction, SourceArtifact, adapter_for, domain_status,
 )
@@ -278,7 +278,7 @@ def _derive(item: Item, registry: Optional[Dict[str, DomainAdapter]] = None) -> 
     files: Dict[str, DerivedFile] = {derived.path: derived for derived in extraction.files}
     files[MODEL] = DerivedFile(
         path=MODEL, data=_json_bytes(extraction.model), role="engineering_model", media_type="application/json",
-        producer="ecad_model.builder", version=BUILDER_VERSION,
+        producer=extraction.producer[0], version=extraction.producer[1],
         # The model is derived from the extraction files, or, when an adapter
         # reads its artefacts directly, from the artefacts themselves.
         derived_from=(*([derived.path for derived in extraction.files]
@@ -360,7 +360,7 @@ def _item_manifest(item: Item, derivation: Derivation, registry: Optional[Dict[s
         "hash": _content_hash(item),
         "versions": {
             "extraction": ", ".join(f"{d.producer} {d.version}" for d in derivation.extraction.files) or "none",
-            "engineering_model": BUILDER_VERSION,
+            "engineering_model": derivation.extraction.producer[1],
             "domain_models": {derivation.adapter.domain: ", ".join(
                 f"{d.producer} {d.version}" for d in derivation.files.values() if d.role == "domain_model") or "none"},
             "simulation": _simulation_digest(item, simulation),
