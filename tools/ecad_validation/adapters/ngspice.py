@@ -157,6 +157,30 @@ class NgspiceAdapter(Adapter):
         return probe_executable(self.name, ("ngspice", "--version"))
 
     def run(self, request: AdapterRequest) -> AdapterResult:
+        """Run the case's deck as ``ngspice -b <deck>`` and read the measurements it declares.
+
+        Args:
+            request: The case. Its first input file is the deck; its
+                arguments never reach ngspice.
+
+        Returns:
+            BLOCKED, with nothing run, when ngspice is unavailable (the probe's
+            reason as a receipt reason code, the raw reason in the summary),
+            when there is no deck, or when the deck is over MAX_DECK_BYTES.
+            Otherwise the process's verdict, and on PASS the metrics
+            parse_measurements reads, with every declared name it could not
+            read named in the summary; stdout that was cut short gives
+            INCONCLUSIVE OUTPUT_TRUNCATED and no metrics.
+
+        Example:
+            >>> from pathlib import Path
+            >>> class Unavailable(NgspiceAdapter):
+            ...     def capability(self):
+            ...         return Capability(adapter="ngspice", available=False, reason="VERSION_PROBE_EXIT_-9")
+            >>> result = Unavailable().run(AdapterRequest(case_id="c", product_root=Path("."), input_files=[]))
+            >>> result.verdict.value, result.reason_code, result.summary, result.command
+            ('BLOCKED', 'VERSION_PROBE_EXIT_NONZERO', 'ngspice is unavailable: VERSION_PROBE_EXIT_-9', [])
+        """
         capability = self.capability()
         if not capability.available:
             return AdapterResult(

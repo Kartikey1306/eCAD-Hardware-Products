@@ -690,11 +690,37 @@ class ElectricalAdapter:
                    "metrics from one ngspice transient, compared with closed-form references")
 
     def deck_path(self, sample_id: str) -> str:
+        """Where a sample's deck is written.
+
+        Args:
+            sample_id: The dataset item's id.
+
+        Returns:
+            The deck's sample-relative path.
+
+        Example:
+            >>> ElectricalAdapter().deck_path("servo_supply_001")
+            'derived/electrical/servo_supply_001.cir'
+        """
         return f"derived/electrical/{sample_id}.cir"
 
     def extract(self, root: Path, sources: Sequence[SourceArtifact], annotations: Dict[str, Any],
                 refs: Dict[str, str]) -> Extraction:
         """Read the netlist with the strict grammar and build the engineering model from it.
+
+        Args:
+            root: The sample's directory.
+            sources: The sample's source artefacts; exactly one is spice.
+            annotations: The sample's engineering-model/v1/design-annotations
+                document.
+            refs: Repository paths the model cites: "sample" (the sample's
+                directory), "annotations", and "annotations_sha256" (the
+                digest of the annotation bytes).
+
+        Returns:
+            The engineering model and this module's producer; there is no
+            extraction file and no tool record, since nothing but this
+            parser reads the netlist.
 
         Raises:
             ExtractionError: Of kind "rejected": the netlist is not a regular
@@ -704,6 +730,20 @@ class ElectricalAdapter:
                 MAX_STEPS steps (spec §26). None of these reaches ngspice.
             ValueError: Not exactly one spice source, or the annotations are
                 inconsistent with the netlist.
+
+        Example:
+            >>> import hashlib, json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> annotations = (item / "design/annotations.json").read_bytes()
+            >>> extraction = ElectricalAdapter().extract(
+            ...     item, [SourceArtifact("source/servo_supply_001.cir", "spice")], json.loads(annotations),
+            ...     {"sample": "datasets/cad/servo_supply_001",
+            ...      "annotations": "datasets/cad/servo_supply_001/design/annotations.json",
+            ...      "annotations_sha256": hashlib.sha256(annotations).hexdigest()})
+            >>> extraction.producer, extraction.files, extraction.tools
+            (('ecad_model.domains.electrical', '1.0.0 (ecad_model.spice 1.0.0)'), [], [])
+            >>> extraction.model == json.loads((item / "derived/engineering_model.json").read_text())
+            True
         """
         netlists = [artifact for artifact in sources if artifact.format == "spice"]
         if len(netlists) != 1:
@@ -733,20 +773,91 @@ class ElectricalAdapter:
                                                  f"{MODEL_BUILDER_VERSION} (ecad_model.spice {spice.VERSION})"))
 
     def write_models(self, model: Dict[str, Any], sample_id: str) -> List[DerivedFile]:
+        """The domain model ngspice runs: the deck, written from the engineering model.
+
+        Args:
+            model: An engineering model of this domain.
+            sample_id: The dataset item's id, which names the deck.
+
+        Returns:
+            One file, the deck, reproduced byte for byte ("exact").
+
+        Raises:
+            ExtractionError: The circuit is not the network class this domain
+                validates (see supply_input_roles).
+
+        Example:
+            >>> import json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+            >>> [deck] = ElectricalAdapter().write_models(model, "servo_supply_001")
+            >>> deck.path, deck.media_type, deck.comparator, deck.derived_from
+            ('derived/electrical/servo_supply_001.cir', 'text/x-spice', 'exact', ('derived/engineering_model.json',))
+            >>> deck.data == (item / deck.path).read_bytes()
+            True
+        """
         return [DerivedFile(
             path=self.deck_path(sample_id), data=write_deck(model), role="domain_model", media_type="text/x-spice",
             producer="ecad_model.domains.electrical", version=VERSION,
             derived_from=("derived/engineering_model.json",), comparator="exact")]
 
     def case_target(self, sample_id: str) -> CaseTarget:
+        """How every case of a sample runs: ngspice on the sample's one deck.
+
+        Args:
+            sample_id: The dataset item's id.
+
+        Returns:
+            The ngspice adapter, the deck as its only input, and no
+            arguments for any scenario.
+
+        Example:
+            >>> target = ElectricalAdapter().case_target("servo_supply_001")
+            >>> target.adapter, target.inputs, target.arguments({"name": "output_short"})
+            ('ngspice', ('derived/electrical/servo_supply_001.cir',), [])
+        """
         # Every case runs the same deck: a scenario is a window of its one transient.
         return CaseTarget(adapter="ngspice", inputs=(self.deck_path(sample_id),), arguments=lambda scenario: [])
 
     def reference_value(self, model: Dict[str, Any], derivation: str,
                         scenario: Dict[str, Any]) -> Tuple[float, List[str]]:
+        """The module's reference_value, which documents each closed form.
+
+        Args:
+            model: An engineering model of this domain.
+            derivation: One of the nine closed forms.
+            scenario: The case's scenario, which is not read.
+
+        Returns:
+            (value in SI units, model paths the value was computed from).
+
+        Raises:
+            ReferenceBlocked: An input has a null status, or the form does
+                not apply to this design.
+            ValueError: The derivation name is not recognised.
+
+        Example:
+            >>> import json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+            >>> value, paths = ElectricalAdapter().reference_value(model, "steady_input_current",
+            ...                                                    {"name": "steady_state"})
+            >>> round(value, 5), len(paths), paths[0]
+            (4.16667, 10, 'components/v_in/domains/electrical/waveform_voltage')
+        """
         return reference_value(model, derivation, scenario)
 
     def metrics(self) -> Dict[str, Metric]:
+        """Every metric the deck measures, with its unit and fidelity.
+
+        Returns:
+            A copy of METRICS, in the order the deck declares them.
+
+        Example:
+            >>> metrics = ElectricalAdapter().metrics()
+            >>> len(metrics), list(metrics)[0], metrics["inrush_i2t_a2s"].unit, metrics["inrush_i2t_a2s"].fidelity
+            (9, 'inrush_peak_current_a', 'A^2*s', 'SIMPLIFIED')
+        """
         return dict(METRICS)
 
     def check_requirements(self, requirements: Dict[str, Any]) -> None:
@@ -754,11 +865,29 @@ class ElectricalAdapter:
         each metric must be asked for in the scenario it is measured in, and
         each reference must compare the metric its derivation computes.
 
+        Args:
+            requirements: An engineering-model/v1/engineering-requirements
+                document.
+
+        Returns:
+            None; it raises instead.
+
         Raises:
             ValueError: A scenario or derivation is not in the electrical
                 vocabulary (schemas/engineering-model/v1/electrical-vocabulary),
                 or a metric or derivation is paired with the wrong scenario
                 or metric.
+
+        Example:
+            >>> import json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> requirements = json.loads((item / "requirements/requirements.json").read_text())
+            >>> ElectricalAdapter().check_requirements(requirements)
+            >>> requirements["reference_values"][0]["scenario"] = {"name": "steady_state"}
+            >>> ElectricalAdapter().check_requirements(requirements)
+            Traceback (most recent call last):
+            ...
+            ValueError: REF-EL-001: inrush_peak_current_a is measured in the startup scenario, not steady_state
         """
         validate_schema({
             "scenarios": [entry["scenario"] for entry in (*requirements["reference_values"], *requirements["requirements"])],
@@ -781,27 +910,137 @@ class ElectricalAdapter:
         Coarse on purpose: every value the netlist states for every circuit
         component, since every case runs the one deck written from all of
         them. Ratings are not simulated, so they are not dependencies.
+
+        Args:
+            model: An engineering model of this domain.
+            metric: The simulated metric, which is not read.
+            scenario: Its scenario, which is not read.
+
+        Returns:
+            The model paths of the netlist's values, sorted.
+
+        Example:
+            >>> import json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+            >>> paths = ElectricalAdapter().dependencies(model, "steady_bus_voltage_v", {"name": "steady_state"})
+            >>> len(paths), paths[0], "components/r_f1/domains/electrical/melting_i2t" in paths
+            (20, 'components/c_bulk/domains/electrical/capacitance', False)
         """
         return sorted(f"components/{c['component_id']}/domains/electrical/{name}"
                       for c in _circuit(model) for name in c["domains"].get("electrical", {})
                       if name in NETLIST_FACETS)
 
     def reference_inputs(self, model: Dict[str, Any], derivation: str, scenario: Dict[str, Any]) -> List[str]:
-        """The model paths a reference derivation reads, whether or not it applies."""
+        """The model paths a reference derivation reads, whether or not it applies.
+
+        Args:
+            model: An engineering model of this domain.
+            derivation: One of the nine closed forms.
+            scenario: The case's scenario, which is not read.
+
+        Returns:
+            The paths of the facets INPUTS lists for the derivation, in that
+            order; the series resistance's is left out when the capacitor
+            goes straight to ground.
+
+        Raises:
+            ValueError: The derivation name is not recognised.
+            ExtractionError: The circuit is not the network class this domain
+                validates.
+
+        Example:
+            >>> import json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+            >>> for path in ElectricalAdapter().reference_inputs(model, "precharge_peak_current", {"name": "startup"}):
+            ...     print(path)
+            components/v_in/domains/electrical/waveform_time
+            components/v_in/domains/electrical/waveform_voltage
+            components/r_f1/domains/electrical/resistance
+            components/r_pre/domains/electrical/resistance
+            components/s_byp/domains/electrical/off_resistance
+            components/r_esr/domains/electrical/resistance
+            components/c_bulk/domains/electrical/capacitance
+        """
         return _inputs(model, derivation)[2]
 
     def document_schemas(self) -> Dict[str, str]:
+        """The schema of each extraction file, checked at V0.
+
+        Returns:
+            Nothing: the model is built from the netlist directly, so there
+            is no extraction file.
+
+        Example:
+            >>> ElectricalAdapter().document_schemas()
+            {}
+        """
         return {}  # no extraction file: the model is built from the netlist directly
 
     def components_for(self, model: Dict[str, Any], metric: str) -> List[str]:
-        """Every circuit component, as "<id> (<designator>)": every metric comes from the whole circuit."""
+        """Every circuit component, as "<id> (<designator>)": every metric comes from the whole circuit.
+
+        Args:
+            model: An engineering model of this domain.
+            metric: The metric, which is not read.
+
+        Returns:
+            The components with a circuit member, sorted; a component the
+            netlist does not declare, such as the product it supplies, is
+            not one of them.
+
+        Example:
+            >>> import json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+            >>> components = ElectricalAdapter().components_for(model, "fault_input_current_a")
+            >>> len(components), components[:3], components[-1]
+            (10, ['c_bulk (C_BULK)', 'i_load (I_LOAD)', 'r_esr (R_ESR)'], 'v_in (V_IN)')
+        """
         return sorted(f"{c['component_id']} ({c['circuit']['designator']})" for c in _circuit(model))
 
     def simulation_files(self, root: Path) -> List[str]:
+        """The sample's simulation scripts, which V0 hashes.
+
+        Args:
+            root: The sample's directory, which is not read.
+
+        Returns:
+            Nothing: the deck is derived, and no script runs.
+
+        Example:
+            >>> from pathlib import Path
+            >>> ElectricalAdapter().simulation_files(Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001")
+            []
+        """
         return []  # the deck is derived; no script runs
 
     def sanity_problems(self, model: Dict[str, Any]) -> List[str]:
-        """Why the circuit's values, units or sequence are impossible for the deck's windows, if they are."""
+        """Why the circuit's values, units or sequence are impossible for the deck's windows, if they are.
+
+        Args:
+            model: An engineering model of this domain.
+
+        Returns:
+            One sentence per problem, naming the component or the event; an
+            empty list when there is none.
+
+        Raises:
+            ExtractionError: The circuit is not the network class this domain
+                validates.
+
+        Example:
+            >>> import json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+            >>> ElectricalAdapter().sanity_problems(model)
+            []
+            >>> bypass = next(c for c in model["components"] if c["component_id"] == "s_byp")
+            >>> bypass["domains"]["electrical"]["threshold_voltage"]["value"] = 5.0  # V_BYP's high level is 5 V
+            >>> ElectricalAdapter().sanity_problems(model)
+            ["V_BYP: its high level 5.0 V does not exceed S_BYP's VT + VH = 5.0 V, so the switch never closes"]
+        """
         problems = []
         for component in model["components"]:
             for name, facet in component["domains"].get("electrical", {}).items():
@@ -859,7 +1098,33 @@ class ElectricalAdapter:
     def invariant_problems(self, model: Dict[str, Any], extraction_files: Dict[str, Any],
                            domain_models: Dict[str, bytes]) -> List[str]:
         """The deck is the model's circuit plus exactly the adapter's lines; every
-        netlist value cites the netlist; a supply matches the sheet of what it powers."""
+        netlist value cites the netlist; a supply matches the sheet of what it powers.
+
+        Args:
+            model: An engineering model of this domain.
+            extraction_files: The extraction files by path, which this domain
+                does not have.
+            domain_models: Each deck's bytes, by its sample-relative path.
+
+        Returns:
+            One sentence per disagreement, naming the file, line or component;
+            an empty list when there is none.
+
+        Raises:
+            ExtractionError: The circuit is not the network class this domain
+                validates.
+
+        Example:
+            >>> import json; from pathlib import Path
+            >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+            >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+            >>> deck = (item / "derived/electrical/servo_supply_001.cir").read_bytes()
+            >>> ElectricalAdapter().invariant_problems(model, {}, {"derived/electrical/servo_supply_001.cir": deck})
+            []
+            >>> edited = deck.replace(b"R_PRE n_f n_bus 10.0", b"R_PRE n_f n_bus 1.0")
+            >>> ElectricalAdapter().invariant_problems(model, {}, {"edited.cir": edited})
+            ["edited.cir:5: R_PRE values {'resistance': 1.0} != the model's {'resistance': 10.0}"]
+        """
         problems = []
         circuit = _circuit(model)
         for path, deck in domain_models.items():

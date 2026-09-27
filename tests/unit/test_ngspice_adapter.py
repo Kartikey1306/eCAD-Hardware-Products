@@ -695,6 +695,21 @@ class TestDocumentationExamples(unittest.TestCase):
                 self.assertGreater(result.attempted, 0, f"{name} has no runnable examples")
                 self.assertEqual(result.failed, 0)
 
+    def test_every_function_the_electrical_domain_wrote_here_has_an_example(self):
+        # The functions these modules gained or had rewritten for the
+        # electrical domain; the others predate it and are not held here.
+        import doctest
+        import importlib
+
+        written = {"ngspice": ("declared_measurements", "parse_measurements", "NgspiceAdapter.run"),
+                   "capabilities": ("version_from_output",)}
+        for name, functions in written.items():
+            module = importlib.import_module(f"ecad_validation.adapters.{name}")
+            examples = {test.name: len(test.examples) for test in doctest.DocTestFinder().find(module)}
+            for function in functions:
+                with self.subTest(f"{name}.{function}"):
+                    self.assertGreater(examples.get(f"{module.__name__}.{function}", 0), 0)
+
 
 if __name__ == "__main__":
     unittest.main()
