@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Optional
 
 from .base import Capability
 
@@ -15,6 +16,38 @@ TOOL_COMMANDS = {
     "iverilog": ("iverilog", "-V"),
     "openscad": ("openscad", "--version"),
 }
+
+# A tool whose probe does not state its version on the first line of its
+# output. ngspice-47 opens its banner with "******" and names itself on the
+# second line: "** ngspice-47 : Circuit level simulation program".
+VERSION_PATTERNS: Dict[str, re.Pattern[str]] = {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)")}
+
+
+def version_from_output(adapter: str, output: str) -> Optional[str]:
+    """The version a tool's probe output states, or None if it states none.
+
+    Args:
+        adapter: The adapter the probe is for; it selects a VERSION_PATTERNS entry.
+        output: The probe's stdout and stderr, stripped.
+
+    Returns:
+        The pattern's match for a tool that has one, and None when it does
+        not match, since a version nobody reported is never invented; for
+        every other tool the first line of the output, or None if empty.
+
+    Example:
+        >>> version_from_output("ngspice", "******\\n** ngspice-47 : Circuit level simulation program\\n******")
+        '47'
+        >>> version_from_output("ngspice", "******") is None
+        True
+        >>> version_from_output("iverilog", "Icarus Verilog version 13.0 (stable) (v13_0)\\n\\nCopyright (c) 2000-2026")
+        'Icarus Verilog version 13.0 (stable) (v13_0)'
+    """
+    pattern = VERSION_PATTERNS.get(adapter)
+    if pattern is None:
+        return output.splitlines()[0].strip() if output else None
+    match = pattern.search(output)
+    return match.group(1) if match else None
 
 
 def probe_executable(adapter: str, command: Iterable[str]) -> Capability:
@@ -45,7 +78,7 @@ def probe_executable(adapter: str, command: Iterable[str]) -> Capability:
             reason=f"VERSION_PROBE_ERROR:{exc}",
         )
     output = "\n".join(part for part in (completed.stdout, completed.stderr) if part).strip()
-    version_line = output.splitlines()[0].strip() if output else None
+    version_line = version_from_output(adapter, output)
     if completed.returncode != 0 and not version_line:
         return Capability(
             adapter=adapter,

@@ -3,13 +3,13 @@
 
 Each mutant is one targeted edit that makes a behaviour the tests claim to
 protect wrong. For every mutant this copies the repository, applies the edit,
-runs the fast engineering-model and domain-adapter tests and, only if they
-stay green, the slower CAD-kernel tests. A mutant of a dataset item's own
-file (its simulation script) is followed by a rebuild of that item, so the
-manifest's hashes cannot kill it: a behavioural test must. A mutant the
-suite does not kill is a test gap, and the script exits 1. The unmutated copy
-runs first and must be green: against a failing baseline every mutant would
-look killed.
+runs the fast engineering-model, domain-adapter and ngspice-adapter tests
+and, only if they stay green, the slower CAD-kernel tests. A mutant of a
+dataset item's own file (its simulation script) is followed by a rebuild of
+that item, so the manifest's hashes cannot kill it: a behavioural test must.
+A mutant the suite does not kill is a test gap, and the script exits 1. The
+unmutated copy runs first and must be green: against a failing baseline every
+mutant would look killed.
 
 Needs the CAD kernel and MuJoCo (tools/requirements-cad.txt), with `python3`
 on PATH able to import mujoco. Not collected by pytest.
@@ -42,8 +42,11 @@ MA = "tools/ecad_model/domains/mechanical.py"
 RS = "tools/ecad_model/results.py"
 DR = "tools/ecad_model/domains/__init__.py"
 J = "datasets/cad/robotic_joint_001/simulation/joint_dynamics.py"
+NG = "tools/ecad_validation/adapters/ngspice.py"
+CP = "tools/ecad_validation/adapters/capabilities.py"
 FAST = "tests/unit/test_engineering_model.py"
 ADAPTER = "tests/unit/test_domain_adapter.py"
+NGSPICE = "tests/unit/test_ngspice_adapter.py"
 SLOW = "tests/unit/test_cad_dataset.py"
 
 # (name, file, text to replace, replacement). The replaced text must occur
@@ -411,6 +414,30 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("manifest-verified-at-optional", "schemas/cad-dataset/v1/dataset-item.schema.json",
      '"then": {"properties": {"license": {"required": ["license_text", "verified_by", "verified_at"]}}}',
      '"then": {"properties": {"license": {"required": ["license_text", "verified_by"]}}}'),
+    # ngspice: batch invocation, .meas capture from stdout, version banner, receipt-safe probe reasons
+    ("ngspice-rawfile-requested", NG, 'argv=[capability.executable or "ngspice", "-b", relative],',
+     'argv=[capability.executable or "ngspice", "-b", "-r", "ngspice.raw", relative],'),
+    ("ngspice-log-requested", NG, 'argv=[capability.executable or "ngspice", "-b", relative],',
+     'argv=[capability.executable or "ngspice", "-b", "-o", "ngspice.log", relative],'),
+    ("ngspice-arguments-passed", NG, 'argv=[capability.executable or "ngspice", "-b", relative],',
+     'argv=[capability.executable or "ngspice", "-b", relative, *request.arguments],'),
+    ("ngspice-suffix-refused", NG, r'(\S+)(?:[ \t]+(?:at|from|to)=[ \t]*\S+)*[ \t]*$")', r'(\S+)[ \t]*$")'),
+    ("ngspice-duplicate-kept", NG, "reported.setdefault(found.group(1), []).append(found.group(2))",
+     "reported[found.group(1)] = [found.group(2)]"),
+    ("ngspice-non-finite-kept", NG, "        elif not math.isfinite(float(values[0])):\n", "        elif False:\n"),
+    ("ngspice-python-number-spellings", NG, "        elif not NUMBER.match(values[0]):\n", "        elif False:\n"),
+    ("ngspice-failed-read-as-zero", NG, '            problems[name] = f"failed: {failed[name]}"', "            metrics[name] = 0.0"),
+    ("ngspice-undeclared-names-read", NG, "    for name in declared:\n", "    for name in [*declared, *reported]:\n"),
+    ("ngspice-truncation-ignored", NG, "            if process.stdout.endswith(TRUNCATED):", "            if False:"),
+    ("ngspice-parsed-on-failure", NG, "        if verdict is Verdict.PASS:\n",
+     "        if process.execution_status is ExecutionStatus.COMPLETED:\n"),
+    ("ngspice-oversize-deck-read", NG, "        if netlist.stat().st_size > MAX_DECK_BYTES:", "        if False:"),
+    ("ngspice-reason-unsanitised", NG, "    if RECEIPT_CODE.match(reason):\n", "    if True:\n"),
+    ("ngspice-version-first-line", CP, r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)")}', "= {}"),
+    ("ngspice-version-invented", CP, "    return match.group(1) if match else None\n",
+     '    return match.group(1) if match else "unknown"\n'),
+    ("probe-pattern-for-every-tool", CP, "    pattern = VERSION_PATTERNS.get(adapter)\n",
+     '    pattern = VERSION_PATTERNS.get("ngspice")\n'),
 ]
 
 
@@ -460,7 +487,7 @@ def run(name: str, relative: Optional[str], old: str, new: str) -> Tuple[str, st
                                 "user.email=mutation@localhost", "commit", "-q", "-m", "mutant"]):
                     subprocess.run(command, cwd=copy, check=True, capture_output=True, timeout=300)
         environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", PYTHONDONTWRITEBYTECODE="1")
-        for suite in (FAST, ADAPTER, SLOW):
+        for suite in (FAST, ADAPTER, NGSPICE, SLOW):
             result = subprocess.run(
                 [sys.executable, "-m", "pytest", suite, "-q", "-x", "-p", "no:cacheprovider"],
                 cwd=copy, env=environment, capture_output=True, text=True, timeout=1800,
