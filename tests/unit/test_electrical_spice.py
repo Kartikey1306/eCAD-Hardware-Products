@@ -34,16 +34,18 @@ DECK = "derived/electrical/servo_supply_001.cir"
 # ngspice's progress report: the simulated time it had reached and a CR,
 # written over a blank line of stdout when a run is slow. Observed on
 # ngspice-47, 2026-09-27: each of 28 runs made in parallel printed one or
-# more; the design's two lone runs printed none. run_process reads stdout as
-# text, so the CR arrives as a line end.
+# more; the design's two lone runs printed none. ngspice-36 writes it to
+# stderr instead: each of two runs in an ubuntu:22.04 arm64 container on a
+# loaded machine wrote two there (Observed, 36+ds-1ubuntu0.1, 2026-09-27).
+# run_process reads both streams as text, so the CR arrives as a line end.
 PROGRESS = re.compile(r"^ Reference value : +\S+$")
-# All ngspice may print on stderr for the committed deck. ngspice-47 and 44.2
-# print nothing; ngspice-36 warns once for each of the deck's four PWL
-# sources that it has no DC value and uses the source's value at time 0,
-# which is what the deck means, and still exits 0 (Verified 2026-09-27:
-# 36+ds-1ubuntu0.1 in an ubuntu:22.04 container, 44.2+ds-1 in
-# python:3.12-slim, both arm64). Any other line, such as an error or a failed
-# measurement, fails the test.
+# All ngspice may print on stderr for the committed deck besides that
+# report. ngspice-47 and 44.2 print nothing; ngspice-36 warns once for each
+# of the deck's four PWL sources that it has no DC value and uses the
+# source's value at time 0, which is what the deck means, and still exits 0
+# (Verified 2026-09-27: 36+ds-1ubuntu0.1 in an ubuntu:22.04 container,
+# 44.2+ds-1 in python:3.12-slim, both arm64). Any other line, such as an
+# error or a failed measurement, fails the test.
 DC_VALUE_WARNINGS = frozenset(f"Warning: {source}: no DC value, transient time 0 value used"
                               for source in ("v_in", "v_byp", "i_load", "v_flt"))
 # The closed forms of the design (§5.3), to 12 significant figures, and each
@@ -152,8 +154,9 @@ class TestRealNgspice(unittest.TestCase):
             with self.subTest(result.summary):
                 self.assertEqual((result.verdict.value, result.reason_code), ("PASS", "TOOL_EXITED_ZERO"))
                 unexpected = [line for line in result.stderr.splitlines()
-                              if line.strip() and line not in DC_VALUE_WARNINGS]
-                self.assertEqual(unexpected, [], "stderr carries nothing but ngspice-36's no-DC-value warnings")
+                              if line.strip() and line not in DC_VALUE_WARNINGS and not PROGRESS.match(line)]
+                self.assertEqual(unexpected, [], "stderr carries nothing but ngspice-36's no-DC-value warnings "
+                                                 "and progress reports")
                 self.assertNotIn("/", result.stdout, "no host path in the hash-bound stdout")
                 self.assertEqual(set(result.metrics), set(CLOSED_FORMS))
                 for metric, (expected, tolerance) in CLOSED_FORMS.items():
