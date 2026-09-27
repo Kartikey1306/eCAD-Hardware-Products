@@ -1,0 +1,190 @@
+{
+  "$schema": "https://embeddedos.org/schemas/cad-dataset/v1/dataset-item.schema.json",
+  "artifact_type": "spice_netlist",
+  "artifact_version": "1.0",
+  "collected_at": "2026-09-27",
+  "coordinate_system": "none (a netlist has no geometry)",
+  "created_at": "2026-09-27",
+  "dataset_item_version": "1.0.0",
+  "derived": [
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "derived/engineering_model.json",
+        "sha256": "5cb14da3fc22c0bf5bf9cb17d19eb1d06664a3fc7cf1de5549b6a2c387bcac7a",
+        "size_bytes": 27266
+      },
+      "derived_from": [
+        "source/servo_supply_001.cir",
+        "design/annotations.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.domains.electrical",
+        "version": "1.0.0 (ecad_model.spice 1.0.0)"
+      },
+      "role": "engineering_model"
+    },
+    {
+      "artifact": {
+        "media_type": "text/x-spice",
+        "path": "derived/electrical/servo_supply_001.cir",
+        "sha256": "2840fc040b30a626891a347bb447a242f81ce97cd23aa415a6e32c7ef4451d30",
+        "size_bytes": 1300
+      },
+      "derived_from": [
+        "derived/engineering_model.json"
+      ],
+      "domain": "electrical",
+      "producer": {
+        "tool": "ecad_model.domains.electrical",
+        "version": "1.0.0"
+      },
+      "role": "domain_model"
+    },
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "validation/golden/cases.json",
+        "sha256": "28d7a472da9f317ce0e0625952ed1495ebd395f58d0d7441fdc3ea88decfd342",
+        "size_bytes": 4308
+      },
+      "derived_from": [
+        "derived/engineering_model.json",
+        "requirements/requirements.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.requirements",
+        "version": "1.0.0"
+      },
+      "role": "golden_cases"
+    },
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "validation/corners/cases.json",
+        "sha256": "0138c3c96e687c2b10ec0c908f4b985f93aa10b53f2276f2838a2b7fcb6f2de7",
+        "size_bytes": 1815
+      },
+      "derived_from": [
+        "derived/engineering_model.json",
+        "requirements/requirements.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.requirements",
+        "version": "1.0.0"
+      },
+      "role": "corner_cases"
+    }
+  ],
+  "description": "48 V servo-drive supply input testbench: hot-plug supply, fuse F1 as its cold resistance, precharge resistor with an ideal bypass switch, bulk capacitor with series resistance, a constant-current stand-in for the eServo-200 drive, and a fault switch that shorts the bus. No element is a real part. Authored for the eCAD multi-domain validation pipeline (issue #27).",
+  "domain": "electrical",
+  "domains": [
+    {
+      "domain": "mechanical",
+      "reason": "the mechanical adapter reads step, which this sample does not have",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "domain": "electrical",
+      "reason": "the series-precharge supply-input network only (a supply ramp, a fuse's cold resistance, a precharge resistor with a bypass switch, a bulk capacitor with its series resistance, a constant-current load and a fault switch): inrush, precharge, steady-state and output-short metrics from one ngspice transient, compared with closed-form references; requirements resting on components/c_bulk/domains/electrical/ripple_current_rating (UNKNOWN), components/c_bulk/domains/electrical/voltage_rating (UNKNOWN), components/drive/domains/electrical/input_ripple_current (UNSPECIFIED), components/drive/domains/electrical/switching_frequency (UNSPECIFIED), components/r_f1/domains/electrical/breaking_capacity (UNKNOWN), components/r_f1/domains/electrical/current_rating (UNKNOWN), components/r_f1/domains/electrical/melting_i2t (UNKNOWN), components/r_pre/domains/electrical/power_rating (UNKNOWN), components/r_pre/domains/electrical/pulse_energy_rating (UNKNOWN), components/s_byp/domains/electrical/current_rating (UNKNOWN) are BLOCKED",
+      "status": "AVAILABLE"
+    },
+    {
+      "domain": "digital",
+      "reason": "no digital validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "pcb",
+      "reason": "no pcb validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "power_electronics",
+      "reason": "no power_electronics validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "control",
+      "reason": "no control validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "electromagnetic",
+      "reason": "no electromagnetic validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "thermal",
+      "reason": "no thermal validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "full_system",
+      "reason": "no full_system validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    }
+  ],
+  "hash": "sha256:5f83f0bfb09cce5da856ac30e09191da42ef291770fca32462bbd06c69a874da",
+  "inputs": {
+    "annotations": {
+      "media_type": "application/json",
+      "path": "design/annotations.json",
+      "sha256": "f715d088466c00b2e8c3d88c831ac66566ec8cb34797350c1abdd88539c10296",
+      "size_bytes": 7306
+    },
+    "provenance": {
+      "media_type": "application/json",
+      "path": "source/provenance.json",
+      "sha256": "4cf0753a7fd701206919a3edd074d595ab3cd4a7da91a7969f6e704926a4e6c9",
+      "size_bytes": 1526
+    },
+    "requirements": {
+      "media_type": "application/json",
+      "path": "requirements/requirements.json",
+      "sha256": "1292859427d683146ffcdb41c02bc74f4405ebc5ac2999ba6a8c87dc43f6e108",
+      "size_bytes": 9175
+    },
+    "simulation": []
+  },
+  "item_id": "servo_supply_001",
+  "source": {
+    "artifacts": [
+      {
+        "format": "spice",
+        "media_type": "text/x-spice",
+        "path": "source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344",
+        "size_bytes": 1300
+      }
+    ],
+    "license": {
+      "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation",
+      "basis": "hand-written in this repository as source/servo_supply_001.cir and committed under the repository's MIT LICENSE; contains no third-party model, library or part data",
+      "license_text": {
+        "path": "LICENSE",
+        "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"
+      },
+      "license_verified": true,
+      "redistribution_permitted": true,
+      "spdx": "MIT",
+      "training_use_permitted": true
+    },
+    "origin": {
+      "author": "EmbeddedOS (EoS) Research Foundation",
+      "kind": "self_authored"
+    }
+  },
+  "source_url": null,
+  "title": "servo_supply_001: 48 V servo-drive supply input -- fuse, precharge limiter with bypass, bulk capacitor, drive load",
+  "units": "SI (V, A, ohm, F, s) with lowercase SPICE scale suffixes t g meg k m u n p",
+  "versions": {
+    "domain_models": {
+      "electrical": "ecad_model.domains.electrical 1.0.0"
+    },
+    "engineering_model": "1.0.0 (ecad_model.spice 1.0.0)",
+    "extraction": "none",
+    "simulation": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validation_contract": "hardware-validation v1.0.0"
+  }
+}

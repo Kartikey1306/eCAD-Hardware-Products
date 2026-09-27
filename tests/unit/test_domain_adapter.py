@@ -10,8 +10,8 @@ no STEP file:
 - the base types carry a non-CAD source, and build writes a schema-valid
   model and manifest, which names the fixture as the model's producer;
 - domain status comes from the registry: the fixture's domain is AVAILABLE,
-  mechanical is NOT_APPLICABLE (an adapter exists, but it does not run for
-  this sample), every other domain NOT_IMPLEMENTED;
+  mechanical and electrical are NOT_APPLICABLE (an adapter exists, but it
+  does not run for this sample), every other domain NOT_IMPLEMENTED;
 - check reproduces the derivation, validate writes a schema-valid receipt;
 - a requirement compiles through the fixture's metric vocabulary into a case
   the existing engine runs with the Icarus adapter (reported not installed,
@@ -288,6 +288,7 @@ class TestArtefactFirstDomain(unittest.TestCase):
             status = {d["domain"]: d["status"] for d in manifest["domains"]}
             self.assertEqual(status.pop("digital"), "AVAILABLE")
             self.assertEqual(status.pop("mechanical"), "NOT_APPLICABLE")
+            self.assertEqual(status.pop("electrical"), "NOT_APPLICABLE")
             self.assertEqual(set(status.values()), {"NOT_IMPLEMENTED"})
             self.assertEqual(manifest["source"]["artifacts"][0]["format"], "verilog")
             lineage = {d["artifact"]["path"]: d["derived_from"] for d in manifest["derived"]}

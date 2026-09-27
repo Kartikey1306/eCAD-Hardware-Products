@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/electrical-vocabulary.schema.json",
+  "title": "eCAD Electrical Domain Vocabulary v1",
+  "description": "The scenarios and closed-form derivations the electrical domain adapter implements. The generic requirements schema leaves both open; the electrical adapter validates every electrical requirement and reference against this document. A scenario is a window of the one ngspice transient every case runs, so it carries only its name.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenarios",
+    "derivations"
+  ],
+  "properties": {
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/scenario"
+      }
+    },
+    "derivations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/derivation"
+      }
+    }
+  },
+  "definitions": {
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "description": "startup: the power-up sequence before the fault; steady_state: the instant the fault is commanded, with the load on; output_short: the end of the fault window.",
+          "enum": [
+            "startup",
+            "steady_state",
+            "output_short"
+          ]
+        }
+      }
+    },
+    "derivation": {
+      "description": "Name of the independent closed-form derivation that computes the expected value from the engineering model. The value itself is computed, not typed.",
+      "enum": [
+        "precharge_peak_current",
+        "precharge_i2t",
+        "precharge_charge_time",
+        "precharge_bus_voltage",
+        "settled_no_load_bus_voltage",
+        "steady_bus_voltage",
+        "steady_input_current",
+        "steady_fuse_power",
+        "settled_fault_input_current"
+      ]
+    }
+  }
+}

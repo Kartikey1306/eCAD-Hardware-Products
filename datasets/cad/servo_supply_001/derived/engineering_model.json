@@ -1,0 +1,836 @@
+{
+  "$schema": "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json",
+  "components": [
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "V_IN",
+        "element": "voltage_source",
+        "terminals": {
+          "n": "0",
+          "p": "n_in"
+        }
+      },
+      "component_id": "v_in",
+      "domains": {
+        "electrical": {
+          "waveform_time": {
+            "note": "V_IN waveform_time as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "s",
+            "value": [
+              0.0,
+              0.0001
+            ]
+          },
+          "waveform_voltage": {
+            "note": "V_IN waveform_voltage as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": [
+              0.0,
+              48.0
+            ]
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "voltage_source",
+      "material": null,
+      "name": "hot-plug supply: 0 to 48 V in 100 us (testbench stimulus)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "R_F1",
+        "element": "resistor",
+        "terminals": {
+          "n": "n_f",
+          "p": "n_in"
+        }
+      },
+      "component_id": "r_f1",
+      "domains": {
+        "electrical": {
+          "breaking_capacity": {
+            "note": "no fuse is selected, so no breaking capacity exists to check against",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "A",
+            "value": null
+          },
+          "current_rating": {
+            "note": "no fuse is selected, so no current rating exists to check against",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "A",
+            "value": null
+          },
+          "melting_i2t": {
+            "note": "no fuse is selected, so no melting I2t exists to check against",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "A^2*s",
+            "value": null
+          },
+          "resistance": {
+            "note": "R_F1 resistance as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "ohm",
+            "value": 0.02
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "fuse",
+      "material": null,
+      "name": "F1 input fuse, modelled by its cold resistance only (no fuse is selected; it never opens)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "R_PRE",
+        "element": "resistor",
+        "terminals": {
+          "n": "n_bus",
+          "p": "n_f"
+        }
+      },
+      "component_id": "r_pre",
+      "domains": {
+        "electrical": {
+          "power_rating": {
+            "note": "no resistor is selected",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "W",
+            "value": null
+          },
+          "pulse_energy_rating": {
+            "note": "no resistor is selected",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "J",
+            "value": null
+          },
+          "resistance": {
+            "note": "R_PRE resistance as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "ohm",
+            "value": 10.0
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "resistor",
+      "material": null,
+      "name": "R1 precharge resistor (no resistor is selected)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "S_BYP",
+        "element": "voltage_controlled_switch",
+        "model": "SW_BYP",
+        "terminals": {
+          "cn": "0",
+          "cp": "n_byp",
+          "n": "n_bus",
+          "p": "n_f"
+        }
+      },
+      "component_id": "s_byp",
+      "domains": {
+        "electrical": {
+          "current_rating": {
+            "note": "no bypass device is selected",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "A",
+            "value": null
+          },
+          "hysteresis_voltage": {
+            "note": "S_BYP hysteresis_voltage as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": 0.0
+          },
+          "off_resistance": {
+            "note": "S_BYP off_resistance as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "ohm",
+            "value": 1000000000.0
+          },
+          "on_resistance": {
+            "note": "S_BYP on_resistance as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "ohm",
+            "value": 0.01
+          },
+          "threshold_voltage": {
+            "note": "S_BYP threshold_voltage as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": 2.5
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "switch",
+      "material": null,
+      "name": "Q1 precharge bypass, an ideal voltage-controlled switch (no relay or MOSFET is selected)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "V_BYP",
+        "element": "voltage_source",
+        "terminals": {
+          "n": "0",
+          "p": "n_byp"
+        }
+      },
+      "component_id": "v_byp",
+      "domains": {
+        "electrical": {
+          "waveform_time": {
+            "note": "V_BYP waveform_time as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "s",
+            "value": [
+              0.0,
+              0.03,
+              0.030001
+            ]
+          },
+          "waveform_voltage": {
+            "note": "V_BYP waveform_voltage as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": [
+              0.0,
+              0.0,
+              5.0
+            ]
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "voltage_source",
+      "material": null,
+      "name": "precharge controller's bypass command, 0 to 5 V at 30 ms (testbench stimulus)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "C_BULK",
+        "element": "capacitor",
+        "terminals": {
+          "n": "n_esr",
+          "p": "n_bus"
+        }
+      },
+      "component_id": "c_bulk",
+      "domains": {
+        "electrical": {
+          "capacitance": {
+            "note": "C_BULK capacitance as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "F",
+            "value": 0.00047
+          },
+          "ripple_current_rating": {
+            "note": "no capacitor is selected",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "A",
+            "value": null
+          },
+          "voltage_rating": {
+            "note": "no capacitor is selected, so no voltage rating exists to check against",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "V",
+            "value": null
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "capacitor",
+      "material": null,
+      "name": "C1 bulk capacitor, ideal apart from R_ESR (no capacitor is selected)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "R_ESR",
+        "element": "resistor",
+        "terminals": {
+          "n": "0",
+          "p": "n_esr"
+        }
+      },
+      "component_id": "r_esr",
+      "domains": {
+        "electrical": {
+          "resistance": {
+            "note": "R_ESR resistance as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "ohm",
+            "value": 0.05
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "resistor",
+      "material": null,
+      "name": "C1 series resistance: a design value, not a datasheet ESR",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "I_LOAD",
+        "element": "current_source",
+        "terminals": {
+          "n": "0",
+          "p": "n_bus"
+        }
+      },
+      "component_id": "i_load",
+      "domains": {
+        "electrical": {
+          "waveform_current": {
+            "note": "I_LOAD waveform_current as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "A",
+            "value": [
+              0.0,
+              0.0,
+              4.16667
+            ]
+          },
+          "waveform_time": {
+            "note": "I_LOAD waveform_time as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "s",
+            "value": [
+              0.0,
+              0.04,
+              0.0401
+            ]
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "current_source",
+      "material": null,
+      "name": "constant-current stand-in for the eServo-200 drive input, 200 W / 48 V from 40 ms (testbench stimulus)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "S_FLT",
+        "element": "voltage_controlled_switch",
+        "model": "SW_FLT",
+        "terminals": {
+          "cn": "0",
+          "cp": "n_fc",
+          "n": "0",
+          "p": "n_bus"
+        }
+      },
+      "component_id": "s_flt",
+      "domains": {
+        "electrical": {
+          "hysteresis_voltage": {
+            "note": "S_FLT hysteresis_voltage as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": 0.0
+          },
+          "off_resistance": {
+            "note": "S_FLT off_resistance as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "ohm",
+            "value": 1000000000.0
+          },
+          "on_resistance": {
+            "note": "S_FLT on_resistance as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "ohm",
+            "value": 0.1
+          },
+          "threshold_voltage": {
+            "note": "S_FLT threshold_voltage as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": 2.5
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "switch",
+      "material": null,
+      "name": "fault injector: shorts the bus through 100 mohm at 100 ms (testbench only)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "circuit": {
+        "designator": "V_FLT",
+        "element": "voltage_source",
+        "terminals": {
+          "n": "0",
+          "p": "n_fc"
+        }
+      },
+      "component_id": "v_flt",
+      "domains": {
+        "electrical": {
+          "waveform_time": {
+            "note": "V_FLT waveform_time as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "s",
+            "value": [
+              0.0,
+              0.1,
+              0.100001
+            ]
+          },
+          "waveform_voltage": {
+            "note": "V_FLT waveform_voltage as the netlist states it, not a rating of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": [
+              0.0,
+              0.0,
+              5.0
+            ]
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "voltage_source",
+      "material": null,
+      "name": "fault injector command (testbench only)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "component_id": "drive",
+      "domains": {
+        "electrical": {
+          "input_ripple_current": {
+            "note": "the sheet does not state the drive's input ripple current",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "UNSPECIFIED",
+            "unit": "A",
+            "value": null
+          },
+          "rated_current": {
+            "note": "the datasheet states 5 A without saying whether it is continuous or peak",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "SPECIFIED",
+            "unit": "A",
+            "value": 5.0
+          },
+          "rated_power": {
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "SPECIFIED",
+            "unit": "W",
+            "value": 200.0
+          },
+          "supply_voltage": {
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "SPECIFIED",
+            "unit": "V",
+            "value": 48.0
+          },
+          "switching_frequency": {
+            "note": "the sheet gives a 20 kHz current-loop bandwidth, which is not a switching frequency",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "status": "UNSPECIFIED",
+            "unit": "Hz",
+            "value": null
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "motor_driver",
+      "material": null,
+      "name": "eServo-200 EtherCAT servo drive",
+      "physical": null,
+      "placement": null
+    }
+  ],
+  "design": {
+    "design_id": "servo_supply_001",
+    "name": "servo_supply_001: 48 V servo-drive supply input -- fuse, precharge limiter with bypass, bulk capacitor, drive load",
+    "revision": "1.0",
+    "sources": [
+      {
+        "format": "spice",
+        "path": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      }
+    ]
+  },
+  "joints": [],
+  "model_version": "1.1.0",
+  "relationships": [
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "v_in"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "r_f1"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "r_pre"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "s_byp"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "v_byp"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "c_bulk"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "r_esr"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "i_load"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "s_flt"
+    },
+    {
+      "from": "servo_supply_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
+        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+      },
+      "to": "v_flt"
+    },
+    {
+      "from": "drive",
+      "relation": "powered_by",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/servo_supply_001/design/annotations.json",
+        "sha256": "f715d088466c00b2e8c3d88c831ac66566ec8cb34797350c1abdd88539c10296"
+      },
+      "to": "v_in"
+    }
+  ],
+  "unknowns": [
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no capacitor is selected",
+      "path": "components/c_bulk/domains/electrical/ripple_current_rating",
+      "status": "UNKNOWN"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no capacitor is selected, so no voltage rating exists to check against",
+      "path": "components/c_bulk/domains/electrical/voltage_rating",
+      "status": "UNKNOWN"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "the sheet does not state the drive's input ripple current",
+      "path": "components/drive/domains/electrical/input_ripple_current",
+      "status": "UNSPECIFIED"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "the sheet gives a 20 kHz current-loop bandwidth, which is not a switching frequency",
+      "path": "components/drive/domains/electrical/switching_frequency",
+      "status": "UNSPECIFIED"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no fuse is selected, so no breaking capacity exists to check against",
+      "path": "components/r_f1/domains/electrical/breaking_capacity",
+      "status": "UNKNOWN"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no fuse is selected, so no current rating exists to check against",
+      "path": "components/r_f1/domains/electrical/current_rating",
+      "status": "UNKNOWN"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no fuse is selected, so no melting I2t exists to check against",
+      "path": "components/r_f1/domains/electrical/melting_i2t",
+      "status": "UNKNOWN"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no resistor is selected",
+      "path": "components/r_pre/domains/electrical/power_rating",
+      "status": "UNKNOWN"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no resistor is selected",
+      "path": "components/r_pre/domains/electrical/pulse_energy_rating",
+      "status": "UNKNOWN"
+    },
+    {
+      "needed_by": [
+        "electrical"
+      ],
+      "note": "no bypass device is selected",
+      "path": "components/s_byp/domains/electrical/current_rating",
+      "status": "UNKNOWN"
+    }
+  ]
+}

@@ -35,3 +35,9 @@
 
 # SVG kept as text (vector source files)
 *.svg text
+
+# Hash-bound or hash-cited bytes are never converted on checkout: every file of
+# a dataset item, the licence and the product sheet the samples cite.
+datasets/cad/** -text
+LICENSE -text
+eRobotics_CAD_Design/robot_components/product_datasheet.md -text

@@ -18,7 +18,10 @@
     "$schema": {
       "const": "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json"
     },
-    "model_version": {"const": "1.0.0"},
+    "model_version": {
+      "description": "The format version. A compatible addition raises the minor version: every minor version of v1 is accepted, and a document that uses an addition must declare the version that introduced it (1.1.0: the circuit member and the electrical component kinds).",
+      "enum": ["1.0.0", "1.1.0"]
+    },
     "design": {"$ref": "#/definitions/design"},
     "components": {
       "type": "array",
@@ -33,6 +36,24 @@
       "items": {"$ref": "#/definitions/unknown"}
     }
   },
+  "allOf": [
+    {
+      "description": "A model that uses an addition of format 1.1.0 (a circuit member, or an electrical component kind) declares 1.1.0, so a 1.0.0 reader is never handed members it does not know.",
+      "if": {
+        "properties": {
+          "components": {
+            "contains": {
+              "anyOf": [
+                {"required": ["circuit"]},
+                {"required": ["kind"], "properties": {"kind": {"enum": ["fuse", "resistor", "capacitor", "switch", "voltage_source", "current_source"]}}}
+              ]
+            }
+          }
+        }
+      },
+      "then": {"properties": {"model_version": {"const": "1.1.0"}}}
+    }
+  ],
   "definitions": {
     "quantity": {"$ref": "common.schema.json#/definitions/quantity"},
     "identifier": {"$ref": "common.schema.json#/definitions/identifier"},
@@ -100,8 +121,18 @@
             "sensor",
             "controller",
             "pcb",
+            "fuse",
+            "resistor",
+            "capacitor",
+            "switch",
+            "voltage_source",
+            "current_source",
             "other"
           ]
+        },
+        "circuit": {
+          "description": "Where a netlist element sits in its circuit (format 1.1.0). Nets are derived from the terminals, never stored.",
+          "$ref": "#/definitions/circuit"
         },
         "cad_ref": {
           "description": "null means the component is part of the design but not represented in the CAD.",
@@ -190,6 +221,34 @@
           }
         }
       }
+    },
+    "circuit": {
+      "description": "A netlist element: its designator, element type, the node each terminal is on (\"0\" is ground), and a switch's .model name. Node names are those the netlist grammar reads: never gnd, which ngspice treats as ground, and never pa_<digits>, which ngspice's par() creates.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["designator", "element", "terminals"],
+      "properties": {
+        "designator": {"type": "string", "pattern": "^[RCVIS][A-Z0-9_]{1,31}$"},
+        "element": {"enum": ["resistor", "capacitor", "voltage_source", "current_source", "voltage_controlled_switch"]},
+        "model": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,31}$"},
+        "terminals": {
+          "type": "object",
+          "propertyNames": {"enum": ["p", "n", "cp", "cn"]},
+          "additionalProperties": {"type": "string", "pattern": "^(0|(?!gnd$)(?!pa_[0-9]+$)[a-z][a-z0-9_]{0,31})$"}
+        }
+      },
+      "allOf": [
+        {
+          "description": "A switch has a model and four terminals; no other element has a model, and every other has exactly p and n.",
+          "if": {"properties": {"element": {"const": "voltage_controlled_switch"}}},
+          "then": {"required": ["model"], "properties": {"designator": {"pattern": "^S"}, "terminals": {"required": ["p", "n", "cp", "cn"]}}},
+          "else": {"not": {"required": ["model"]}, "properties": {"terminals": {"required": ["p", "n"], "maxProperties": 2}}}
+        },
+        {"if": {"properties": {"element": {"const": "resistor"}}}, "then": {"properties": {"designator": {"pattern": "^R"}}}},
+        {"if": {"properties": {"element": {"const": "capacitor"}}}, "then": {"properties": {"designator": {"pattern": "^C"}}}},
+        {"if": {"properties": {"element": {"const": "voltage_source"}}}, "then": {"properties": {"designator": {"pattern": "^V"}}}},
+        {"if": {"properties": {"element": {"const": "current_source"}}}, "then": {"properties": {"designator": {"pattern": "^I"}}}}
+      ]
     },
     "facet": {
       "type": "object",

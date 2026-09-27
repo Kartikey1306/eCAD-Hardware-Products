@@ -1,0 +1,26 @@
+* servo_supply_001: 48 V servo-drive supply input -- fuse, precharge limiter with bypass, bulk capacitor, drive load
+* written by ecad_model.domains.electrical 1.0.0 from derived/engineering_model.json; regenerate with build, never edit
+V_IN n_in 0 PWL(0.0 0.0 0.0001 48.0)
+R_F1 n_in n_f 0.02
+R_PRE n_f n_bus 10.0
+S_BYP n_f n_bus n_byp 0 SW_BYP
+V_BYP n_byp 0 PWL(0.0 0.0 0.03 0.0 0.030001 5.0)
+C_BULK n_bus n_esr 0.00047
+R_ESR n_esr 0 0.05
+I_LOAD n_bus 0 PWL(0.0 0.0 0.04 0.0 0.0401 4.16667)
+S_FLT n_bus 0 n_fc 0 SW_FLT
+V_FLT n_fc 0 PWL(0.0 0.0 0.1 0.0 0.100001 5.0)
+.model SW_BYP SW(RON=0.01 ROFF=1000000000.0 VT=2.5 VH=0.0)
+.model SW_FLT SW(RON=0.1 ROFF=1000000000.0 VT=2.5 VH=0.0)
+.options noacct
+.tran 1e-06 0.11 0.0 1e-06
+.meas tran inrush_peak_current_a MAX par('-i(V_IN)') FROM=0.0 TO=0.03
+.meas tran inrush_i2t_a2s INTEG par('i(V_IN)*i(V_IN)') FROM=0.0 TO=0.03
+.meas tran bus_charge_time_s WHEN v(n_bus)=43.2 RISE=1
+.meas tran bus_voltage_at_bypass_v FIND v(n_bus) AT=0.03
+.meas tran bus_peak_voltage_v MAX v(n_bus) FROM=0.0 TO=0.1
+.meas tran steady_bus_voltage_v FIND v(n_bus) AT=0.1
+.meas tran steady_input_current_a FIND par('-i(V_IN)') AT=0.1
+.meas tran steady_fuse_power_w FIND par('(v(n_in)-v(n_f))*(-i(V_IN))') AT=0.1
+.meas tran fault_input_current_a FIND par('-i(V_IN)') AT=0.11
+.end

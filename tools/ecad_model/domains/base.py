@@ -14,9 +14,10 @@ file format or domain model. A domain adapter supplies all of it:
 Running cases and deciding verdicts stay with the existing case engine and its
 deterministic comparators, so no adapter can decide whether 4.8 <= 5.0.
 
-This protocol is provisional (ECAD_MULTI_DOMAIN_DATASET_PLAN.md §11): one
-domain uses it in production. A test-only adapter for an artefact-first
-domain exercises it, and the first real second domain may still change it.
+Stable since the electrical domain: two production domains use it, one
+CAD-first (mechanical) and one artefact-first (electrical). Changes since the
+foundation: `Extraction.producer`. A further change lists its reason and the
+matching change to every registered adapter and to the test fixture.
 """
 
 from __future__ import annotations

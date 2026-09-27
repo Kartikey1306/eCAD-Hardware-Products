@@ -1,0 +1,293 @@
+{
+  "$schema": "https://embeddedos.org/schemas/engineering-model/v1/engineering-requirements.schema.json",
+  "requirements_version": "1.0.0",
+  "design_id": "servo_supply_001",
+  "reference_values": [
+    {
+      "reference_id": "REF-EL-001",
+      "title": "Inrush peak equals the RC-ramp closed form",
+      "domain": "electrical",
+      "metric": "inrush_peak_current_a",
+      "scenario": {
+        "name": "startup"
+      },
+      "unit": "A",
+      "absolute_tolerance": 0.0001,
+      "derivation": "precharge_peak_current",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-EL-002",
+      "title": "Inrush I2t over the precharge equals its closed form",
+      "domain": "electrical",
+      "metric": "inrush_i2t_a2s",
+      "scenario": {
+        "name": "startup"
+      },
+      "unit": "A^2*s",
+      "absolute_tolerance": 0.0001,
+      "derivation": "precharge_i2t",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-EL-003",
+      "title": "The bus reaches 90 % of the supply when the RC charge says",
+      "domain": "electrical",
+      "metric": "bus_charge_time_s",
+      "scenario": {
+        "name": "startup"
+      },
+      "unit": "s",
+      "absolute_tolerance": 1e-06,
+      "derivation": "precharge_charge_time",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-EL-004",
+      "title": "Bus voltage when the bypass is commanded equals its closed form",
+      "domain": "electrical",
+      "metric": "bus_voltage_at_bypass_v",
+      "scenario": {
+        "name": "startup"
+      },
+      "unit": "V",
+      "absolute_tolerance": 0.001,
+      "derivation": "precharge_bus_voltage",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-EL-005",
+      "title": "The bus never exceeds its settled no-load voltage",
+      "domain": "electrical",
+      "metric": "bus_peak_voltage_v",
+      "scenario": {
+        "name": "startup"
+      },
+      "unit": "V",
+      "absolute_tolerance": 0.001,
+      "derivation": "settled_no_load_bus_voltage",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-EL-006",
+      "title": "Steady bus voltage under the load equals the DC divider",
+      "domain": "electrical",
+      "metric": "steady_bus_voltage_v",
+      "scenario": {
+        "name": "steady_state"
+      },
+      "unit": "V",
+      "absolute_tolerance": 0.001,
+      "derivation": "steady_bus_voltage",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-EL-007",
+      "title": "Steady input current equals the DC divider",
+      "domain": "electrical",
+      "metric": "steady_input_current_a",
+      "scenario": {
+        "name": "steady_state"
+      },
+      "unit": "A",
+      "absolute_tolerance": 0.0001,
+      "derivation": "steady_input_current",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-EL-008",
+      "title": "Steady fuse dissipation equals I^2 R",
+      "domain": "electrical",
+      "metric": "steady_fuse_power_w",
+      "scenario": {
+        "name": "steady_state"
+      },
+      "unit": "W",
+      "absolute_tolerance": 1e-05,
+      "derivation": "steady_fuse_power",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-EL-009",
+      "title": "Settled short-circuit input current equals the DC divider",
+      "domain": "electrical",
+      "metric": "fault_input_current_a",
+      "scenario": {
+        "name": "output_short"
+      },
+      "unit": "A",
+      "absolute_tolerance": 0.01,
+      "derivation": "settled_fault_input_current",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "REQ-EL-001",
+      "title": "Precharge keeps the inrush peak at or below 10 A",
+      "domain": "electrical",
+      "component": "r_pre",
+      "metric": "inrush_peak_current_a",
+      "scenario": {
+        "name": "startup"
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 10.0
+      },
+      "unit": "A",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-EL-002",
+      "title": "The bypass closes only once the bus is within 5 % of the supply",
+      "domain": "electrical",
+      "component": "s_byp",
+      "metric": "bus_voltage_at_bypass_v",
+      "scenario": {
+        "name": "startup"
+      },
+      "operator": ">=",
+      "limit": {
+        "value": 45.6
+      },
+      "unit": "V",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-EL-003",
+      "title": "Steady input current within the eServo-200 sheet's 5 A (continuous or peak is not stated)",
+      "domain": "electrical",
+      "component": "drive",
+      "metric": "steady_input_current_a",
+      "scenario": {
+        "name": "steady_state"
+      },
+      "operator": "<=",
+      "limit": {
+        "quantity": "components/drive/domains/electrical/rated_current"
+      },
+      "unit": "A",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-EL-004",
+      "title": "Steady bus at or above 47 V under the drive load",
+      "domain": "electrical",
+      "component": "drive",
+      "metric": "steady_bus_voltage_v",
+      "scenario": {
+        "name": "steady_state"
+      },
+      "operator": ">=",
+      "limit": {
+        "value": 47.0
+      },
+      "unit": "V",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-EL-005",
+      "title": "Bus peak within C1's voltage rating",
+      "domain": "electrical",
+      "component": "c_bulk",
+      "metric": "bus_peak_voltage_v",
+      "scenario": {
+        "name": "startup"
+      },
+      "operator": "<=",
+      "limit": {
+        "quantity": "components/c_bulk/domains/electrical/voltage_rating"
+      },
+      "unit": "V",
+      "source": {
+        "kind": "requirement",
+        "ref": "example rule for the servo_supply_001 MVP: a part stays within its own rating, with no derating; no standard was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-EL-006",
+      "title": "Precharge I2t within F1's melting I2t",
+      "domain": "electrical",
+      "component": "r_f1",
+      "metric": "inrush_i2t_a2s",
+      "scenario": {
+        "name": "startup"
+      },
+      "operator": "<=",
+      "limit": {
+        "quantity": "components/r_f1/domains/electrical/melting_i2t"
+      },
+      "unit": "A^2*s",
+      "source": {
+        "kind": "requirement",
+        "ref": "example rule for the servo_supply_001 MVP: a part stays within its own rating, with no derating; no standard was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-EL-007",
+      "title": "Prospective short-circuit current within F1's breaking capacity",
+      "domain": "electrical",
+      "component": "r_f1",
+      "metric": "fault_input_current_a",
+      "scenario": {
+        "name": "output_short"
+      },
+      "operator": "<=",
+      "limit": {
+        "quantity": "components/r_f1/domains/electrical/breaking_capacity"
+      },
+      "unit": "A",
+      "source": {
+        "kind": "requirement",
+        "ref": "example rule for the servo_supply_001 MVP: a part stays within its own rating, with no derating; no standard was consulted"
+      },
+      "illustrative": true
+    }
+  ]
+}

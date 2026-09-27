@@ -3,16 +3,19 @@
 
 Each mutant is one targeted edit that makes a behaviour the tests claim to
 protect wrong. For every mutant this copies the repository, applies the edit,
-runs the fast engineering-model, domain-adapter and ngspice-adapter tests
-and, only if they stay green, the slower CAD-kernel tests. A mutant of a
-dataset item's own file (its simulation script) is followed by a rebuild of
-that item, so the manifest's hashes cannot kill it: a behavioural test must.
-A mutant the suite does not kill is a test gap, and the script exits 1. The
+runs the fast engineering-model, domain-adapter, netlist, ngspice-adapter
+and electrical tests, then the electrical tests that run ngspice and, only if
+they all stay green, the slower CAD-kernel tests. A mutant of a dataset
+item's own file (a simulation script, a netlist, its annotations,
+requirements or provenance) is followed by a rebuild of that item, so the
+manifest's hashes cannot kill it: a behavioural test must. A mutant the
+suite does not kill is a test gap, and the script exits 1. The
 unmutated copy runs first and must be green: against a failing baseline every
 mutant would look killed.
 
 Needs the CAD kernel and MuJoCo (tools/requirements-cad.txt), with `python3`
-on PATH able to import mujoco. Not collected by pytest.
+on PATH able to import mujoco, and ngspice whose `--version` names its
+version (brew install ngspice; apt install ngspice). Not collected by pytest.
 
 Usage:
     python3 tests/mutation/run_mutations.py [--workers N] [--only NAME ...]
@@ -44,9 +47,19 @@ DR = "tools/ecad_model/domains/__init__.py"
 J = "datasets/cad/robotic_joint_001/simulation/joint_dynamics.py"
 NG = "tools/ecad_validation/adapters/ngspice.py"
 CP = "tools/ecad_validation/adapters/capabilities.py"
+SP = "tools/ecad_model/spice.py"
+EL = "tools/ecad_model/domains/electrical.py"
+EN = "datasets/cad/servo_supply_001/source/servo_supply_001.cir"
+EA = "datasets/cad/servo_supply_001/design/annotations.json"
+ER = "datasets/cad/servo_supply_001/requirements/requirements.json"
+EP = "datasets/cad/servo_supply_001/source/provenance.json"
+MS = "schemas/engineering-model/v1/engineering-model.schema.json"
 FAST = "tests/unit/test_engineering_model.py"
 ADAPTER = "tests/unit/test_domain_adapter.py"
+NETLIST = "tests/unit/test_spice_netlist.py"
 NGSPICE = "tests/unit/test_ngspice_adapter.py"
+ELECTRICAL = "tests/unit/test_electrical_domain.py"
+SPICE = "tests/unit/test_electrical_spice.py"
 SLOW = "tests/unit/test_cad_dataset.py"
 
 # (name, file, text to replace, replacement). The replaced text must occur
@@ -414,6 +427,83 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("manifest-verified-at-optional", "schemas/cad-dataset/v1/dataset-item.schema.json",
      '"then": {"properties": {"license": {"required": ["license_text", "verified_by", "verified_at"]}}}',
      '"then": {"properties": {"license": {"required": ["license_text", "verified_by"]}}}'),
+    # spice: the netlist grammar refuses what ngspice would reinterpret
+    ("spice-control-accepted", SP, '            if keyword != ".model":\n',
+     '            if keyword in (".control", ".endc"):\n                continue\n            if keyword != ".model":\n'),
+    ("spice-include-accepted", SP, '            if keyword != ".model":\n',
+     '            if keyword in (".include", ".lib"):\n                continue\n            if keyword != ".model":\n'),
+    ("spice-milli-read-as-micro", SP, '"m": -3,', '"m": -6,'),
+    ("spice-number-case-folded", SP, "    match = _NUMBER.fullmatch(token)\n", "    match = _NUMBER.fullmatch(token.lower())\n"),
+    ("spice-unit-letters-ignored", SP, '+ "))?")', '+ "))?[A-Za-z]*")'),
+    ("spice-femto-accepted", SP, '"n": -9, "p": -12}', '"n": -9, "p": -12, "f": -15}'),
+    ("spice-gnd-accepted", SP, '    if node == "gnd":\n', "    if False:\n"),
+    ("spice-par-node-accepted", SP, "    if _PAR_NODE.fullmatch(node):\n", "    if False:\n"),
+    ("spice-after-end-ignored", SP, '            if text:\n                raise NetlistRefused(f"{where}: text after .end',
+     '            if False:\n                raise NetlistRefused(f"{where}: text after .end'),
+    ("spice-end-optional", SP, '    if not ended:\n        raise NetlistRefused(f"{path}: no .end line',
+     '    if False:\n        raise NetlistRefused(f"{path}: no .end line'),
+    ("spice-title-card-accepted", SP, "    problem = _title_problem(lines[0])\n", "    problem = None\n"),
+    ("spice-continuation-accepted", SP,
+     '        if text.startswith("+"):\n            raise NetlistRefused(f"{where}: a \'+\' continuation, which joins this line to the one before it")\n',
+     '        if text.startswith("+"):\n            continue\n'),
+    ("spice-dangling-node-allowed", SP, '        if node != "0" and len(terminals) < 2:\n', "        if False:\n"),
+    ("spice-dc-path-unchecked", SP, "    unreached = [node for node in first_line if node not in reached]\n",
+     "    unreached = []\n"),
+    ("spice-duplicate-designator-accepted", SP, "        if designator in designators:\n", "        if False:\n"),
+    ("spice-switch-defaults-allowed", SP, "    missing = [key for key in _SWITCH_KEYS if key not in params]\n",
+     '    missing = [key for key in ("RON", "ROFF") if key not in params]\n'),
+    ("spice-pwl-order-unchecked", SP, "    if any(later <= earlier for earlier, later in zip(times, times[1:])):\n",
+     "    if False:\n"),
+    ("spice-writer-rounds-values", SP, "    return repr(float(value))\n", '    return f"{value:.6g}"\n'),
+    # electrical: the network class, the closed forms, the deck, V1 and V2
+    ("el-extra-element-accepted", EL, '    if extra:\n        raise refuse("C8"', '    if False:\n        raise refuse("C8"'),
+    ("el-capacitor-anywhere", EL, 'capacitors = [c for c in of("capacitor") if rail in _main(c)]', 'capacitors = of("capacitor")'),
+    ("el-esr-left-out-of-references", EL, 'r1 = r_f + _par(r_p, values[("bypass", "off_resistance")]) + r_e',
+     'r1 = r_f + _par(r_p, values[("bypass", "off_resistance")])'),
+    ("el-ramp-read-as-step", EL, "return c * k * (1 - math.exp(-t_r / tau1)), paths", "return supply_voltage / r1, paths"),
+    ("el-charge-level-changed", EL, "CHARGED_FRACTION = 0.9  #", "CHARGED_FRACTION = 1 - 1 / math.e  #"),
+    ("el-supply-current-sign-flipped", EL, "current = f\"par('-i({supply})')\"", "current = f\"par('i({supply})')\""),
+    ("el-fault-measured-at-the-fault", EL, '"fault_input_current_a": f"FIND {current} AT={_n(t_end)}",',
+     '"fault_input_current_a": f"FIND {current} AT={_n(t_flt)}",'),
+    ("el-steady-sampled-after-the-fault", EL, '"steady_bus_voltage_v": f"FIND {rail} AT={_n(t_flt)}",',
+     '"steady_bus_voltage_v": f"FIND {rail} AT={_n(t_end)}",'),
+    ("el-settling-unchecked", EL, "    return span >= SETTLE_TIME_CONSTANTS * tau\n", "    return True\n"),
+    ("el-scenario-pairing-unchecked", EL, 'if window is not None and entry["scenario"]["name"] != window:', "if False:"),
+    ("el-derivation-pairing-unchecked", EL, 'if DERIVATION_METRIC[reference["derivation"]] != reference["metric"]:', "if False:"),
+    ("el-metric-unit-wrong", EL, '"inrush_peak_current_a": Metric("A", ', '"inrush_peak_current_a": Metric("mA", '),
+    ("el-facet-unit-unchecked", EL, '                elif facet["unit"] != unit:\n', "                elif False:\n"),
+    ("el-supply-sheet-invariant-off", EL, '            if final != stated["value"]:\n', "            if False:\n"),
+    ("el-netlist-hash-not-bound", EL, 'netlist_source = source("design_annotation", netlist_ref, netlist_sha256)',
+     'netlist_source = source("design_annotation", netlist_ref)'),
+    ("el-annotation-overrides-netlist", EL, "        if twice:\n            raise ValueError(", "        if False:\n            raise ValueError("),
+    ("el-ratings-dropped", EL, 'domains["electrical"] = {**stated, **added}', 'domains["electrical"] = dict(stated)'),
+    # electrical: the sample's own files (each rebuilt, so a behavioural test must kill it)
+    ("el-precharge-resistor-changed", EN, "R_PRE n_f n_bus 10\n", "R_PRE n_f n_bus 1\n"),
+    ("el-capacitance-plus-one-percent", EN, "C_BULK n_bus n_esr 470u", "C_BULK n_bus n_esr 474.7u"),
+    ("el-inrush-limit-changed", ER, '"value": 10.0', '"value": 4.0'),
+    ("el-illustrative-flag-cleared", ER,
+     '"value": 10.0\n      },\n      "unit": "A",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement '
+     'for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"\n'
+     '      },\n      "illustrative": true',
+     '"value": 10.0\n      },\n      "unit": "A",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement '
+     'for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"\n'
+     '      },\n      "illustrative": false'),
+    ("el-operator-flipped", ER, '"operator": ">=",\n      "limit": {\n        "value": 47.0',
+     '"operator": "<=",\n      "limit": {\n        "value": 47.0'),
+    ("el-rating-invented", EA, '"value": null,\n            "unit": "V",\n            "status": "UNKNOWN"',
+     '"value": 63.0,\n            "unit": "V",\n            "status": "SPECIFIED"'),
+    ("el-sheet-digest-changed", EA,
+     '"value": 5.0,\n            "unit": "A",\n            "status": "SPECIFIED",\n            "source": {\n'
+     '              "kind": "product_specification",\n              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",\n'
+     '              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"',
+     '"value": 5.0,\n            "unit": "A",\n            "status": "SPECIFIED",\n            "source": {\n'
+     '              "kind": "product_specification",\n              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",\n'
+     '              "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"'),
+    ("el-artifact-type-changed", EP, '"artifact_type": "spice_netlist"', '"artifact_type": "other"'),
+    # electrical: the format rule and the registry
+    ("circuit-format-rule-dropped", MS, '"then": {"properties": {"model_version": {"const": "1.1.0"}}}', '"then": {}'),
+    ("electrical-unregistered", DR, '{"mechanical": MechanicalAdapter(), "electrical": ElectricalAdapter()}',
+     '{"mechanical": MechanicalAdapter()}'),
     # ngspice: batch invocation, .meas capture from stdout, version banner, receipt-safe probe reasons
     ("ngspice-rawfile-requested", NG, 'argv=[capability.executable or "ngspice", "-b", relative],',
      'argv=[capability.executable or "ngspice", "-b", "-r", "ngspice.raw", relative],'),
@@ -489,8 +579,9 @@ def run(name: str, relative: Optional[str], old: str, new: str) -> Tuple[str, st
                 for command in (["git", "add", "-A"], ["git", "-c", "user.name=mutation", "-c",
                                 "user.email=mutation@localhost", "commit", "-q", "-m", "mutant"]):
                     subprocess.run(command, cwd=copy, check=True, capture_output=True, timeout=300)
-        environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", PYTHONDONTWRITEBYTECODE="1")
-        for suite in (FAST, ADAPTER, NGSPICE, SLOW):
+        environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", ECAD_REQUIRE_SPICE_TOOLS="1",
+                           PYTHONDONTWRITEBYTECODE="1")
+        for suite in (FAST, ADAPTER, NETLIST, NGSPICE, ELECTRICAL, SPICE, SLOW):
             result = subprocess.run(
                 [sys.executable, "-m", "pytest", suite, "-q", "-x", "-p", "no:cacheprovider"],
                 cwd=copy, env=environment, capture_output=True, text=True, timeout=1800,

@@ -103,8 +103,8 @@
     },
     {
       "domain": "electrical",
-      "reason": "no electrical validator exists in this platform yet; this sample also lacks components/actuator/domains/electrical/torque_constant (UNKNOWN), components/actuator/domains/electrical/winding_resistance (UNKNOWN)",
-      "status": "NOT_IMPLEMENTED"
+      "reason": "the electrical adapter reads spice, which this sample does not have; this sample also lacks components/actuator/domains/electrical/torque_constant (UNKNOWN), components/actuator/domains/electrical/winding_resistance (UNKNOWN)",
+      "status": "NOT_APPLICABLE"
     },
     {
       "domain": "digital",
