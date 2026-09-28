@@ -477,6 +477,16 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      'netlist_source = source("design_annotation", netlist_ref)'),
     ("el-annotation-overrides-netlist", EL, "        if twice:\n            raise ValueError(", "        if False:\n            raise ValueError("),
     ("el-ratings-dropped", EL, 'domains["electrical"] = {**stated, **added}', 'domains["electrical"] = dict(stated)'),
+    # electrical: the branches a line-coverage run found no test going through
+    ("el-capacitor-to-ground-refused", EL, '    if far != "0":\n', "    if True:\n"),
+    ("el-no-esr-read-as-50-milliohm", EL, 'r_e = values.get(("esr", "resistance"), 0.0)',
+     'r_e = values.get(("esr", "resistance"), 0.05)'),
+    ("el-absent-esr-dereferenced", EL, "        if component is None:\n            continue\n", ""),
+    ("el-spice-source-count-unchecked", EL, "        if len(netlists) != 1:\n", "        if False:\n"),
+    ("el-null-supply-voltage-compared", EL, 'if (stated is None or is_null(stated["status"]) or supply is None',
+     "if (stated is None or supply is None"),
+    ("spice-source-fields-unchecked", SP, "        if len(parts) != 4:\n", "        if False:\n"),
+    ("spice-model-card-name-unchecked", SP, "    if not _MODEL_NAME.fullmatch(name):\n", "    if False:\n"),
     # electrical: the sample's own files (each rebuilt, so a behavioural test must kill it)
     ("el-precharge-resistor-changed", EN, "R_PRE n_f n_bus 10\n", "R_PRE n_f n_bus 1\n"),
     ("el-capacitance-plus-one-percent", EN, "C_BULK n_bus n_esr 470u", "C_BULK n_bus n_esr 474.7u"),

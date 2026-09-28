@@ -239,6 +239,8 @@ class TestNetlistGrammar(unittest.TestCase):
             with self.subTest(spec=spec):
                 self.refused(netlist(f"V1 a 0 {spec}", "R1 a b 1k", "R2 b 0 1k"), f"x.cir:2: V1: {kind} {only_pwl}")
         self.refused(netlist(*GOOD, "I1 b 0 DC 1"), f"x.cir:5: I1: DC {only_pwl}")
+        self.refused(netlist("V1 a 0", "R1 a b 1k", "R2 b 0 1k"), "x.cir:2: V1: a source is V<id> NODE NODE PWL(...)")
+        self.refused(netlist(*GOOD, "I1 b 0"), "x.cir:5: I1: a source is I<id> NODE NODE PWL(...)")
         for spec, reason in (("PWL(0 0 1m)", "a PWL is time-value pairs, at least two of them; found 3 numbers"),
                              ("PWL(0 0)", "a PWL is time-value pairs, at least two of them; found 2 numbers"),
                              ("PWL()", "a PWL is time-value pairs, at least two of them; found 0 numbers"),
@@ -280,6 +282,7 @@ class TestNetlistGrammar(unittest.TestCase):
         self.refused(netlist(*SWITCHED[:2], "S1 b 0 c 0 SW1 OFF", *SWITCHED[3:]),
                      "x.cir:4: S1: a switch is S<id> NODE NODE NODE NODE MODEL, exactly")
         self.refused(netlist(*SWITCHED[:2], "S1 b 0 c 0 sw1", *SWITCHED[3:]), "x.cir:4: S1: 'sw1' is not a model name")
+        self.refused(netlist(*SWITCHED[:4], SW1.replace("SW1", "sw1")), "x.cir:6: 'sw1' is not a model name")
 
     def test_names_are_canonical_unique_and_never_ground_aliases_or_par_nodes(self):
         self.refused(netlist(*GOOD, "R1 a 0 1k"), "x.cir:5: R1 is already declared on line 3")

@@ -61,6 +61,16 @@ CLOSED_FORMS = {
     "steady_fuse_power_w": (0.347222785757, 1e-5),
     "fault_input_current_a": (372.464522495, 1e-2),
 }
+# Rule C5's other branch, the bulk capacitor straight to ground (R_E = 0): the
+# netlist edit, the annotation of the element it removes, and the four
+# precharge forms at R_E = 0 (the design's closed forms, 12 significant
+# figures); the settled forms do not move.
+NO_ESR = ("C_BULK n_bus n_esr 470u\nR_ESR n_esr 0 50m\n", "C_BULK n_bus 0 470u\n")
+ESR_ANNOTATION = ('    "R_ESR": {\n      "name": "C1 series resistance: a design value, not a datasheet ESR",\n'
+                  '      "kind": "resistor"\n    },\n')
+NO_ESR_CLOSED_FORMS = {**CLOSED_FORMS, "inrush_peak_current_a": (4.7399171105, 1e-4),
+                       "inrush_i2t_a2s": (0.0536553201, 1e-4), "bus_charge_time_s": (0.0108938826039, 1e-6),
+                       "bus_voltage_at_bypass_v": (47.9169573916, 1e-3)}
 
 
 def require_ngspice() -> Any:
@@ -238,6 +248,24 @@ class TestRealNgspice(unittest.TestCase):
         charge = checks["v3.REF-EL-003"]
         self.assertEqual((charge["verdict"], charge["reason_code"]), ("BLOCKED", "REFERENCE_NOT_APPLICABLE"))
         self.assertIn("after the bypass is commanded", charge["summary"])
+
+    def test_ngspice_agrees_with_the_closed_forms_when_the_capacitor_goes_straight_to_ground(self):
+        """R_E = 0: the inrush peak rises to 4.7399171105 A, and every
+        reference still passes against ngspice."""
+        with _scratch() as directory:
+            item = _copy(directory, {NETLIST: NO_ESR, "design/annotations.json": (ESR_ANNOTATION, "")})
+            receipt, _, _ = _validate(item)
+        checks = _checks(receipt)
+        for check_id in ("v1.electrical.extraction-and-sanity", "v2.dataset-reproduction", "v2.electrical.model-invariants"):
+            with self.subTest(check_id):
+                self.assertEqual(checks[check_id]["verdict"], "PASS", checks[check_id]["findings"])
+        self.assertEqual(_verdicts(checks, "v3."), {f"v3.REF-EL-00{n}": ("PASS", "GOLDEN_COMPARISON_PASSED")
+                                                    for n in range(1, 10)})
+        measured = checks["v3.REF-EL-001"]["metrics"]
+        self.assertEqual(set(measured), set(NO_ESR_CLOSED_FORMS))
+        for metric, (expected, tolerance) in NO_ESR_CLOSED_FORMS.items():
+            with self.subTest(metric):
+                self.assertLessEqual(abs(measured[metric] - expected), tolerance)
 
     def test_the_inrush_limit_at_its_boundary_with_real_ngspice(self):
         """Margins of at least 3.4e-3 over the 2.8e-8 numerical error of the

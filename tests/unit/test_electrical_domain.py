@@ -149,6 +149,13 @@ CLOSED_FORMS = {
     "steady_input_current": 4.16667004787, "steady_fuse_power": 0.347222785757,
     "settled_fault_input_current": 372.464522495,
 }
+# Rule C5's other branch: the bulk capacitor straight to ground, so R_E = 0.
+# The four precharge forms move; the settled forms read R_E only to decide
+# whether the rail has settled, so their values stay. Typed from _closed_forms
+# below at R_E = 0 (the design's own closed-form script gives the same digits).
+NO_ESR = ("C_BULK n_bus n_esr 470u\nR_ESR n_esr 0 50m\n", "C_BULK n_bus 0 470u\n")
+NO_ESR_CLOSED_FORMS = {**CLOSED_FORMS, "precharge_peak_current": 4.7399171105, "precharge_i2t": 0.0536553201,
+                       "precharge_charge_time": 0.0108938826039, "precharge_bus_voltage": 47.9169573916}
 
 
 def _path(component: str, facet: str) -> str:
@@ -432,6 +439,10 @@ class TestModel(unittest.TestCase):
                                   "sha256": hashlib.sha256((ITEM / "design" / "annotations.json").read_bytes()).hexdigest()}},
                       model["relationships"])
         self.assertEqual(_adapter().invariant_problems(model, {}, {DECK_PATH: DECK.encode()}), [])
+        # A supply voltage the sheet does not state leaves nothing to compare.
+        unstated = copy.deepcopy(model)
+        _component(unstated, "drive")["domains"]["electrical"]["supply_voltage"].update(value=None, status="UNSPECIFIED")
+        self.assertEqual(_adapter().invariant_problems(unstated, {}, {DECK_PATH: DECK.encode()}), [])
         with _scratch() as directory:
             item = _copy(directory, {NETLIST: ("V_IN n_in 0 PWL(0 0 100u 48)", "V_IN n_in 0 PWL(0 0 100u 60)")})
             receipt, _ = _validate(item)
@@ -542,6 +553,19 @@ class TestModel(unittest.TestCase):
         v1 = _checks(receipt)["v1.electrical.extraction-and-sanity"]
         self.assertEqual(_outcome(v1), ("FAIL", "DATASET_INPUT_INVALID"))
         self.assertIn("R_F1: resistance declared twice", v1["findings"][0])
+
+    def test_the_adapter_reads_exactly_one_spice_source(self):
+        from ecad_model.domains.base import SourceArtifact
+
+        annotations = (ITEM / "design" / "annotations.json").read_bytes()
+        refs = {"sample": "datasets/cad/servo_supply_001", "annotations": ANNOTATIONS_REF,
+                "annotations_sha256": hashlib.sha256(annotations).hexdigest()}
+        netlist = SourceArtifact(NETLIST, "spice")
+        for label, sources, found in (("none", [], 0), ("only a STEP file", [SourceArtifact("source/x.step", "step")], 0),
+                                      ("two", [netlist, SourceArtifact("source/second.cir", "spice")], 2)):
+            with self.subTest(label), self.assertRaisesRegex(
+                    ValueError, f"^the electrical domain reads exactly one spice source, found {found}$"):
+                _adapter().extract(ITEM, sources, json.loads(annotations), refs)
 
 
 class TestNetworkAndSanity(unittest.TestCase):
@@ -740,6 +764,35 @@ class TestReferences(unittest.TestCase):
                          sorted(f"{cid} ({designator})" for cid, (designator, _, _, _) in CIRCUIT.items()))
         with self.assertRaisesRegex(ValueError, "unknown derivation 'precharge_energy'"):
             reference_value(model, "precharge_energy")
+
+    def test_the_bulk_capacitor_may_go_straight_to_ground(self):
+        """Rule C5's other branch: with no series resistance every closed form is
+        the written-out one at R_E = 0, and none reads a resistance that is not there."""
+        from ecad_model.dataset import build
+        from ecad_model.domains.electrical import reference_value, supply_input_roles
+
+        adapter = _adapter()
+        with _scratch() as directory:
+            item = _copy(directory, {NETLIST: NO_ESR}, rebuild=False)
+            _edit_json(item / "design" / "annotations.json", lambda document: document["circuit_elements"].pop("R_ESR"))
+            build(item)
+            model = json.loads((item / "derived" / "engineering_model.json").read_bytes())
+            deck = (item / DECK_PATH).read_bytes()
+        roles = supply_input_roles(model)
+        self.assertIsNone(roles.esr)
+        self.assertEqual((roles.capacitor["circuit"]["terminals"], roles.rail), ({"p": "n_bus", "n": "0"}, "n_bus"))
+        self.assertEqual(deck, DECK.replace("C_BULK n_bus n_esr 0.00047\nR_ESR n_esr 0 0.05\n",
+                                            "C_BULK n_bus 0 0.00047\n").encode())
+        self.assertEqual(adapter.sanity_problems(model), [])
+        self.assertEqual(adapter.invariant_problems(model, {}, {DECK_PATH: deck}), [])
+        written_out = _closed_forms({**PARAMETERS, "RE": 0.0})
+        for derivation, stored in NO_ESR_CLOSED_FORMS.items():
+            with self.subTest(derivation):
+                value, used = reference_value(model, derivation, {"name": "startup"})
+                self.assertEqual(float(f"{value:.12g}"), stored)
+                self.assertLessEqual(abs(value - written_out[derivation]), 1e-12 * abs(written_out[derivation]))
+                self.assertEqual(sorted(used), sorted(path for path in REFERENCE_INPUTS[derivation]
+                                                      if path != _path("r_esr", "resistance")))
 
     def test_a_reference_does_not_apply_where_its_assumptions_fail(self):
         from ecad_model.domains.electrical import reference_value
