@@ -11,8 +11,8 @@
       "artifact": {
         "media_type": "application/json",
         "path": "derived/engineering_model.json",
-        "sha256": "5cb14da3fc22c0bf5bf9cb17d19eb1d06664a3fc7cf1de5549b6a2c387bcac7a",
-        "size_bytes": 27266
+        "sha256": "aa053fd76bd347fa552038427c894f5c50ab6aa0a76e1782b688c9c4a49b1381",
+        "size_bytes": 27575
       },
       "derived_from": [
         "source/servo_supply_001.cir",
@@ -28,8 +28,8 @@
       "artifact": {
         "media_type": "text/x-spice",
         "path": "derived/electrical/servo_supply_001.cir",
-        "sha256": "2840fc040b30a626891a347bb447a242f81ce97cd23aa415a6e32c7ef4451d30",
-        "size_bytes": 1300
+        "sha256": "effee83541b2028dffc8ee1467b314c33e20a6d43bd93c026f9cc232176466c0",
+        "size_bytes": 1370
       },
       "derived_from": [
         "derived/engineering_model.json"
@@ -45,8 +45,8 @@
       "artifact": {
         "media_type": "application/json",
         "path": "validation/golden/cases.json",
-        "sha256": "28d7a472da9f317ce0e0625952ed1495ebd395f58d0d7441fdc3ea88decfd342",
-        "size_bytes": 4308
+        "sha256": "3cb1e0f992f6fe21412f9391872046f6785e829a86c37254f3c761a38f896cbb",
+        "size_bytes": 4770
       },
       "derived_from": [
         "derived/engineering_model.json",
@@ -62,8 +62,8 @@
       "artifact": {
         "media_type": "application/json",
         "path": "validation/corners/cases.json",
-        "sha256": "0138c3c96e687c2b10ec0c908f4b985f93aa10b53f2276f2838a2b7fcb6f2de7",
-        "size_bytes": 1815
+        "sha256": "c5381a62388aac9c893f64cead2796ba6d8c5e28865f83db0258873ef46d2c25",
+        "size_bytes": 2228
       },
       "derived_from": [
         "derived/engineering_model.json",
@@ -125,13 +125,13 @@
       "status": "NOT_IMPLEMENTED"
     }
   ],
-  "hash": "sha256:5f83f0bfb09cce5da856ac30e09191da42ef291770fca32462bbd06c69a874da",
+  "hash": "sha256:be95ac7c6b059c5b304c769cda7093500eb5aa24111690db6f076311d7c9489b",
   "inputs": {
     "annotations": {
       "media_type": "application/json",
       "path": "design/annotations.json",
-      "sha256": "f715d088466c00b2e8c3d88c831ac66566ec8cb34797350c1abdd88539c10296",
-      "size_bytes": 7306
+      "sha256": "5f4bc1424cf41f788c38de0689cf460b589491201cb9b2f12c289783f094235a",
+      "size_bytes": 7615
     },
     "provenance": {
       "media_type": "application/json",
@@ -142,8 +142,8 @@
     "requirements": {
       "media_type": "application/json",
       "path": "requirements/requirements.json",
-      "sha256": "1292859427d683146ffcdb41c02bc74f4405ebc5ac2999ba6a8c87dc43f6e108",
-      "size_bytes": 9175
+      "sha256": "a641a7d25cfad888d5a69d3479bd45063ea7b589b805ffb2fc14016b5563807e",
+      "size_bytes": 10440
     },
     "simulation": []
   },
@@ -154,8 +154,8 @@
         "format": "spice",
         "media_type": "text/x-spice",
         "path": "source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344",
-        "size_bytes": 1300
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30",
+        "size_bytes": 1319
       }
     ],
     "license": {

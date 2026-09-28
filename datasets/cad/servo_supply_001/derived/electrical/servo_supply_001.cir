@@ -23,4 +23,5 @@ V_FLT n_fc 0 PWL(0.0 0.0 0.1 0.0 0.100001 5.0)
 .meas tran steady_input_current_a FIND par('-i(V_IN)') AT=0.1
 .meas tran steady_fuse_power_w FIND par('(v(n_in)-v(n_f))*(-i(V_IN))') AT=0.1
 .meas tran fault_input_current_a FIND par('-i(V_IN)') AT=0.11
+.meas tran startup_peak_current_a MAX par('-i(V_IN)') FROM=0.0 TO=0.1
 .end

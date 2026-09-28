@@ -5,7 +5,7 @@ ecad_model.spice. Everything the dataset runner must not know about the
 electrical domain lives here: how the netlist and its annotations become the
 engineering model (each element a component whose circuit member records its
 terminals), which network the domain validates, the deck ngspice runs, the
-nine metrics and their closed-form references, and the checks of V1 and V2.
+ten metrics and their closed-form references, and the checks of V1 and V2.
 ngspice never sees the netlist: it runs a deck written from the model, so the
 chain is netlist -> engineering model -> deck -> simulator.
 
@@ -64,13 +64,15 @@ METRICS = {
     "steady_fuse_power_w": Metric("W", "SIMPLIFIED", "power in the fuse's resistance under the load"),
     "fault_input_current_a": Metric("A", "SIMPLIFIED", "supply current at the end of the fault window; prospective, "
                                                        "since the fuse never opens"),
+    "startup_peak_current_a": Metric("A", "SIMPLIFIED", "peak supply current from power-up until the fault is "
+                                                        "commanded, the surge when the bypass closes included"),
 }
 # The one scenario, a window of the transient, each metric is measured in.
 METRIC_SCENARIO = {
     "inrush_peak_current_a": "startup", "inrush_i2t_a2s": "startup", "bus_charge_time_s": "startup",
     "bus_voltage_at_bypass_v": "startup", "bus_peak_voltage_v": "startup", "steady_bus_voltage_v": "steady_state",
     "steady_input_current_a": "steady_state", "steady_fuse_power_w": "steady_state",
-    "fault_input_current_a": "output_short",
+    "fault_input_current_a": "output_short", "startup_peak_current_a": "startup",
 }
 # The metric each closed form computes.
 DERIVATION_METRIC = {
@@ -78,7 +80,7 @@ DERIVATION_METRIC = {
     "precharge_charge_time": "bus_charge_time_s", "precharge_bus_voltage": "bus_voltage_at_bypass_v",
     "settled_no_load_bus_voltage": "bus_peak_voltage_v", "steady_bus_voltage": "steady_bus_voltage_v",
     "steady_input_current": "steady_input_current_a", "steady_fuse_power": "steady_fuse_power_w",
-    "settled_fault_input_current": "fault_input_current_a",
+    "settled_fault_input_current": "fault_input_current_a", "startup_peak_current": "startup_peak_current_a",
 }
 
 # Every electrical facet a model of this domain may carry, with its unit.
@@ -312,7 +314,7 @@ def _windows(roles: Roles) -> Tuple[float, float, float, float]:
 
 
 def _section(roles: Roles) -> List[str]:
-    """The deck's own lines after the circuit: options, the analysis, and the nine measurements."""
+    """The deck's own lines after the circuit: options, the analysis, and the ten measurements."""
     t_byp, t_flt, t_end, level = _windows(roles)
     supply = roles.supply["circuit"]["designator"]
     # A voltage source's current is negative while it sources: -i() is the supply current.
@@ -329,6 +331,8 @@ def _section(roles: Roles) -> List[str]:
         "steady_input_current_a": f"FIND {current} AT={_n(t_flt)}",
         "steady_fuse_power_w": f"FIND par('(v({roles.input_node})-v({roles.junction}))*(-i({supply}))') AT={_n(t_flt)}",
         "fault_input_current_a": f"FIND {current} AT={_n(t_end)}",
+        # Up to T_FLT, so a surge when the bypass closes, after T_BYP, is seen too.
+        "startup_peak_current_a": f"MAX {current} FROM=0.0 TO={_n(t_flt)}",
     }
     return [".options noacct", f".tran {_n(TSTEP)} {_n(t_end)} 0.0 {_n(TMAX)}",
             *(f".meas tran {name} {measured[name]}" for name in METRICS)]
@@ -349,7 +353,7 @@ def write_deck(model: Dict[str, Any]) -> bytes:
     component in model order, each switch's .model card, `.options noacct`
     (which removes the operating-point table and the run statistics; a slow
     run can still print a progress report, so stdout is identical run to run
-    only apart from that), one transient to T_END with a fixed TMAX, the nine
+    only apart from that), one transient to T_END with a fixed TMAX, the ten
     measurements, `.end`.
     Every number is a model value, or a sum or product of model values and
     this module's constants, written with repr.
@@ -389,33 +393,100 @@ def write_deck(model: Dict[str, Any]) -> bytes:
 # The facets each closed form reads, by role; ("esr", ...) is skipped when the
 # capacitor goes straight to ground.
 _PRECHARGE = (("supply", "waveform_time"), ("supply", "waveform_voltage"), ("fuse", "resistance"),
-              ("limiter", "resistance"), ("bypass", "off_resistance"), ("esr", "resistance"),
-              ("capacitor", "capacitance"))
+              ("limiter", "resistance"), ("bypass", "off_resistance"), ("fault", "off_resistance"),
+              ("esr", "resistance"), ("capacitor", "capacitance"))
 _CLOSED = (("supply", "waveform_voltage"), ("fuse", "resistance"), ("limiter", "resistance"),
            ("bypass", "on_resistance"))
 _SETTLING = (("capacitor", "capacitance"), ("esr", "resistance"))
 _STEADY = (*_CLOSED, ("fault", "off_resistance"), ("load", "waveform_time"), ("load", "waveform_current"),
            ("fault_command", "waveform_time"), *_SETTLING)
+_BYPASS_CLOSES = (("bypass_command", "waveform_time"), ("bypass_command", "waveform_voltage"),
+                  ("bypass", "threshold_voltage"), ("bypass", "hysteresis_voltage"))
 INPUTS = {
     "precharge_peak_current": _PRECHARGE,
     "precharge_i2t": (*_PRECHARGE, ("bypass_command", "waveform_time")),
     "precharge_charge_time": (*_PRECHARGE, ("bypass_command", "waveform_time")),
     "precharge_bus_voltage": (*_PRECHARGE, ("bypass_command", "waveform_time")),
     "settled_no_load_bus_voltage": (*_CLOSED, ("fault", "off_resistance"), ("load", "waveform_time"),
-                                    ("bypass_command", "waveform_time"), ("bypass_command", "waveform_voltage"),
-                                    ("bypass", "threshold_voltage"), ("bypass", "hysteresis_voltage"), *_SETTLING),
+                                    *_BYPASS_CLOSES, *_SETTLING),
     "steady_bus_voltage": _STEADY,
     "steady_input_current": _STEADY,
     "steady_fuse_power": _STEADY,
     "settled_fault_input_current": (*_CLOSED, ("fault", "on_resistance"), ("load", "waveform_current"),
                                     ("fault_command", "waveform_time"), ("fault_command", "waveform_voltage"),
                                     ("fault", "threshold_voltage"), ("fault", "hysteresis_voltage"), *_SETTLING),
+    "startup_peak_current": (*_PRECHARGE, *_BYPASS_CLOSES, ("bypass", "on_resistance"), ("load", "waveform_time"),
+                             ("load", "waveform_current"), ("fault_command", "waveform_time")),
 }
+
+
+class _DoesNotApply(Exception):
+    """A closed form's assumptions fail for this design; the message says which."""
 
 
 def _settled(span: float, tau: float) -> bool:
     """Whether a window of this length lets a first-order response settle to within e^-30."""
     return span >= SETTLE_TIME_CONSTANTS * tau
+
+
+def _closing_time(times: Sequence[float], levels: Sequence[float], threshold: float, hysteresis: float) -> float:
+    """When a commanded switch closes: its command, stepping (0, 0), (t, 0), (t + e, h),
+    rises through VT + VH (ngspice's switch turns on above VT + VH).
+
+    Example:
+        >>> _closing_time([0.0, 0.03, 0.030001], [0.0, 0.0, 5.0], 2.5, 0.0)
+        0.0300005
+    """
+    return times[1] + (times[2] - times[1]) * (threshold + hysteresis) / levels[2]
+
+
+def _unmeasurable(model: Dict[str, Any], roles: Roles) -> Optional[str]:
+    """Why the deck's windows cannot measure this circuit, or None.
+
+    extract() refuses such a netlist rather than leaving it to a V1 finding,
+    because V1's findings do not stop the cases: a value the closed forms
+    divide by that is not positive; a supply ramp still rising when the
+    bypass is commanded, where the precharge windows end; and a fault switch
+    that never closes, or closes too late for the rail to settle before
+    T_END, so that fault_input_current_a would read the current before the
+    short (or during it) and a limit on it could pass.
+
+    Example:
+        >>> import json; from pathlib import Path
+        >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/servo_supply_001"
+        >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+        >>> _unmeasurable(model, supply_input_roles(model)) is None
+        True
+        >>> command = next(c for c in model["components"] if c["component_id"] == "v_flt")
+        >>> command["domains"]["electrical"]["waveform_time"]["value"] = [0.0, 0.1, 0.2]
+        >>> print(_unmeasurable(model, supply_input_roles(model)))
+        S_FLT closes at 0.15000000000000002 s, and the rail needs 30 time constants (...) to settle after it, but the fault window ends at 0.11 s: fault_input_current_a would not measure the settled short
+    """
+    for component in _circuit(model):
+        for facet in ("resistance", "capacitance", "on_resistance", "off_resistance"):
+            value = component["domains"]["electrical"].get(facet, {}).get("value")
+            if value is not None and not value > 0:
+                return f"{component['circuit']['designator']}: {facet} {value!r} is not positive"
+    t_r = _value(roles.supply, "waveform_time")[1]
+    t_b = _value(roles.bypass_command, "waveform_time")[1]
+    if not t_r < t_b:
+        return f"the supply ramp ends at {t_r!r} s, not before the bypass command at {t_b!r} s, where the precharge ends"
+    fault, command = roles.fault["circuit"]["designator"], roles.fault_command["circuit"]["designator"]
+    times, levels = _value(roles.fault_command, "waveform_time"), _value(roles.fault_command, "waveform_voltage")
+    threshold, hysteresis = _value(roles.fault, "threshold_voltage"), _value(roles.fault, "hysteresis_voltage")
+    if not levels[2] > threshold + hysteresis:
+        return (f"{command}'s high level {levels[2]!r} V does not exceed {fault}'s VT + VH = {threshold + hysteresis!r} V: "
+                "the fault switch never closes, so no metric would measure the short")
+    closes = _closing_time(times, levels, threshold, hysteresis)
+    r_c = _value(roles.fuse, "resistance") + _par(_value(roles.limiter, "resistance"), _value(roles.bypass, "on_resistance"))
+    r_e = _value(roles.esr, "resistance") if roles.esr is not None else 0.0
+    tau_f = _value(roles.capacitor, "capacitance") * (r_e + _par(r_c, _value(roles.fault, "on_resistance")))
+    t_end = _windows(roles)[2]
+    if not _settled(t_end - closes, tau_f):
+        return (f"{fault} closes at {closes!r} s, and the rail needs {SETTLE_TIME_CONSTANTS} time constants "
+                f"({SETTLE_TIME_CONSTANTS * tau_f!r} s) to settle after it, but the fault window ends at {t_end!r} s: "
+                "fault_input_current_a would not measure the settled short")
+    return None
 
 
 def _inputs(model: Dict[str, Any], derivation: str) -> Tuple[Roles, Dict[Tuple[str, str], Any], List[str],
@@ -440,31 +511,150 @@ def _inputs(model: Dict[str, Any], derivation: str) -> Tuple[Roles, Dict[Tuple[s
     return roles, values, paths, missing
 
 
+def _steady_current(values: Dict[Tuple[str, str], Any], r_c: float) -> Tuple[float, float]:
+    """(v_ss, i_ss): the settled rail voltage and supply current under the load, the fault switch open.
+
+    _DoesNotApply unless the rail settles between the load stepping on and the fault command.
+    """
+    supply_voltage = values[("supply", "waveform_voltage")][1]
+    r_off_f = values[("fault", "off_resistance")]
+    tau2 = values[("capacitor", "capacitance")] * (values.get(("esr", "resistance"), 0.0) + _par(r_c, r_off_f))
+    if not _settled(values[("fault_command", "waveform_time")][1] - values[("load", "waveform_time")][2], tau2):
+        raise _DoesNotApply("the rail has not settled between the load stepping on and the fault command")
+    v_ss = (supply_voltage - values[("load", "waveform_current")][2] * r_c) / (1 + r_c / r_off_f)
+    return v_ss, (supply_voltage - v_ss) / r_c
+
+
+def _closed_form(derivation: str, values: Dict[Tuple[str, str], Any]) -> float:
+    """One closed form's value from its inputs; _DoesNotApply names the assumption that fails."""
+    supply_voltage = values[("supply", "waveform_voltage")][1]
+    r_f = values[("fuse", "resistance")]
+    r_p = values[("limiter", "resistance")]
+    r_e = values.get(("esr", "resistance"), 0.0)
+    c = values[("capacitor", "capacitance")]
+
+    if derivation.startswith("precharge_") or derivation == "startup_peak_current":
+        # Until the bypass closes, the supply feeds the rail through R_s = R_F +
+        # R_P || R_off,B, and the open fault switch loads it with R_off,F: the
+        # capacitor branch sees alpha*V(t) behind alpha*R_s (Thevenin).
+        t_r = values[("supply", "waveform_time")][1]
+        r_s = r_f + _par(r_p, values[("bypass", "off_resistance")])
+        r_off_f = values[("fault", "off_resistance")]
+        alpha = r_off_f / (r_s + r_off_f)
+        tau1 = (alpha * r_s + r_e) * c
+        k = supply_voltage / t_r
+        g = 1 / (r_s + r_off_f)  # what R_off,F draws per volt of supply once the rail follows it
+        decay = 1 - math.exp(-t_r / tau1)
+        drive = alpha ** 2 * c * k
+        # The supply current is g*k*t + drive*(1 - e^(-t/tau1)) during the ramp,
+        # g*V + b*e^(-(t - t_r)/tau1) after it, and the rail alpha*V - R_s*b*e^(...).
+        b = drive * decay
+        peak = g * supply_voltage + b
+        if derivation == "precharge_peak_current":
+            return peak
+        settles_at, below = alpha * supply_voltage, r_s * b
+        if derivation == "startup_peak_current":
+            r_c = r_f + _par(r_p, values[("bypass", "on_resistance")])
+            closes = _closing_time(values[("bypass_command", "waveform_time")],
+                                   values[("bypass_command", "waveform_voltage")],
+                                   values[("bypass", "threshold_voltage")], values[("bypass", "hysteresis_voltage")])
+            if not _settled(values[("load", "waveform_time")][1] - closes, c * (r_e + _par(r_c, r_off_f))):
+                raise _DoesNotApply("the rail has not settled between the bypass closing and the load stepping on")
+            _, i_ss = _steady_current(values, r_c)
+            # The capacitor's voltage is continuous when the bypass closes; the
+            # rail then sits between the supply through R_c, the capacitor through
+            # R_E and R_off,F, and the supply current steps up to the surge.
+            v_c = settles_at - alpha * k * tau1 * decay * math.exp(-(closes - t_r) / tau1)
+            rail = (supply_voltage * r_e * r_off_f + v_c * r_c * r_off_f) / (r_e * r_off_f + r_c * r_off_f + r_c * r_e)
+            surge = (supply_voltage - rail) / r_c
+            # Between the steps the network is first order, so the current is
+            # largest at the end of the ramp, just after the bypass closes, or
+            # settled under the load at the fault command.
+            if surge >= max(peak, i_ss):
+                raise _DoesNotApply(f"the largest current is the surge when the bypass closes, {surge!r} A, a step "
+                                    "ngspice samples at its first time point after the switch closes, later than "
+                                    "the instant this form assumes")
+            return max(peak, i_ss)
+        t_byp = values[("bypass_command", "waveform_time")][1]
+        span = t_byp - t_r
+        if derivation == "precharge_i2t":
+            ramp = ((g * k) ** 2 * t_r ** 3 / 3
+                    + 2 * g * k * drive * (t_r ** 2 / 2 - tau1 ** 2 + tau1 * (t_r + tau1) * math.exp(-t_r / tau1))
+                    + drive ** 2 * (t_r - 2 * tau1 * decay + tau1 / 2 * (1 - math.exp(-2 * t_r / tau1))))
+            after = ((g * supply_voltage) ** 2 * span
+                     + 2 * g * supply_voltage * b * tau1 * (1 - math.exp(-span / tau1))
+                     + b ** 2 * tau1 / 2 * (1 - math.exp(-2 * span / tau1)))
+            return ramp + after
+        if derivation == "precharge_bus_voltage":
+            return settles_at - below * math.exp(-span / tau1)
+        level = CHARGED_FRACTION * supply_voltage
+        if not settles_at > level:
+            raise _DoesNotApply(f"the precharge settles at {settles_at!r} V, which does not exceed the charge level "
+                                f"{level!r} V")
+        if not below > settles_at - level:
+            raise _DoesNotApply("the rail reaches the charge level during the supply ramp")
+        crossing = t_r + tau1 * math.log(below / (settles_at - level))
+        if crossing > t_byp:
+            raise _DoesNotApply(f"the precharge would reach the charge level at {crossing!r} s, after the bypass "
+                                f"is commanded at {t_byp!r} s")
+        return crossing
+
+    r_c = r_f + _par(r_p, values[("bypass", "on_resistance")])
+    if derivation == "settled_no_load_bus_voltage":
+        r_off_f = values[("fault", "off_resistance")]
+        closes = _closing_time(values[("bypass_command", "waveform_time")], values[("bypass_command", "waveform_voltage")],
+                               values[("bypass", "threshold_voltage")], values[("bypass", "hysteresis_voltage")])
+        if not _settled(values[("load", "waveform_time")][1] - closes, c * (r_e + _par(r_c, r_off_f))):
+            raise _DoesNotApply("the rail has not settled between the bypass closing and the load stepping on")
+        return supply_voltage * r_off_f / (r_off_f + r_c)
+    if derivation == "settled_fault_input_current":
+        r_on_f = values[("fault", "on_resistance")]
+        command_time = values[("fault_command", "waveform_time")]
+        closes = _closing_time(command_time, values[("fault_command", "waveform_voltage")],
+                               values[("fault", "threshold_voltage")], values[("fault", "hysteresis_voltage")])
+        if not _settled(command_time[1] + FAULT_WINDOW_S - closes, c * (r_e + _par(r_c, r_on_f))):
+            raise _DoesNotApply("the rail has not settled between the fault switch closing and the end of the window")
+        v_inf = (supply_voltage / r_c - values[("load", "waveform_current")][2]) / (1 / r_c + 1 / r_on_f)
+        return (supply_voltage - v_inf) / r_c
+    v_ss, i_ss = _steady_current(values, r_c)
+    if derivation == "steady_bus_voltage":
+        return v_ss
+    if derivation == "steady_input_current":
+        return i_ss
+    return i_ss ** 2 * r_f
+
+
 def reference_value(model: Dict[str, Any], derivation: str,
                     scenario: Optional[Dict[str, Any]] = None) -> Tuple[float, List[str]]:
     """Compute one closed-form reference value from the engineering model.
 
-    With par(a, b) = ab/(a + b), R1 = R_F + par(R_P, R_off,B) + R_E, tau1 =
-    R1*C, k = V/t_r and R_c = R_F + par(R_P, R_on,B):
+    With par(a, b) = ab/(a + b), k = V/t_r and R_c = R_F + par(R_P, R_on,B):
+    until the bypass closes the rail is fed through R_s = R_F + par(R_P,
+    R_off,B) and loaded by the open fault switch's R_off,F, so the capacitor
+    branch sees a Thevenin source alpha*V(t), alpha = R_off,F/(R_s + R_off,F),
+    behind alpha*R_s. With tau1 = (alpha*R_s + R_E)*C, g = 1/(R_s + R_off,F),
+    D = alpha^2*C*k and B = D*(1 - e^(-t_r/tau1)), the supply current is
+    g*k*t + D*(1 - e^(-t/tau1)) during the ramp and g*V + B*e^(-(t - t_r)/tau1)
+    after it, and the rail alpha*V - R_s*B*e^(-(t - t_r)/tau1):
 
-      precharge_peak_current       C*k*(1 - e^(-t_r/tau1)), at the end of the ramp;
-      precharge_i2t                the integral of i^2 over the ramp and the
-                                   exponential decay after it, up to T_BYP;
-      precharge_charge_time        t_r + tau1*ln(A(1 - R_E/R1)/((1 - f)V)), A = V - v_C(t_r);
-      precharge_bus_voltage        V - A(1 - R_E/R1)e^(-(T_BYP - t_r)/tau1);
+      precharge_peak_current       g*V + B, at the end of the ramp;
+      precharge_i2t                the integral of the supply current squared
+                                   over the ramp and after it, up to T_BYP;
+      precharge_charge_time        t_r + tau1*ln(R_s*B/(alpha*V - f*V));
+      precharge_bus_voltage        alpha*V - R_s*B*e^(-(T_BYP - t_r)/tau1);
       settled_no_load_bus_voltage  V*R_off,F/(R_off,F + R_c);
       steady_bus_voltage           v_ss = (V - I_L*R_c)/(1 + R_c/R_off,F);
-      steady_input_current         (V - v_ss)/R_c;
+      steady_input_current         i_ss = (V - v_ss)/R_c;
       steady_fuse_power            i_ss^2 * R_F;
-      settled_fault_input_current  (V - v_inf)/R_c, v_inf = (V/R_c - I_L)/(1/R_c + 1/R_on,F).
-
-    The precharge forms neglect the fault switch's off resistance across the
-    rail: it draws at most V/R_off,F, 4.8e-8 A on the committed sample, below
-    the tightest current tolerance by 2000x.
+      settled_fault_input_current  (V - v_inf)/R_c, v_inf = (V/R_c - I_L)/(1/R_c + 1/R_on,F);
+      startup_peak_current         the larger of the precharge peak and i_ss,
+                                   when the surge as the bypass closes, (V -
+                                   v_rail)/R_c with the capacitor's voltage
+                                   continuous, is smaller than both.
 
     Args:
         model: An engineering model of this domain.
-        derivation: One of the nine names above.
+        derivation: One of the ten names above.
         scenario: The case's scenario; a scenario carries only its name, so
             it is not read.
 
@@ -473,10 +663,12 @@ def reference_value(model: Dict[str, Any], derivation: str,
 
     Raises:
         ReferenceBlocked: An input has a null status (its paths and statuses
-            are attached), or the form does not apply to this design: the
-            precharge crossing happens during the ramp or after T_BYP, or a
-            window is shorter than SETTLE_TIME_CONSTANTS time constants
-            (nothing is attached).
+            are attached), or the form does not apply to this design:
+            the precharge crossing happens during the ramp or after T_BYP,
+            or never; a window is shorter than SETTLE_TIME_CONSTANTS time
+            constants; the startup peak is the bypass surge; or the form
+            cannot be evaluated on these values, or gives a value that is not
+            finite (nothing is attached).
         ValueError: The derivation name is not recognised.
 
     Example:
@@ -487,77 +679,30 @@ def reference_value(model: Dict[str, Any], derivation: str,
         4.71663
         >>> round(reference_value(model, "settled_fault_input_current", {"name": "output_short"})[0], 3)
         372.465
+        >>> round(reference_value(model, "startup_peak_current")[0], 6)
+        4.71663
+        >>> capacitor = next(c for c in model["components"] if c["component_id"] == "c_bulk")
+        >>> capacitor["domains"]["electrical"]["capacitance"]["value"] = 0.0
+        >>> reference_value(model, "precharge_peak_current")
+        Traceback (most recent call last):
+        ...
+        ecad_model.requirements.ReferenceBlocked: precharge_peak_current does not apply to this design: its closed form cannot be evaluated on these values (ZeroDivisionError: ...)
     """
-    roles, values, paths, missing = _inputs(model, derivation)
+    _, values, paths, missing = _inputs(model, derivation)
     if missing:
         raise ReferenceBlocked(f"{derivation} needs quantities that have no value", missing)
-    supply_voltage = values[("supply", "waveform_voltage")][1]
-    r_f = values[("fuse", "resistance")]
-    r_p = values[("limiter", "resistance")]
-    r_e = values.get(("esr", "resistance"), 0.0)
-    c = values[("capacitor", "capacitance")]
-
-    def not_applicable(why: str) -> ReferenceBlocked:
-        return ReferenceBlocked(f"{derivation} does not apply to this design: {why}", [])
-
-    if derivation.startswith("precharge_"):
-        t_r = values[("supply", "waveform_time")][1]
-        r1 = r_f + _par(r_p, values[("bypass", "off_resistance")]) + r_e
-        tau1 = r1 * c
-        k = supply_voltage / t_r
-        if derivation == "precharge_peak_current":
-            # The current rises during the ramp and decays after it.
-            return c * k * (1 - math.exp(-t_r / tau1)), paths
-        t_byp = values[("bypass_command", "waveform_time")][1]
-        a = supply_voltage - k * (t_r - tau1 * (1 - math.exp(-t_r / tau1)))
-        if derivation == "precharge_i2t":
-            ramp = (c * k) ** 2 * (t_r - 2 * tau1 * (1 - math.exp(-t_r / tau1))
-                                   + tau1 / 2 * (1 - math.exp(-2 * t_r / tau1)))
-            return ramp + (a / r1) ** 2 * tau1 / 2 * (1 - math.exp(-2 * (t_byp - t_r) / tau1)), paths
-        # After the ramp the rail follows V - A(1 - R_E/R1)e^(-(t - t_r)/tau1), rising.
-        below = a * (1 - r_e / r1)
-        if derivation == "precharge_bus_voltage":
-            return supply_voltage - below * math.exp(-(t_byp - t_r) / tau1), paths
-        if not below > (1 - CHARGED_FRACTION) * supply_voltage:
-            raise not_applicable("the rail reaches the charge level during the supply ramp")
-        crossing = t_r + tau1 * math.log(below / ((1 - CHARGED_FRACTION) * supply_voltage))
-        if crossing > t_byp:
-            raise not_applicable(f"the precharge would reach the charge level at {crossing!r} s, after the bypass "
-                                 f"is commanded at {t_byp!r} s")
-        return crossing, paths
-
-    r_c = r_f + _par(r_p, values[("bypass", "on_resistance")])
-    if derivation == "settled_no_load_bus_voltage":
-        r_off_f = values[("fault", "off_resistance")]
-        command_time, command_level = (values[("bypass_command", name)] for name in ("waveform_time", "waveform_voltage"))
-        closes = command_time[1] + (command_time[2] - command_time[1]) * (
-            values[("bypass", "threshold_voltage")] + values[("bypass", "hysteresis_voltage")]) / command_level[2]
-        tau2 = c * (r_e + _par(r_c, r_off_f))
-        if not _settled(values[("load", "waveform_time")][1] - closes, tau2):
-            raise not_applicable("the rail has not settled between the bypass closing and the load stepping on")
-        return supply_voltage * r_off_f / (r_off_f + r_c), paths
-    if derivation == "settled_fault_input_current":
-        r_on_f = values[("fault", "on_resistance")]
-        command_time, command_level = (values[("fault_command", name)] for name in ("waveform_time", "waveform_voltage"))
-        closes = command_time[1] + (command_time[2] - command_time[1]) * (
-            values[("fault", "threshold_voltage")] + values[("fault", "hysteresis_voltage")]) / command_level[2]
-        tau_f = c * (r_e + _par(r_c, r_on_f))
-        if not _settled(command_time[1] + FAULT_WINDOW_S - closes, tau_f):
-            raise not_applicable("the rail has not settled between the fault switch closing and the end of the window")
-        v_inf = (supply_voltage / r_c - values[("load", "waveform_current")][2]) / (1 / r_c + 1 / r_on_f)
-        return (supply_voltage - v_inf) / r_c, paths
-    r_off_f = values[("fault", "off_resistance")]
-    load = values[("load", "waveform_current")][2]
-    tau2 = c * (r_e + _par(r_c, r_off_f))
-    if not _settled(values[("fault_command", "waveform_time")][1] - values[("load", "waveform_time")][2], tau2):
-        raise not_applicable("the rail has not settled between the load stepping on and the fault command")
-    v_ss = (supply_voltage - load * r_c) / (1 + r_c / r_off_f)
-    if derivation == "steady_bus_voltage":
-        return v_ss, paths
-    i_ss = (supply_voltage - v_ss) / r_c
-    if derivation == "steady_input_current":
-        return i_ss, paths
-    return i_ss ** 2 * r_f, paths
+    try:
+        value = _closed_form(derivation, values)
+    except _DoesNotApply as exc:
+        raise ReferenceBlocked(f"{derivation} does not apply to this design: {exc}", []) from None
+    except ArithmeticError as exc:
+        # Values extraction refuses (a zero capacitance) or cannot bound (1e150 F)
+        # reach here only from a model built some other way; no case can compare them.
+        raise ReferenceBlocked(f"{derivation} does not apply to this design: its closed form cannot be evaluated "
+                               f"on these values ({type(exc).__name__}: {exc})", []) from exc
+    if not math.isfinite(value):
+        raise ReferenceBlocked(f"{derivation} does not apply to this design: its closed form gives {value!r}", [])
+    return value, paths
 
 
 def _netlist_facets(element: spice.Element, origin: Dict[str, str]) -> Dict[str, Any]:
@@ -726,8 +871,12 @@ class ElectricalAdapter:
             ExtractionError: Of kind "rejected": the netlist is not a regular
                 file within the size limit, is outside the grammar, has a
                 title the deck cannot carry, is not the network class this
-                domain validates, or its transient would need more than
-                MAX_STEPS steps (spec §26). None of these reaches ngspice.
+                domain validates, its transient would need more than
+                MAX_STEPS steps (spec §26), or the deck's windows cannot
+                measure it: a resistance, capacitance or switch resistance
+                that is not positive, a supply ramp that has not ended at the
+                bypass command, or a fault switch that does not close and
+                settle within the fault window. None of these reaches ngspice.
             ValueError: Not exactly one spice source, or the annotations are
                 inconsistent with the netlist.
 
@@ -769,6 +918,9 @@ class ElectricalAdapter:
         if steps > MAX_STEPS:
             raise ExtractionError("rejected", f"{netlist_ref}: the transient to the end of the fault window needs "
                                               f"{steps!r} steps of {TMAX!r} s, more than {MAX_STEPS}")
+        problem = _unmeasurable(model, roles)
+        if problem is not None:
+            raise ExtractionError("rejected", f"{netlist_ref}: {problem}")
         return Extraction(model=model, producer=("ecad_model.domains.electrical",
                                                  f"{MODEL_BUILDER_VERSION} (ecad_model.spice {spice.VERSION})"))
 
@@ -825,7 +977,7 @@ class ElectricalAdapter:
 
         Args:
             model: An engineering model of this domain.
-            derivation: One of the nine closed forms.
+            derivation: One of the ten closed forms.
             scenario: The case's scenario, which is not read.
 
         Returns:
@@ -856,7 +1008,7 @@ class ElectricalAdapter:
         Example:
             >>> metrics = ElectricalAdapter().metrics()
             >>> len(metrics), list(metrics)[0], metrics["inrush_i2t_a2s"].unit, metrics["inrush_i2t_a2s"].fidelity
-            (9, 'inrush_peak_current_a', 'A^2*s', 'SIMPLIFIED')
+            (10, 'inrush_peak_current_a', 'A^2*s', 'SIMPLIFIED')
         """
         return dict(METRICS)
 
@@ -936,7 +1088,7 @@ class ElectricalAdapter:
 
         Args:
             model: An engineering model of this domain.
-            derivation: One of the nine closed forms.
+            derivation: One of the ten closed forms.
             scenario: The case's scenario, which is not read.
 
         Returns:
@@ -960,6 +1112,7 @@ class ElectricalAdapter:
             components/r_f1/domains/electrical/resistance
             components/r_pre/domains/electrical/resistance
             components/s_byp/domains/electrical/off_resistance
+            components/s_flt/domains/electrical/off_resistance
             components/r_esr/domains/electrical/resistance
             components/c_bulk/domains/electrical/capacitance
         """
@@ -1077,11 +1230,12 @@ class ElectricalAdapter:
         closes = {}
         for switch, command in ((roles.bypass, roles.bypass_command), (roles.fault, roles.fault_command)):
             times, levels = _value(command, "waveform_time"), _value(command, "waveform_voltage")
-            on = _value(switch, "threshold_voltage") + _value(switch, "hysteresis_voltage")
-            if not levels[2] > on:
+            threshold, hysteresis = _value(switch, "threshold_voltage"), _value(switch, "hysteresis_voltage")
+            if not levels[2] > threshold + hysteresis:
                 problems.append(f"{command['circuit']['designator']}: its high level {levels[2]!r} V does not exceed "
-                                f"{switch['circuit']['designator']}'s VT + VH = {on!r} V, so the switch never closes")
-            closes[switch["component_id"]] = times[1] + (times[2] - times[1]) * on / levels[2]
+                                f"{switch['circuit']['designator']}'s VT + VH = {threshold + hysteresis!r} V, so the "
+                                "switch never closes")
+            closes[switch["component_id"]] = _closing_time(times, levels, threshold, hysteresis)
         t_r = _value(roles.supply, "waveform_time")[1]
         t_b = _value(roles.bypass_command, "waveform_time")[1]
         load_times = _value(roles.load, "waveform_time")

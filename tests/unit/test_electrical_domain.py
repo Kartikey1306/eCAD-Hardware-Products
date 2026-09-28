@@ -5,7 +5,7 @@ fuse, precharge resistor with a bypass switch, bulk capacitor with its
 series resistance, a constant-current load and a fault switch. These tests
 need neither a CAD kernel nor ngspice. Where a case must "run", a stand-in
 for the ngspice adapter answers every deck with RECORDED_STDOUT, the output
-ngspice-47 printed for the committed deck on macOS arm64 on 2026-09-27
+ngspice-47 printed for the committed deck on macOS arm64 on 2026-09-28
 (identical over two runs, empty stderr), read through the real adapter's
 own parser. tests/unit/test_electrical_spice.py runs the real ngspice.
 
@@ -40,7 +40,7 @@ NETLIST = "source/servo_supply_001.cir"
 DECK_PATH = "derived/electrical/servo_supply_001.cir"
 NETLIST_REF = "datasets/cad/servo_supply_001/source/servo_supply_001.cir"
 ANNOTATIONS_REF = "datasets/cad/servo_supply_001/design/annotations.json"
-NETLIST_SHA256 = "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+NETLIST_SHA256 = "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
 SHEET = "eRobotics_CAD_Design/robot_components/product_datasheet.md"
 SHEET_SHA256 = "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
 LICENSE_SHA256 = "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"
@@ -73,10 +73,11 @@ DECK = (
     ".meas tran steady_input_current_a FIND par('-i(V_IN)') AT=0.1\n"
     ".meas tran steady_fuse_power_w FIND par('(v(n_in)-v(n_f))*(-i(V_IN))') AT=0.1\n"
     ".meas tran fault_input_current_a FIND par('-i(V_IN)') AT=0.11\n"
+    ".meas tran startup_peak_current_a MAX par('-i(V_IN)') FROM=0.0 TO=0.1\n"
     ".end\n"
 )
-DECK_SHA256 = "2840fc040b30a626891a347bb447a242f81ce97cd23aa415a6e32c7ef4451d30"
-# ngspice-47, macOS arm64, 2026-09-27: `ngspice -b` on DECK, byte for byte.
+DECK_SHA256 = "effee83541b2028dffc8ee1467b314c33e20a6d43bd93c026f9cc232176466c0"
+# ngspice-47, macOS arm64, 2026-09-28: `ngspice -b` on DECK, byte for byte.
 RECORDED_STDOUT = (
     "\n"
     "Note: No compatibility mode selected!\n"
@@ -101,6 +102,7 @@ RECORDED_STDOUT = (
     "steady_input_current_a=  4.16667e+00\n"
     "steady_fuse_power_w =  3.47223e-01\n"
     "fault_input_current_a=  3.72465e+02\n"
+    "startup_peak_current_a=  4.71663e+00 at=  1.00000e-04\n"
     "\n"
     "\n"
 )
@@ -109,6 +111,7 @@ RECORDED_METRICS = {
     "inrush_peak_current_a": 4.71663, "inrush_i2t_a2s": 0.0533906, "bus_charge_time_s": 0.0109244,
     "bus_voltage_at_bypass_v": 47.9147, "bus_peak_voltage_v": 48.0, "steady_bus_voltage_v": 47.875,
     "steady_input_current_a": 4.16667, "steady_fuse_power_w": 0.347223, "fault_input_current_a": 372.465,
+    "startup_peak_current_a": 4.71663,
 }
 # The netlist's values in SI units, read by hand: 20m is 0.02, 470u is 0.00047, 1g is 1e9.
 NETLIST_VALUES: Dict[str, Dict[str, Any]] = {
@@ -141,21 +144,26 @@ CIRCUIT = {
 KINDS = {"v_in": "voltage_source", "r_f1": "fuse", "r_pre": "resistor", "s_byp": "switch", "v_byp": "voltage_source",
          "c_bulk": "capacitor", "r_esr": "resistor", "i_load": "current_source", "s_flt": "switch",
          "v_flt": "voltage_source", "drive": "motor_driver"}
-# The closed forms of the design (§5.3), to the 12 significant figures the golden cases store.
+# The closed forms of the design (§5.3), with the open fault switch's off
+# resistance folded into the four precharge forms (review finding CS-4), and
+# the startup peak (CS-5), to the 12 significant figures the golden cases
+# store. Typed from _closed_forms below; a scratch script written apart from
+# both gives the same digits, and ngspice-47 agrees with it (2026-09-28).
 CLOSED_FORMS = {
-    "precharge_peak_current": 4.71663002764, "precharge_i2t": 0.0533907676223,
-    "precharge_charge_time": 0.0109244343789, "precharge_bus_voltage": 47.9147188794,
+    "precharge_peak_current": 4.71663002765, "precharge_i2t": 0.0533907681653,
+    "precharge_charge_time": 0.010924434697, "precharge_bus_voltage": 47.9147184047,
     "settled_no_load_bus_voltage": 47.9999999986, "steady_bus_voltage": 47.8750415236,
     "steady_input_current": 4.16667004787, "steady_fuse_power": 0.347222785757,
-    "settled_fault_input_current": 372.464522495,
+    "settled_fault_input_current": 372.464522495, "startup_peak_current": 4.71663002765,
 }
 # Rule C5's other branch: the bulk capacitor straight to ground, so R_E = 0.
-# The four precharge forms move; the settled forms read R_E only to decide
-# whether the rail has settled, so their values stay. Typed from _closed_forms
-# below at R_E = 0 (the design's own closed-form script gives the same digits).
+# The four precharge forms and the startup peak move; the settled forms read
+# R_E only to decide whether the rail has settled, so their values stay.
+# Typed from _closed_forms below at R_E = 0.
 NO_ESR = ("C_BULK n_bus n_esr 470u\nR_ESR n_esr 0 50m\n", "C_BULK n_bus 0 470u\n")
-NO_ESR_CLOSED_FORMS = {**CLOSED_FORMS, "precharge_peak_current": 4.7399171105, "precharge_i2t": 0.0536553201,
-                       "precharge_charge_time": 0.0108938826039, "precharge_bus_voltage": 47.9169573916}
+NO_ESR_CLOSED_FORMS = {**CLOSED_FORMS, "precharge_peak_current": 4.7399171105, "precharge_i2t": 0.0536553206378,
+                       "precharge_charge_time": 0.01089388292, "precharge_bus_voltage": 47.9169569168,
+                       "startup_peak_current": 4.7399171105}
 
 
 def _path(component: str, facet: str) -> str:
@@ -163,8 +171,8 @@ def _path(component: str, facet: str) -> str:
 
 
 PRECHARGE_INPUTS = [_path("v_in", "waveform_time"), _path("v_in", "waveform_voltage"), _path("r_f1", "resistance"),
-                    _path("r_pre", "resistance"), _path("s_byp", "off_resistance"), _path("r_esr", "resistance"),
-                    _path("c_bulk", "capacitance")]
+                    _path("r_pre", "resistance"), _path("s_byp", "off_resistance"), _path("s_flt", "off_resistance"),
+                    _path("r_esr", "resistance"), _path("c_bulk", "capacitance")]
 CLOSED_INPUTS = [_path("v_in", "waveform_voltage"), _path("r_f1", "resistance"), _path("r_pre", "resistance"),
                  _path("s_byp", "on_resistance"), _path("c_bulk", "capacitance"), _path("r_esr", "resistance")]
 STEADY_INPUTS = [*CLOSED_INPUTS, _path("s_flt", "off_resistance"), _path("i_load", "waveform_time"),
@@ -184,6 +192,10 @@ REFERENCE_INPUTS = {
     "settled_fault_input_current": [*CLOSED_INPUTS, _path("s_flt", "on_resistance"), _path("i_load", "waveform_current"),
                                     _path("v_flt", "waveform_time"), _path("v_flt", "waveform_voltage"),
                                     _path("s_flt", "threshold_voltage"), _path("s_flt", "hysteresis_voltage")],
+    "startup_peak_current": [*PRECHARGE_INPUTS, _path("v_byp", "waveform_time"), _path("v_byp", "waveform_voltage"),
+                             _path("s_byp", "threshold_voltage"), _path("s_byp", "hysteresis_voltage"),
+                             _path("s_byp", "on_resistance"), _path("i_load", "waveform_time"),
+                             _path("i_load", "waveform_current"), _path("v_flt", "waveform_time")],
 }
 UNKNOWNS = [
     (_path("c_bulk", "ripple_current_rating"), "UNKNOWN"), (_path("c_bulk", "voltage_rating"), "UNKNOWN"),
@@ -193,34 +205,53 @@ UNKNOWNS = [
     (_path("r_pre", "pulse_energy_rating"), "UNKNOWN"), (_path("s_byp", "current_rating"), "UNKNOWN"),
 ]
 FIXTURE_SOURCE = {"kind": "design_annotation", "ref": "tests/unit/test_electrical_domain.py"}
+# REQ-EL-001's limit, as requirements.json writes it (REQ-EL-008 states 10 A too).
+INRUSH_LIMIT = ('"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n'
+                '      "operator": "<=",\n      "limit": {\n        "value": 10.0')
 
 
 def _closed_forms(p: Dict[str, float]) -> Dict[str, float]:
-    """The nine forms of the design (§5.2), written out independently of the adapter."""
+    """The ten forms, written out independently of the adapter.
+
+    Before the bypass closes the rail sees the supply through Rs = RF + RP||RoffB
+    and the open fault switch's RoffF: a Thevenin source a*V(t), a = RoffF/(Rs +
+    RoffF), behind a*Rs. The supply current is (V(t) - v_rail)/Rs.
+    """
     def par(a: float, b: float) -> float:
         return a * b / (a + b)
 
     volts, ramp, cap = p["V"], p["tr"], p["C"]
-    r1 = p["RF"] + par(p["RP"], p["RoffB"]) + p["RE"]
-    tau1, slope = r1 * cap, volts / ramp
+    rs = p["RF"] + par(p["RP"], p["RoffB"])
+    a = p["RoffF"] / (rs + p["RoffF"])
+    tau1, slope = (a * rs + p["RE"]) * cap, volts / ramp
     decay = 1 - math.exp(-ramp / tau1)
-    left = volts - slope * (ramp - tau1 * decay)  # A = V - v_C(t_r)
-    below = left * (1 - p["RE"] / r1)
+    leak = 1 / (rs + p["RoffF"])  # the current through RoffF per volt, once the rail follows the supply
+    step = a * a * cap * slope  # the capacitor branch's current is step * (1 - e^(-t/tau1)) during the ramp
+    peak = leak * volts + step * decay
+    tail = step * decay  # the part of the supply current that decays after the ramp
+    span = p["tb"] - ramp
+    during = ((leak * slope) ** 2 * ramp ** 3 / 3
+              + 2 * leak * slope * step * (ramp ** 2 / 2 - (tau1 ** 2 - tau1 * (ramp + tau1) * math.exp(-ramp / tau1)))
+              + step ** 2 * (ramp - 2 * tau1 * decay + tau1 / 2 * (1 - math.exp(-2 * ramp / tau1))))
+    after = ((leak * volts) ** 2 * span + 2 * leak * volts * tail * tau1 * (1 - math.exp(-span / tau1))
+             + tail ** 2 * tau1 / 2 * (1 - math.exp(-2 * span / tau1)))
+    below = rs * tail  # how far the rail is below a*V at the end of the ramp
     rc = p["RF"] + par(p["RP"], p["RonB"])
     v_ss = (volts - p["IL"] * rc) / (1 + rc / p["RoffF"])
     i_ss = (volts - v_ss) / rc
     v_inf = (volts / rc - p["IL"]) / (1 / rc + 1 / p["RonF"])
     return {
-        "precharge_peak_current": cap * slope * decay,
-        "precharge_i2t": (cap * slope) ** 2 * (ramp - 2 * tau1 * decay + tau1 / 2 * (1 - math.exp(-2 * ramp / tau1)))
-        + (left / r1) ** 2 * tau1 / 2 * (1 - math.exp(-2 * (p["tb"] - ramp) / tau1)),
-        "precharge_charge_time": ramp + tau1 * math.log(below / (0.1 * volts)),
-        "precharge_bus_voltage": volts - below * math.exp(-(p["tb"] - ramp) / tau1),
+        "precharge_peak_current": peak,
+        "precharge_i2t": during + after,
+        "precharge_charge_time": ramp + tau1 * math.log(below / (a * volts - 0.9 * volts)),
+        "precharge_bus_voltage": a * volts - below * math.exp(-span / tau1),
         "settled_no_load_bus_voltage": volts * p["RoffF"] / (p["RoffF"] + rc),
         "steady_bus_voltage": v_ss,
         "steady_input_current": i_ss,
         "steady_fuse_power": i_ss ** 2 * p["RF"],
         "settled_fault_input_current": (volts - v_inf) / rc,
+        # The surge when the bypass closes is below both on these samples.
+        "startup_peak_current": max(peak, i_ss),
     }
 
 
@@ -633,6 +664,97 @@ class TestNetworkAndSanity(unittest.TestCase):
         self.assertEqual(_outcome(v1), ("FAIL", "SOURCE_REJECTED"))
         self.assertIn("steps of 1e-06 s, more than 1000000", v1["findings"][0])
 
+    def test_a_fault_the_transient_cannot_measure_is_refused(self):
+        """CS-2: with V_FLT rising over 100 ms the fault switch closed at 150 ms,
+        after T_END = 110 ms, V1 passed, and fault_input_current_a read the
+        pre-fault 4.17 A, so a real limit of 10 A on it passed."""
+        from ecad_model.dataset import build
+        from ecad_model.importers import ExtractionError
+
+        command = "V_FLT n_fc 0 PWL(0 0 100m 0 100.001m 5)"
+        # tau_f = C*(R_E + R_c || R_on,F) = 3.4343e-5 s, so the rail needs 1.0303 ms
+        # after the switch closes, which is 0.5 of the command's rise after 100 ms.
+        for label, edits, refused in (
+            ("the switch closes after T_END", {NETLIST: (command, "V_FLT n_fc 0 PWL(0 0 100m 0 200m 5)")},
+             "S_FLT closes at 0.15000000000000002 s, and the rail needs 30 time constants"),
+            ("the rail cannot settle before T_END", {NETLIST: (command, "V_FLT n_fc 0 PWL(0 0 100m 0 119m 5)")},
+             "S_FLT closes at 0.1095 s, and the rail needs 30 time constants"),
+            ("the hysteresis delays the closing", {NETLIST: ("SW(RON=100m ROFF=1g VT=2.5 VH=0)", "SW(RON=100m ROFF=1g VT=2.5 VH=2.4)"),
+                                                  },
+             None),
+            ("the command never reaches VT + VH", {NETLIST: (command, "V_FLT n_fc 0 PWL(0 0 100m 0 100.001m 2.5)")},
+             "V_FLT's high level 2.5 V does not exceed S_FLT's VT + VH = 2.5 V: the fault switch never closes"),
+        ):
+            with self.subTest(label), _scratch() as directory:
+                item = _copy(directory, edits, rebuild=False)
+                if refused is None:
+                    # VH = 2.4 V over a 1 us rise still leaves the window: accepted.
+                    build(item)
+                    continue
+                with self.assertRaises(ExtractionError) as raised:
+                    build(item)
+                self.assertEqual(raised.exception.kind, "rejected")
+                self.assertIn(f"{NETLIST}: {refused}", str(raised.exception))
+                receipt, _ = _validate(item, _stand_in(refuse=True))
+                checks = _checks(receipt)
+                self.assertEqual(_outcome(checks["v1.electrical.extraction-and-sanity"]), ("FAIL", "SOURCE_REJECTED"))
+                self.assertEqual(_outcome(checks["v4.REQ-EL-007"]), ("BLOCKED", "DERIVATION_NOT_AVAILABLE"))
+        # The window's edge: a rise of 17 ms leaves 1.5 ms to settle, 19 ms leaves 0.5 ms.
+        with _scratch() as directory:
+            build(_copy(directory, {NETLIST: (command, "V_FLT n_fc 0 PWL(0 0 100m 0 117m 5)")}, rebuild=False))
+        # The hysteresis counts: VT + VH = 4.9 V is crossed 9.8 ms into a 10 ms rise,
+        # 0.2 ms before T_END; without VH the switch would close at 105 ms.
+        with _scratch() as directory:
+            item = _copy(directory, {NETLIST: ("SW(RON=100m ROFF=1g VT=2.5 VH=0)", "SW(RON=100m ROFF=1g VT=2.5 VH=2.4)")},
+                         rebuild=False)
+            netlist = item / NETLIST
+            netlist.write_bytes(netlist.read_bytes().replace(command.encode(), b"V_FLT n_fc 0 PWL(0 0 100m 0 110m 5)"))
+            with self.assertRaisesRegex(ExtractionError, r"S_FLT closes at 0\.10980000000000001 s, and the rail needs 30 "
+                                                         r"time constants \(0\.00103030126\d+ s\)"):
+                build(item)
+
+    def test_values_the_closed_forms_divide_by_are_refused_and_never_cost_a_receipt(self):
+        """CS-3: a zero capacitance raised ZeroDivisionError from the closed forms,
+        which compile_cases calls before V1's sanity check, so validate, build
+        and check printed a traceback and no receipt was written."""
+        import contextlib
+        import io
+
+        from ecad_model import cli
+        from ecad_model.dataset import build
+        from ecad_model.importers import ExtractionError
+
+        for label, (old, new), refused in (
+            ("a zero capacitance", ("C_BULK n_bus n_esr 470u", "C_BULK n_bus n_esr 0"), "C_BULK: capacitance 0.0 is not positive"),
+            ("a negative capacitance", ("C_BULK n_bus n_esr 470u", "C_BULK n_bus n_esr -470u"),
+             "C_BULK: capacitance -0.00047 is not positive"),
+            ("a zero series resistance", ("R_ESR n_esr 0 50m", "R_ESR n_esr 0 0"), "R_ESR: resistance 0.0 is not positive"),
+            ("a zero on resistance", ("SW(RON=100m ROFF=1g", "SW(RON=0 ROFF=1g"), "S_FLT: on_resistance 0.0 is not positive"),
+            ("a zero off resistance", ("SW(RON=10m ROFF=1g", "SW(RON=10m ROFF=0"), "S_BYP: off_resistance 0.0 is not positive"),
+            ("a bypass commanded during the supply ramp",
+             ("V_BYP n_byp 0 PWL(0 0 30m 0 30.001m 5)", "V_BYP n_byp 0 PWL(0 0 50u 0 51u 5)"),
+             "the supply ramp ends at 0.0001 s, not before the bypass command at 5e-05 s"),
+        ):
+            with self.subTest(label), _scratch() as directory:
+                item = _copy(directory, {NETLIST: (old, new)}, rebuild=False)
+                with self.assertRaises(ExtractionError) as raised:
+                    build(item)
+                self.assertEqual(raised.exception.kind, "rejected")
+                self.assertIn(f"{NETLIST}: {refused}", str(raised.exception))
+                receipt, _ = _validate(item, _stand_in(refuse=True))
+                v1 = _checks(receipt)["v1.electrical.extraction-and-sanity"]
+                self.assertEqual(_outcome(v1), ("FAIL", "SOURCE_REJECTED"))
+                self.assertIn(refused, v1["findings"][0])
+        # Through the command line, as the review ran it: validate writes its receipt.
+        with _scratch() as directory, tempfile.TemporaryDirectory() as output:
+            item = _copy(directory, {NETLIST: ("C_BULK n_bus n_esr 470u", "C_BULK n_bus n_esr 0")}, rebuild=False)
+            printed = io.StringIO()
+            with contextlib.redirect_stdout(printed), _stand_in(refuse=True):
+                status = cli.main(["validate", str(item), "--output", str(Path(output) / "run")])
+            self.assertEqual(status, 0)
+            self.assertTrue((Path(output) / "run" / "receipt.json").is_file())
+            self.assertIn('"V1": "FAIL"', printed.getvalue())
+
     def test_v1_refuses_impossible_values_units_and_sequences(self):
         adapter = _adapter()
         model = _model()
@@ -717,12 +839,12 @@ class TestDeck(unittest.TestCase):
             ("a swapped terminal", ("R_F1 n_in n_f 0.02", "R_F1 n_f n_in 0.02"), f"{DECK_PATH}:4: R_F1 terminals"),
             ("a dropped element", ("I_LOAD n_bus 0 PWL(0.0 0.0 0.04 0.0 0.0401 4.16667)\n", ""),
              f"{DECK_PATH}: 9 elements, but the model has 10"),
-            ("a missing measurement", (last_meas, ""), f"{DECK_PATH}: 10 lines follow the circuit, not the adapter's 11"),
+            ("a missing measurement", (last_meas, ""), f"{DECK_PATH}: 11 lines follow the circuit, not the adapter's 12"),
             ("an extra measurement", (last_meas, last_meas + ".meas tran extra_v FIND v(n_bus) AT=0.05\n"),
-             f"{DECK_PATH}: 12 lines follow the circuit, not the adapter's 11"),
+             f"{DECK_PATH}: 13 lines follow the circuit, not the adapter's 12"),
             ("a duplicated measurement", (last_meas, last_meas + last_meas),
              f"{DECK_PATH}: the deck is not one this adapter writes"),
-            ("a flipped current sign", ("MAX par('-i(V_IN)')", "MAX par('i(V_IN)')"),
+            ("a flipped current sign", ("inrush_peak_current_a MAX par('-i(V_IN)')", "inrush_peak_current_a MAX par('i(V_IN)')"),
              f"{DECK_PATH}: the adapter's line 3 is \".meas tran inrush_peak_current_a MAX par('i(V_IN)') FROM=0.0 TO=0.03\""),
             ("a changed analysis", (".tran 1e-06 0.11 0.0 1e-06", ".tran 1e-06 0.11 0.0 1e-05"),
              f"{DECK_PATH}: the adapter's line 2 is '.tran 1e-06 0.11 0.0 1e-05', not '.tran 1e-06 0.11 0.0 1e-06'"),
@@ -761,6 +883,26 @@ class TestReferences(unittest.TestCase):
                 self.assertLessEqual(abs(value - undersized[derivation]), 1e-12 * abs(undersized[derivation]))
         # The design's closed form for the undersized precharge resistor (§6.4).
         self.assertLessEqual(abs(reference_value(small, "precharge_peak_current")[0] - 40.6811962), 1e-7)
+        # CS-4: the open fault switch's 1 kohm is folded into the precharge forms,
+        # which then agree with ngspice-47 (4.71664, 0.0539697, 0.0112597, 47.4445).
+        # Neglecting it gives the committed sample's values, 2e-4 to 0.5 V away.
+        leaky = _set(model, "s_flt", "off_resistance", 1e3)
+        written_leaky = _closed_forms({**PARAMETERS, "RoffF": 1e3})
+        for derivation, stored in (("precharge_peak_current", 4.71663968429), ("precharge_i2t", 0.0539698769487),
+                                   ("precharge_charge_time", 0.0112597416097), ("precharge_bus_voltage", 47.4445426184)):
+            with self.subTest(leaky=derivation):
+                value = reference_value(leaky, derivation)[0]
+                self.assertEqual(float(f"{value:.12g}"), stored)
+                self.assertLessEqual(abs(value - written_leaky[derivation]), 1e-12 * abs(stored))
+        # CS-5: a bypass closing at 24.9 ms draws a surge of 3.15 A through R_c + R_E, below
+        # the precharge peak, which stays the startup peak (ngspice-47: 4.71663, 2026-09-28).
+        later = _set(model, "v_byp", "waveform_time", [0.0, 0.0249, 0.024901])
+        self.assertEqual(float(f"{reference_value(later, 'startup_peak_current')[0]:.12g}"), 4.71663002765)
+        # CS-5: under an 8 A load the startup peak is the settled load current, not the precharge peak.
+        heavy = _set(model, "i_load", "waveform_current", [0.0, 0.0, 8.0])
+        self.assertEqual(float(f"{reference_value(heavy, 'startup_peak_current')[0]:.12g}"), 8.00000004776)
+        self.assertLessEqual(abs(reference_value(heavy, "startup_peak_current")[0]
+                                 - _closed_forms({**PARAMETERS, "IL": 8.0})["startup_peak_current"]), 1e-11)
         self.assertEqual(sorted(adapter.dependencies(model, "inrush_peak_current_a", {"name": "startup"})),
                          sorted(_path(cid, facet) for cid, values in NETLIST_VALUES.items() for facet in values))
         self.assertEqual(adapter.components_for(model, "fault_input_current_a"),
@@ -815,6 +957,21 @@ class TestReferences(unittest.TestCase):
              "between the load stepping on and the fault command"),
             ("the fault window is too short to settle", _set(model, "v_flt", "waveform_time", [0.0, 0.1, 0.1198]),
              ["settled_fault_input_current"], "between the fault switch closing and the end of the window"),
+            # CS-5: the surge when a bypass closes at 14.5 ms, 28.33 A, is the startup peak;
+            # ngspice samples that step later than the form's instant (28.3205 A on ngspice-47).
+            ("the startup peak is the bypass surge", _set(model, "v_byp", "waveform_time", [0.0, 0.0145, 0.014501]),
+             ["startup_peak_current"], "the largest current is the surge when the bypass closes, 28.32858"),
+            # CS-3: values extraction refuses, or cannot bound, reach the forms only from a
+            # model built some other way; each is blocked, never raised.
+            ("a zero capacitance", _set(model, "c_bulk", "capacitance", 0.0),
+             ["precharge_peak_current", "precharge_i2t", "precharge_charge_time", "precharge_bus_voltage",
+              "startup_peak_current"], "cannot be evaluated on these values (ZeroDivisionError"),
+            ("a zero fault on resistance", _set(model, "s_flt", "on_resistance", 0.0),
+             ["settled_fault_input_current"], "cannot be evaluated on these values (ZeroDivisionError"),
+            ("a capacitance of 1e150 F", _set(model, "c_bulk", "capacitance", 1e150),
+             ["precharge_i2t"], "cannot be evaluated on these values (OverflowError"),
+            ("a supply of 1e308 V", _set(model, "v_in", "waveform_voltage", [0.0, 1e308]),
+             ["settled_no_load_bus_voltage", "startup_peak_current"], "its closed form gives inf"),
         ):
             for derivation in derivations:
                 with self.subTest(label, derivation=derivation), self.assertRaises(ReferenceBlocked) as raised:
@@ -828,7 +985,7 @@ class TestReferences(unittest.TestCase):
                                            adapter.reference_value, adapter.metrics())
         self.assertEqual([c["id"] for c in golden["cases"]], [f"REF-EL-00{n}" for n in (1, 2, 4, 5, 6, 7, 8, 9)])
         self.assertEqual([(b["id"], b["gate"], b["missing_inputs"]) for b in blocked if b["gate"] == "V3"],
-                         [("REF-EL-003", "V3", [])])
+                         [("REF-EL-003", "V3", []), ("REF-EL-010", "V3", [])])
         # A null input is a missing input, with its path and status.
         null = copy.deepcopy(model)
         _component(null, "c_bulk")["domains"]["electrical"]["capacitance"].update(value=None, status="UNKNOWN")
@@ -845,7 +1002,8 @@ class TestReferences(unittest.TestCase):
         self.assertEqual({name: metric.unit for name, metric in adapter.metrics().items()},
                          {"inrush_peak_current_a": "A", "inrush_i2t_a2s": "A^2*s", "bus_charge_time_s": "s",
                           "bus_voltage_at_bypass_v": "V", "bus_peak_voltage_v": "V", "steady_bus_voltage_v": "V",
-                          "steady_input_current_a": "A", "steady_fuse_power_w": "W", "fault_input_current_a": "A"})
+                          "steady_input_current_a": "A", "steady_fuse_power_w": "W", "fault_input_current_a": "A",
+                          "startup_peak_current_a": "A"})
         self.assertEqual({metric.fidelity for metric in adapter.metrics().values()}, {"SIMPLIFIED"})
 
         def changed(kind: str, index: int, change: Dict[str, Any]) -> Dict[str, Any]:
@@ -952,7 +1110,7 @@ class TestSample(unittest.TestCase):
                           manifest["versions"]["simulation"], manifest["created_at"], manifest["collected_at"]),
                          ("electrical", "spice_netlist", "none", EMPTY_SET, "2026-09-27", "2026-09-27"))
         self.assertEqual(manifest["source"]["artifacts"], [{"path": NETLIST, "format": "spice", "sha256": NETLIST_SHA256,
-                                                            "size_bytes": 1300, "media_type": "text/x-spice"}])
+                                                            "size_bytes": 1319, "media_type": "text/x-spice"}])
         self.assertEqual(manifest["inputs"]["simulation"], [])
         self.assertEqual(manifest["source"]["license"]["license_text"], {"path": "LICENSE", "sha256": LICENSE_SHA256})
         # The one entry the electrical adapter changes in the mechanical sample's manifest (§8.3).
@@ -1033,13 +1191,14 @@ class TestReceipt(unittest.TestCase):
         gates = {g["gate"]: g["verdict"] for g in self.receipt["gates"]}
         self.assertEqual([gates[gate] for gate in ("V1", "V2", "V3", "V4")], ["PASS", "PASS", "PASS", "BLOCKED"])
         self.assertEqual((self.receipt["overall_verdict"], self.receipt["eligible_for_ebuild"]), ("BLOCKED", False))
-        references = {f"v3.REF-EL-00{n}": derivation for n, derivation in enumerate(CLOSED_FORMS, start=1)}
+        references = {f"v3.REF-EL-{n:03d}": derivation for n, derivation in enumerate(CLOSED_FORMS, start=1)}
         for check_id, derivation in references.items():
             with self.subTest(check_id):
                 self.assertEqual(_outcome(checks[check_id]), ("PASS", "GOLDEN_COMPARISON_PASSED"))
                 self.assertEqual(checks[check_id]["metrics"], RECORDED_METRICS)
                 self.assertEqual(self.results[check_id]["expected_value"], CLOSED_FORMS[derivation])
-        for n, (value, limit) in enumerate(((4.71663, 10.0), (47.9147, 45.6), (4.16667, 5.0), (47.875, 47.0)), start=1):
+        for n, (value, limit) in {1: (4.71663, 10.0), 2: (47.9147, 45.6), 3: (4.16667, 5.0), 4: (47.875, 47.0),
+                                  8: (4.71663, 10.0)}.items():
             with self.subTest(requirement=n):
                 row = self.results[f"v4.REQ-EL-00{n}"]
                 self.assertEqual(_outcome(checks[f"v4.REQ-EL-00{n}"]), ("WARNING", "WITHIN_ILLUSTRATIVE_LIMIT"))
@@ -1056,7 +1215,7 @@ class TestReceipt(unittest.TestCase):
                 # The measured side is borrowed from the first check that ran the same deck.
                 self.assertEqual((row["measured_value"], row["measured_by"], row["expected_value"], row["simulator"]),
                                  (measured, "v3.REF-EL-001", None, None))
-        self.assertEqual(len(self.results), 16)
+        self.assertEqual(len(self.results), 18)
         self.assertEqual({row["model_fidelity"] for row in self.results.values()}, {"SIMPLIFIED"})
         [tool] = [t for t in self.receipt["tools"] if t["tool_id"] == "ngspice"]
         self.assertEqual(tool["version"], "stand-in 0")
@@ -1090,7 +1249,7 @@ class TestReceipt(unittest.TestCase):
 class TestVerdicts(unittest.TestCase):
     def test_a_tightened_limit_fails_and_only_a_real_requirement_can_pass(self):
         with _scratch() as directory:
-            item = _copy(directory, {"requirements/requirements.json": ('"value": 10.0', '"value": 4.0')})
+            item = _copy(directory, {"requirements/requirements.json": (INRUSH_LIMIT, INRUSH_LIMIT.replace("10.0", "4.0"))})
             tightened = _checks(_validate(item)[0])["v4.REQ-EL-001"]
         self.assertEqual(_outcome(tightened), ("FAIL", "CORNER_LIMITS_FAILED"))
         self.assertEqual(tightened["findings"], ["inrush_peak_current_a: actual 4.71663 is above maximum 4.0"])
@@ -1175,14 +1334,14 @@ class TestVerdicts(unittest.TestCase):
         receipt, results = _validate(ITEM, _no_ngspice())
         validate_document(REPO_ROOT, "validation-receipt.schema.json", receipt)
         checks = _checks(receipt)
-        compiled = [f"v3.REF-EL-00{n}" for n in range(1, 10)] + [f"v4.REQ-EL-00{n}" for n in (1, 2, 3, 4)]
+        compiled = [f"v3.REF-EL-{n:03d}" for n in range(1, 11)] + [f"v4.REQ-EL-00{n}" for n in (1, 2, 3, 4, 8)]
         for check_id in compiled:
             with self.subTest(check_id):
                 self.assertEqual(_outcome(checks[check_id]), ("BLOCKED", "TOOL_NOT_INSTALLED"))
                 self.assertEqual(checks[check_id]["tool_id"], "ecad-validator")
         self.assertEqual({_outcome(checks[f"v4.REQ-EL-00{n}"]) for n in (5, 6, 7)}, {("BLOCKED", "MISSING_REQUIRED_INPUT")})
         assert results is not None
-        self.assertEqual(len(results["results"]), 16)
+        self.assertEqual(len(results["results"]), 18)
         self.assertEqual({r["simulator_version"] for r in results["results"]}, {None})
         self.assertNotIn("ngspice", {t["tool_id"] for t in receipt["tools"]})
 
@@ -1201,7 +1360,7 @@ class TestVerdicts(unittest.TestCase):
         # .end is line 25 of the netlist, so the inserted .control is too.
         self.assertIn(f"{NETLIST}:25: .control: runs commands, including shell", v1["findings"][0])
         for check_id in ("v2.dataset-reproduction", "v2.electrical.model-invariants",
-                         *(f"v3.REF-EL-00{n}" for n in range(1, 10)), *(f"v4.REQ-EL-00{n}" for n in range(1, 8))):
+                         *(f"v3.REF-EL-{n:03d}" for n in range(1, 11)), *(f"v4.REQ-EL-00{n}" for n in range(1, 9))):
             with self.subTest(check_id):
                 self.assertEqual(_outcome(checks[check_id]), ("BLOCKED", "DERIVATION_NOT_AVAILABLE"))
 
@@ -1222,7 +1381,7 @@ class TestVerdicts(unittest.TestCase):
                 v1 = checks["v1.electrical.extraction-and-sanity"]
                 self.assertEqual(_outcome(v1), ("FAIL", "SOURCE_REJECTED"))
                 self.assertIn(refused, v1["findings"][0])
-                self.assertEqual({_outcome(checks[f"v4.REQ-EL-00{n}"]) for n in range(1, 8)},
+                self.assertEqual({_outcome(checks[f"v4.REQ-EL-00{n}"]) for n in range(1, 9)},
                                  {("BLOCKED", "DERIVATION_NOT_AVAILABLE")})
 
     def test_a_deck_edited_without_a_rebuild_is_divergent_and_not_counted(self):
@@ -1233,7 +1392,7 @@ class TestVerdicts(unittest.TestCase):
         reproduction = checks["v2.dataset-reproduction"]
         self.assertEqual(_outcome(reproduction), ("FAIL", "DERIVATION_DIVERGED"))
         self.assertIn(f"{DECK_PATH}: bytes differ from a fresh derivation", reproduction["findings"])
-        for check_id in (*(f"v3.REF-EL-00{n}" for n in range(1, 10)), *(f"v4.REQ-EL-00{n}" for n in (1, 2, 3, 4))):
+        for check_id in (*(f"v3.REF-EL-{n:03d}" for n in range(1, 11)), *(f"v4.REQ-EL-00{n}" for n in (1, 2, 3, 4, 8))):
             with self.subTest(check_id):
                 self.assertEqual(_outcome(checks[check_id]), ("BLOCKED", "COMMITTED_CASE_STALE"))
                 self.assertIn(f"its input {DECK_PATH} no longer reproduces", checks[check_id]["findings"][0])

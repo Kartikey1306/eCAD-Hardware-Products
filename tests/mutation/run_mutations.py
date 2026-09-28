@@ -245,7 +245,7 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      'foreign = sorted({entry["domain"] for entry in (*requirements["reference_values"], *requirements["requirements"])}',
      'foreign = sorted({entry["domain"] for entry in requirements["requirements"]}'),
     # Foundation review: a receipt is always written, and says what ran
-    ("item-error-crashes-validate", D, '        except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:',
+    ("item-error-crashes-validate", D, '        except (OSError, ValueError, KeyError, IndexError, TypeError, ArithmeticError) as exc:',
      '        except (OSError, ValueError) as exc:'),
     ("requirements-unreadable-crash", D, '    except (OSError, ValueError) as exc:\n        requirements_problem = f"{REQUIREMENTS}: {exc}"',
      '    except ZeroDivisionError as exc:\n        requirements_problem = f"{REQUIREMENTS}: {exc}"'),
@@ -458,9 +458,8 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     # electrical: the network class, the closed forms, the deck, V1 and V2
     ("el-extra-element-accepted", EL, '    if extra:\n        raise refuse("C8"', '    if False:\n        raise refuse("C8"'),
     ("el-capacitor-anywhere", EL, 'capacitors = [c for c in of("capacitor") if rail in _main(c)]', 'capacitors = of("capacitor")'),
-    ("el-esr-left-out-of-references", EL, 'r1 = r_f + _par(r_p, values[("bypass", "off_resistance")]) + r_e',
-     'r1 = r_f + _par(r_p, values[("bypass", "off_resistance")])'),
-    ("el-ramp-read-as-step", EL, "return c * k * (1 - math.exp(-t_r / tau1)), paths", "return supply_voltage / r1, paths"),
+    ("el-esr-left-out-of-references", EL, "tau1 = (alpha * r_s + r_e) * c", "tau1 = alpha * r_s * c"),
+    ("el-ramp-read-as-step", EL, "peak = g * supply_voltage + b", "peak = supply_voltage / (r_s + r_e)"),
     ("el-charge-level-changed", EL, "CHARGED_FRACTION = 0.9  #", "CHARGED_FRACTION = 1 - 1 / math.e  #"),
     ("el-supply-current-sign-flipped", EL, "current = f\"par('-i({supply})')\"", "current = f\"par('i({supply})')\""),
     ("el-fault-measured-at-the-fault", EL, '"fault_input_current_a": f"FIND {current} AT={_n(t_end)}",',
@@ -490,12 +489,18 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     # electrical: the sample's own files (each rebuilt, so a behavioural test must kill it)
     ("el-precharge-resistor-changed", EN, "R_PRE n_f n_bus 10\n", "R_PRE n_f n_bus 1\n"),
     ("el-capacitance-plus-one-percent", EN, "C_BULK n_bus n_esr 470u", "C_BULK n_bus n_esr 474.7u"),
-    ("el-inrush-limit-changed", ER, '"value": 10.0', '"value": 4.0'),
+    # REQ-EL-001's limit; REQ-EL-008 states 10 A too
+    ("el-inrush-limit-changed", ER, '"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n      "operator": "<=",\n'
+     '      "limit": {\n        "value": 10.0',
+     '"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n      "operator": "<=",\n'
+     '      "limit": {\n        "value": 4.0'),
     ("el-illustrative-flag-cleared", ER,
-     '"value": 10.0\n      },\n      "unit": "A",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement '
+     '"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n      "operator": "<=",\n'
+     '      "limit": {\n        "value": 10.0\n      },\n      "unit": "A",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement '
      'for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"\n'
      '      },\n      "illustrative": true',
-     '"value": 10.0\n      },\n      "unit": "A",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement '
+     '"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n      "operator": "<=",\n'
+     '      "limit": {\n        "value": 10.0\n      },\n      "unit": "A",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement '
      'for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"\n'
      '      },\n      "illustrative": false'),
     ("el-operator-flipped", ER, '"operator": ">=",\n      "limit": {\n        "value": 47.0',
@@ -551,6 +556,35 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("schema-node-prefix-dropped", MS, '"pattern": "^(0|n_[a-z0-9_]{1,30})$"',
      '"pattern": "^(0|(?!gnd$)(?!pa_[0-9]+$)[a-z][a-z0-9_]{0,31})$"'),
     ("schema-model-prefix-dropped", MS, '"pattern": "^SW_[A-Z0-9_]{1,29}$"', '"pattern": "^[A-Z][A-Z0-9_]{0,31}$"'),
+    # the review of the electrical branch: a fault the window cannot measure (CS-2)
+    ("el-fault-window-unchecked", EL, "    if not _settled(t_end - closes, tau_f):\n", "    if False:\n"),
+    ("el-fault-that-never-closes-accepted", EL, "    if not levels[2] > threshold + hysteresis:\n        return",
+     "    if False:\n        return"),
+    ("el-fault-hysteresis-ignored-at-extraction", EL, "    closes = _closing_time(times, levels, threshold, hysteresis)\n",
+     "    closes = _closing_time(times, levels, threshold, 0.0)\n"),
+    # values the closed forms divide by, and errors that cost a receipt (CS-3)
+    ("el-nonpositive-value-accepted", EL, "            if value is not None and not value > 0:\n", "            if False:\n"),
+    ("el-ramp-after-bypass-accepted", EL, "    if not t_r < t_b:\n        return", "    if False:\n        return"),
+    ("el-arithmetic-error-raised", EL, "    except ArithmeticError as exc:\n", "    except LookupError as exc:\n"),
+    ("el-non-finite-reference-kept", EL, "    if not math.isfinite(value):\n        raise ReferenceBlocked",
+     "    if False:\n        raise ReferenceBlocked"),
+    ("runner-arithmetic-error-crashes", D,
+     '        except (OSError, ValueError, KeyError, IndexError, TypeError, ArithmeticError) as exc:',
+     '        except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:'),
+    # the open fault switch in the precharge forms (CS-4)
+    ("el-precharge-fault-divider-ignored", EL, "alpha = r_off_f / (r_s + r_off_f)", "alpha = 1.0"),
+    ("el-precharge-fault-current-ignored", EL, "g = 1 / (r_s + r_off_f)  #", "g = 0.0  #"),
+    # the startup peak and its closed form (CS-5)
+    ("el-startup-window-ends-at-bypass", EL, '"startup_peak_current_a": f"MAX {current} FROM=0.0 TO={_n(t_flt)}",',
+     '"startup_peak_current_a": f"MAX {current} FROM=0.0 TO={_n(t_byp)}",'),
+    ("el-startup-surge-ignored", EL, "            if surge >= max(peak, i_ss):\n", "            if False:\n"),
+    ("el-startup-load-ignored", EL, "            return max(peak, i_ss)\n", "            return peak\n"),
+    ("el-startup-surge-without-esr", EL, "            rail = (supply_voltage * r_e * r_off_f + v_c * r_c * r_off_f)",
+     "            rail = v_c + 0 * (supply_voltage * r_e * r_off_f + v_c * r_c * r_off_f)"),
+    ("el-startup-limit-changed", ER, '"metric": "startup_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n'
+     '      "operator": "<=",\n      "limit": {\n        "value": 10.0',
+     '"metric": "startup_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n'
+     '      "operator": "<=",\n      "limit": {\n        "value": 100.0'),
 ]
 
 

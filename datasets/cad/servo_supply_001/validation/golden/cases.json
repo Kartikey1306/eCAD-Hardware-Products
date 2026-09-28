@@ -8,7 +8,7 @@
       "expected_metrics": {
         "inrush_peak_current_a": {
           "absolute_tolerance": 0.0001,
-          "value": 4.71663002764
+          "value": 4.71663002765
         }
       },
       "id": "REF-EL-001",
@@ -28,7 +28,7 @@
       "expected_metrics": {
         "inrush_i2t_a2s": {
           "absolute_tolerance": 0.0001,
-          "value": 0.0533907676223
+          "value": 0.0533907681653
         }
       },
       "id": "REF-EL-002",
@@ -48,7 +48,7 @@
       "expected_metrics": {
         "bus_charge_time_s": {
           "absolute_tolerance": 1e-06,
-          "value": 0.0109244343789
+          "value": 0.010924434697
         }
       },
       "id": "REF-EL-003",
@@ -68,7 +68,7 @@
       "expected_metrics": {
         "bus_voltage_at_bypass_v": {
           "absolute_tolerance": 0.001,
-          "value": 47.9147188794
+          "value": 47.9147184047
         }
       },
       "id": "REF-EL-004",
@@ -172,6 +172,26 @@
         }
       },
       "id": "REF-EL-009",
+      "inputs": [
+        "derived/electrical/servo_supply_001.cir"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "ngspice",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "startup_peak_current_a": {
+          "absolute_tolerance": 0.0001,
+          "value": 4.71663002765
+        }
+      },
+      "id": "REF-EL-010",
       "inputs": [
         "derived/electrical/servo_supply_001.cir"
       ],

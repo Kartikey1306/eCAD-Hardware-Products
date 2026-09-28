@@ -19,7 +19,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "s",
@@ -33,7 +33,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "V",
@@ -99,7 +99,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "ohm",
@@ -152,7 +152,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "ohm",
@@ -198,7 +198,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "V",
@@ -209,7 +209,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "ohm",
@@ -220,7 +220,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "ohm",
@@ -231,7 +231,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "V",
@@ -264,7 +264,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "s",
@@ -279,7 +279,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "V",
@@ -316,7 +316,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "F",
@@ -369,7 +369,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "ohm",
@@ -402,7 +402,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "A",
@@ -417,7 +417,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "s",
@@ -457,7 +457,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "V",
@@ -468,7 +468,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "ohm",
@@ -479,7 +479,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "ohm",
@@ -490,7 +490,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "V",
@@ -523,7 +523,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "s",
@@ -538,7 +538,7 @@
             "source": {
               "kind": "design_annotation",
               "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-              "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+              "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
             },
             "status": "SPECIFIED",
             "unit": "V",
@@ -574,7 +574,7 @@
             "value": null
           },
           "rated_current": {
-            "note": "the datasheet states 5 A without saying whether it is continuous or peak",
+            "note": "the sheet gives 5 A in its summary and on its power stage (3-phase MOSFET bridge, 48V/5A), without saying whether it is continuous or peak or whether the supply delivers it; REQ-EL-003 assumes it bounds the drive's input current",
             "source": {
               "kind": "product_specification",
               "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
@@ -585,6 +585,7 @@
             "value": 5.0
           },
           "rated_power": {
+            "note": "the sheet does not say whether 200 W is input or output power; the netlist's I_LOAD assumes it is the drive's input, 200 W / 48 V",
             "source": {
               "kind": "product_specification",
               "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
@@ -633,7 +634,7 @@
       {
         "format": "spice",
         "path": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       }
     ]
   },
@@ -646,7 +647,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "v_in"
     },
@@ -656,7 +657,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "r_f1"
     },
@@ -666,7 +667,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "r_pre"
     },
@@ -676,7 +677,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "s_byp"
     },
@@ -686,7 +687,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "v_byp"
     },
@@ -696,7 +697,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "c_bulk"
     },
@@ -706,7 +707,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "r_esr"
     },
@@ -716,7 +717,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "i_load"
     },
@@ -726,7 +727,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "s_flt"
     },
@@ -736,7 +737,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/source/servo_supply_001.cir",
-        "sha256": "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+        "sha256": "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
       },
       "to": "v_flt"
     },
@@ -746,7 +747,7 @@
       "source": {
         "kind": "design_annotation",
         "ref": "datasets/cad/servo_supply_001/design/annotations.json",
-        "sha256": "f715d088466c00b2e8c3d88c831ac66566ec8cb34797350c1abdd88539c10296"
+        "sha256": "5f4bc1424cf41f788c38de0689cf460b589491201cb9b2f12c289783f094235a"
       },
       "to": "v_in"
     }

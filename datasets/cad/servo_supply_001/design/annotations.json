@@ -170,7 +170,7 @@
               "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
               "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
             },
-            "note": "the datasheet states 5 A without saying whether it is continuous or peak"
+            "note": "the sheet gives 5 A in its summary and on its power stage (3-phase MOSFET bridge, 48V/5A), without saying whether it is continuous or peak or whether the supply delivers it; REQ-EL-003 assumes it bounds the drive's input current"
           },
           "rated_power": {
             "value": 200.0,
@@ -180,7 +180,8 @@
               "kind": "product_specification",
               "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
               "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
-            }
+            },
+            "note": "the sheet does not say whether 200 W is input or output power; the netlist's I_LOAD assumes it is the drive's input, 200 W / 48 V"
           },
           "input_ripple_current": {
             "value": null,

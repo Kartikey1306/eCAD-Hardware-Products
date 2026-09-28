@@ -48,18 +48,21 @@ PROGRESS = re.compile(r"^ Reference value : +\S+$")
 # error or a failed measurement, fails the test.
 DC_VALUE_WARNINGS = frozenset(f"Warning: {source}: no DC value, transient time 0 value used"
                               for source in ("v_in", "v_byp", "i_load", "v_flt"))
-# The closed forms of the design (§5.3), to 12 significant figures, and each
-# reference's absolute tolerance, from requirements/requirements.json.
+# The closed forms of the design (§5.3), the open fault switch's off
+# resistance folded into the precharge forms (review finding CS-4), with the
+# startup peak (CS-5), to 12 significant figures, and each reference's
+# absolute tolerance, from requirements/requirements.json.
 CLOSED_FORMS = {
-    "inrush_peak_current_a": (4.71663002764, 1e-4),
-    "inrush_i2t_a2s": (0.0533907676223, 1e-4),
-    "bus_charge_time_s": (0.0109244343789, 1e-6),
-    "bus_voltage_at_bypass_v": (47.9147188794, 1e-3),
+    "inrush_peak_current_a": (4.71663002765, 1e-4),
+    "inrush_i2t_a2s": (0.0533907681653, 1e-4),
+    "bus_charge_time_s": (0.010924434697, 1e-6),
+    "bus_voltage_at_bypass_v": (47.9147184047, 1e-3),
     "bus_peak_voltage_v": (47.9999999986, 1e-3),
     "steady_bus_voltage_v": (47.8750415236, 1e-3),
     "steady_input_current_a": (4.16667004787, 1e-4),
     "steady_fuse_power_w": (0.347222785757, 1e-5),
     "fault_input_current_a": (372.464522495, 1e-2),
+    "startup_peak_current_a": (4.71663002765, 1e-4),
 }
 # Rule C5's other branch, the bulk capacitor straight to ground (R_E = 0): the
 # netlist edit, the annotation of the element it removes, and the four
@@ -69,8 +72,8 @@ NO_ESR = ("C_BULK n_bus n_esr 470u\nR_ESR n_esr 0 50m\n", "C_BULK n_bus 0 470u\n
 ESR_ANNOTATION = ('    "R_ESR": {\n      "name": "C1 series resistance: a design value, not a datasheet ESR",\n'
                   '      "kind": "resistor"\n    },\n')
 NO_ESR_CLOSED_FORMS = {**CLOSED_FORMS, "inrush_peak_current_a": (4.7399171105, 1e-4),
-                       "inrush_i2t_a2s": (0.0536553201, 1e-4), "bus_charge_time_s": (0.0108938826039, 1e-6),
-                       "bus_voltage_at_bypass_v": (47.9169573916, 1e-3)}
+                       "inrush_i2t_a2s": (0.0536553206378, 1e-4), "bus_charge_time_s": (0.01089388292, 1e-6),
+                       "bus_voltage_at_bypass_v": (47.9169569168, 1e-3), "startup_peak_current_a": (4.7399171105, 1e-4)}
 
 
 def require_ngspice() -> Any:
@@ -200,13 +203,13 @@ class TestRealNgspice(unittest.TestCase):
                 self.assertEqual(checks[check_id]["verdict"], "PASS", checks[check_id]["findings"])
         gates = {g["gate"]: g["verdict"] for g in receipt["gates"]}
         self.assertEqual((gates["V1"], gates["V2"], gates["V3"], gates["V4"]), ("PASS", "PASS", "PASS", "BLOCKED"))
-        self.assertEqual(_verdicts(checks, "v3."), {f"v3.REF-EL-00{n}": ("PASS", "GOLDEN_COMPARISON_PASSED")
-                                                    for n in range(1, 10)})
+        self.assertEqual(_verdicts(checks, "v3."), {f"v3.REF-EL-{n:03d}": ("PASS", "GOLDEN_COMPARISON_PASSED")
+                                                    for n in range(1, 11)})
         self.assertEqual(_verdicts(checks, "v4."), {
-            **{f"v4.REQ-EL-00{n}": ("WARNING", "WITHIN_ILLUSTRATIVE_LIMIT") for n in (1, 2, 3, 4)},
+            **{f"v4.REQ-EL-00{n}": ("WARNING", "WITHIN_ILLUSTRATIVE_LIMIT") for n in (1, 2, 3, 4, 8)},
             **{f"v4.REQ-EL-00{n}": ("BLOCKED", "MISSING_REQUIRED_INPUT") for n in (5, 6, 7)}})
         self.assertEqual((receipt["overall_verdict"], receipt["eligible_for_ebuild"]), ("BLOCKED", False))
-        self.assertEqual(len(results["results"]), 16)
+        self.assertEqual(len(results["results"]), 18)
         [tool] = [t for t in receipt["tools"] if t["tool_id"] == "ngspice"]
         self.assertEqual(tool["version"], self.capability.version)
         self.assertRegex(tool["version"], r"^\d")
@@ -230,8 +233,8 @@ class TestRealNgspice(unittest.TestCase):
         self.assertEqual((inrush["verdict"], inrush["reason_code"]), ("FAIL", "CORNER_LIMITS_FAILED"))
         # ngspice-47 printed 4.06812e+01; the closed form is 40.6811962.
         self.assertLessEqual(abs(inrush["metrics"]["inrush_peak_current_a"] - 40.6812), 1e-3)
-        self.assertEqual(_verdicts(checks, "v3."), {f"v3.REF-EL-00{n}": ("PASS", "GOLDEN_COMPARISON_PASSED")
-                                                    for n in range(1, 10)})
+        self.assertEqual(_verdicts(checks, "v3."), {f"v3.REF-EL-{n:03d}": ("PASS", "GOLDEN_COMPARISON_PASSED")
+                                                    for n in range(1, 11)})
 
     def test_a_bypass_that_closes_before_the_bus_is_charged_fails(self):
         """The bypass commanded at 5 ms: the bus is at 31.2 V, and the charge-time
@@ -259,13 +262,54 @@ class TestRealNgspice(unittest.TestCase):
         for check_id in ("v1.electrical.extraction-and-sanity", "v2.dataset-reproduction", "v2.electrical.model-invariants"):
             with self.subTest(check_id):
                 self.assertEqual(checks[check_id]["verdict"], "PASS", checks[check_id]["findings"])
-        self.assertEqual(_verdicts(checks, "v3."), {f"v3.REF-EL-00{n}": ("PASS", "GOLDEN_COMPARISON_PASSED")
-                                                    for n in range(1, 10)})
+        self.assertEqual(_verdicts(checks, "v3."), {f"v3.REF-EL-{n:03d}": ("PASS", "GOLDEN_COMPARISON_PASSED")
+                                                    for n in range(1, 11)})
         measured = checks["v3.REF-EL-001"]["metrics"]
         self.assertEqual(set(measured), set(NO_ESR_CLOSED_FORMS))
         for metric, (expected, tolerance) in NO_ESR_CLOSED_FORMS.items():
             with self.subTest(metric):
                 self.assertLessEqual(abs(measured[metric] - expected), tolerance)
+
+    def test_the_precharge_forms_hold_with_a_leaky_fault_switch(self):
+        """CS-4: with SW_FLT's ROFF at 1 kohm, V1 passed but REF-EL-002, 003 and 004
+        failed, because the precharge forms neglected the open fault switch. The
+        values are those of the forms with it folded in, typed from a scratch
+        script written apart from the adapter; ngspice-47 printed 4.71664,
+        0.0539697, 0.0112597 and 47.4445 (2026-09-28)."""
+        with _scratch() as directory:
+            item = _copy(directory, {NETLIST: ("SW(RON=100m ROFF=1g", "SW(RON=100m ROFF=1k")})
+            receipt, _, _ = _validate(item)
+        checks = _checks(receipt)
+        self.assertEqual(checks["v1.electrical.extraction-and-sanity"]["verdict"], "PASS")
+        self.assertEqual(_verdicts(checks, "v3."), {
+            **{f"v3.REF-EL-{n:03d}": ("PASS", "GOLDEN_COMPARISON_PASSED") for n in range(1, 10)},
+            # The surge when the bypass closes, 6.98 A, is now the startup peak.
+            "v3.REF-EL-010": ("BLOCKED", "REFERENCE_NOT_APPLICABLE")})
+        measured = checks["v3.REF-EL-001"]["metrics"]
+        for metric, (expected, tolerance) in (("inrush_peak_current_a", (4.71663968429, 1e-4)),
+                                              ("inrush_i2t_a2s", (0.0539698769487, 1e-4)),
+                                              ("bus_charge_time_s", (0.0112597416097, 1e-6)),
+                                              ("bus_voltage_at_bypass_v", (47.4445426184, 1e-3))):
+            with self.subTest(metric):
+                self.assertLessEqual(abs(measured[metric] - expected), tolerance)
+
+    def test_a_surge_after_an_early_bypass_fails_the_startup_requirement(self):
+        """CS-5: the bypass commanded at 14.5 ms closes on a rail 2.27 V short of the
+        supply, and the supply current steps to 28.3 A after T_BYP, where the
+        inrush metric's window has ended. REQ-EL-001 still sees 4.71663 A; the
+        startup peak sees the surge, and REQ-EL-008 fails on it."""
+        with _scratch() as directory:
+            item = _copy(directory, {NETLIST: ("V_BYP n_byp 0 PWL(0 0 30m 0 30.001m 5)",
+                                              "V_BYP n_byp 0 PWL(0 0 14.5m 0 14.501m 5)")})
+            receipt, _, _ = _validate(item)
+        checks = _checks(receipt)
+        self.assertEqual((checks["v4.REQ-EL-001"]["verdict"], checks["v4.REQ-EL-008"]["verdict"]), ("WARNING", "FAIL"))
+        # ngspice-47 printed 2.83205e+01 at 1.45005e-02, the instant the switch closes;
+        # the closed form of the surge is 28.3285811 A.
+        self.assertLessEqual(abs(checks["v4.REQ-EL-008"]["metrics"]["startup_peak_current_a"] - 28.3205), 0.02)
+        startup = checks["v3.REF-EL-010"]
+        self.assertEqual((startup["verdict"], startup["reason_code"]), ("BLOCKED", "REFERENCE_NOT_APPLICABLE"))
+        self.assertIn("the largest current is the surge when the bypass closes", startup["summary"])
 
     def test_the_inrush_limit_at_its_boundary_with_real_ngspice(self):
         """Margins of at least 3.4e-3 over the 2.8e-8 numerical error of the

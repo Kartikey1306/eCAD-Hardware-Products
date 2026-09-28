@@ -995,10 +995,11 @@ def validate(directory: Path, output: Path, registry: Optional[Dict[str, DomainA
             failure = (ExecutionStatus.SKIPPED, Verdict.BLOCKED, "MISSING_REQUIRED_INPUT",
                        f"a value the {domain} model needs has no value")
             v1_findings = [f"{entry['status']}: {entry['path']}" for entry in exc.inputs] or [str(exc)]
-        except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:
+        except (OSError, ValueError, KeyError, IndexError, TypeError, ArithmeticError) as exc:
             # A schema-invalid input or an inconsistent annotation: the item is
             # wrong. The item is untrusted input, so an error it provokes in the
-            # builder or the adapter is recorded here, never raised past the receipt.
+            # builder or the adapter -- a division by a value it set to zero
+            # included -- is recorded here, never raised past the receipt.
             failure = (ExecutionStatus.COMPLETED, Verdict.FAIL, "DATASET_INPUT_INVALID", "the item's inputs cannot be built into a model")
             v1_findings = [str(exc) if isinstance(exc, (OSError, ValueError)) else f"{type(exc).__name__}: {exc}"]
     v1_blocked = "; ".join(v1_findings) if failure else None

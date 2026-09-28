@@ -483,6 +483,25 @@ class TestHonestOutcomesWithoutCad(unittest.TestCase):
         self.assertEqual((v1["verdict"], v1["reason_code"]), ("FAIL", "DATASET_INPUT_INVALID"))
         self.assertIn("KeyError", v1["findings"][0])
 
+    def test_an_arithmetic_error_the_item_provokes_still_gives_a_receipt(self):
+        """Review finding CS-3: a zero capacitance made the electrical closed forms
+        divide by zero during the derivation, and validate wrote no receipt."""
+        from ecad_model.dataset import validate
+
+        for error in (ZeroDivisionError("float division by zero"), OverflowError("(34, 'Result too large')")):
+            class Dividing(VerilogFixtureAdapter):
+                def reference_value(self, *args, **kwargs):
+                    raise error
+
+            with self.subTest(type(error).__name__), _scratch() as directory, tempfile.TemporaryDirectory() as output:
+                item = _digital_sample(directory)
+                _write_requirements(item, [], [REFERENCE])
+                receipt = validate(item, Path(output) / "run", {**REGISTRY, "digital": Dividing()})
+                self.assertTrue((Path(output) / "run" / "receipt.json").is_file())
+                v1 = _checks(receipt)["v1.digital.extraction-and-sanity"]
+                self.assertEqual((v1["verdict"], v1["reason_code"]), ("FAIL", "DATASET_INPUT_INVALID"))
+                self.assertEqual(v1["findings"], [f"{type(error).__name__}: {error}"])
+
     def test_a_requirement_that_cannot_compile_still_gives_a_receipt(self):
         from ecad_validation.contract import validate_document
 

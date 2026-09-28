@@ -6,8 +6,11 @@ these tests run on every machine. The recorded texts below are byte-for-byte
 copies of what ngspice-47 printed on macOS arm64 on 2026-09-27, with each
 deck they came from:
 
-- RECORDED_DECK / RECORDED_STDOUT: the servo_supply_001 deck (exit 0, empty
-  stderr, stdout identical over two runs);
+- RECORDED_DECK / RECORDED_STDOUT: the servo_supply_001 deck as committed on
+  2026-09-27, with nine measurements (exit 0, empty stderr, stdout identical
+  over two runs). The committed deck has since gained a tenth,
+  startup_peak_current_a; test_electrical_domain.py follows it, and these
+  recordings stay what 47, 36 and 44.2 printed for the nine;
 - FAILING_DECK / FAILING_STDOUT / FAILING_STDERR: a measurement outside the
   simulated interval, which ngspice reports on stderr while still exiting 0;
 - DUPLICATE_DECK / DUPLICATE_STDOUT: a name declared twice, printed twice;

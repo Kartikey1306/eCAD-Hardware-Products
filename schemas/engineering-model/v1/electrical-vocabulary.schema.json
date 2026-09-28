@@ -52,7 +52,8 @@
         "steady_bus_voltage",
         "steady_input_current",
         "steady_fuse_power",
-        "settled_fault_input_current"
+        "settled_fault_input_current",
+        "startup_peak_current"
       ]
     }
   }

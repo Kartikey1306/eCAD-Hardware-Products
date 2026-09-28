@@ -146,6 +146,22 @@
         "kind": "computation",
         "ref": "model verification: an independent closed-form derivation, not a design requirement"
       }
+    },
+    {
+      "reference_id": "REF-EL-010",
+      "title": "Startup peak current equals the larger of the precharge peak and the settled load current",
+      "domain": "electrical",
+      "metric": "startup_peak_current_a",
+      "scenario": {
+        "name": "startup"
+      },
+      "unit": "A",
+      "absolute_tolerance": 0.0001,
+      "derivation": "startup_peak_current",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
     }
   ],
   "requirements": [
@@ -191,7 +207,7 @@
     },
     {
       "requirement_id": "REQ-EL-003",
-      "title": "Steady input current within the eServo-200 sheet's 5 A (continuous or peak is not stated)",
+      "title": "Steady input current within the eServo-200 sheet's 5 A, assumed to bound the drive's input (the sheet gives it for the power stage, and says neither continuous nor peak)",
       "domain": "electrical",
       "component": "drive",
       "metric": "steady_input_current_a",
@@ -286,6 +302,26 @@
       "source": {
         "kind": "requirement",
         "ref": "example rule for the servo_supply_001 MVP: a part stays within its own rating, with no derating; no standard was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-EL-008",
+      "title": "Supply current, the surge when the bypass closes included, at or below 10 A until the fault",
+      "domain": "electrical",
+      "component": "s_byp",
+      "metric": "startup_peak_current_a",
+      "scenario": {
+        "name": "startup"
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 10.0
+      },
+      "unit": "A",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
       },
       "illustrative": true
     }
