@@ -609,11 +609,16 @@ class TestNetworkAndSanity(unittest.TestCase):
 
         for label, (old, new), rule in (
             ("C1: the supply steps instead of ramping once", ("V_IN n_in 0 PWL(0 0 100u 48)", "V_IN n_in 0 PWL(0 0 100u 48 200u 48)"), "C1"),
+            ("C1: the supply ramps to 0 V", ("V_IN n_in 0 PWL(0 0 100u 48)", "V_IN n_in 0 PWL(0 0 100u 0)"), "C1"),
             ("C2: the input node feeds a second element", (".end\n", "R_X n_in 0 1k\n.end\n"), "C2"),
             ("C3: the junction feeds a third element", (".end\n", "R_X n_f 0 1k\n.end\n"), "C3"),
             ("C3: C_BULK moved to n_f", ("C_BULK n_bus n_esr 470u", "C_BULK n_f n_esr 470u"), "C3"),
+            ("C3: the bypass ends on ground, not the rail", ("S_BYP n_f n_bus n_byp 0 SW_BYP", "S_BYP n_f 0 n_byp 0 SW_BYP"), "C3"),
             ("C4: the bypass command is not one step", ("V_BYP n_byp 0 PWL(0 0 30m 0 30.001m 5)",
                                                         "V_BYP n_byp 0 PWL(0 0 30m 0 30.001m 5 40m 0)"), "C4"),
+            ("C4: the bypass's cn is on the rail", ("S_BYP n_f n_bus n_byp 0 SW_BYP", "S_BYP n_f n_bus n_byp n_bus SW_BYP"), "C4"),
+            ("C4: both switches share the bypass command",
+             ("S_FLT n_bus 0 n_fc 0 SW_FLT\nV_FLT n_fc 0 PWL(0 0 100m 0 100.001m 5)\n", "S_FLT n_bus 0 n_byp 0 SW_FLT\n"), "C4"),
             ("C5: a second capacitor on the rail", (".end\n", "C_X n_bus 0 1u\n.end\n"), "C5"),
             ("C5: the series resistance's node feeds a third element", (".end\n", "R_X n_esr 0 1k\n.end\n"), "C5"),
             ("C5: the bulk capacitor is not on the rail",
@@ -621,10 +626,15 @@ class TestNetworkAndSanity(unittest.TestCase):
             ("C6: the load ramps instead of stepping", ("I_LOAD n_bus 0 PWL(0 0 40m 0 40.1m 4.16667)",
                                                         "I_LOAD n_bus 0 PWL(0 0 40m 4.16667)"), "C6"),
             ("C7: the fault switch is turned round", ("S_FLT n_bus 0 n_fc 0 SW_FLT", "S_FLT 0 n_bus n_fc 0 SW_FLT"), "C7"),
+            ("C7: the fault's cn is on the rail", ("S_FLT n_bus 0 n_fc 0 SW_FLT", "S_FLT n_bus 0 n_fc n_bus SW_FLT"), "C7"),
             ("C8: an element with no role", (".end\n", "R_X n_bus 0 1k\n.end\n"), "C8"),
         ):
             with self.subTest(label), _scratch() as directory:
                 item = _copy(directory, {NETLIST: (old, new)}, rebuild=False)
+                if "V_FLT" not in new and "V_FLT" in old:
+                    # The annotations may describe only elements the netlist declares.
+                    _edit_json(item / "design" / "annotations.json",
+                               lambda document: document["circuit_elements"].pop("V_FLT"))
                 with self.assertRaises(ExtractionError) as raised:
                     build(item)
                 self.assertEqual(raised.exception.kind, "rejected")
@@ -859,6 +869,18 @@ class TestDeck(unittest.TestCase):
         _component(unbound, "r_pre")["domains"]["electrical"]["resistance"]["source"]["sha256"] = "0" * 64
         self.assertEqual(adapter.invariant_problems(unbound, {}, {DECK_PATH: DECK.encode()}),
                          [f"r_pre: resistance does not cite the netlist {NETLIST_REF} by its hash"])
+        # The right hash under another path is not the netlist either.
+        misplaced = copy.deepcopy(model)
+        _component(misplaced, "r_pre")["domains"]["electrical"]["resistance"]["source"]["ref"] = "elsewhere.cir"
+        self.assertEqual(adapter.invariant_problems(misplaced, {}, {DECK_PATH: DECK.encode()}),
+                         [f"r_pre: resistance does not cite the netlist {NETLIST_REF} by its hash"])
+        # powered_by compares a supply's settled voltage; a relation to an element
+        # that is not a voltage source has no waveform to compare, and is passed over.
+        unsupplied = copy.deepcopy(model)
+        for relation in unsupplied["relationships"]:
+            if relation["relation"] == "powered_by":
+                relation["to"] = "r_f1"
+        self.assertEqual(adapter.invariant_problems(unsupplied, {}, {DECK_PATH: DECK.encode()}), [])
 
 
 class TestReferences(unittest.TestCase):
@@ -956,6 +978,14 @@ class TestReferences(unittest.TestCase):
              ["steady_bus_voltage", "steady_input_current", "steady_fuse_power"],
              "between the load stepping on and the fault command"),
             ("the fault window is too short to settle", _set(model, "v_flt", "waveform_time", [0.0, 0.1, 0.1198]),
+             ["settled_fault_input_current"], "between the fault switch closing and the end of the window"),
+            # VT + VH = 4.9 V is crossed 9.8 ms into a 10 ms command: without VH the
+            # switch would close 5 ms in and each window would be long enough.
+            ("the bypass's hysteresis delays its closing",
+             _set(_set(model, "s_byp", "hysteresis_voltage", 2.4), "v_byp", "waveform_time", [0.0, 0.03, 0.04]),
+             ["settled_no_load_bus_voltage", "startup_peak_current"], "between the bypass closing and the load stepping on"),
+            ("the fault switch's hysteresis delays its closing",
+             _set(_set(model, "s_flt", "hysteresis_voltage", 2.4), "v_flt", "waveform_time", [0.0, 0.1, 0.11]),
              ["settled_fault_input_current"], "between the fault switch closing and the end of the window"),
             # CS-5: the surge when a bypass closes at 14.5 ms, 28.33 A, is the startup peak;
             # ngspice samples that step later than the form's instant (28.3205 A on ngspice-47).
@@ -1389,6 +1419,10 @@ class TestVerdicts(unittest.TestCase):
             item = _copy(directory, {DECK_PATH: ("R_PRE n_f n_bus 10.0", "R_PRE n_f n_bus 1.0")}, rebuild=False)
             receipt, _ = _validate(item)
         checks = _checks(receipt)
+        # HT-1: V2's electrical invariants read the deck regenerated from the fresh
+        # model, not the committed one, so they pass here; only the reproduction
+        # check sees the edited committed deck.
+        self.assertEqual(_outcome(checks["v2.electrical.model-invariants"]), ("PASS", "DOMAIN_MODEL_CONSISTENT"))
         reproduction = checks["v2.dataset-reproduction"]
         self.assertEqual(_outcome(reproduction), ("FAIL", "DERIVATION_DIVERGED"))
         self.assertIn(f"{DECK_PATH}: bytes differ from a fresh derivation", reproduction["findings"])

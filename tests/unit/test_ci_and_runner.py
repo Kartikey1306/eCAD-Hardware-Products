@@ -5,6 +5,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from typing import Any, Dict
 from unittest import mock
 
 import run_all_tests
@@ -12,6 +13,54 @@ import run_all_tests
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 CI_WORKFLOW = REPOSITORY_ROOT / ".github" / "workflows" / "ci.yml"
+
+
+def _job(workflow: str, name: str) -> Dict[str, Any]:
+    """One job of the workflow, read strictly in the layout ci.yml uses.
+
+    No YAML parser is installed, so this reads the two-space layout itself:
+    job keys at four spaces, env entries at six, steps at six ("- ") with
+    their keys at eight, and anything deeper (a block scalar's lines, the
+    entries of with: or env:) appended to the key above it. A line in any
+    other place fails the test rather than being skipped.
+
+    Returns:
+        {"keys": job keys and their values, "env": the job's env entries,
+        "steps": each step's keys and values, "text": the job's lines}.
+    """
+    lines = workflow.split("\n")
+    start = lines.index(f"  {name}:")
+    body = []
+    for line in lines[start + 1:]:
+        if line.strip() and not line.startswith("    "):
+            break
+        body.append(line)
+    keys: Dict[str, str] = {}
+    env: Dict[str, str] = {}
+    steps: list = []
+    section, current = "", ""
+    for line in body:
+        text = line.strip()
+        if not text or text.startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        if indent == 4:
+            section, _, value = text.partition(":")
+            keys[section] = value.strip()
+        elif section == "env" and indent == 6:
+            key, _, value = text.partition(":")
+            env[key] = value.strip()
+        elif section == "steps" and indent == 6 and text.startswith("- "):
+            current, _, value = text[2:].partition(":")
+            steps.append({current: value.strip()})
+        elif section == "steps" and indent == 8 and steps:
+            current, _, value = text.partition(":")
+            steps[-1][current] = value.strip()
+        elif section == "steps" and indent >= 10 and steps:
+            steps[-1][current] = f"{steps[-1][current]}\n{text}"
+        else:
+            raise AssertionError(f"job {name}: a line this reader does not place: {line!r}")
+    return {"keys": keys, "env": env, "steps": steps, "text": "\n".join(body)}
 
 
 class TestCIWorkflow(unittest.TestCase):
@@ -53,9 +102,39 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertNotIn("python -m build", self.workflow)
         self.assertNotIn("dist/*.whl", self.workflow)
 
+    def assert_the_suite_runs_whole_and_required(self, name: str, variable: str) -> None:
+        """The job runs, unconditionally, the whole suite with the variable set to 1.
+
+        Each of these read as green with the simulation tests skipped, and
+        the substring checks of the tests below let every one through: an
+        `if:` on the job, `|| true` after the suite, `--ignore`, `--deselect`
+        or `-k` on it, and the variable set to 0 in a step's own env.
+        """
+        job = _job(self.workflow, name)
+        self.assertEqual(set(job["keys"]), {"name", "runs-on", "env", "steps"}, "no if:, continue-on-error or matrix")
+        self.assertEqual(job["env"], {variable: '"1"'})
+        self.assertEqual(job["text"].count(variable), 1, "set once, for the whole job, and never overridden")
+        suite = [step for step in job["steps"] if "run_all_tests.py" in step.get("run", "")]
+        self.assertEqual(len(suite), 1)
+        self.assertEqual(set(suite[0]), {"name", "run"}, "the suite step has no if:, env or continue-on-error")
+        self.assertEqual(suite[0]["run"], "python run_all_tests.py --tb=short")
+        for step in job["steps"]:
+            self.assertNotIn("continue-on-error", step)
+            self.assertNotIn(variable, step.get("env", ""))
+            for flag in ("||", "--ignore", "--deselect", " -k ", " -k="):
+                self.assertNotIn(flag, step.get("run", ""))
+
+    def test_the_job_reader_refuses_a_line_it_cannot_place(self):
+        with self.assertRaisesRegex(AssertionError, "a line this reader does not place"):
+            _job("jobs:\n  spice:\n    steps:\n     - run: x\n", "spice")
+        job = _job("jobs:\n  spice:\n    if: false\n    env:\n      A: \"1\"\n    steps:\n      - name: s\n"
+                   "        run: |\n          a\n          b\n  next:\n", "spice")
+        self.assertEqual((job["keys"]["if"], job["env"], job["steps"]), ("false", {"A": '"1"'}, [{"name": "s", "run": "|\na\nb"}]))
+
     def test_cad_dataset_job_cannot_skip_silently(self):
         """The dataset tests skip without the CAD kernel. The one job that installs
         it must turn a skip into a failure, or a broken install reads as green."""
+        self.assert_the_suite_runs_whole_and_required("cad-dataset", "ECAD_REQUIRE_CAD_TOOLS")
         start = self.workflow.index("\n  cad-dataset:\n")
         following = self.workflow.find("\n  release:\n", start)
         job = self.workflow[start:following]
@@ -71,6 +150,7 @@ class TestCIWorkflow(unittest.TestCase):
     def test_spice_job_cannot_skip_silently(self):
         """The electrical simulation tests skip without ngspice. The one job that
         installs it must turn a skip into a failure, or a missing simulator reads as green."""
+        self.assert_the_suite_runs_whole_and_required("spice", "ECAD_REQUIRE_SPICE_TOOLS")
         start = self.workflow.index("\n  spice:\n")
         # Before cad-dataset, so the slice of the test above still ends at release.
         self.assertLess(self.workflow.index("\n  validation-evidence:\n"), start)

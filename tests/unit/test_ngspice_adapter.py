@@ -522,6 +522,17 @@ class TestMeasurements(unittest.TestCase):
                 self.assertTrue(path.startswith("generated/"))
                 self.assertEqual(json.loads(record)["metrics"], {"fine": 2.5})
 
+    def test_the_summary_names_at_most_ten_unread_measurements(self):
+        """Twelve declared names, none reported: the summary names the first ten,
+        in deck order, and still counts all twelve."""
+        names = [f"m{n:02d}" for n in range(1, 13)]
+        deck = "* twelve\n" + "".join(f".meas tran {name} FIND v(a) AT=1u\n" for name in names) + ".end\n"
+        with tempfile.TemporaryDirectory() as directory, _installed(), _process("no measurement here\n"):
+            result = _run(_product(Path(directory), deck))
+        self.assertEqual((result.verdict.value, result.metrics), ("PASS", {}))
+        self.assertEqual(result.summary, "ngspice batch run completed: 0 of 12 declared measurements read; "
+                         + "; ".join(f"{name}: not reported" for name in names[:10]))
+
     def test_names_the_deck_does_not_declare_are_ignored(self):
         from ecad_validation.adapters.ngspice import declared_measurements, parse_measurements
 

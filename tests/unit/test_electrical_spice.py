@@ -7,9 +7,13 @@ CI job that installs ngspice -- a missing or unidentified ngspice is a
 failure instead, so the skip can never go silent where it matters.
 
 Expected values are typed by hand from the netlist and the closed forms of
-the design (and, for the two FAIL copies, from ngspice-47's own output on
-macOS arm64, 2026-09-27, which the tolerances are wide of), never obtained by
-calling the code under test.
+the design (and, for the FAIL copies, from ngspice-47's own output on macOS
+arm64, 2026-09-27 and 2026-09-28, which the tolerances are wide of), never
+obtained by calling the code under test -- with one exception:
+test_the_parser_reads_every_value_form_as_ngspice_does is a differential
+test. It expects 1 / parse_value(form) amperes, so it checks that the parser
+and ngspice read each value spelling the same, not that either reads it
+right; the spellings' values are pinned by hand in test_spice_netlist.py.
 """
 
 from __future__ import annotations

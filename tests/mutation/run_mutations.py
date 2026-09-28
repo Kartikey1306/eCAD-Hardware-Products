@@ -585,6 +585,26 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      '      "operator": "<=",\n      "limit": {\n        "value": 10.0',
      '"metric": "startup_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n'
      '      "operator": "<=",\n      "limit": {\n        "value": 100.0'),
+    # conditions of rules C1, C3, C4 and C7 no test reached (HT-3)
+    ("el-ramp-zero-level", EL, "and points[1][0] > 0 and points[1][1] > 0", "and points[1][0] > 0 and points[1][1] >= 0"),
+    ("el-command-node-shared", EL, ' or len(at[control["cp"]]) != 2', ""),
+    ("el-command-cn-ground", EL, 'if (control["cn"] != "0" or control["cp"] == "0"', 'if (control["cp"] == "0"'),
+    ("el-bypass-other-end", EL, " or _other(bypasses[0], junction) != _other(limiters[0], junction)", ""),
+    # branches no test reached (HT-5)
+    ("ng-summary-cap", NG, "list(problems.items())[:MAX_SUMMARY_PROBLEMS])", "list(problems.items()))"),
+    ("el-invariant-ref-unchecked", EL, ' or facet["source"]["ref"] != netlist["path"])', ")"),
+    ("el-powered-by-any-element", EL, '\n                    or supply.get("circuit", {}).get("element") != "voltage_source"):', "):"),
+    ("el-closes-hysteresis-bypass", EL,
+     'values[("bypass_command", "waveform_voltage")],\n                               values[("bypass", "threshold_voltage")], '
+     'values[("bypass", "hysteresis_voltage")])',
+     'values[("bypass_command", "waveform_voltage")],\n                               values[("bypass", "threshold_voltage")], 0.0)'),
+    ("el-closes-hysteresis-startup", EL,
+     '\n                                   values[("bypass", "threshold_voltage")], values[("bypass", "hysteresis_voltage")])',
+     '\n                                   values[("bypass", "threshold_voltage")], 0.0)'),
+    ("el-closes-hysteresis-fault", EL, 'values[("fault", "threshold_voltage")], values[("fault", "hysteresis_voltage")])',
+     'values[("fault", "threshold_voltage")], 0.0)'),
+    ("el-closing-time-ignores-hysteresis", EL, "(times[2] - times[1]) * (threshold + hysteresis) / levels[2]",
+     "(times[2] - times[1]) * threshold / levels[2]"),
 ]
 
 

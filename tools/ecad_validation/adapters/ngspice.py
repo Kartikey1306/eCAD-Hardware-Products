@@ -168,9 +168,10 @@ class NgspiceAdapter(Adapter):
             reason as a receipt reason code, the raw reason in the summary),
             when there is no deck, or when the deck is over MAX_DECK_BYTES.
             Otherwise the process's verdict, and on PASS the metrics
-            parse_measurements reads, with every declared name it could not
-            read named in the summary; stdout that was cut short gives
-            INCONCLUSIVE OUTPUT_TRUNCATED and no metrics.
+            parse_measurements reads; the summary counts the declared names
+            and names the first MAX_SUMMARY_PROBLEMS of those it could not
+            read, with why. Stdout that was cut short gives INCONCLUSIVE
+            OUTPUT_TRUNCATED and no metrics.
 
         Example:
             >>> from pathlib import Path
