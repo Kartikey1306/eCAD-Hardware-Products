@@ -261,7 +261,7 @@ Verification (2026-09-26/27; code at `000309b` unless a row names another commit
 
 Owner: unassigned
 Mode: build
-Status: review (local branch `feat/domain-electrical`; not pushed; two independent reviews at `bf04f1b`, whose findings are fixed at `11b19b1`, `555bfd7` and `ec37115` (plan §7.6); the fixes have had no review of their own)
+Status: review (local branch `feat/domain-electrical`; not pushed; two independent reviews at `bf04f1b`, whose findings are fixed at `11b19b1`, `555bfd7`, `ec37115` and `49887ac` (plan §7.6); the fixes have had no review of their own)
 Depends on: T-011 (`feat/multi-domain-foundation` at `042f934`, which this branch builds on)
 
 Goal
@@ -380,6 +380,7 @@ Verification of the branch review (2026-09-28/29, macOS arm64, Python 3.14.4, ng
   | Two statements of the `555bfd7` commit message | -- | Wrong, not amended: it says 16 new mutants (it adds 15) and that the goldens moved "in the ninth to twelfth figure" (the eighth to twelfth) |
   | ngspice-36 and 44.2, Linux, the CI job | a real run | `NOT RUN` -- no container was run for the branch review; push access is read-only |
   | Coverage of new and changed code | a coverage tool | `NOT RUN` -- none is installed |
+  | The parser test's texts, `49887ac` | after `5917365`: `test_spice_netlist.py`'s NETLIST and DECK compared with the committed files | Found stale: `555bfd7` changed the netlist's comment and the deck's measurements and left the constants, though the file says they are the committed texts. `49887ac` updates them and asserts they equal the files. Then, on clean clones of `49887ac`: the 16 mutants that file kills, `--workers 4` in two batches of 8, each after a green baseline -- 16 of 16 killed, each by the same test as before; the complete suite -- 410 passed, 0 failed, 0 skipped (217 s) |
 
 ## Completed
 

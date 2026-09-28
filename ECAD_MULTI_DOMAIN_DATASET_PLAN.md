@@ -402,7 +402,9 @@ closed them. Its own fixes have not had a review of their own.
 correctness and security (CS) and honesty and tests (HT), each of which
 reproduced every finding below with its own scripts (both on 2026-09-28).
 The fixes are `11b19b1` (spice), `555bfd7` (electrical), `ec37115`
-(tests) and the documentation commit that adds this section; each named
+(tests), the documentation commit `5917365` that adds this section, and
+`49887ac`, which brings the parser test's netlist and deck, left behind by
+`555bfd7`, back to the committed files; each named
 mutant is in `tests/mutation/run_mutations.py`, and §16 records the run
 that killed it. The fixes have had no review of their own.
 
