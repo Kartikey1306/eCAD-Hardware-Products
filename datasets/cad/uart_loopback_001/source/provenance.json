@@ -1,0 +1,32 @@
+{
+  "$schema": "https://embeddedos.org/schemas/cad-dataset/v1/source-provenance.schema.json",
+  "provenance_version": "1.1.0",
+  "domain": "digital",
+  "artifacts": [
+    {"path": "source/tb_uart_loopback.v", "format": "verilog"},
+    {"path": "source/uart_tx.v", "format": "verilog",
+     "copied_from": {"path": "rtl/uart_tx.v", "sha256": "5be9e1bdd20b37a3b79cb40c98fbfe241e8d6faca5ecb443b0e93378d7b4f01a"}},
+    {"path": "source/uart_rx.v", "format": "verilog",
+     "copied_from": {"path": "rtl/uart_rx.v", "sha256": "c1bebcc6e894e86abd4b39af5501031b8c817f4395048ef65059eebfb710ab81"}}
+  ],
+  "description": "8N1 UART loopback: rtl/uart_tx.v and rtl/uart_rx.v, copied unmodified, wired transmitter to receiver by a self-authored declarative top that states the clock half-period, the reset length, the parameters each instance receives and two bytes. No board, oscillator or peer device is modelled; no value is a property of a real part. Authored for the eCAD multi-domain validation pipeline (issue #27).",
+  "artifact_type": "hdl_source",
+  "artifact_version": "1.0",
+  "units": "Verilog with `timescale 1ns / 1ps; CLK_FREQ read as Hz and BAUD_RATE as Bd, as the RTL's header comments state; SI in the engineering model",
+  "coordinate_system": "none (HDL has no geometry)",
+  "created_at": "2026-09-27",
+  "collected_at": "2026-09-27",
+  "origin": {
+    "kind": "self_authored",
+    "author": "EmbeddedOS (EoS) Research Foundation"
+  },
+  "license": {
+    "spdx": "MIT",
+    "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation (LICENSE); source/uart_tx.v and source/uart_rx.v keep their own header, Copyright (c) 2026 EmbeddedOS Foundation",
+    "license_verified": true,
+    "license_text": {"path": "LICENSE", "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"},
+    "redistribution_permitted": true,
+    "training_use_permitted": true,
+    "basis": "source/tb_uart_loopback.v is hand-written in this repository; source/uart_tx.v and source/uart_rx.v are byte-identical copies of rtl/uart_tx.v and rtl/uart_rx.v, first-party files committed in f15a4aa that state SPDX-License-Identifier: MIT; all three are under the repository's MIT LICENSE; no third-party code, library, IP or part data"
+  }
+}

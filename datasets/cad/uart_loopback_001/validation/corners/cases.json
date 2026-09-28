@@ -1,0 +1,121 @@
+{
+  "$schema": "https://embeddedos.org/schemas/hardware-validation/v1/validation-cases.schema.json",
+  "cases": [
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-DIG-001",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "metric_limits": {
+        "tx_bit_rate_bd": {
+          "minimum": 112896.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-DIG-002",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "metric_limits": {
+        "tx_bit_rate_bd": {
+          "maximum": 117504.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-DIG-003",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "metric_limits": {
+        "rx_bytes_received": {
+          "minimum": 2.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-DIG-004",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "metric_limits": {
+        "rx_bit_errors": {
+          "maximum": 0.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-DIG-005",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "metric_limits": {
+        "rx_framing_errors": {
+          "maximum": 0.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-DIG-006",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "metric_limits": {
+        "outputs_unknown_after_reset": {
+          "maximum": 0.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    }
+  ],
+  "contract_version": "1.0.0",
+  "gate": "V4"
+}

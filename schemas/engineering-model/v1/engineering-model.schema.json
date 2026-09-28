@@ -19,8 +19,8 @@
       "const": "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json"
     },
     "model_version": {
-      "description": "The format version. A compatible addition raises the minor version: every minor version of v1 is accepted, and a document that uses an addition must declare the version that introduced it (1.1.0: the circuit member and the electrical component kinds).",
-      "enum": ["1.0.0", "1.1.0"]
+      "description": "The format version. A compatible addition raises the minor version: every minor version of v1 is accepted, and a document that uses an addition must declare the version that introduced it (1.1.0: the circuit member and the electrical component kinds; 1.2.0: the hdl member).",
+      "enum": ["1.0.0", "1.1.0", "1.2.0"]
     },
     "design": {"$ref": "#/definitions/design"},
     "components": {
@@ -52,6 +52,11 @@
         }
       },
       "then": {"properties": {"model_version": {"const": "1.1.0"}}}
+    },
+    {
+      "description": "A model that uses the addition of format 1.2.0 (an hdl member) declares 1.2.0.",
+      "if": {"properties": {"components": {"contains": {"required": ["hdl"]}}}},
+      "then": {"properties": {"model_version": {"const": "1.2.0"}}}
     }
   ],
   "definitions": {
@@ -134,6 +139,7 @@
           "description": "Where a netlist element sits in its circuit (format 1.1.0). Nets are derived from the terminals, never stored.",
           "$ref": "#/definitions/circuit"
         },
+        "hdl": {"$ref": "#/definitions/hdl"},
         "cad_ref": {
           "description": "null means the component is part of the design but not represented in the CAD.",
           "oneOf": [{"$ref": "#/definitions/cadRef"}, {"type": "null"}]
@@ -248,6 +254,70 @@
         {"if": {"properties": {"element": {"const": "capacitor"}}}, "then": {"properties": {"designator": {"pattern": "^C"}}}},
         {"if": {"properties": {"element": {"const": "voltage_source"}}}, "then": {"properties": {"designator": {"pattern": "^V"}}}},
         {"if": {"properties": {"element": {"const": "current_source"}}}, "then": {"properties": {"designator": {"pattern": "^I"}}}}
+      ]
+    },
+    "hdlName": {"type": "string", "pattern": "^(?!ecad_)[A-Za-z_][A-Za-z0-9_]{0,63}$"},
+    "hdl": {
+      "description": "Where a component sits in the elaborated HDL design (format 1.2.0): its module, the sample file that defines it and its ports. The top lists the signals it declares; an instance names its hierarchical path, the facet that holds each parameter value the top passes, the top signal each port connects to, and its module's source text verbatim, bound to design.sources by hash. Behaviour is carried only as that text.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "source", "ports"],
+      "properties": {
+        "module": {"$ref": "#/definitions/hdlName"},
+        "source": {"$ref": "common.schema.json#/definitions/relativePath"},
+        "instance": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}(\\.[A-Za-z_][A-Za-z0-9_]{0,63})+$"},
+        "parameters": {
+          "type": "object",
+          "maxProperties": 64,
+          "propertyNames": {"$ref": "#/definitions/hdlName"},
+          "additionalProperties": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}
+        },
+        "ports": {
+          "type": "object",
+          "maxProperties": 256,
+          "propertyNames": {"$ref": "#/definitions/hdlName"},
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["direction", "width"],
+            "properties": {
+              "direction": {"enum": ["input", "output"]},
+              "width": {"type": "integer", "minimum": 1, "maximum": 64},
+              "signal": {"$ref": "#/definitions/hdlName"}
+            }
+          }
+        },
+        "signals": {
+          "type": "object",
+          "maxProperties": 256,
+          "propertyNames": {"$ref": "#/definitions/hdlName"},
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "width"],
+            "properties": {
+              "kind": {"enum": ["reg", "wire"]},
+              "width": {"type": "integer", "minimum": 1, "maximum": 64}
+            }
+          }
+        },
+        "text": {"type": "string", "minLength": 1, "maxLength": 1048576}
+      },
+      "allOf": [
+        {
+          "description": "An instance carries its parameters, its module's text and each port's signal, and no signals; the top carries its signals, no parameters, no text and no ports.",
+          "if": {"required": ["instance"]},
+          "then": {
+            "required": ["parameters", "text"],
+            "not": {"required": ["signals"]},
+            "properties": {"ports": {"additionalProperties": {"required": ["signal"]}}}
+          },
+          "else": {
+            "required": ["signals"],
+            "not": {"anyOf": [{"required": ["parameters"]}, {"required": ["text"]}]},
+            "properties": {"ports": {"maxProperties": 0}}
+          }
+        }
       ]
     },
     "facet": {

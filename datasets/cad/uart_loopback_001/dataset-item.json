@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/cad-dataset/v1/dataset-item.schema.json",
+  "artifact_type": "hdl_source",
+  "artifact_version": "1.0",
+  "collected_at": "2026-09-27",
+  "coordinate_system": "none (HDL has no geometry)",
+  "created_at": "2026-09-27",
+  "dataset_item_version": "1.0.0",
+  "derived": [
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "derived/engineering_model.json",
+        "sha256": "a9710c5f61973ed50ca6cc401ccb619f18168dae14818089a385a63be6ee3909",
+        "size_bytes": 19730
+      },
+      "derived_from": [
+        "source/tb_uart_loopback.v",
+        "source/uart_tx.v",
+        "source/uart_rx.v",
+        "design/annotations.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.domains.digital",
+        "version": "1.0.0 (ecad_model.verilog 1.0.0)"
+      },
+      "role": "engineering_model"
+    },
+    {
+      "artifact": {
+        "media_type": "text/x-verilog",
+        "path": "derived/digital/uart_loopback_001.v",
+        "sha256": "191bd8f16c0167764878d099ac5a1fc8c4a2e509e06e433997452cb5944d3e84",
+        "size_bytes": 12852
+      },
+      "derived_from": [
+        "derived/engineering_model.json"
+      ],
+      "domain": "digital",
+      "producer": {
+        "tool": "ecad_model.domains.digital",
+        "version": "1.0.0"
+      },
+      "role": "domain_model"
+    },
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "validation/golden/cases.json",
+        "sha256": "461c1ec77339916cacf736528d2cc4e6e6e6db60eeb7fa5601c3f22d386a0f39",
+        "size_bytes": 3697
+      },
+      "derived_from": [
+        "derived/engineering_model.json",
+        "requirements/requirements.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.requirements",
+        "version": "1.0.0"
+      },
+      "role": "golden_cases"
+    },
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "validation/corners/cases.json",
+        "sha256": "205a27cbea68e7177a190551dceca75edb88340122df9ebacd50eaa65c878776",
+        "size_bytes": 2600
+      },
+      "derived_from": [
+        "derived/engineering_model.json",
+        "requirements/requirements.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.requirements",
+        "version": "1.0.0"
+      },
+      "role": "corner_cases"
+    }
+  ],
+  "description": "8N1 UART loopback: rtl/uart_tx.v and rtl/uart_rx.v, copied unmodified, wired transmitter to receiver by a self-authored declarative top that states the clock half-period, the reset length, the parameters each instance receives and two bytes. No board, oscillator or peer device is modelled; no value is a property of a real part. Authored for the eCAD multi-domain validation pipeline (issue #27).",
+  "domain": "digital",
+  "domains": [
+    {
+      "domain": "mechanical",
+      "reason": "the mechanical adapter reads step, which this sample does not have",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "domain": "electrical",
+      "reason": "the electrical adapter reads spice, which this sample does not have",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "domain": "digital",
+      "reason": "the UART 8N1 loopback only (a transmitter and a receiver with the port and parameter interfaces of rtl/uart_tx.v and rtl/uart_rx.v, wired transmitter to receiver by a declarative top): reset, frame-timing and byte-recovery metrics from one Icarus Verilog run of a harness written from the model, compared with closed-form references; requirements resting on components/target_device/domains/digital/min_clock_period (UNKNOWN) are BLOCKED",
+      "status": "AVAILABLE"
+    },
+    {
+      "domain": "pcb",
+      "reason": "no pcb validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "power_electronics",
+      "reason": "no power_electronics validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "control",
+      "reason": "no control validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "electromagnetic",
+      "reason": "no electromagnetic validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "thermal",
+      "reason": "no thermal validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "full_system",
+      "reason": "no full_system validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    }
+  ],
+  "hash": "sha256:9f8c691f85012c5887800da7d152239a2a953f9ccdb40f945c4473d4ab24f0bb",
+  "inputs": {
+    "annotations": {
+      "media_type": "application/json",
+      "path": "design/annotations.json",
+      "sha256": "8c82527d54242131ba822b36bd9025e4292878fa006625df3ee23e0e01c6cde5",
+      "size_bytes": 1067
+    },
+    "provenance": {
+      "media_type": "application/json",
+      "path": "source/provenance.json",
+      "sha256": "c432b01a9857e2022714f156efc6e03d27b23bd3f052f9a41a942a5a538904de",
+      "size_bytes": 2257
+    },
+    "requirements": {
+      "media_type": "application/json",
+      "path": "requirements/requirements.json",
+      "sha256": "b65f1f79788e0c216a0da7d0f12a677279ca404795522794aea6f72855c79c28",
+      "size_bytes": 8639
+    },
+    "simulation": []
+  },
+  "item_id": "uart_loopback_001",
+  "source": {
+    "artifacts": [
+      {
+        "format": "verilog",
+        "media_type": "text/x-verilog",
+        "path": "source/tb_uart_loopback.v",
+        "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed",
+        "size_bytes": 2152
+      },
+      {
+        "format": "verilog",
+        "media_type": "text/x-verilog",
+        "path": "source/uart_tx.v",
+        "sha256": "5be9e1bdd20b37a3b79cb40c98fbfe241e8d6faca5ecb443b0e93378d7b4f01a",
+        "size_bytes": 3367
+      },
+      {
+        "format": "verilog",
+        "media_type": "text/x-verilog",
+        "path": "source/uart_rx.v",
+        "sha256": "c1bebcc6e894e86abd4b39af5501031b8c817f4395048ef65059eebfb710ab81",
+        "size_bytes": 4195
+      }
+    ],
+    "license": {
+      "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation (LICENSE); source/uart_tx.v and source/uart_rx.v keep their own header, Copyright (c) 2026 EmbeddedOS Foundation",
+      "basis": "source/tb_uart_loopback.v is hand-written in this repository; source/uart_tx.v and source/uart_rx.v are byte-identical copies of rtl/uart_tx.v and rtl/uart_rx.v, first-party files committed in f15a4aa that state SPDX-License-Identifier: MIT; all three are under the repository's MIT LICENSE; no third-party code, library, IP or part data",
+      "license_text": {
+        "path": "LICENSE",
+        "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"
+      },
+      "license_verified": true,
+      "redistribution_permitted": true,
+      "spdx": "MIT",
+      "training_use_permitted": true
+    },
+    "origin": {
+      "author": "EmbeddedOS (EoS) Research Foundation",
+      "kind": "self_authored"
+    }
+  },
+  "source_url": null,
+  "title": "tb_uart_loopback",
+  "units": "Verilog with `timescale 1ns / 1ps; CLK_FREQ read as Hz and BAUD_RATE as Bd, as the RTL's header comments state; SI in the engineering model",
+  "versions": {
+    "domain_models": {
+      "digital": "ecad_model.domains.digital 1.0.0"
+    },
+    "engineering_model": "1.0.0 (ecad_model.verilog 1.0.0)",
+    "extraction": "none",
+    "simulation": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validation_contract": "hardware-validation v1.0.0"
+  }
+}

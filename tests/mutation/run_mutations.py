@@ -4,18 +4,21 @@
 Each mutant is one targeted edit that makes a behaviour the tests claim to
 protect wrong. For every mutant this copies the repository, applies the edit,
 runs the fast engineering-model, domain-adapter, netlist, ngspice-adapter,
-electrical and hdl-adapter tests, then the electrical tests that run ngspice
-and, if they all stay green, the slower CAD-kernel tests. A mutant of a dataset
-item's own file (a simulation script, a netlist, its annotations,
-requirements or provenance) is followed by a rebuild of that item, so the
-manifest's hashes cannot kill it: a behavioural test must. A mutant the
+electrical, Verilog-grammar, hdl-adapter and digital tests, then the
+electrical tests that run ngspice and the digital tests that run Icarus
+Verilog and, if they all stay green, the slower CAD-kernel tests. A mutant of
+a dataset item's own file (a simulation script, a netlist or HDL source, its
+annotations, requirements or provenance) is followed by a rebuild of that
+item, so the manifest's hashes cannot kill it: a behavioural test must. A mutant the
 suite does not kill is a test gap, and the script exits 1. The
 unmutated copy runs first and must be green: against a failing baseline every
 mutant would look killed.
 
 Needs the CAD kernel and MuJoCo (tools/requirements-cad.txt), with `python3`
-on PATH able to import mujoco, and ngspice whose `--version` names its
-version (brew install ngspice; apt install ngspice). Not collected by pytest.
+on PATH able to import mujoco, ngspice whose `--version` names its version
+(brew install ngspice; apt install ngspice), and Icarus Verilog whose
+`iverilog -V` names it, with vvp (brew install icarus-verilog; apt install
+iverilog). Not collected by pytest.
 
 Usage:
     python3 tests/mutation/run_mutations.py [--workers N] [--only NAME ...]
@@ -51,18 +54,30 @@ HD = "tools/ecad_validation/adapters/hdl.py"
 PR = "tools/ecad_validation/adapters/process.py"
 SP = "tools/ecad_model/spice.py"
 EL = "tools/ecad_model/domains/electrical.py"
+VG = "tools/ecad_model/verilog.py"
+DG = "tools/ecad_model/domains/digital.py"
 EN = "datasets/cad/servo_supply_001/source/servo_supply_001.cir"
 EA = "datasets/cad/servo_supply_001/design/annotations.json"
 ER = "datasets/cad/servo_supply_001/requirements/requirements.json"
 EP = "datasets/cad/servo_supply_001/source/provenance.json"
+DT = "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v"
+DA = "datasets/cad/uart_loopback_001/design/annotations.json"
+DQ = "datasets/cad/uart_loopback_001/requirements/requirements.json"
+DP = "datasets/cad/uart_loopback_001/source/provenance.json"
 MS = "schemas/engineering-model/v1/engineering-model.schema.json"
+AS = "schemas/engineering-model/v1/design-annotations.schema.json"
+PS = "schemas/cad-dataset/v1/source-provenance.schema.json"
+GA = ".gitattributes"
 FAST = "tests/unit/test_engineering_model.py"
 ADAPTER = "tests/unit/test_domain_adapter.py"
 NETLIST = "tests/unit/test_spice_netlist.py"
 NGSPICE = "tests/unit/test_ngspice_adapter.py"
 ELECTRICAL = "tests/unit/test_electrical_domain.py"
+VERILOG = "tests/unit/test_verilog_source.py"
 HDLAD = "tests/unit/test_hdl_adapter.py"
+DIGITAL = "tests/unit/test_digital_domain.py"
 SPICE = "tests/unit/test_electrical_spice.py"
+ICARUS = "tests/unit/test_digital_icarus.py"
 SLOW = "tests/unit/test_cad_dataset.py"
 
 # (name, file, text to replace, replacement). The replaced text must occur
@@ -520,8 +535,7 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("el-artifact-type-changed", EP, '"artifact_type": "spice_netlist"', '"artifact_type": "other"'),
     # electrical: the format rule and the registry
     ("circuit-format-rule-dropped", MS, '"then": {"properties": {"model_version": {"const": "1.1.0"}}}', '"then": {}'),
-    ("electrical-unregistered", DR, '{"mechanical": MechanicalAdapter(), "electrical": ElectricalAdapter()}',
-     '{"mechanical": MechanicalAdapter()}'),
+    ("electrical-unregistered", DR, '"electrical": ElectricalAdapter(),', ""),
     # ngspice: batch invocation, .meas capture from stdout, version banner, receipt-safe probe reasons
     ("ngspice-rawfile-requested", NG, 'argv=[capability.executable or "ngspice", "-b", relative],',
      'argv=[capability.executable or "ngspice", "-b", "-r", "ngspice.raw", relative],'),
@@ -696,6 +710,133 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)"), "iverilog": re.compile(r"version ([0-9.]+)")}'),
     ("silent-probe-version-invented", CP, "        return output.splitlines()[0].strip() if output else None\n",
      '        return output.splitlines()[0].strip() if output else "unknown"\n'),
+    # the Verilog grammar (tools/ecad_model/verilog.py): refusals, bounds, elaboration
+    ("vg-include-accepted", VG, '            if value == "`timescale" and not tokens and lines[line - 1] == TIMESCALE:\n', '            if value == "`include":\n                position = text.index("\\n", position)\n                continue\n            if value == "`timescale" and not tokens and lines[line - 1] == TIMESCALE:\n'),
+    ("vg-timescale-any", VG, "lines[line - 1] == TIMESCALE:", 'lines[line - 1].startswith("`timescale"):'),
+    ("vg-system-task-accepted", VG, '            if not (harness and value in HARNESS_TASKS):\n                suffix = "; the harness uses only $display, $finish and $realtime" if harness else ""\n                raise HdlRefused(f"{where}: {value}: {_system_reason(value)}{suffix}")\n            tokens.append(("system", value, line, None))\n', '            tokens.append(("name", value, line, None))\n'),
+    ("vg-string-accepted", VG, '            if not harness:\n                raise HdlRefused(f"{where}: a string: outside the lexical subset (file names and import "\n', "            if not harness:\n                position = text.index('\"', position + 1) + 1\n                continue\n                raise HdlRefused(f\"{where}: a string: outside the lexical subset (file names and import \"\n"),
+    ("vg-attribute-accepted", VG, '            if value == "(*":\n                raise HdlRefused(f"{where}: (*: an attribute: outside the lexical subset")\n', '            if value == "(*":\n                position = text.index("*)", position) + 2\n                continue\n'),
+    ("vg-dpi-import-accepted", VG, '"calls C code": "import export chandle bind",', '"calls C code": "export chandle bind",'),
+    ("vg-initial-in-rtl-accepted", VG, 'if else case endcase default"', 'if else case endcase default initial"'),
+    ("vg-defparam-accepted", VG, '"defparam force release deassign', '"force release deassign'),
+    ("vg-blocking-assign-accepted", VG, '    if operator[1] == "=":\n', "    if False:\n"),
+    ("vg-hierarchical-reference-accepted", VG, '    if cursor.at("."):\n        raise cursor.refuse(token, f"{token[1]}.{cursor.peek(1)[1]}: a hierarchical reference, which reads or "\n', '    while cursor.at("."):\n        cursor.index += 2\n    if False:\n        raise cursor.refuse(token, f"{token[1]}.{cursor.peek(1)[1]}: a hierarchical reference, which reads or "\n'),
+    ("vg-instance-in-leaf-accepted", VG, '        elif token[0] == "name" and (cursor.peek(1)[0] == "name" or cursor.at("#", 1)):\n            raise cursor.refuse(token, f"an instance of {token[1]}: a leaf instantiates no module; a top is written "\n', '        elif token[0] == "name" and (cursor.peek(1)[0] == "name" or cursor.at("#", 1)):\n            while cursor.take()[1] != ";":\n                pass\n        elif False:\n            raise cursor.refuse(token, f"an instance of {token[1]}: a leaf instantiates no module; a top is written "\n'),
+    ("vg-non-ascii-code-accepted", VG, '            if ord(char) > 0x7F:\n                raise HdlRefused(f"{where}: non-ASCII outside a comment (U+{ord(char):04X})")\n', "            if ord(char) > 0x7F:\n                position += 1\n                continue\n"),
+    ("vg-size-limit-off-by-one", VG, "    if len(data) > MAX_SOURCE_BYTES:\n", "    if len(data) >= MAX_SOURCE_BYTES:\n"),
+    ("vg-depth-unbounded", VG, '            if len(stack) == MAX_DEPTH:\n                raise cursor.refuse(token, f"{word}: statements nested more than {MAX_DEPTH} deep")\n', '            if False:\n                raise cursor.refuse(token, f"{word}: statements nested more than {MAX_DEPTH} deep")\n'),
+    ("vg-range-lsb-ignored", VG, "    if lsb[3] != 0:\n", "    if False:\n"),
+    ("vg-literal-overflow-accepted", VG, "    if number >= 1 << width:\n", "    if False:\n"),
+    ("vg-top-initialiser-accepted", VG, '                if not harness or word == "wire":\n', '                if word == "wire":\n'),
+    ("vg-width-mismatch-accepted", VG, "        if width != port.width:\n", "        if False:\n"),
+    ("vg-two-drivers-accepted", VG, "        if len(outputs) > 1:\n", "        if False:\n"),
+    ("vg-second-top-accepted", VG, "    if len(tops) != 1:\n", "    if len(tops) < 1:\n"),
+    ("vg-harness-names-allowed", VG, '    if value.startswith("ecad_") and not harness:\n', "    if False:\n"),
+    ("vg-marker-text-allowed", VG, "    marker = text.find(_MARKER)\n    if marker >= 0:\n", "    marker = text.find(_MARKER)\n    if False:\n"),
+    # beyond section 10: the expression depth, the decimal bound, bidirectional controls, the harness's tasks
+    ("vg-expression-depth-unbounded", VG, '                if len(stack) == MAX_DEPTH:\n                    raise cursor.refuse(token, f"an expression nested more than {MAX_DEPTH} deep")\n                cursor.take()\n                stack.append("(")\n', '                if False:\n                    raise cursor.refuse(token, f"an expression nested more than {MAX_DEPTH} deep")\n                cursor.take()\n                stack.append("(")\n'),
+    ("vg-decimal-unbounded", VG, "            if number > MAX_DECIMAL:\n", "            if False:\n"),
+    ("vg-bidi-control-accepted", VG, '    for pattern, what in ((_CONTROL, "a control character"), (_BIDI, "a bidirectional control character")):\n', '    for pattern, what in ((_CONTROL, "a control character"),):\n'),
+    ("vg-harness-any-system-task", VG, "            if not (harness and value in HARNESS_TASKS):\n", "            if not harness:\n"),
+    # the digital domain: the class rules, V1, the closed forms, the harness writer and the model
+    ("dg-rule-c2-unchecked", DG, "if shape[2] == TRANSMITTER_PORTS and shape[3] == parameters]",
+     "if shape[3] == parameters]"),
+    ("dg-rule-c5-line-unchecked", DG, '        "line": only(tx_ports["tx"], "wire", [f"{tx_name}.tx", f"{rx_name}.rx"],\n                     "the line, which the transmitter\'s tx and the receiver\'s rx share,"),\n',
+     '        "line": tx_ports["tx"],\n'),
+    ("dg-rule-c6-inert-localparam", DG, "    if inert:\n",
+     "    if False:\n"),
+    ("dg-resource-guard-off", DG, "        if end > MAX_CYCLES:\n",
+     "        if end > 10**12:\n"),
+    ("dg-clock-consistency-unchecked", DG, "            if half is not None and abs(2 * half * clock - 1) > 1e-9:\n",
+     "            if False:\n"),
+    ("dg-receiver-ticks-unchecked", DG, "and clock // (rate * oversample) < 1:\n",
+     "and False:\n"),
+    ("dg-facet-unit-unchecked", DG, '                elif facet["unit"] != unit:\n',
+     "                elif False:\n"),
+    ("dg-frame-bits-nine", DG, "FRAME_BITS = 10  # 8N1",
+     "FRAME_BITS = 9  # 8N1"),
+    ("dg-bit-period-rounded", DG, '    bit_cycles = values[("transmitter", "clk_freq")] // values[("transmitter", "baud_rate")]\n',
+     '    bit_cycles = round(values[("transmitter", "clk_freq")] / values[("transmitter", "baud_rate")])\n'),
+    ("dg-half-period-as-period", DG, '        return 2 * values[("top", "clock_half_period")], paths\n',
+     '        return values[("top", "clock_half_period")], paths\n'),
+    ("dg-bit-rate-parity-ignored", DG, "        if first % 2 == 0:\n",
+     "        if False:\n"),
+    ("dg-sampling-condition-always", DG, "    if tick_cycles < 1:\n        return False\n",
+     "    return True\n"),
+    ("dg-sampling-upper-bound-inclusive", DG, "+ tick_cycles - 1 < (bit + 1) * bit_cycles",
+     "+ tick_cycles - 1 <= (bit + 1) * bit_cycles"),
+    ("dg-sampling-lower-bound-dropped", DG, "    return all(bit * bit_cycles <= (middle + oversample * bit) * tick_cycles\n               and (middle",
+     "    return all((middle"),
+    ("dg-harness-samples-rising-edge", DG, '        f"    always @(negedge {clk}) begin",\n',
+     '        f"    always @(posedge {clk}) begin",\n'),
+    ("dg-end-cycle-hard-coded", DG, '        f"        if (ecad_cycle == {end}) begin",\n',
+     '        "        if (ecad_cycle == 20836) begin",\n'),
+    ("dg-byte-count-hard-coded", DG, '        f"            if (ecad_received < {count}) begin",\n',
+     '        "            if (ecad_received < 2) begin",\n'),
+    ("dg-marker-dropped", DG, '        \'            $display("ECAD_METRIC rx_framing_errors %0d", ecad_framing_errors);\',\n',
+     ""),
+    ("dg-rtl-not-verbatim", DG, '                    "text": leaf.text},\n',
+     '                    "text": leaf.text.encode("ascii", "replace").decode("ascii")},\n'),
+    ("dg-top-hash-not-bound", DG, '        return source("design_annotation", path, digests[path])\n',
+     '        return source("design_annotation", path)\n'),
+    ("dg-overrides-not-written", DG, '    return f"    {hdl[\'module\']} #({overrides}) {hdl[\'instance\'].rsplit(\'.\', 1)[1]} ({connections});"\n',
+     '    return f"    {hdl[\'module\']} {hdl[\'instance\'].rsplit(\'.\', 1)[1]} ({connections});"\n'),
+    # the digital domain beyond design §10: the rules and V2 checks this implementation adds or names
+    ("dg-even-first-byte-accepted", DG, '    if localparams["TX_BYTE_0"][0] % 2 == 0:\n',
+     "    if False:\n"),
+    ("dg-oversample-literal-unchecked", DG, '    if "OVERSAMPLE" not in design.leaves[receiver.module].literal_localparams:\n',
+     "    if False:\n"),
+    ("dg-rule-c4-unchecked", DG, "        if overridden != parameters:\n",
+     "        if False:\n"),
+    ("dg-v2-rtl-prefix-unchecked", DG, "                if number > len(lines) or lines[number - 1] != want:\n",
+     "                if False:\n"),
+    ("dg-v2-harness-read-back-ignored", DG, "            if read[what] != want:\n",
+     "            if False:\n"),
+    ("dg-v2-writer-equality-ignored", DG, "        if harness != own:\n",
+     "        if False:\n"),
+    ("dg-v2-text-hash-unchecked", DG, '            elif "text" in hdl and hashlib.sha256(hdl["text"].encode("utf-8")).hexdigest() != sources[hdl["source"]]:\n',
+     "            elif False:\n"),
+    ("dg-v2-citation-unchecked", DG, '            if (facet["status"] != Status.SPECIFIED.value or facet["source"]["ref"] != origin\n',
+     '            if (False and facet["source"]["ref"] != origin\n'),
+    ("dg-v2-harness-position-unchecked", DG, "            if found != HARNESS_SEPARATOR:\n",
+     "            if False:\n"),
+    # the digital domain: the registry
+    ("digital-unregistered", DR, ',\n                                      "digital": DigitalAdapter()}',
+     "}"),
+    # REUSE-1: a copied source is bound to its origin by hash
+    ("reuse-origin-unchecked", D, '        problem = _citation_problem(f"{artifact[\'path\']}\'s origin", origin["path"], origin["sha256"])\n        if problem:\n            problems.append(problem)\n',
+     ""),
+    ("reuse-copy-unchecked", D, '        if _sha256(item.read(artifact["path"])) != origin["sha256"]:\n',
+     "        if False:\n"),
+    ("reuse-origin-inside-item-allowed", D, '        if (REPOSITORY_ROOT / origin["path"]).resolve().is_relative_to(item.root):\n',
+     "        if False:\n"),
+    # the format rules of the hdl member, the digital facet and copied_from
+    ("schema-hdl-any-version", MS, '"then": {"properties": {"model_version": {"const": "1.2.0"}}}',
+     '"then": {}'),
+    ("annotations-digital-any-version", AS, '"const": "1.2.0"',
+     '"enum": ["1.0.0", "1.1.0", "1.2.0"]'),
+    ("provenance-copy-version-rule-dropped", PS, '"then": {"properties": {"provenance_version": {"const": "1.1.0"}}}',
+     '"then": {}'),
+    # digital: the sample's own files (each rebuilt, so a behavioural test must kill it)
+    ("item-baud-rate-changed", DT, "    localparam BAUD_RATE          = 115_200;",
+     "    localparam BAUD_RATE          = 230_400;"),
+    ("item-byte-changed", DT, "TX_BYTE_1    = 8'hCA;",
+     "TX_BYTE_1    = 8'hC5;"),
+    ("item-limit-tightened", DQ, '"value": 117504.0',
+     '"value": 115000.0'),
+    ("item-illustrative-cleared", DQ, '"unit": "bits",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"\n      },\n      "illustrative": true',
+     '"unit": "bits",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"\n      },\n      "illustrative": false'),
+    ("item-operator-flipped", DQ, '"operator": ">=",\n      "limit": {\n        "value": 112896.0',
+     '"operator": "<=",\n      "limit": {\n        "value": 112896.0'),
+    ("item-device-limit-invented", DA, '"value": null,\n            "unit": "s",\n            "status": "UNKNOWN"',
+     '"value": 1e-08,\n            "unit": "s",\n            "status": "SPECIFIED"'),
+    ("item-origin-digest-changed", DP, '"copied_from": {"path": "rtl/uart_tx.v", "sha256": "5be9e1bdd20b37a3b79cb40c98fbfe241e8d6faca5ecb443b0e93378d7b4f01a"}',
+     '"copied_from": {"path": "rtl/uart_tx.v", "sha256": "c1bebcc6e894e86abd4b39af5501031b8c817f4395048ef65059eebfb710ab81"}'),
+    ("item-artifact-type-changed", DP, '"artifact_type": "hdl_source"',
+     '"artifact_type": "other"'),
+    # the origins REUSE-1 binds are never converted on checkout
+    ("rtl-origin-converted-on-checkout", GA, "rtl/uart_tx.v -text\n",
+     ""),
 ]
 
 
@@ -745,8 +886,8 @@ def run(name: str, relative: Optional[str], old: str, new: str) -> Tuple[str, st
                                 "user.email=mutation@localhost", "commit", "-q", "-m", "mutant"]):
                     subprocess.run(command, cwd=copy, check=True, capture_output=True, timeout=300)
         environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", ECAD_REQUIRE_SPICE_TOOLS="1",
-                           PYTHONDONTWRITEBYTECODE="1")
-        for suite in (FAST, ADAPTER, NETLIST, NGSPICE, ELECTRICAL, HDLAD, SPICE, SLOW):
+                           ECAD_REQUIRE_HDL_TOOLS="1", PYTHONDONTWRITEBYTECODE="1")
+        for suite in (FAST, ADAPTER, NETLIST, NGSPICE, ELECTRICAL, VERILOG, HDLAD, DIGITAL, SPICE, ICARUS, SLOW):
             result = subprocess.run(
                 [sys.executable, "-m", "pytest", suite, "-q", "-x", "-p", "no:cacheprovider"],
                 cwd=copy, env=environment, capture_output=True, text=True, timeout=1800,

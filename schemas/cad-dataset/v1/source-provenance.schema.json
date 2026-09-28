@@ -22,7 +22,10 @@
   ],
   "properties": {
     "$schema": {"const": "https://embeddedos.org/schemas/cad-dataset/v1/source-provenance.schema.json"},
-    "provenance_version": {"const": "1.0.0"},
+    "provenance_version": {
+      "description": "The format version. Every minor version of v1 is accepted; a provenance that records a copied artefact declares 1.1.0, which introduced copied_from.",
+      "enum": ["1.0.0", "1.1.0"]
+    },
     "description": {"$ref": "#/definitions/nonEmptyString"},
     "domain": {
       "description": "The sample's primary engineering domain: the domain adapter that builds its engineering model.",
@@ -39,7 +42,17 @@
         "required": ["path", "format"],
         "properties": {
           "path": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/relativePath"},
-          "format": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/identifier"}
+          "format": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/identifier"},
+          "copied_from": {
+            "description": "A byte-identical copy of this repository file, outside the item, and the origin's hash (format 1.1.0); check and V0 re-hash both (REUSE-1).",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/relativePath"},
+              "sha256": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/sha256"}
+            }
+          }
         }
       }
     },
@@ -100,6 +113,11 @@
     }
   },
   "allOf": [
+    {
+      "description": "copied_from is an addition of format 1.1.0.",
+      "if": {"properties": {"artifacts": {"contains": {"required": ["copied_from"]}}}},
+      "then": {"properties": {"provenance_version": {"const": "1.1.0"}}}
+    },
     {
       "if": {"properties": {"origin": {"properties": {"kind": {"const": "third_party"}}}}},
       "then": {"properties": {"license": {"required": ["license_text"]}}}

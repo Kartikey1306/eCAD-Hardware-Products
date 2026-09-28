@@ -1,0 +1,377 @@
+{
+  "$schema": "https://embeddedos.org/schemas/engineering-model/v1/engineering-model.schema.json",
+  "components": [
+    {
+      "cad_ref": null,
+      "component_id": "tb_uart_loopback",
+      "domains": {
+        "digital": {
+          "byte_count": {
+            "derived_from": [
+              "components/tb_uart_loopback/domains/digital/tx_bytes"
+            ],
+            "source": {
+              "kind": "computation",
+              "ref": "ecad_model.domains.digital 1.0.0: the number of TX_BYTE_i localparams"
+            },
+            "status": "DERIVED",
+            "unit": "1",
+            "value": 2
+          },
+          "clock_half_period": {
+            "note": "CLK_HALF_PERIOD_NS = 10 as source/tb_uart_loopback.v:26 states it, in its 1 ns time unit; not a rating or measurement of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+              "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+            },
+            "status": "SPECIFIED",
+            "unit": "s",
+            "value": 1e-08
+          },
+          "reset_cycles": {
+            "note": "RESET_CYCLES = 4 as source/tb_uart_loopback.v:29 states it; not a rating or measurement of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+              "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+            },
+            "status": "SPECIFIED",
+            "unit": "cycles",
+            "value": 4
+          },
+          "tx_bytes": {
+            "note": "TX_BYTE_0 = 53, TX_BYTE_1 = 202 as source/tb_uart_loopback.v:30-31 state them; not a rating or measurement of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+              "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+            },
+            "status": "SPECIFIED",
+            "unit": "1",
+            "value": [
+              53,
+              202
+            ]
+          }
+        }
+      },
+      "geometry": null,
+      "hdl": {
+        "module": "tb_uart_loopback",
+        "ports": {},
+        "signals": {
+          "clk": {
+            "kind": "reg",
+            "width": 1
+          },
+          "line": {
+            "kind": "wire",
+            "width": 1
+          },
+          "rst_n": {
+            "kind": "reg",
+            "width": 1
+          },
+          "rx_data": {
+            "kind": "wire",
+            "width": 8
+          },
+          "rx_error": {
+            "kind": "wire",
+            "width": 1
+          },
+          "rx_valid": {
+            "kind": "wire",
+            "width": 1
+          },
+          "tx_data": {
+            "kind": "reg",
+            "width": 8
+          },
+          "tx_ready": {
+            "kind": "wire",
+            "width": 1
+          },
+          "tx_valid": {
+            "kind": "reg",
+            "width": 1
+          }
+        },
+        "source": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v"
+      },
+      "kind": "other",
+      "material": null,
+      "name": "tb_uart_loopback (declarative top)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "component_id": "u_tx",
+      "domains": {
+        "digital": {
+          "baud_rate": {
+            "note": "u_tx BAUD_RATE = BAUD_RATE = 115200 as source/tb_uart_loopback.v:28 and :43 state it; not a rating or measurement of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+              "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+            },
+            "status": "SPECIFIED",
+            "unit": "Bd",
+            "value": 115200
+          },
+          "clk_freq": {
+            "note": "u_tx CLK_FREQ = CLK_FREQ = 50000000 as source/tb_uart_loopback.v:27 and :43 state it; not a rating or measurement of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+              "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+            },
+            "status": "SPECIFIED",
+            "unit": "Hz",
+            "value": 50000000
+          }
+        }
+      },
+      "geometry": null,
+      "hdl": {
+        "instance": "tb_uart_loopback.u_tx",
+        "module": "uart_tx",
+        "parameters": {
+          "BAUD_RATE": "baud_rate",
+          "CLK_FREQ": "clk_freq"
+        },
+        "ports": {
+          "clk": {
+            "direction": "input",
+            "signal": "clk",
+            "width": 1
+          },
+          "rst_n": {
+            "direction": "input",
+            "signal": "rst_n",
+            "width": 1
+          },
+          "tx": {
+            "direction": "output",
+            "signal": "line",
+            "width": 1
+          },
+          "tx_data": {
+            "direction": "input",
+            "signal": "tx_data",
+            "width": 8
+          },
+          "tx_ready": {
+            "direction": "output",
+            "signal": "tx_ready",
+            "width": 1
+          },
+          "tx_valid": {
+            "direction": "input",
+            "signal": "tx_valid",
+            "width": 1
+          }
+        },
+        "source": "datasets/cad/uart_loopback_001/source/uart_tx.v",
+        "text": "// uart_tx.v\n// UART Transmitter — 8N1 format, configurable baud rate\n//\n// Parameters:\n//   CLK_FREQ  : System clock frequency in Hz (default 50 MHz)\n//   BAUD_RATE : UART baud rate (default 115200)\n//\n// Ports:\n//   clk       : System clock (rising edge)\n//   rst_n     : Active-low synchronous reset\n//   tx_data   : 8-bit data to transmit\n//   tx_valid  : Pulse high for 1 cycle to start transmission\n//   tx_ready  : High when transmitter is idle and ready\n//   tx        : UART TX output line\n//\n// SPDX-License-Identifier: MIT\n// Copyright (c) 2026 EmbeddedOS Foundation\n\n`timescale 1ns / 1ps\n\nmodule uart_tx #(\n    parameter CLK_FREQ  = 50_000_000,\n    parameter BAUD_RATE = 115_200\n) (\n    input  wire       clk,\n    input  wire       rst_n,\n    input  wire [7:0] tx_data,\n    input  wire       tx_valid,\n    output reg        tx_ready,\n    output reg        tx\n);\n\n    // Baud rate divider: number of clock cycles per bit\n    localparam BAUD_DIV = CLK_FREQ / BAUD_RATE;\n\n    // State machine\n    localparam IDLE  = 2'd0;\n    localparam START = 2'd1;\n    localparam DATA  = 2'd2;\n    localparam STOP  = 2'd3;\n\n    reg [1:0]  state;\n    reg [15:0] baud_cnt;    // Baud rate counter\n    reg [2:0]  bit_idx;     // Current data bit index (0–7)\n    reg [7:0]  shift_reg;   // Data shift register\n\n    always @(posedge clk) begin\n        if (!rst_n) begin\n            state    <= IDLE;\n            baud_cnt <= 0;\n            bit_idx  <= 0;\n            shift_reg<= 8'h00;\n            tx       <= 1'b1;   // Idle line is high\n            tx_ready <= 1'b1;\n        end else begin\n            case (state)\n\n                IDLE: begin\n                    tx       <= 1'b1;\n                    tx_ready <= 1'b1;\n                    if (tx_valid) begin\n                        shift_reg <= tx_data;\n                        baud_cnt  <= 0;\n                        state     <= START;\n                        tx_ready  <= 1'b0;\n                    end\n                end\n\n                START: begin\n                    tx <= 1'b0;   // Start bit (low)\n                    if (baud_cnt == BAUD_DIV - 1) begin\n                        baud_cnt <= 0;\n                        bit_idx  <= 0;\n                        state    <= DATA;\n                    end else begin\n                        baud_cnt <= baud_cnt + 1;\n                    end\n                end\n\n                DATA: begin\n                    tx <= shift_reg[bit_idx];   // LSB first\n                    if (baud_cnt == BAUD_DIV - 1) begin\n                        baud_cnt <= 0;\n                        if (bit_idx == 7) begin\n                            state <= STOP;\n                        end else begin\n                            bit_idx <= bit_idx + 1;\n                        end\n                    end else begin\n                        baud_cnt <= baud_cnt + 1;\n                    end\n                end\n\n                STOP: begin\n                    tx <= 1'b1;   // Stop bit (high)\n                    if (baud_cnt == BAUD_DIV - 1) begin\n                        baud_cnt <= 0;\n                        state    <= IDLE;\n                        tx_ready <= 1'b1;\n                    end else begin\n                        baud_cnt <= baud_cnt + 1;\n                    end\n                end\n\n                default: state <= IDLE;\n\n            endcase\n        end\n    end\n\nendmodule\n"
+      },
+      "kind": "other",
+      "material": null,
+      "name": "u_tx (uart_tx, source/uart_tx.v)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "component_id": "u_rx",
+      "domains": {
+        "digital": {
+          "baud_rate": {
+            "note": "u_rx BAUD_RATE = BAUD_RATE = 115200 as source/tb_uart_loopback.v:28 and :48 state it; not a rating or measurement of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+              "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+            },
+            "status": "SPECIFIED",
+            "unit": "Bd",
+            "value": 115200
+          },
+          "clk_freq": {
+            "note": "u_rx CLK_FREQ = CLK_FREQ = 50000000 as source/tb_uart_loopback.v:27 and :48 state it; not a rating or measurement of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+              "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+            },
+            "status": "SPECIFIED",
+            "unit": "Hz",
+            "value": 50000000
+          },
+          "oversample": {
+            "note": "OVERSAMPLE = 16 as source/uart_rx.v:23 states it; not a rating or measurement of any part",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/source/uart_rx.v",
+              "sha256": "c1bebcc6e894e86abd4b39af5501031b8c817f4395048ef65059eebfb710ab81"
+            },
+            "status": "SPECIFIED",
+            "unit": "1",
+            "value": 16
+          }
+        }
+      },
+      "geometry": null,
+      "hdl": {
+        "instance": "tb_uart_loopback.u_rx",
+        "module": "uart_rx",
+        "parameters": {
+          "BAUD_RATE": "baud_rate",
+          "CLK_FREQ": "clk_freq"
+        },
+        "ports": {
+          "clk": {
+            "direction": "input",
+            "signal": "clk",
+            "width": 1
+          },
+          "rst_n": {
+            "direction": "input",
+            "signal": "rst_n",
+            "width": 1
+          },
+          "rx": {
+            "direction": "input",
+            "signal": "line",
+            "width": 1
+          },
+          "rx_data": {
+            "direction": "output",
+            "signal": "rx_data",
+            "width": 8
+          },
+          "rx_error": {
+            "direction": "output",
+            "signal": "rx_error",
+            "width": 1
+          },
+          "rx_valid": {
+            "direction": "output",
+            "signal": "rx_valid",
+            "width": 1
+          }
+        },
+        "source": "datasets/cad/uart_loopback_001/source/uart_rx.v",
+        "text": "// uart_rx.v\n// UART Receiver — 8N1 format, configurable baud rate\n// Uses 16x oversampling for robust bit detection\n//\n// SPDX-License-Identifier: MIT\n// Copyright (c) 2026 EmbeddedOS Foundation\n\n`timescale 1ns / 1ps\n\nmodule uart_rx #(\n    parameter CLK_FREQ  = 50_000_000,\n    parameter BAUD_RATE = 115_200\n) (\n    input  wire       clk,\n    input  wire       rst_n,\n    input  wire       rx,\n    output reg  [7:0] rx_data,\n    output reg        rx_valid,   // Pulses high for 1 cycle when byte received\n    output reg        rx_error    // Framing error (stop bit not high)\n);\n\n    // 16x oversampling: sample at 16× baud rate, latch at sample 8\n    localparam OVERSAMPLE    = 16;\n    localparam BAUD_DIV      = CLK_FREQ / (BAUD_RATE * OVERSAMPLE);\n    localparam SAMPLE_POINT  = OVERSAMPLE / 2;   // Sample at mid-bit\n\n    localparam IDLE  = 2'd0;\n    localparam START = 2'd1;\n    localparam DATA  = 2'd2;\n    localparam STOP  = 2'd3;\n\n    reg [1:0]  state;\n    reg [15:0] clk_cnt;      // Clock divider counter\n    reg [3:0]  sample_cnt;   // Oversample counter (0–15)\n    reg [2:0]  bit_idx;      // Data bit index\n    reg [7:0]  shift_reg;\n    reg        rx_sync;      // Synchronized RX input\n\n    // Synchronize RX input to avoid metastability\n    reg rx_meta;\n    always @(posedge clk) begin\n        rx_meta <= rx;\n        rx_sync <= rx_meta;\n    end\n\n    always @(posedge clk) begin\n        if (!rst_n) begin\n            state      <= IDLE;\n            clk_cnt    <= 0;\n            sample_cnt <= 0;\n            bit_idx    <= 0;\n            shift_reg  <= 0;\n            rx_data    <= 0;\n            rx_valid   <= 0;\n            rx_error   <= 0;\n        end else begin\n            rx_valid <= 0;\n            rx_error <= 0;\n\n            if (clk_cnt == BAUD_DIV - 1) begin\n                clk_cnt <= 0;\n\n                case (state)\n\n                    IDLE: begin\n                        if (!rx_sync) begin\n                            // Falling edge detected — possible start bit\n                            sample_cnt <= 1;\n                            state      <= START;\n                        end\n                    end\n\n                    START: begin\n                        sample_cnt <= sample_cnt + 1;\n                        if (sample_cnt == SAMPLE_POINT) begin\n                            if (!rx_sync) begin\n                                // Confirmed start bit at mid-point\n                                bit_idx    <= 0;\n                                sample_cnt <= 0;\n                                state      <= DATA;\n                            end else begin\n                                // False start — return to idle\n                                state <= IDLE;\n                            end\n                        end\n                    end\n\n                    DATA: begin\n                        sample_cnt <= sample_cnt + 1;\n                        if (sample_cnt == OVERSAMPLE - 1) begin\n                            sample_cnt         <= 0;\n                            shift_reg[bit_idx] <= rx_sync;\n                            if (bit_idx == 7) begin\n                                state <= STOP;\n                            end else begin\n                                bit_idx <= bit_idx + 1;\n                            end\n                        end\n                    end\n\n                    STOP: begin\n                        sample_cnt <= sample_cnt + 1;\n                        if (sample_cnt == OVERSAMPLE - 1) begin\n                            sample_cnt <= 0;\n                            state      <= IDLE;\n                            if (rx_sync) begin\n                                // Valid stop bit\n                                rx_data  <= shift_reg;\n                                rx_valid <= 1;\n                            end else begin\n                                // Framing error\n                                rx_error <= 1;\n                            end\n                        end\n                    end\n\n                    default: state <= IDLE;\n\n                endcase\n            end else begin\n                clk_cnt <= clk_cnt + 1;\n            end\n        end\n    end\n\nendmodule\n"
+      },
+      "kind": "other",
+      "material": null,
+      "name": "u_rx (uart_rx, source/uart_rx.v)",
+      "physical": null,
+      "placement": null
+    },
+    {
+      "cad_ref": null,
+      "component_id": "target_device",
+      "domains": {
+        "digital": {
+          "min_clock_period": {
+            "note": "no target device is selected and the design has not been synthesised, so the shortest clock period it would meet is unknown",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/uart_loopback_001/design/annotations.json"
+            },
+            "status": "UNKNOWN",
+            "unit": "s",
+            "value": null
+          }
+        }
+      },
+      "geometry": null,
+      "kind": "other",
+      "material": null,
+      "name": "the FPGA or ASIC this RTL would be implemented on (none is selected)",
+      "physical": null,
+      "placement": null
+    }
+  ],
+  "design": {
+    "design_id": "uart_loopback_001",
+    "name": "tb_uart_loopback",
+    "revision": "1.0",
+    "sources": [
+      {
+        "format": "verilog",
+        "path": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+        "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+      },
+      {
+        "format": "verilog",
+        "path": "datasets/cad/uart_loopback_001/source/uart_tx.v",
+        "sha256": "5be9e1bdd20b37a3b79cb40c98fbfe241e8d6faca5ecb443b0e93378d7b4f01a"
+      },
+      {
+        "format": "verilog",
+        "path": "datasets/cad/uart_loopback_001/source/uart_rx.v",
+        "sha256": "c1bebcc6e894e86abd4b39af5501031b8c817f4395048ef65059eebfb710ab81"
+      }
+    ]
+  },
+  "joints": [],
+  "model_version": "1.2.0",
+  "relationships": [
+    {
+      "from": "uart_loopback_001",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+        "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+      },
+      "to": "tb_uart_loopback"
+    },
+    {
+      "from": "tb_uart_loopback",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+        "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+      },
+      "to": "u_tx"
+    },
+    {
+      "from": "tb_uart_loopback",
+      "relation": "contains",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/uart_loopback_001/source/tb_uart_loopback.v",
+        "sha256": "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
+      },
+      "to": "u_rx"
+    },
+    {
+      "from": "tb_uart_loopback",
+      "relation": "constrained_by",
+      "source": {
+        "kind": "design_annotation",
+        "ref": "datasets/cad/uart_loopback_001/design/annotations.json",
+        "sha256": "8c82527d54242131ba822b36bd9025e4292878fa006625df3ee23e0e01c6cde5"
+      },
+      "to": "target_device"
+    }
+  ],
+  "unknowns": [
+    {
+      "needed_by": [
+        "digital"
+      ],
+      "note": "no target device is selected and the design has not been synthesised, so the shortest clock period it would meet is unknown",
+      "path": "components/target_device/domains/digital/min_clock_period",
+      "status": "UNKNOWN"
+    }
+  ]
+}

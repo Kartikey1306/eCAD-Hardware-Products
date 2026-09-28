@@ -1,0 +1,167 @@
+{
+  "$schema": "https://embeddedos.org/schemas/hardware-validation/v1/validation-cases.schema.json",
+  "cases": [
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "clock_period_s": {
+          "absolute_tolerance": 1e-15,
+          "value": 2e-08
+        }
+      },
+      "id": "REF-DIG-001",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "tx_idle_after_reset": {
+          "absolute_tolerance": 0,
+          "value": 1.0
+        }
+      },
+      "id": "REF-DIG-002",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "tx_bit_cycles": {
+          "absolute_tolerance": 0,
+          "value": 434.0
+        }
+      },
+      "id": "REF-DIG-003",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "tx_bit_rate_bd": {
+          "absolute_tolerance": 0.001,
+          "value": 115207.373272
+        }
+      },
+      "id": "REF-DIG-004",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "tx_frame_cycles": {
+          "absolute_tolerance": 0,
+          "value": 4340.0
+        }
+      },
+      "id": "REF-DIG-005",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "rx_bytes_received": {
+          "absolute_tolerance": 0,
+          "value": 2.0
+        }
+      },
+      "id": "REF-DIG-006",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "rx_bit_errors": {
+          "absolute_tolerance": 0,
+          "value": 0.0
+        }
+      },
+      "id": "REF-DIG-007",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "adapter": "iverilog",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "expected_metrics": {
+        "rx_framing_errors": {
+          "absolute_tolerance": 0,
+          "value": 0.0
+        }
+      },
+      "id": "REF-DIG-008",
+      "inputs": [
+        "derived/digital/uart_loopback_001.v"
+      ],
+      "requirement_ids": [
+        "POLICY:V3-GOLDEN"
+      ],
+      "seed": 0,
+      "timeout_seconds": 60
+    }
+  ],
+  "contract_version": "1.0.0",
+  "gate": "V3"
+}

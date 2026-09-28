@@ -67,7 +67,7 @@ GOLDEN = "validation/golden/cases.json"
 CORNERS = "validation/corners/cases.json"
 MANIFEST = "dataset-item.json"
 MANIFEST_VERSION = "1.0.0"
-VALIDATOR_VERSION = "1.0.0"  # of this runner, as the receipt's ecad-validator tool
+VALIDATOR_VERSION = "1.1.0"  # of this runner, as the receipt's ecad-validator tool; 1.1.0: V0 checks copied sources
 CASE_DOCUMENTS = ((GOLDEN, "V3", "golden"), (CORNERS, "V4", "corners"))
 RELATIVE_TOLERANCE = 1e-9
 ABSOLUTE_TOLERANCE = 1e-12
@@ -752,22 +752,30 @@ def manifest_problems(item: Item, derived: Optional[Derivation] = None,
 
 
 def cited_source_problems(item: Item) -> List[str]:
-    """Every file an annotation cites by hash, and the licence text, must still have that hash.
+    """Every file an annotation cites by hash, the licence text, and the origin
+    of every copied source must still have that hash; a copy must be byte-identical
+    to its origin.
 
     A citation is read only if it resolves to a regular file inside the
     repository: annotations are untrusted input, and an absolute or ../ ref
-    would otherwise have the checker read any file on the host.
+    would otherwise have the checker read any file on the host. A copied
+    source (provenance copied_from, REUSE-1) names an origin outside the item,
+    so the copy and the origin are two files, both re-hashed here.
 
     Args:
         item: The dataset item.
 
     Returns:
         One message per cited file that is outside the repository, missing,
-        not a regular file, or changed.
+        not a regular file, or changed; per copy origin that lies inside the
+        item; and per copy that is not its origin's bytes.
 
     Example:
         >>> cited_source_problems(Item(REPOSITORY_ROOT / "datasets/cad/robotic_joint_001"))
         []
+        >>> [a["copied_from"]["path"] for a in Item(REPOSITORY_ROOT / "datasets/cad/uart_loopback_001").provenance[
+        ...     "artifacts"] if "copied_from" in a], cited_source_problems(Item(REPOSITORY_ROOT / "datasets/cad/uart_loopback_001"))
+        (['rtl/uart_tx.v', 'rtl/uart_rx.v'], [])
     """
     problems: List[str] = []
 
@@ -790,6 +798,21 @@ def cited_source_problems(item: Item) -> List[str]:
         problem = _citation_problem("licence text", licence["path"], licence["sha256"])
         if problem:
             problems.append(problem)
+    for artifact in item.provenance["artifacts"]:
+        origin = artifact.get("copied_from")
+        if origin is None:
+            continue
+        if (REPOSITORY_ROOT / origin["path"]).resolve().is_relative_to(item.root):
+            # A copy of a file of the item itself binds nothing: editing both is one edit.
+            problems.append(f"{artifact['path']}'s origin {origin['path']} lies inside the item; "
+                            "a copy's origin is a repository file outside it")
+            continue
+        problem = _citation_problem(f"{artifact['path']}'s origin", origin["path"], origin["sha256"])
+        if problem:
+            problems.append(problem)
+        if _sha256(item.read(artifact["path"])) != origin["sha256"]:
+            problems.append(f"{artifact['path']} is not a byte-identical copy of {origin['path']}: its sha256 is "
+                            "not the one copied_from records")
     return sorted(set(problems))
 
 
