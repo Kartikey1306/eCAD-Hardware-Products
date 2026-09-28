@@ -110,7 +110,8 @@ report `BLOCKED` with `TOOL_NOT_INSTALLED`, and with an ngspice whose
 - **Derived files are never hand-edited.** An edit is detected by `check` as
   drift. Change the input and rebuild. This holds for the electrical deck
   too: ngspice runs `derived/electrical/<item>.cir`, never the netlist, and
-  the deck is compared byte for byte.
+  the deck is compared byte for byte -- after `validate` has run it, since
+  the committed deck is what the cases name (plan §7.2 SEC-2).
 - **No byte of an item is converted on checkout.** `.gitattributes` marks
   every file under `datasets/cad/` `-text`, with `LICENSE` and the product
   sheet the items cite by hash, so a `core.autocrlf` checkout cannot change

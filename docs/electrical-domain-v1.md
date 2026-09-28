@@ -19,8 +19,12 @@ requirements/requirements.json ──► validation/{golden,corners}/cases.json
                         receipt.json · evidence/ · results.json · report.md
 ```
 
-ngspice never sees the netlist. It runs a deck regenerated from the model, so
-every value it simulates is one the model records with its source and status.
+ngspice never sees the netlist. It runs the committed deck, which `build`
+wrote from the model, so every value it simulates is one the model records
+with its source and status -- as long as the committed deck is still the
+one the model regenerates, which `v2.dataset-reproduction` and `check`
+compare byte for byte. A committed deck edited by hand still runs (plan
+§7.2 SEC-2, Known limitations).
 The dataset layout, gates and results are those of
 [cad-dataset-engineering-model-v1.md](cad-dataset-engineering-model-v1.md);
 this page covers what is specific to the electrical domain. The code is
@@ -28,8 +32,9 @@ this page covers what is specific to the electrical domain. The code is
 `tools/ecad_model/domains/electrical.py` (the adapter) and
 `tools/ecad_validation/adapters/ngspice.py` (the tool adapter).
 
-Every statement marked **Verified** below was run on 2026-09-27 on macOS
-arm64 with Python 3.14.4 and ngspice-47 (`/opt/homebrew/bin/ngspice`).
+Every statement marked **Verified** below was run on 2026-09-27, or for
+what the review of the branch changed on 2026-09-28, on macOS arm64 with
+Python 3.14.4 and ngspice-47 (`/opt/homebrew/bin/ngspice`).
 
 ## What the domain is
 
@@ -65,7 +70,7 @@ lists what was verified.
 | Voltage and current sources | `V<id> NODE NODE PWL(t0 v0 t1 v1 ...)`, `I<id> ...`: at least two points, at most `MAX_PWL_POINTS` (16), the first at time 0, times strictly increasing |
 | Voltage-controlled switch | `S<id> NODE NODE NODE NODE MODEL`, exactly six tokens (no `on`/`off`), with its own `.model NAME SW(RON=v ROFF=v VT=v VH=v)`: all four keys, each once, no other; one switch per model, and every model used |
 | End | `.end` alone on its line; only blank lines after it |
-| Names | Designators `^[RCVIS][A-Z0-9_]{1,31}$`, unique; model names `^[A-Z][A-Z0-9_]{0,31}$`; nodes `0` or `^[a-z][a-z0-9_]{0,31}$` |
+| Names | Designators `^[RCVIS][A-Z0-9_]{1,31}$`, unique; model names `^SW_[A-Z0-9_]{1,29}$`; nodes `0` or `^n_[a-z0-9_]{1,30}$` |
 | Numbers | Digits with an optional fraction, then either an exponent or one lower-case scale suffix: `t g meg k m u n p`. `470u` is read as the one decimal literal `470e-6` |
 | Connectivity | Node `0` present; no element with both main terminals on one node; every other node on at least two terminals; every node reaches `0` through resistors, voltage sources or switch main terminals |
 
@@ -87,6 +92,7 @@ lists what was verified.
 | `;` `$` `'` `"` `{` `}` `` ` `` `!` `\` | inline comments, expressions, quoting or escapes |
 | upper-case suffixes, `f`/`F`, trailing unit letters, `mil`, an exponent with a suffix, a non-finite value | ngspice misreads them (`1M` is milli, `10uF` is 10 µ) |
 | node `gnd`, nodes `pa_<digits>` | `gnd` is ground to ngspice; `par()` in a `.meas` creates nodes `pa_00`, `pa_01`, … and takes over a netlist node of that name |
+| any other node name without the `n_` prefix, any model name without `SW_` | in a `.meas` ngspice-47 reads `v(time)` as the time axis, `v(all)` and `v(allv)` as another vector and `v(alli)` as none, crashes on a node `temper`, and stops on `limit`, `gauss`, `agauss`, `unif` and `aunif` inside `par()`; a model `TEMPER` crashes it and a model `GND` is never found (**Verified**, 2026-09-28: 12 of 174 probed names misread as nodes and 2 as models, none with the prefixes). With the rail named `time`, a real limit "bus peak ≤ 45 V" passed at 0.1 |
 | a title card, a missing `.end`, text after `.end`, a dangling node, a node with no DC path to ground | ngspice would drop, read on, or accept them |
 | CR, NUL or any byte outside printable ASCII, tab and LF; a Git LFS pointer; more than 1 MiB, 1024 characters on a line or 1000 elements; an empty file | the file-level limits |
 
@@ -178,7 +184,20 @@ netlist breaks it.
 
 The transient must also fit the resource guard: T_END / TMAX may not exceed
 1 000 000 steps, or extraction refuses it (the committed sample needs
-110 000).
+110 000). Extraction also refuses a circuit the deck's windows cannot
+measure (`_unmeasurable`): a resistance, capacitance or switch resistance
+that is not positive (the closed forms divide by them); a supply ramp still
+rising at the bypass command, where the precharge windows end; and a fault
+switch whose command never exceeds VT + VH, or that closes too late for the
+rail to settle, 30 time constants of C·(R_E + R_c ‖ R_on,F), before T_END,
+so that `fault_input_current_a` would read the current before (or during)
+the short. Each is V1 `FAIL SOURCE_REJECTED`, not a V1 sanity finding,
+because V1's findings do not stop the cases: with V_FLT rising over 100 ms
+the switch closed at 150 ms, after T_END, V1 passed and a real limit of
+10 A on the fault current passed at the pre-fault 4.17 A (review finding
+CS-2). The bypass's timing is a V1 finding (it must close before the load
+steps on), and the forms that need the rail settled after it say they do
+not apply.
 
 **Scenarios are windows of the one transient.** With T_BYP the bypass
 command time, T_FLT the fault command time and T_END = T_FLT + 10 ms:
@@ -188,7 +207,7 @@ scenario carries only its name
 (`schemas/engineering-model/v1/electrical-vocabulary.schema.json`), and every
 case runs the same deck.
 
-**Nine metrics**, all `SIMPLIFIED` (ideal sources, the fuse as a fixed
+**Ten metrics**, all `SIMPLIFIED` (ideal sources, the fuse as a fixed
 resistance, ideal switches, a capacitor with a series resistance only, a
 constant-current load, no temperature, no parasitics):
 
@@ -203,19 +222,39 @@ constant-current load, no temperature, no parasitics):
 | `steady_input_current_a` | A | steady_state | supply current at T_FLT | `steady_input_current` |
 | `steady_fuse_power_w` | W | steady_state | fuse voltage × supply current at T_FLT | `steady_fuse_power` |
 | `fault_input_current_a` | A | output_short | supply current at T_END | `settled_fault_input_current` |
+| `startup_peak_current_a` | A | startup | `MAX` of the supply current over [0, T_FLT], the surge when the bypass closes included | `startup_peak_current` |
 
 The closed forms (`electrical.reference_value`, written out in its
 docstring) are computed from the model's values alone, on a code path
 separate from the deck writer and the simulator, so a deck-writing or
-simulator error shows up as a golden mismatch. A form that does not apply
-raises `ReferenceBlocked`, and V3 reports `REFERENCE_NOT_APPLICABLE`: the
-charge-time form when the rail crosses 0.9 × V during the ramp or after
-T_BYP, and the settled forms when their window is shorter than 30 time
-constants. A null-status input gives `MISSING_REQUIRED_INPUT`.
+simulator error shows up as a golden mismatch. Until the bypass closes,
+the four precharge forms see the open fault switch's off resistance across
+the rail as a Thevenin source (review finding CS-4: with a valid ROFF of
+1 kΩ they had failed REF-EL-002 to 004; with it folded in they agree with
+ngspice-47 at 1 kΩ, 100 Ω and the committed 1 GΩ, **Verified**
+2026-09-28). The inrush metrics stop at T_BYP; `startup_peak_current_a`
+runs to T_FLT, so the surge when an early bypass closes is seen (CS-5: a
+bypass at 14.5 ms drew 28.3 A that no metric measured, and REQ-EL-001
+passed). Its form is the larger of the precharge peak and the settled load
+current, when the surge as the bypass closes is smaller than both.
+
+A form that does not apply raises `ReferenceBlocked`, and V3 reports
+`REFERENCE_NOT_APPLICABLE`: the charge-time form when the rail crosses
+0.9 × V during the ramp or after T_BYP, or never; the settled forms, and
+the startup peak, when their window is shorter than 30 time constants;
+the startup peak when the bypass surge is the largest current, because
+ngspice samples that step at its first time point after the switch
+closes (28.3205 A against the form's 28.3286 A at 14.5 ms, 3e-4 to 8e-4
+low on the variants tried); and any form that cannot be evaluated on the
+model's values (a division by zero, an overflow) or gives a value that is
+not finite -- values extraction refuses, reached only by a model built
+some other way. A null-status input gives `MISSING_REQUIRED_INPUT`.
 
 **V1** (`sanity_problems`, `DOMAIN_SANITY_FAILED`): every electrical facet is
 in the domain's vocabulary with that vocabulary's unit; resistances,
-capacitances and switch on-resistances are positive; a switch's off
+capacitances and switch on-resistances are positive (extraction already
+refuses a netlist whose values are not, so through `validate` this reports
+only a model built some other way); a switch's off
 resistance exceeds its on resistance, its hysteresis is not negative and its
 threshold exceeds its hysteresis, so it starts open; each command's high
 level exceeds VT + VH, so the switch closes; every known rating is positive;
@@ -223,15 +262,19 @@ and the sequence the windows assume holds: the ramp ends before the bypass
 command, the bypass closes before the load steps on, and the load is fully on
 before the fault command.
 
-**V2** (`invariant_problems`, `DOMAIN_MODEL_INCONSISTENT`): the committed deck
-is read back with the netlist grammar (`spice.read_deck`); its title, its
-elements (designator, element, terminals, model, values compared as exact
-floats) and every line of the adapter's own section must equal what the model
+**V2** (`invariant_problems`, `DOMAIN_MODEL_INCONSISTENT`): the deck the runner
+regenerates from the fresh model -- not the committed deck -- is read back
+with the netlist grammar (`spice.read_deck`); its title, its elements
+(designator, element, terminals, model, values compared as exact floats)
+and every line of the adapter's own section must equal what the model
 calls for; every netlist value cites the netlist by path and hash; and a
-supply that powers a component with a stated `supply_voltage` settles at that
-voltage (here V_IN's 48 V against the eServo-200 sheet's 48 V). The
-domain-neutral `v2.dataset-reproduction` also compares the deck byte for
-byte (comparator `exact`).
+supply that powers a component with a stated `supply_voltage` settles at
+that voltage (here V_IN's 48 V against the eServo-200 sheet's 48 V). These
+invariants check the deck writer against the reader and the model. Only
+the domain-neutral `v2.dataset-reproduction` reads the committed deck: it
+compares it byte for byte (comparator `exact`), so a committed deck edited
+without a rebuild fails reproduction while the model invariants still pass
+(`test_a_deck_edited_without_a_rebuild_is_divergent_and_not_counted`).
 
 ## Known limitations
 
@@ -244,12 +287,15 @@ byte (comparator `exact`).
 - **`.meas` precision.** ngspice-47 prints six significant digits, and
   `.options numdgt=12` does not change that (**Verified**: a 1 V / 3 Ω probe
   printed `3.33333e-01`). The recorded outputs of ngspice-36 and 44.2 in
-  `tests/unit/test_ngspice_adapter.py` print seven of the nine values to
-  seven digits. The tolerances are at least 21 times the deviation measured
-  on ngspice-47 (Example, below) and were set on that one platform; every
-  reference also passed on real ngspice-36 and 44.2 in arm64 Linux
-  containers (**Verified** at `f6dee36`, `TASKS.md`), not on the x86_64 CI
-  runner.
+  `tests/unit/test_ngspice_adapter.py`, of the nine-measurement deck
+  committed on 2026-09-27, print seven of the nine values to seven digits.
+  The tolerances are at least 20 times the deviation measured on ngspice-47
+  (20.94 for the fault current; Example, below) and were set on that one
+  platform. The nine references of 2026-09-27 also passed on real
+  ngspice-36 and 44.2 in arm64 Linux containers (**Verified** at `f6dee36`,
+  `TASKS.md`); the tenth, and the precharge goldens as the fault switch's
+  off resistance moved them (by 2e-12 to 3e-8 relative), have been run on
+  ngspice-47 only, and nothing on the x86_64 CI runner.
 - **No part rating can pass.** Every rating is `UNKNOWN` because no part is
   selected, and every limit is illustrative, so the sample's receipt is at
   best `BLOCKED` and never eligible for ebuild.
@@ -268,10 +314,17 @@ byte (comparator `exact`).
   `norefvalue`, which removed the report on 36, 44.2 and 47 alike, is plan
   §20 Q11.
 - **SEC-1 and SEC-2 residual.** `run_process` is process hardening, not a
-  sandbox. The parser and the regenerated deck close the netlist path, and
-  V2 and `check` report an edited deck, but the runner executes a committed
-  case document before it decides what counts: a hand-edited deck or a
-  forged case would run before it is marked stale (plan §7.2 SEC-2, open).
+  sandbox. The parser keeps what a netlist can carry out of the deck
+  `build` writes, but ngspice runs the committed deck, which equals that
+  deck only while `v2.dataset-reproduction` passes. The runner executes a
+  committed case document, and the committed deck it names, before it
+  decides which cases count: a hand-edited deck with a `.control` `shell`
+  block ran during `validate` (**Verified** by the review, 2026-09-28), and
+  a forged case document could name other inputs, before either is marked
+  stale. The same holds for the Python case scripts of the mechanical
+  domain. The guard that would close it (plan §7.2 SEC-2, §20 Q14) is a
+  maintainer's decision and is not implemented; until then only reviewed
+  repository content may be validated (plan §20 R5).
 - **STATE-2.** Execution records and the receipt's `tools[]` carry the
   absolute path of the ngspice executable (plan §7.2, open).
 - **The CI ngspice is unpinned and its version Unknown** until the `spice` job
@@ -284,9 +337,10 @@ byte (comparator `exact`).
 
 ## Example
 
-Run on a clean, committed copy of the repository (macOS arm64, Python 3.14.4,
-ngspice-47, 2026-09-27). The output directory is shown as `<dir>`; nothing
-else is edited.
+Run on a clean clone of `ec37115` (macOS arm64, Python 3.14.4, ngspice-47,
+2026-09-28). The output directory is shown as `<dir>`; nothing else is
+edited. The `build` shown is the one run on 2026-09-27; `check` now says
+the same, and `build` writes the same five files.
 
 ```console
 $ python3 tools/cad_dataset.py check datasets/cad/servo_supply_001
@@ -315,9 +369,9 @@ report: <dir>/report.md
 ```
 
 All three exited 0; the rebuild left the tree unchanged. The receipt is not
-eligible for ebuild; `results.json` holds 16 results bound to the receipt's
-digest, and all 82 evidence digests re-hash. The requirements table of
-`report.md`:
+eligible for ebuild; `results.json` holds 18 results bound to the receipt's
+digest, and all 90 evidence entries (47 distinct digests) re-hash. The
+requirements table of `report.md`:
 
 | Requirement | Kind | Metric | Measured | Verdict | Why |
 |---|---|---|---|---|---|
@@ -330,6 +384,7 @@ digest, and all 82 evidence digests re-hash. The requirements table of
 | REF-EL-007 | reference | `steady_input_current_a` | 4.16667 A | PASS | GOLDEN_COMPARISON_PASSED |
 | REF-EL-008 | reference | `steady_fuse_power_w` | 0.347223 W | PASS | GOLDEN_COMPARISON_PASSED |
 | REF-EL-009 | reference | `fault_input_current_a` | 372.465 A | PASS | GOLDEN_COMPARISON_PASSED |
+| REF-EL-010 | reference | `startup_peak_current_a` | 4.71663 A | PASS | GOLDEN_COMPARISON_PASSED |
 | REQ-EL-001 | illustrative requirement | `inrush_peak_current_a` | 4.71663 A | WARNING | REQ-EL-001 is illustrative: not a customer, safety or certification requirement |
 | REQ-EL-002 | illustrative requirement | `bus_voltage_at_bypass_v` | 47.9147 V | WARNING | REQ-EL-002 is illustrative: not a customer, safety or certification requirement |
 | REQ-EL-003 | illustrative requirement | `steady_input_current_a` | 4.16667 A | WARNING | REQ-EL-003 is illustrative: not a customer, safety or certification requirement |
@@ -337,29 +392,37 @@ digest, and all 82 evidence digests re-hash. The requirements table of
 | REQ-EL-005 | illustrative requirement | `bus_peak_voltage_v` | 48 V (measured by v3.REF-EL-001) | BLOCKED | UNKNOWN: components/c_bulk/domains/electrical/voltage_rating |
 | REQ-EL-006 | illustrative requirement | `inrush_i2t_a2s` | 0.0533906 A^2*s (measured by v3.REF-EL-001) | BLOCKED | UNKNOWN: components/r_f1/domains/electrical/melting_i2t |
 | REQ-EL-007 | illustrative requirement | `fault_input_current_a` | 372.465 A (measured by v3.REF-EL-001) | BLOCKED | UNKNOWN: components/r_f1/domains/electrical/breaking_capacity |
+| REQ-EL-008 | illustrative requirement | `startup_peak_current_a` | 4.71663 A | WARNING | REQ-EL-008 is illustrative: not a customer, safety or certification requirement |
 
 Every case runs the same deck, so a requirement blocked only by its limit
 still reports the value another check measured for the same metric, and
 names that check.
 
 **ngspice-47 against the closed forms**, the golden stored to 12 significant
-figures (**Verified**: the committed deck run with ngspice-47, and
-`electrical.reference_value` on the committed model):
+figures (**Verified**, 2026-09-28: the committed deck run with ngspice-47,
+twice, identical stdout and empty stderr; the goldens of
+`validation/golden/cases.json`; each difference and ratio computed in
+decimal from the printed value and the stored golden):
 
 | Metric | ngspice-47 | Closed form | \|difference\| | Tolerance | Tolerance / difference |
 |---|---|---|---|---|---|
-| `inrush_peak_current_a` | 4.71663 | 4.71663002764 | 2.8e-8 | 1e-4 | 3618 |
-| `inrush_i2t_a2s` | 0.0533906 | 0.0533907676223 | 1.7e-7 | 1e-4 | 597 |
-| `bus_charge_time_s` | 0.0109244 | 0.0109244343789 | 3.4e-8 | 1e-6 | 29 |
-| `bus_voltage_at_bypass_v` | 47.9147 | 47.9147188794 | 1.9e-5 | 1e-3 | 53 |
-| `bus_peak_voltage_v` | 48.0000 | 47.9999999986 | 1.4e-9 | 1e-3 | 714287 |
-| `steady_bus_voltage_v` | 47.8750 | 47.8750415236 | 4.2e-5 | 1e-3 | 24 |
+| `inrush_peak_current_a` | 4.71663 | 4.71663002765 | 2.8e-8 | 1e-4 | 3617 |
+| `inrush_i2t_a2s` | 0.0533906 | 0.0533907681653 | 1.7e-7 | 1e-4 | 595 |
+| `bus_charge_time_s` | 0.0109244 | 0.010924434697 | 3.5e-8 | 1e-6 | 28.8 |
+| `bus_voltage_at_bypass_v` | 47.9147 | 47.9147184047 | 1.8e-5 | 1e-3 | 54.3 |
+| `bus_peak_voltage_v` | 48.0000 | 47.9999999986 | 1.4e-9 | 1e-3 | 714286 |
+| `steady_bus_voltage_v` | 47.8750 | 47.8750415236 | 4.2e-5 | 1e-3 | 24.1 |
 | `steady_input_current_a` | 4.16667 | 4.16667004787 | 4.8e-8 | 1e-4 | 2089 |
-| `steady_fuse_power_w` | 0.347223 | 0.347222785757 | 2.1e-7 | 1e-5 | 47 |
-| `fault_input_current_a` | 372.465 | 372.464522495 | 4.8e-4 | 1e-2 | 21 |
+| `steady_fuse_power_w` | 0.347223 | 0.347222785757 | 2.1e-7 | 1e-5 | 46.7 |
+| `fault_input_current_a` | 372.465 | 372.464522495 | 4.8e-4 | 1e-2 | 20.9 |
+| `startup_peak_current_a` | 4.71663 | 4.71663002765 | 2.8e-8 | 1e-4 | 3617 |
 
-The design's independent scratch computation of the same forms agrees with
-the code's to the digits printed.
+The first four closed forms are those of the design with the open fault
+switch's 1 GΩ folded in, which moves them in the eighth to twelfth figure
+(the design's 4.71663002764, 0.0533907676223, 0.0109244343789 and
+47.9147188794). A scratch computation written apart from the adapter
+(`_closed_forms` in `test_electrical_domain.py` follows it) agrees to the
+digits printed.
 
 ## Dataset samples
 
@@ -370,12 +433,12 @@ testbench in which no element is a real part.
 | File | Written by | Holds |
 |---|---|---|
 | `source/provenance.json` | hand | domain `electrical`, the netlist as format `spice`, the MIT licence cited by the `LICENSE` digest, created and collected 2026-09-27 |
-| `source/servo_supply_001.cir` | hand | the source of truth: V_IN 0 → 48 V in 100 µs; R_F1 20 mΩ; R_PRE 10 Ω with S_BYP across it (commanded at 30 ms); C_BULK 470 µF with R_ESR 50 mΩ; I_LOAD 4.16667 A from 40 ms (200 W / 48 V); S_FLT shorting the rail through 100 mΩ at 100 ms. Its comments say which values come from the eServo-200 sheet and that none is a part's rating |
-| `design/annotations.json` | hand | element names and kinds; eight `UNKNOWN` ratings of the unselected fuse, resistor, bypass device and capacitor; the eServo-200 drive with its 48 V, 5 A and 200 W from the product sheet (cited by hash) and two `UNSPECIFIED` facets the sheet is silent on; `drive powered_by v_in` |
-| `requirements/requirements.json` | hand | 9 references and 7 illustrative requirements (below) |
+| `source/servo_supply_001.cir` | hand | the source of truth: V_IN 0 → 48 V in 100 µs; R_F1 20 mΩ; R_PRE 10 Ω with S_BYP across it (commanded at 30 ms); C_BULK 470 µF with R_ESR 50 mΩ; I_LOAD 4.16667 A from 40 ms (200 W / 48 V); S_FLT shorting the rail through 100 mΩ at 100 ms. Its comments say which values come from the eServo-200 sheet, that none is a part's rating, and that taking the sheet's 200 W as the drive's input power is an assumption: the sheet does not say input or output |
+| `design/annotations.json` | hand | element names and kinds; eight `UNKNOWN` ratings of the unselected fuse, resistor, bypass device and capacitor; the eServo-200 drive with its 48 V, 5 A and 200 W from the product sheet (cited by hash), whose notes say what the sheet leaves open and what is assumed: whether 5 A is continuous or peak and bounds the input current (the sheet gives it for the power stage), and whether 200 W is input or output power; two `UNSPECIFIED` facets the sheet is silent on; `drive powered_by v_in` |
+| `requirements/requirements.json` | hand | 10 references and 8 illustrative requirements (below) |
 | `derived/engineering_model.json` | `build` | 11 components, 10 null-status values indexed as needed by electrical |
 | `derived/electrical/servo_supply_001.cir` | `build` | the deck ngspice runs |
-| `validation/golden/cases.json`, `validation/corners/cases.json` | `build` | 9 V3 cases; 4 V4 cases (the 3 rating limits are blocked when compiled) |
+| `validation/golden/cases.json`, `validation/corners/cases.json` | `build` | 10 V3 cases; 5 V4 cases (the 3 rating limits are blocked when compiled) |
 | `dataset-item.json` | `build` | the manifest: electrical `AVAILABLE`, mechanical `NOT_APPLICABLE`, the other seven `NOT_IMPLEMENTED` |
 
 There is no `simulation/` directory (no script runs) and no per-sample README
@@ -390,7 +453,7 @@ inputs are built by the tests as copies, not committed.
 refuses a metric under another scenario than the one it is measured in and a
 derivation paired with another metric.
 
-- **References** REF-EL-001 to 009: one per metric, each comparing ngspice
+- **References** REF-EL-001 to 010: one per metric, each comparing ngspice
   with its closed form within the absolute tolerance above. Their source is
   model verification, not a design requirement.
 - **Requirements**, all `illustrative: true` and chosen to exercise the
@@ -400,32 +463,38 @@ derivation paired with another metric.
 |---|---|---|---|
 | REQ-EL-001 | r_pre | inrush peak ≤ 10 A | example |
 | REQ-EL-002 | s_byp | rail at the bypass command ≥ 45.6 V (within 5 % of the supply) | example |
-| REQ-EL-003 | drive | steady input current ≤ the sheet's 5 A (continuous or peak is not stated) | `components/drive/domains/electrical/rated_current` |
+| REQ-EL-003 | drive | steady input current ≤ the sheet's 5 A, **assumed** to bound the drive's input (the sheet gives 5 A for the power stage and says neither continuous nor peak) | `components/drive/domains/electrical/rated_current` |
 | REQ-EL-004 | drive | steady rail ≥ 47 V | example |
 | REQ-EL-005 | c_bulk | rail peak ≤ the capacitor's voltage rating | `UNKNOWN`: `BLOCKED` |
 | REQ-EL-006 | r_f1 | precharge I²t ≤ the fuse's melting I²t | `UNKNOWN`: `BLOCKED` |
 | REQ-EL-007 | r_f1 | prospective short-circuit current ≤ the fuse's breaking capacity | `UNKNOWN`: `BLOCKED` |
+| REQ-EL-008 | s_byp | supply current up to the fault command, the bypass surge included, ≤ 10 A | example (the same as REQ-EL-001's) |
 
 ## Expected outputs
 
 | Input | Receipt | Where it is shown |
 |---|---|---|
-| The committed sample | V0–V3 `PASS`; V4 `BLOCKED`: four `WARNING WITHIN_ILLUSTRATIVE_LIMIT`, three `BLOCKED MISSING_REQUIRED_INPUT`; overall `BLOCKED`, not eligible; 16 results | Example above; `test_the_committed_sample_validates_as_designed` (real ngspice), `test_the_committed_sample_validates_as_designed_with_recorded_ngspice_output` (stand-in) |
+| The committed sample | V0–V3 `PASS`; V4 `BLOCKED`: five `WARNING WITHIN_ILLUSTRATIVE_LIMIT`, three `BLOCKED MISSING_REQUIRED_INPUT`; overall `BLOCKED`, not eligible; 18 results | Example above; `test_the_committed_sample_validates_as_designed` (real ngspice), `test_the_committed_sample_validates_as_designed_with_recorded_ngspice_output` (stand-in) |
 | R_PRE 10 Ω → 1 Ω, rebuilt | REQ-EL-001 `FAIL CORNER_LIMITS_FAILED` at 40.6812 A ("actual 40.6812 is above maximum 10.0"); every reference still `PASS`; overall `FAIL` (**Verified**) | `test_an_undersized_precharge_resistor_fails_the_inrush_requirement` |
 | Bypass commanded at 5 ms instead of 30 ms, rebuilt | REQ-EL-002 `FAIL` at 31.2169 V; REF-EL-003 `BLOCKED REFERENCE_NOT_APPLICABLE`: "the precharge would reach the charge level at 0.010924434378860507 s, after the bypass is commanded at 0.005 s"; overall `FAIL` (**Verified**) | `test_a_bypass_that_closes_before_the_bus_is_charged_fails` |
-| ngspice not on `PATH` | the 13 compiled cases `BLOCKED TOOL_NOT_INSTALLED`, the 3 rating limits `BLOCKED MISSING_REQUIRED_INPUT`; no simulator version in any result (**Verified**) | `test_without_ngspice_every_case_is_blocked_and_the_receipt_holds` |
+| ngspice not on `PATH` | the 15 compiled cases `BLOCKED TOOL_NOT_INSTALLED`, the 3 rating limits `BLOCKED MISSING_REQUIRED_INPUT`; no simulator version in any result | `test_without_ngspice_every_case_is_blocked_and_the_receipt_holds` |
 | A limit on the boundary, one float beyond, and with a tolerance | `WARNING`, `FAIL`, `WARNING` on both operators | `test_the_limit_boundaries_are_exact`, `test_the_inrush_limit_at_its_boundary_with_real_ngspice` |
 | A rating as `UNKNOWN`, `UNSPECIFIED`, `NOT_AVAILABLE` | `BLOCKED MISSING_REQUIRED_INPUT` naming the status and path | `test_each_null_status_of_a_rating_blocks_with_its_status_and_path` |
 | A real (non-illustrative) limit on a `SPECIFIED` fixture rating; the same as `AI_ASSUMPTION` | `PASS`; `INCONCLUSIVE INPUT_IS_AI_ASSUMPTION` whether met or violated | `test_a_rating_passes_only_when_specified_and_real_and_never_when_ai_assumed` |
 | A refused netlist (`.control`) | V1 `FAIL SOURCE_REJECTED`, V2–V4 `BLOCKED DERIVATION_NOT_AVAILABLE`; ngspice never called | `test_a_refused_netlist_gives_a_receipt_and_never_reaches_ngspice` |
-| A deck edited without a rebuild | V2 `DERIVATION_DIVERGED`; every case `COMMITTED_CASE_STALE` | `test_a_deck_edited_without_a_rebuild_is_divergent_and_not_counted` |
+| A deck edited without a rebuild | `v2.dataset-reproduction` `FAIL DERIVATION_DIVERGED`; `v2.electrical.model-invariants` `PASS` (it reads the regenerated deck); every case `COMMITTED_CASE_STALE` | `test_a_deck_edited_without_a_rebuild_is_divergent_and_not_counted` |
+| A node named `time` or `all`, a switch model named `TEMPER` | V1 `FAIL SOURCE_REJECTED`; ngspice never called | `test_a_name_ngspice_reads_as_its_own_is_refused_before_ngspice_runs` |
+| V_FLT rising over 100 ms (the switch closes at 150 ms, after T_END), or too late to settle, or never above VT + VH | V1 `FAIL SOURCE_REJECTED`; every case `BLOCKED DERIVATION_NOT_AVAILABLE` (**Verified** with the review's script) | `test_a_fault_the_transient_cannot_measure_is_refused` |
+| A zero or negative capacitance, a zero resistance, RON or ROFF; a bypass commanded during the ramp | V1 `FAIL SOURCE_REJECTED`, with a receipt, `validate` exit 0 (**Verified** with the review's script) | `test_values_the_closed_forms_divide_by_are_refused_and_never_cost_a_receipt` |
+| SW_FLT's ROFF 1 kΩ, rebuilt | every reference `PASS` but REF-EL-010, `BLOCKED REFERENCE_NOT_APPLICABLE` (its surge, 6.98 A, is the peak) (**Verified**) | `test_the_precharge_forms_hold_with_a_leaky_fault_switch` |
+| Bypass commanded at 14.5 ms, rebuilt | REQ-EL-001 `WARNING` at 4.71663 A; REQ-EL-008 `FAIL CORNER_LIMITS_FAILED` at 28.3205 A; REF-EL-010 `BLOCKED REFERENCE_NOT_APPLICABLE` (**Verified**) | `test_a_surge_after_an_early_bypass_fails_the_startup_requirement` |
 
 ## Evidence
 
-- **The deck** (`derived/electrical/servo_supply_001.cir`, 1300 bytes, SHA-256
-  `2840fc04…1d30`) is hash-bound in the manifest and cited, with its case
+- **The deck** (`derived/electrical/servo_supply_001.cir`, 1370 bytes, SHA-256
+  `effee835…66c0`) is hash-bound in the manifest and cited, with its case
   document, by every check whose case ran. Its last lines are the adapter's
-  own: `.options noacct`, `.tran 1e-06 0.11 0.0 1e-06`, the nine `.meas tran`
+  own: `.options noacct`, `.tran 1e-06 0.11 0.0 1e-06`, the ten `.meas tran`
   lines, `.end`.
 - **Each check's execution record** holds the command
   (`[<ngspice>, "-b", "derived/electrical/servo_supply_001.cir"]`), the tool

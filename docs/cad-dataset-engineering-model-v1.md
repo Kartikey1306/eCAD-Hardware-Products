@@ -197,7 +197,7 @@ requires what each scenario's case reads (a rated move's start, end and
 duration; a free swing's amplitude). The electrical adapter checks them
 against `engineering-model/v1/electrical-vocabulary.schema.json`: three
 scenarios that are windows of one transient and carry only their name, and
-nine derivations; it also refuses a metric asked for under another scenario
+ten derivations; it also refuses a metric asked for under another scenario
 than the one it is measured in, and a derivation paired with another
 metric.
 
@@ -255,8 +255,8 @@ additionally records the engineering requirement each check implements.
 | Gate | Checks |
 |---|---|
 | V0 `v0.dataset-schemas-and-hashes` | Every dataset document conforms to its schema, including the adapter's extraction files; every recorded hash matches exactly, including provenance, simulation scripts and the licence text; no file is unrecorded; every source a value cites exists. Also `v0.dataset-input-immutability` (inputs unchanged during the run) and `v0.pinned-clean-source` (source tree clean and pinned; its evidence also records where the run happened). |
-| V1 `v1.<domain>.extraction-and-sanity` | The sources re-extract, and the domain's sanity checks pass (mechanical: every mass, inertia tensor — symmetric, positive definite, triangle inequality — axis and limit is physically possible; electrical: facet units, positive values, switches that start open and close, and the sequence the measurement windows assume). |
-| V2 `v2.dataset-reproduction`, `v2.<domain>.model-invariants` | The committed derivation reproduces from the sources, and a committed file that does not parse is a divergence, not a crash; `dataset-item.json` matches the one a rebuild would write; no committed case document is one the requirements no longer compile; every relationship endpoint, requirement subject and design source resolves, and each design source is an artefact the provenance declares. Then the domain's invariants (mechanical: every `cad_ref` resolves to a CAD occurrence, and MJCF bodies correspond one to one with CAD components; electrical: the deck reads back as the model's circuit plus exactly the adapter's analysis and measurements, every netlist value cites the netlist by hash, and a supply matches the stated supply voltage of what it powers). |
+| V1 `v1.<domain>.extraction-and-sanity` | The sources re-extract, and the domain's sanity checks pass (mechanical: every mass, inertia tensor — symmetric, positive definite, triangle inequality — axis and limit is physically possible; electrical: facet units, positive values, switches that start open and close, and the sequence the measurement windows assume; a netlist whose values the closed forms divide by are not positive, whose ramp runs past the bypass command, or whose fault switch does not close and settle before T_END is refused at extraction instead, `SOURCE_REJECTED`). |
+| V2 `v2.dataset-reproduction`, `v2.<domain>.model-invariants` | The committed derivation reproduces from the sources, and a committed file that does not parse is a divergence, not a crash; `dataset-item.json` matches the one a rebuild would write; no committed case document is one the requirements no longer compile; every relationship endpoint, requirement subject and design source resolves, and each design source is an artefact the provenance declares. Then the domain's invariants (mechanical: every `cad_ref` resolves to a CAD occurrence, and MJCF bodies correspond one to one with CAD components; electrical: the deck regenerated from the fresh model reads back as the model's circuit plus exactly the adapter's analysis and measurements -- the committed deck is compared only by the reproduction check, byte for byte -- every netlist value cites the netlist by path and hash, and a supply matches the stated supply voltage of what it powers). |
 | V3 | Golden cases, run by the existing case engine and the domain's simulator adapter. |
 | V4 | Corner cases, the input-status rules above, and `BLOCKED` checks for requirements whose limit has a null status. A limit met that is illustrative is `WARNING`. |
 
@@ -433,16 +433,26 @@ netlist is text that ngspice would partly execute.
   name (1 V across 2 Ω read as 1 A). The netlist parser
   (`ecad_model/spice.py`) is an allow-list that refuses each of these a
   netlist can carry, every directive but `.model` and `.end`, and every
-  character ngspice reads as a comment, expression, quote or escape; ngspice
-  only ever runs the deck the adapter regenerates from the model, in a
-  workspace holding only the case's inputs (the deck) and an empty `HOME`. V2 and `check` report a deck edited by
-  hand.
+  character ngspice reads as a comment, expression, quote or escape, and
+  every node and model name without the `n_` or `SW_` prefix, since
+  ngspice reads names such as `time`, `all` or `temper` in a `.meas` as its
+  own. So the deck `build` writes from the model carries none of them.
+  ngspice, though, runs the committed deck named by the committed case
+  document, in a workspace holding only the case's inputs and an empty
+  `HOME`; it equals the deck `build` writes only while the reproduction
+  check passes. V2 and `check` report a deck edited by hand, after it has
+  run.
 - **What is still open (SEC-2).** The runner executes a committed case
-  document before it decides which of its cases count. A hand-edited
-  committed deck, or a forged case whose inputs include a `.spiceinit`,
-  would therefore run before it is marked stale. The proposed guard (run a
-  committed document only if the fresh derivation vouches for every case
-  in it) is its own change (plan §7.2).
+  document, and the committed files it names, before it decides which of
+  its cases count. A hand-edited committed deck therefore runs before it
+  is marked stale: a `.control` `shell` block in one ran during `validate`
+  (**Verified** by the review of the electrical branch, 2026-09-28), and a
+  forged case whose inputs include a `.spiceinit` would too. The same holds
+  for the Python case scripts of the mechanical domain. The proposed guard
+  (run a committed document only if the fresh derivation vouches for every
+  case in it) is its own change and a maintainer's decision (plan §7.2,
+  §20 Q14); it is not implemented, so the path is open, and only reviewed
+  repository content may be validated (plan §20 R5).
 - **No external references.** OpenCASCADE resolves a STEP `DOCUMENT_FILE`
   reference by opening the named file during transfer (verified), which
   would read outside the throwaway workspace. The child refuses a file that

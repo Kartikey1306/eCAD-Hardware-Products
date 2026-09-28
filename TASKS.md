@@ -261,7 +261,7 @@ Verification (2026-09-26/27; code at `000309b` unless a row names another commit
 
 Owner: unassigned
 Mode: build
-Status: review (local branch `feat/domain-electrical`; not pushed; no independent review yet)
+Status: review (local branch `feat/domain-electrical`; not pushed; two independent reviews at `bf04f1b`, whose findings are fixed at `11b19b1`, `555bfd7` and `ec37115` (plan §7.6); the fixes have had no review of their own)
 Depends on: T-011 (`feat/multi-domain-foundation` at `042f934`, which this branch builds on)
 
 Goal
@@ -284,9 +284,9 @@ State of each criterion (the plan §21 item 4 carries the same markers)
 : 1. IMPLEMENTED: `datasets/cad/servo_supply_001` builds, checks and validates as designed (Verification).
   2. IMPLEMENTED for ngspice (ARCH-2, the ngspice half); the `run_process` output copy is not needed by ngspice and stays open for the HDL and KiCad domains.
   3. IMPLEMENTED (RESULT-8); RESULT-2 is PARTIAL, fixed on the ngspice path only.
-  4. PARTIAL: the job is written and its shape is tested; it has never run on a runner, and ngspice is not pinned (BLOCKED until the runner's version is known). Its steps pass in arm64 Linux containers on ngspice-36 and 44.2 (Verification of the review fixes, below), after the fix of a test that failed on ngspice-36.
+  4. PARTIAL: the job is written and its shape is tested (since `ec37115`, strictly enough that an `if:`, `|| true`, `--ignore` or a step-level override fails the test); it has never run on a runner, and ngspice is not pinned (BLOCKED until the runner's version is known). Its steps passed in arm64 Linux containers on ngspice-36 and 44.2 at `f6dee36` (Verification of the review fixes, below), after the fix of a test that failed on ngspice-36; the changes of the branch review (the tenth metric, the new goldens) have not been run on 36 or 44.2.
   5. IMPLEMENTED: `domains/base.py` and the plan §11 state the protocol stable and list its one change, `Extraction.producer`.
-  6. Sample IMPLEMENTED. Met limit: `WARNING` against the illustrative limits IMPLEMENTED; `PASS` against a real requirement only on a test-built copy with a fixture rating, since no real part is selected. `FAIL` from a mutated input IMPLEMENTED (test-built copies, real ngspice). `BLOCKED` from a missing input IMPLEMENTED (the committed sample). Invalid-input and boundary samples PARTIAL: test-built copies, not committed items (plan §20 Q17). Negative tests IMPLEMENTED; mutants IMPLEMENTED: all 285 killed in one run after a green baseline at `57f4fee` (Verification of the review fixes). Documentation IMPLEMENTED (`docs/electrical-domain-v1.md`). CI job PARTIAL, as in 4.
+  6. Sample IMPLEMENTED. Met limit: `WARNING` against the illustrative limits IMPLEMENTED; `PASS` against a real requirement only on a test-built copy with a fixture rating, since no real part is selected. `FAIL` from a mutated input IMPLEMENTED (test-built copies, real ngspice). `BLOCKED` from a missing input IMPLEMENTED (the committed sample). Invalid-input and boundary samples PARTIAL: test-built copies, not committed items (plan §20 Q17). Negative tests IMPLEMENTED; mutants IMPLEMENTED: 322 at `ec37115`, the 101 of the electrical branch killed there after green baselines and the other 221 last run at `57f4fee` (Verification of the branch review). Documentation IMPLEMENTED (`docs/electrical-domain-v1.md`). CI job PARTIAL, as in 4.
 
 Files in scope
 : `tools/ecad_model/spice.py`, `tools/ecad_model/domains/` (electrical.py,
@@ -316,8 +316,11 @@ Risks
   macOS arm64; every reference also passed on 36 and 44.2 in those
   containers. ngspice's output can differ run to run in its progress
   report, which 47 and 44.2 write to stdout and 36 to stderr (plan §20
-  Q11). A committed case document still runs before the runner decides what
-  counts (SEC-2).
+  Q11). A committed case document, and the committed deck it names, still
+  run before the runner decides what counts (SEC-2): a hand-edited deck's
+  `.control` `shell` block ran during `validate` (the branch review).
+  REF-EL-010's tolerance and the moved precharge goldens were checked on
+  ngspice-47 only.
   The mutation harness now needs ngspice, the CAD kernel and MuJoCo on one
   machine. Push access is read-only for this account.
 
@@ -357,6 +360,26 @@ Verification of the review fixes (2026-09-27 UTC; code at `f6dee36` unless a row
   | Test discrimination, all 285 mutants | `python3 tests/mutation/run_mutations.py --workers 8` on a clean clone of `57f4fee`, with ngspice-47, the CAD kernel and MuJoCo | `PASS` -- "baseline green", then "285 of 285 mutants killed", exit 0, in 61 minutes. None survived, and each kill names its test: 114 by `test_engineering_model.py`, 84 by `test_domain_adapter.py`, 37 by `test_cad_dataset.py`, 20 by `test_electrical_domain.py`, 17 by `test_ngspice_adapter.py`, 13 by `test_spice_netlist.py`. `f6dee36` only lets S1 accept more on stderr, so a mutant that passed S1 at `57f4fee` still passes it and every kill stands (Inferred; not re-run at `f6dee36`) |
   | CI `spice` job, and Linux x86_64 | the job itself | `NOT RUN` -- push access is read-only; the containers above are arm64 |
   | Coverage of new and changed code | a coverage tool | `NOT RUN` -- none is installed in this environment (no `coverage`, no `pytest-cov`) |
+
+Verification of the branch review (2026-09-28/29, macOS arm64, Python 3.14.4, ngspice-47; code at `ec37115`, whose documentation commit changes only Markdown; each row on a clean clone unless it says otherwise)
+: | Check | Command | Result |
+  |-------|---------|--------|
+  | Complete suite before the fixes | `ECAD_REQUIRE_CAD_TOOLS=1 ECAD_REQUIRE_SPICE_TOOLS=1 python3 run_all_tests.py -q -p no:cacheprovider --tb=short` at `bf04f1b` | `PASS` -- 402 passed, 0 failed, 0 skipped (201 s) |
+  | Complete suite after the fixes | the same at `ec37115` | `PASS` -- 410 passed, 0 failed, 0 skipped, exit 0 (219 s as pytest counts it; the machine slept during the run); the clone unchanged afterwards. The 73 electrical tests (16 parser, 16 ngspice adapter, 31 domain, 10 real ngspice; 67 at `bf04f1b`) are among them |
+  | Lint, changed Python | `ruff check <the 11 Python files changed since bf04f1b> --select=E,F,W --ignore=E501 --no-cache` | `PASS` -- "All checks passed!" |
+  | Type check | `mypy tools run_all_tests.py tests/mutation/run_mutations.py --ignore-missing-imports --no-strict-optional` | `PASS` for changed code -- "Found 11 errors in 7 files (checked 44 source files)", the baseline set, none in a file the review fixes changed |
+  | Derivation reproduces | `python3 tools/cad_dataset.py check` of both samples | `PASS` -- both exit 0 |
+  | V0-V4 receipt | `python3 tools/cad_dataset.py validate datasets/cad/servo_supply_001 --output <dir>` | `PASS` as designed -- exit 0; V0-V3 `PASS` (REF-EL-001..010), V4 `BLOCKED`: REQ-EL-001..004 and 008 `WARNING WITHIN_ILLUSTRATIVE_LIMIT`, REQ-EL-005..007 `BLOCKED MISSING_REQUIRED_INPUT`; overall `BLOCKED`, not eligible; 18 results; 90 evidence entries (47 digests) re-hash; `v0.pinned-clean-source` `PASS`; ngspice `47` |
+  | The reviewers' reproductions | their scripts, copied with the repository path pointed at a clone of `ec37115`: `time_falsepass.py time` and `n_bus`, `slow_fault.py slow` and `fast`, `variant.py` with a zero C_BULK, SW_FLT ROFF=1k and the bypass at 14.5 ms, and `node_probe.py` (also with its other node renamed `n_a`) | `PASS` -- `time` refused by the parser (`'time' is not a node name`), the `n_bus` control FAILs REQ-EL-900 at 48.0; the slow fault refused (`S_FLT closes at 0.15000000000000002 s ...`), the fast control FAILs at 372.465; the zero capacitance refused with a receipt written; ROFF=1k: every reference `PASS` but REF-EL-010 `BLOCKED REFERENCE_NOT_APPLICABLE`; 14.5 ms: REQ-EL-001 `WARNING`, REQ-EL-008 `FAIL` at 28.3205, REF-EL-010 `BLOCKED`; the 81 names of the node probe all refused, and their 12 `n_` forms read correctly by ngspice |
+  | Names ngspice misreads | a divider on each of 174 names, five `.meas` reading it, and a switch model of each name, run with `ngspice -b` directly (no parser) | Verified -- 12 misread as nodes (`agauss all alli allv aunif gauss gnd limit pa_00 temper time unif`), 2 as models (`GND`, `TEMPER`); with `n_` and `SW_`, none |
+  | Closed forms against ngspice | a scratch script, written apart from the adapter, on 13 variants (the sample; SW_FLT ROFF 1k and 100; SW_BYP ROFF 1k; the bypass at 5, 14.5 and 24.9 ms; no ESR, alone and with 14.5 ms; VH=1 V with a 1 ms command; R_PRE 1 ohm; an 8 A load) | Verified -- every precharge, settled and startup value within its tolerance of ngspice-47 where the form applies; the bypass surge, where it is the startup peak, 3e-4 to 8e-4 below the form (28.3205 against 28.3286 A at 14.5 ms), which is why that form then does not apply |
+  | New tests fail before the fixes | the tests of `555bfd7` for CS-2..CS-5 copied into a clone of `11b19b1` (before the electrical fixes); the tests of `11b19b1` into one of `bf04f1b`; the runner test with `dataset.py` of `bf04f1b` | `PASS` -- on `11b19b1`, 25 tests and subtests of the fault window, the refused values, the closed forms, the startup peak and the two real-ngspice tests failed; on `bf04f1b`, 28 (22 of the parser test, some only for its new message, and 6 of the electrical tests, among them the rail named `time` and the model `TEMPER`); the runner test raised `ZeroDivisionError` out of `validate` |
+  | CI tests catch a hidden skip | the four edits of the review (and two on the cad-dataset job) applied to the workflow text in memory, against the new and the old tests | `PASS` -- each fails the new test of its job and passed the old one |
+  | Test discrimination, the electrical branch | `python3 tests/mutation/run_mutations.py --workers 4 --only <batch>`, nine batches of 9 to 13 covering all 101, on a clean clone of `ec37115` | `PASS` -- "baseline green" and "N of N mutants killed" in each; 101 killed, none survived: 42 by `test_electrical_domain.py`, 22 by `test_engineering_model.py`, 18 by `test_ngspice_adapter.py`, 16 by `test_spice_netlist.py`, 3 by `test_domain_adapter.py`. Three batches ran 8 m 1 s to 8 m 39 s (two of them concurrently); a tool retry started batch 8 twice, and the log kept is the complete second run. Earlier, the 4 name mutants at `11b19b1` (4 of 4) and 10 of the electrical ones at `555bfd7` (10 of 10) |
+  | Test discrimination, the other 221 | `run_mutations.py` | `NOT RUN` here -- last run at `57f4fee` (above); their target lines and killing tests are unchanged |
+  | Two statements of the `555bfd7` commit message | -- | Wrong, not amended: it says 16 new mutants (it adds 15) and that the goldens moved "in the ninth to twelfth figure" (the eighth to twelfth) |
+  | ngspice-36 and 44.2, Linux, the CI job | a real run | `NOT RUN` -- no container was run for the branch review; push access is read-only |
+  | Coverage of new and changed code | a coverage tool | `NOT RUN` -- none is installed |
 
 ## Completed
 
