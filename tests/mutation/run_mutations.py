@@ -543,6 +543,14 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     # the domain adapter names its model's producer
     ("model-producer-hard-coded", D, "producer=extraction.producer[0], version=extraction.producer[1],",
      'producer="ecad_model.builder", version="1.0.0",'),
+    # the review of the electrical branch: names ngspice reads as its own (CS-1)
+    ("spice-node-prefix-dropped", SP, '_NODE = re.compile(r"0|n_[a-z0-9_]{1,30}")',
+     '_NODE = re.compile(r"0|[a-z][a-z0-9_]{0,31}")'),
+    ("spice-model-prefix-dropped", SP, '_MODEL_NAME = re.compile(r"SW_[A-Z0-9_]{1,29}")',
+     '_MODEL_NAME = re.compile(r"[A-Z][A-Z0-9_]{0,31}")'),
+    ("schema-node-prefix-dropped", MS, '"pattern": "^(0|n_[a-z0-9_]{1,30})$"',
+     '"pattern": "^(0|(?!gnd$)(?!pa_[0-9]+$)[a-z][a-z0-9_]{0,31})$"'),
+    ("schema-model-prefix-dropped", MS, '"pattern": "^SW_[A-Z0-9_]{1,29}$"', '"pattern": "^[A-Z][A-Z0-9_]{0,31}$"'),
 ]
 
 

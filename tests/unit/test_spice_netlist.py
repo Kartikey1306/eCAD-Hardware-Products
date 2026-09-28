@@ -105,9 +105,9 @@ EXPECTED = [
 MODELS = {"SW_BYP": {"RON": 0.01, "ROFF": 1e9, "VT": 2.5, "VH": 0.0},
           "SW_FLT": {"RON": 0.1, "ROFF": 1e9, "VT": 2.5, "VH": 0.0}}
 
-GOOD = ("V1 a 0 PWL(0 0 1m 5)", "R1 a b 1k", "R2 b 0 1k")
-SW1 = ".model SW1 SW(RON=1 ROFF=1meg VT=2.5 VH=0.1)"
-SWITCHED = ("V1 a 0 PWL(0 0 1m 5)", "R1 a b 1k", "S1 b 0 c 0 SW1", "V2 c 0 PWL(0 0 1m 5)", SW1)
+GOOD = ("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a n_b 1k", "R2 n_b 0 1k")
+SW1 = ".model SW_1 SW(RON=1 ROFF=1meg VT=2.5 VH=0.1)"
+SWITCHED = ("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a n_b 1k", "S1 n_b 0 n_c 0 SW_1", "V2 n_c 0 PWL(0 0 1m 5)", SW1)
 
 
 def netlist(*cards: str, title: str = "divider", end: str = ".end") -> bytes:
@@ -173,8 +173,8 @@ class TestNetlistGrammar(unittest.TestCase):
         with self.assertRaises(spice.NetlistRefused) as caught:
             spice.parse_value("1e999", "x.cir:9")
         self.assertEqual(str(caught.exception), "x.cir:9: '1e999' is not a finite number")
-        self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a b 1M", "R2 b 0 1k"), "x.cir:3: '1M' is not a number")
-        self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a 0 1k", "C1 a 0 470uF"), "x.cir:4: '470uF' is not a number")
+        self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a n_b 1M", "R2 n_b 0 1k"), "x.cir:3: '1M' is not a number")
+        self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a 0 1k", "C1 n_a 0 470uF"), "x.cir:4: '470uF' is not a number")
 
     def test_directives_that_read_files_run_commands_or_belong_to_the_adapter_are_refused(self):
         classes = {
@@ -203,11 +203,11 @@ class TestNetlistGrammar(unittest.TestCase):
 
     def test_continuations_and_characters_spice_would_reinterpret_are_refused(self):
         continued = "x.cir:4: a '+' continuation, which joins this line to the one before it"
-        self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a b 1k", "+ 5", "R2 b 0 1k"), continued)
-        self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a b 1k", "  +5", "R2 b 0 1k"), continued)
+        self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a n_b 1k", "+ 5", "R2 n_b 0 1k"), continued)
+        self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a n_b 1k", "  +5", "R2 n_b 0 1k"), continued)
         for character in (";", "$", "'", '"', "{", "}", "`", "!", "\\"):
             with self.subTest(character=character):
-                self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", f"R1 a b 1k {character}x", "R2 b 0 1k"),
+                self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", f"R1 n_a n_b 1k {character}x", "R2 n_b 0 1k"),
                              f"x.cir:3: character {character!r}: ngspice reads it as")
         self.refused(netlist(*GOOD, SW1.replace("VH=0.1", "VH={0.1}")), "x.cir:5: character '{'")
         # A comment may say anything: ngspice never reads it.
@@ -221,15 +221,15 @@ class TestNetlistGrammar(unittest.TestCase):
         self.assertEqual(sorted([*reasons, *"CIRSV"]), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
         for letter, reason in reasons.items():
             with self.subTest(letter=letter):
-                self.refused(netlist(*GOOD, f"{letter}1 a b 1k"), f"x.cir:5: {letter}1: {reason}")
-        self.refused(netlist(*GOOD, "l1 a b 1u"), "x.cir:5: l1: an inductor: PLANNED")
-        for card, designator in (("r1 a b 1k", "r1"), ("Rx a b 1k", "Rx"), ("R a b 1k", "R"),
-                                 ("v1 a 0 PWL(0 0 1m 5)", "v1"), ("s1 b 0 c 0 SW1", "s1")):
+                self.refused(netlist(*GOOD, f"{letter}1 n_a n_b 1k"), f"x.cir:5: {letter}1: {reason}")
+        self.refused(netlist(*GOOD, "l1 n_a n_b 1u"), "x.cir:5: l1: an inductor: PLANNED")
+        for card, designator in (("r1 n_a n_b 1k", "r1"), ("Rx n_a n_b 1k", "Rx"), ("R n_a n_b 1k", "R"),
+                                 ("v1 n_a 0 PWL(0 0 1m 5)", "v1"), ("s1 n_b 0 n_c 0 SW_1", "s1")):
             with self.subTest(card=card):
                 self.refused(netlist(*GOOD, card), f"x.cir:5: {designator!r} is not a designator")
-        self.refused(netlist(*GOOD, "1R a b 1k"), "x.cir:5: '1R' is not an element, a comment or a directive")
-        self.refused(netlist(*GOOD, "R3 a b 1k tc1=0"), "x.cir:5: R3: a resistor is R<id> NODE NODE VALUE, exactly")
-        self.refused(netlist(*GOOD, "C3 a 0 1u ic=0"), "x.cir:5: C3: a capacitor is C<id> NODE NODE VALUE, exactly")
+        self.refused(netlist(*GOOD, "1R n_a n_b 1k"), "x.cir:5: '1R' is not an element, a comment or a directive")
+        self.refused(netlist(*GOOD, "R3 n_a n_b 1k tc1=0"), "x.cir:5: R3: a resistor is R<id> NODE NODE VALUE, exactly")
+        self.refused(netlist(*GOOD, "C3 n_a 0 1u ic=0"), "x.cir:5: C3: a capacitor is C<id> NODE NODE VALUE, exactly")
 
     def test_sources_are_piecewise_linear_with_increasing_times(self):
         only_pwl = "source: only PWL(t0 v0 t1 v1 ...) sources are read; other source types are PLANNED"
@@ -237,10 +237,10 @@ class TestNetlistGrammar(unittest.TestCase):
                            ("SIN(0 1 1k)", "SIN"), ("EXP(0 1 0 1m 2m 1m)", "EXP"), ("AC 1", "AC"),
                            ("PWL(0 0 1m 5) r=0", "PWL")):
             with self.subTest(spec=spec):
-                self.refused(netlist(f"V1 a 0 {spec}", "R1 a b 1k", "R2 b 0 1k"), f"x.cir:2: V1: {kind} {only_pwl}")
-        self.refused(netlist(*GOOD, "I1 b 0 DC 1"), f"x.cir:5: I1: DC {only_pwl}")
-        self.refused(netlist("V1 a 0", "R1 a b 1k", "R2 b 0 1k"), "x.cir:2: V1: a source is V<id> NODE NODE PWL(...)")
-        self.refused(netlist(*GOOD, "I1 b 0"), "x.cir:5: I1: a source is I<id> NODE NODE PWL(...)")
+                self.refused(netlist(f"V1 n_a 0 {spec}", "R1 n_a n_b 1k", "R2 n_b 0 1k"), f"x.cir:2: V1: {kind} {only_pwl}")
+        self.refused(netlist(*GOOD, "I1 n_b 0 DC 1"), f"x.cir:5: I1: DC {only_pwl}")
+        self.refused(netlist("V1 n_a 0", "R1 n_a n_b 1k", "R2 n_b 0 1k"), "x.cir:2: V1: a source is V<id> NODE NODE PWL(...)")
+        self.refused(netlist(*GOOD, "I1 n_b 0"), "x.cir:5: I1: a source is I<id> NODE NODE PWL(...)")
         for spec, reason in (("PWL(0 0 1m)", "a PWL is time-value pairs, at least two of them; found 3 numbers"),
                              ("PWL(0 0)", "a PWL is time-value pairs, at least two of them; found 2 numbers"),
                              ("PWL()", "a PWL is time-value pairs, at least two of them; found 0 numbers"),
@@ -248,9 +248,9 @@ class TestNetlistGrammar(unittest.TestCase):
                              ("PWL(0 0 1m 5 1m 6)", "PWL times must strictly increase"),
                              ("PWL(0 0 2m 5 1m 6)", "PWL times must strictly increase")):
             with self.subTest(spec=spec):
-                self.refused(netlist(f"V1 a 0 {spec}", "R1 a b 1k", "R2 b 0 1k"), f"x.cir:2: V1: {reason}")
-        parsed = spice.parse_netlist(netlist("V1 a 0 pwl (0 0 1m 5 2m 5)", "R1 a b 1k", "R2 b 0 1k",
-                                             "I1 b 0 PWL(0 0 1u 2m)"), "x.cir")
+                self.refused(netlist(f"V1 n_a 0 {spec}", "R1 n_a n_b 1k", "R2 n_b 0 1k"), f"x.cir:2: V1: {reason}")
+        parsed = spice.parse_netlist(netlist("V1 n_a 0 pwl (0 0 1m 5 2m 5)", "R1 n_a n_b 1k", "R2 n_b 0 1k",
+                                             "I1 n_b 0 PWL(0 0 1u 2m)"), "x.cir")
         self.assertEqual(parsed.elements[0].values, {"waveform_time": [0.0, 0.001, 0.002],
                                                      "waveform_voltage": [0.0, 5.0, 5.0]})
         self.assertEqual(parsed.elements[3].values, {"waveform_time": [0.0, 1e-06], "waveform_current": [0.0, 0.002]})
@@ -259,70 +259,93 @@ class TestNetlistGrammar(unittest.TestCase):
         parsed = spice.parse_netlist(netlist(*SWITCHED), "x.cir")
         self.assertEqual(parsed.elements[2].values, {"on_resistance": 1.0, "off_resistance": 1e6,
                                                      "threshold_voltage": 2.5, "hysteresis_voltage": 0.1})
-        self.assertEqual(parsed.elements[2].model, "SW1")
-        any_case = spice.parse_netlist(netlist(*SWITCHED[:4], ".MODEL SW1 sw(vh=0.1 vt=2.5 roff=1meg ron=1)"), "x.cir")
+        self.assertEqual(parsed.elements[2].model, "SW_1")
+        any_case = spice.parse_netlist(netlist(*SWITCHED[:4], ".MODEL SW_1 sw(vh=0.1 vt=2.5 roff=1meg ron=1)"), "x.cir")
         self.assertEqual(any_case.elements[2].values, parsed.elements[2].values)
-        self.assertEqual(any_case.models, {"SW1": {"RON": 1.0, "ROFF": 1e6, "VT": 2.5, "VH": 0.1}})
+        self.assertEqual(any_case.models, {"SW_1": {"RON": 1.0, "ROFF": 1e6, "VT": 2.5, "VH": 0.1}})
         for model, reason in (
-                (".model SW1 SW(RON=1 ROFF=1meg VT=2.5)", "model SW1: VH missing; no SPICE default fills a value nobody chose"),
-                (".model SW1 SW(RON=1)", "model SW1: ROFF VT VH missing"),
-                (".model SW1 SW(RON=1 ROFF=1meg VT=2.5 VH=0.1 TD=1)", "model SW1: 'TD=1' is not one of RON= ROFF= VT= VH="),
-                (".model SW1 SW(RON=1 ROFF=1meg VT=2.5 VH)", "model SW1: 'VH' is not one of RON= ROFF= VT= VH="),
-                (".model SW1 SW(RON=1 RON=2 ROFF=1meg VT=2.5 VH=0.1)", "model SW1: RON is given twice"),
-                (".model SW1 CSW(IT=1 IH=0 RON=1 ROFF=1meg)", "model SW1: type CSW: only SW (voltage-controlled switch)"),
-                (".model SW1 SW RON=1 ROFF=1meg VT=2.5 VH=0.1", "a .model card is .model NAME SW(RON=v ROFF=v VT=v VH=v)"),
-                (".model SW1 SW(RON=1 ROFF=1M VT=2.5 VH=0.1)", "'1M' is not a number")):
+                (".model SW_1 SW(RON=1 ROFF=1meg VT=2.5)", "model SW_1: VH missing; no SPICE default fills a value nobody chose"),
+                (".model SW_1 SW(RON=1)", "model SW_1: ROFF VT VH missing"),
+                (".model SW_1 SW(RON=1 ROFF=1meg VT=2.5 VH=0.1 TD=1)", "model SW_1: 'TD=1' is not one of RON= ROFF= VT= VH="),
+                (".model SW_1 SW(RON=1 ROFF=1meg VT=2.5 VH)", "model SW_1: 'VH' is not one of RON= ROFF= VT= VH="),
+                (".model SW_1 SW(RON=1 RON=2 ROFF=1meg VT=2.5 VH=0.1)", "model SW_1: RON is given twice"),
+                (".model SW_1 CSW(IT=1 IH=0 RON=1 ROFF=1meg)", "model SW_1: type CSW: only SW (voltage-controlled switch)"),
+                (".model SW_1 SW RON=1 ROFF=1meg VT=2.5 VH=0.1", "a .model card is .model NAME SW(RON=v ROFF=v VT=v VH=v)"),
+                (".model SW_1 SW(RON=1 ROFF=1M VT=2.5 VH=0.1)", "'1M' is not a number")):
             with self.subTest(model=model):
                 self.refused(netlist(*SWITCHED[:4], model), f"x.cir:6: {reason}")
-        self.refused(netlist(*SWITCHED[:2], "S1 b 0 c 0 SW2", *SWITCHED[3:]),
-                     "x.cir:4: S1 names model SW2, which no .model card declares")
-        self.refused(netlist(*SWITCHED[:4], "S2 b 0 c 0 SW1", SW1),
-                     "x.cir:6: S2 names model SW1, which S1 already uses; each switch has its own .model")
-        self.refused(netlist(*SWITCHED, SW1.replace("SW1", "SW9")), "x.cir:7: model SW9 is used by no switch")
-        self.refused(netlist(*SWITCHED[:2], "S1 b 0 c 0 SW1 OFF", *SWITCHED[3:]),
+        self.refused(netlist(*SWITCHED[:2], "S1 n_b 0 n_c 0 SW_2", *SWITCHED[3:]),
+                     "x.cir:4: S1 names model SW_2, which no .model card declares")
+        self.refused(netlist(*SWITCHED[:4], "S2 n_b 0 n_c 0 SW_1", SW1),
+                     "x.cir:6: S2 names model SW_1, which S1 already uses; each switch has its own .model")
+        self.refused(netlist(*SWITCHED, SW1.replace("SW_1", "SW_9")), "x.cir:7: model SW_9 is used by no switch")
+        self.refused(netlist(*SWITCHED[:2], "S1 n_b 0 n_c 0 SW_1 OFF", *SWITCHED[3:]),
                      "x.cir:4: S1: a switch is S<id> NODE NODE NODE NODE MODEL, exactly")
-        self.refused(netlist(*SWITCHED[:2], "S1 b 0 c 0 sw1", *SWITCHED[3:]), "x.cir:4: S1: 'sw1' is not a model name")
-        self.refused(netlist(*SWITCHED[:4], SW1.replace("SW1", "sw1")), "x.cir:6: 'sw1' is not a model name")
+        self.refused(netlist(*SWITCHED[:2], "S1 n_b 0 n_c 0 sw_1", *SWITCHED[3:]), "x.cir:4: S1: 'sw_1' is not a model name")
+        self.refused(netlist(*SWITCHED[:4], SW1.replace("SW_1", "sw_1")), "x.cir:6: 'sw_1' is not a model name")
 
     def test_names_are_canonical_unique_and_never_ground_aliases_or_par_nodes(self):
-        self.refused(netlist(*GOOD, "R1 a 0 1k"), "x.cir:5: R1 is already declared on line 3")
-        self.refused(netlist(*SWITCHED, SW1), "x.cir:7: model SW1 is already declared on line 6")
-        for node, reason in (("A", "'A' is not a node name: 0, or a lower-case letter and up to 31 of a-z 0-9 _"),
+        self.refused(netlist(*GOOD, "R1 n_a 0 1k"), "x.cir:5: R1 is already declared on line 3")
+        self.refused(netlist(*SWITCHED, SW1), "x.cir:7: model SW_1 is already declared on line 6")
+        not_a_node = "is not a node name: 0, or n_ and 1 to 30 of a-z 0-9 _; ngspice reads names such as time, all or temper"
+        for node, reason in (("A", f"'A' {not_a_node}"),
                              ("gnd", "'gnd' is ground to ngspice; write 0"),
                              ("pa_0", "'pa_0' is a name ngspice's par() gives its own nodes"),
                              ("pa_12", "'pa_12' is a name ngspice's par() gives its own nodes"),
                              ("00", "'00' is not a node name"),
                              ("_a", "'_a' is not a node name"),
-                             ("n" + "x" * 32, f"'n{'x' * 32}' is not a node name")):
+                             ("n_" + "x" * 31, f"'n_{'x' * 31}' is not a node name"),
+                             ("n_", "'n_' is not a node name"),
+                             ("N_A", "'N_A' is not a node name"),
+                             ("a", f"'a' {not_a_node}"),
+                             # Names ngspice-47 reads as its own inside a .meas (2026-09-28):
+                             # the time axis, another vector, a crash or a parse error.
+                             *((name, f"'{name}' {not_a_node}") for name in (
+                                 "time", "all", "allv", "alli", "temper", "limit", "gauss", "agauss", "unif", "aunif")),
+                             ("pa_x", "'pa_x' is not a node name"), ("gnd1", "'gnd1' is not a node name"),
+                             ("ground", "'ground' is not a node name")):
             with self.subTest(node=node):
-                self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a b 1k", f"R2 b {node} 1k"), f"x.cir:4: R2: {reason}")
-        self.refused(netlist(*GOOD, f"R{'X' * 32} a b 1k"), f"x.cir:5: 'R{'X' * 32}' is not a designator")
-        self.refused(netlist(*SWITCHED[:2], f"S1 b 0 c 0 S{'W' * 32}", *SWITCHED[3:]),
+                self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a n_b 1k", f"R2 n_b {node} 1k"), f"x.cir:4: R2: {reason}")
+        self.refused(netlist(*GOOD, f"R{'X' * 32} n_a n_b 1k"), f"x.cir:5: 'R{'X' * 32}' is not a designator")
+        self.refused(netlist(*SWITCHED[:2], f"S1 n_b 0 n_c 0 S{'W' * 32}", *SWITCHED[3:]),
                      f"x.cir:4: S1: 'S{'W' * 32}' is not a model name")
-        # The exclusions are exact: neighbouring names are ordinary nodes, and
-        # 32 characters is the longest name.
-        for node in ("pa_x", "pa_", "gnd1", "ground", "n" + "x" * 31):
+        # Model names ngspice-47 misreads: TEMPER crashes it, GND is never found
+        # (2026-09-28); neither, nor any name without the SW_ prefix, is read.
+        for model in ("TEMPER", "GND", "SW1", "SW_", "SW_" + "W" * 30, "M_SW"):
+            with self.subTest(model=model):
+                self.refused(netlist(*SWITCHED[:2], f"S1 n_b 0 n_c 0 {model}", *SWITCHED[3:]),
+                             f"x.cir:4: S1: '{model}' is not a model name: SW_ and 1 to 29 of A-Z 0-9 _")
+                self.refused(netlist(*SWITCHED[:4], SW1.replace("SW_1", model)),
+                             f"x.cir:6: '{model}' is not a model name: SW_ and 1 to 29 of A-Z 0-9 _")
+        # The prefixes are exact: every excluded name becomes an ordinary node
+        # or model behind them, and 32 characters is the longest name.
+        for node in ("n_time", "n_all", "n_temper", "n_gnd", "n_pa_00", "n_0", "n__", "n_" + "x" * 30):
             with self.subTest(accepted=node):
-                parsed = spice.parse_netlist(netlist("V1 a 0 PWL(0 0 1m 5)", f"R1 a {node} 1k", f"R2 {node} 0 1k"), "x.cir")
+                parsed = spice.parse_netlist(netlist("V1 n_a 0 PWL(0 0 1m 5)", f"R1 n_a {node} 1k", f"R2 {node} 0 1k"), "x.cir")
                 self.assertEqual(parsed.elements[2].terminals, {"p": node, "n": "0"})
+        for model in ("SW_TEMPER", "SW_GND", "SW_0", "SW_" + "W" * 29):
+            with self.subTest(accepted=model):
+                parsed = spice.parse_netlist(netlist(*SWITCHED[:2], f"S1 n_b 0 n_c 0 {model}", *SWITCHED[3:4],
+                                                     SW1.replace("SW_1", model)), "x.cir")
+                self.assertEqual(parsed.elements[2].model, model)
         longest = "R" + "X" * 31
-        self.assertEqual(spice.parse_netlist(netlist(*GOOD, f"{longest} a b 1k"), "x.cir").elements[3].designator, longest)
+        self.assertEqual(spice.parse_netlist(netlist(*GOOD, f"{longest} n_a n_b 1k"), "x.cir").elements[3].designator, longest)
 
     def test_every_node_is_connected_twice_and_reaches_ground(self):
-        self.refused(netlist(*GOOD, "R3 b c 1k"), "x.cir:5: node c has one terminal (R3.n): nothing else connects to it")
+        self.refused(netlist(*GOOD, "R3 n_b n_c 1k"), "x.cir:5: node n_c has one terminal (R3.n): nothing else connects to it")
         singular = "has no DC path to ground: the operating point is singular"
-        self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a 0 1k", "C1 a b 1u", "C2 b 0 1u"), f"x.cir:4: node b {singular}")
-        self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a 0 1k", "I1 a b PWL(0 0 1m 1)", "C1 b 0 1u"),
-                     f"x.cir:4: node b {singular}")
-        self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a 0 1k", "S1 a 0 c d SW1", "C1 c d 1u", SW1),
-                     f"x.cir:4: node c {singular}")
-        self.refused(netlist("V1 a b PWL(0 0 1m 5)", "R1 a b 1k"), "x.cir: no element connects to ground, node 0")
-        self.refused(netlist(*GOOD, "R3 b b 1k"), "x.cir:5: R3: both terminals are on node b")
-        self.refused(netlist(*SWITCHED[:2], "S1 b b c 0 SW1", *SWITCHED[3:]), "x.cir:4: S1: both terminals are on node b")
+        self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a 0 1k", "C1 n_a n_b 1u", "C2 n_b 0 1u"), f"x.cir:4: node n_b {singular}")
+        self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a 0 1k", "I1 n_a n_b PWL(0 0 1m 1)", "C1 n_b 0 1u"),
+                     f"x.cir:4: node n_b {singular}")
+        self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a 0 1k", "S1 n_a 0 n_c n_d SW_1", "C1 n_c n_d 1u", SW1),
+                     f"x.cir:4: node n_c {singular}")
+        self.refused(netlist("V1 n_a n_b PWL(0 0 1m 5)", "R1 n_a n_b 1k"), "x.cir: no element connects to ground, node 0")
+        self.refused(netlist(*GOOD, "R3 n_b n_b 1k"), "x.cir:5: R3: both terminals are on node n_b")
+        self.refused(netlist(*SWITCHED[:2], "S1 n_b n_b n_c 0 SW_1", *SWITCHED[3:]), "x.cir:4: S1: both terminals are on node n_b")
         # A switch's p-n pair conducts (its off resistance is finite), and
         # ground needs only one terminal.
-        spice.parse_netlist(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a 0 1k", "C1 a x 1u", "S1 x 0 a 0 SW1", SW1), "x.cir")
-        spice.parse_netlist(netlist("V1 a 0 PWL(0 0 1m 5)", "R1 a b 1k", "R2 b a 1k"), "x.cir")
+        spice.parse_netlist(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a 0 1k", "C1 n_a n_x 1u", "S1 n_x 0 n_a 0 SW_1", SW1), "x.cir")
+        spice.parse_netlist(netlist("V1 n_a 0 PWL(0 0 1m 5)", "R1 n_a n_b 1k", "R2 n_b n_a 1k"), "x.cir")
 
     def test_the_title_line_is_never_a_card(self):
         card = "x.cir:1: line 1 is the title, so SPICE never reads this element card"
@@ -349,7 +372,7 @@ class TestNetlistGrammar(unittest.TestCase):
         self.refused(netlist(*GOOD, end=""), "x.cir: no .end line; ngspice accepts a netlist without one")
         self.refused(netlist(*GOOD, end="* the end"), "x.cir: no .end line")
         after = "x.cir:6: text after .end, which ngspice still reads"
-        for line in ("R3 b 0 1k", "* a comment", "*#echo x", ".end"):
+        for line in ("R3 n_b 0 1k", "* a comment", "*#echo x", ".end"):
             with self.subTest(line=line):
                 self.refused(netlist(*GOOD, end=f".end\n{line}"), after)
         self.refused(netlist(*GOOD, end=".end now"), "x.cir:5: nothing follows .end on its line")
@@ -373,27 +396,27 @@ class TestNetlistGrammar(unittest.TestCase):
         spice.parse_netlist(netlist(*GOOD, "*" + "x" * 1023), "x.cir")
         self.refused(netlist(*GOOD, "*" + "x" * 1024), "x.cir:5: 1025 characters exceeds the 1024-character line limit")
 
-        resistors = [f"R{index} a 0 1k" for index in range(1, 1000)]
-        self.assertEqual(len(spice.parse_netlist(netlist("V1 a 0 PWL(0 0 1m 5)", *resistors), "x.cir").elements), 1000)
-        self.refused(netlist("V1 a 0 PWL(0 0 1m 5)", *resistors, "R1000 a 0 1k"), "x.cir:1002: more than 1000 elements")
+        resistors = [f"R{index} n_a 0 1k" for index in range(1, 1000)]
+        self.assertEqual(len(spice.parse_netlist(netlist("V1 n_a 0 PWL(0 0 1m 5)", *resistors), "x.cir").elements), 1000)
+        self.refused(netlist("V1 n_a 0 PWL(0 0 1m 5)", *resistors, "R1000 n_a 0 1k"), "x.cir:1002: more than 1000 elements")
 
         sixteen = " ".join(f"{time}m {time}" for time in range(16))
-        parsed = spice.parse_netlist(netlist(f"V1 a 0 PWL({sixteen})", "R1 a 0 1k"), "x.cir")
+        parsed = spice.parse_netlist(netlist(f"V1 n_a 0 PWL({sixteen})", "R1 n_a 0 1k"), "x.cir")
         self.assertEqual(len(parsed.elements[0].values["waveform_time"]), 16)
-        self.refused(netlist(f"V1 a 0 PWL({sixteen} 16m 16)", "R1 a 0 1k"), "x.cir:2: V1: more than 16 PWL points")
+        self.refused(netlist(f"V1 n_a 0 PWL({sixteen} 16m 16)", "R1 n_a 0 1k"), "x.cir:2: V1: more than 16 PWL points")
 
         self.refused(b"", "x.cir: is empty")
         self.refused(b"version https://git-lfs.github.com/spec/v1\noid sha256:" + b"0" * 64 + b"\nsize 1300\n",
                      "x.cir: is a Git LFS pointer, not a netlist")
-        self.refused(netlist(*GOOD).replace(b"R1 a b 1k", b"R1 a b 1k\x00"), "x.cir:3: a NUL byte (0x00)")
+        self.refused(netlist(*GOOD).replace(b"R1 n_a n_b 1k", b"R1 n_a n_b 1k\x00"), "x.cir:3: a NUL byte (0x00)")
         self.refused(netlist(*GOOD).replace(b"\n", b"\r\n"), "x.cir:1: a carriage return: lines end in LF only (0x0d)")
         self.refused(netlist(*GOOD).replace(b".end", "* 470 µF\n.end".encode("utf-8")),
                      "x.cir:5: a byte outside printable ASCII, tab and LF (0xc2)")
         for byte in (b"\x0b", b"\x0c", b"\x1b", b"\x7f", b"\xff"):
             with self.subTest(byte=byte):
                 self.refused(netlist(*GOOD).replace(b"R2", byte + b"R2"), "x.cir:4: a byte outside printable ASCII")
-        tabbed = spice.parse_netlist(netlist("V1\ta\t0\tPWL(0\t0 1m 5)", "R1\ta b\t1k", "R2 b 0 1k"), "x.cir")
-        self.assertEqual(tabbed.elements[1].terminals, {"p": "a", "n": "b"})
+        tabbed = spice.parse_netlist(netlist("V1\tn_a\t0\tPWL(0\t0 1m 5)", "R1\tn_a n_b\t1k", "R2 n_b 0 1k"), "x.cir")
+        self.assertEqual(tabbed.elements[1].terminals, {"p": "n_a", "n": "n_b"})
 
     def test_the_deck_reader_accepts_only_the_adapters_own_lines(self):
         self.assertEqual(hashlib.sha256(DECK).hexdigest(), DECK_SHA256)
@@ -458,7 +481,7 @@ class TestNetlistGrammar(unittest.TestCase):
         # A source line near the longest any accepted netlist can produce
         # still reads back: 32-character names and MAX_PWL_POINTS points of
         # numbers with 16 or 17 significant digits.
-        designator, p, n = "V" + "X" * 31, "a" + "x" * 31, "b" + "x" * 31
+        designator, p, n = "V" + "X" * 31, "n_a" + "x" * 29, "n_b" + "x" * 29
         times = [0.0] + [float(f"{k}.2345678901234567e+200") for k in range(1, 10)] + [
             float(f"9.{k}345678901234567e+201") for k in range(1, 7)]
         levels = [-float(f"{k + 1}.2345678901234567e-300") for k in range(16)]
@@ -472,13 +495,13 @@ class TestNetlistGrammar(unittest.TestCase):
                          {"waveform_time": times, "waveform_voltage": levels})
 
         def element(designator="R1", kind="resistor", terminals=None, values=None, model=None):
-            return spice.Element(designator, kind, terminals or {"p": "a", "n": "0"},
+            return spice.Element(designator, kind, terminals or {"p": "n_a", "n": "0"},
                                  {"resistance": 1.0} if values is None else values, model, 0)
 
         for broken, reason in (
                 (element(terminals={"p": "gnd", "n": "0"}), "'gnd' is ground"),
-                (element(terminals={"p": "a;x", "n": "0"}), "is not a node name"),
-                (element(terminals={"p": "a"}), "terminals ['p'], expected ['p', 'n']"),
+                (element(terminals={"p": "n_a;x", "n": "0"}), "is not a node name"),
+                (element(terminals={"p": "n_a"}), "terminals ['p'], expected ['p', 'n']"),
                 (element(designator="R1;x"), "'R1;x' as a resistor: not an element this module writes"),
                 (element(designator="C1"), "'C1' as a resistor: not an element this module writes"),
                 (element(kind="inductor", designator="L1"), "'L1' as a inductor: not an element this module writes"),
@@ -489,10 +512,10 @@ class TestNetlistGrammar(unittest.TestCase):
                 (element(values={}), "R1: has no resistance"),
                 (element("V1", "voltage_source", values={"waveform_time": [0.0, 1.0], "waveform_voltage": [0.0]}),
                  "V1: 2 PWL times but 1 values"),
-                (element("S1", "voltage_controlled_switch", {"p": "a", "n": "0", "cp": "c", "cn": "0"},
+                (element("S1", "voltage_controlled_switch", {"p": "n_a", "n": "0", "cp": "n_c", "cn": "0"},
                          {"on_resistance": 1.0}, "SW 1"), "S1: 'SW 1' is not a model name"),
-                (element("S1", "voltage_controlled_switch", {"p": "a", "n": "0", "cp": "c", "cn": "0"},
-                         {"on_resistance": 1.0}, "SW1"), "S1: has no off_resistance")):
+                (element("S1", "voltage_controlled_switch", {"p": "n_a", "n": "0", "cp": "n_c", "cn": "0"},
+                         {"on_resistance": 1.0}, "SW_1"), "S1: has no off_resistance")):
             with self.subTest(reason=reason):
                 with self.assertRaises(ValueError) as caught:
                     spice.write_elements(spice.Netlist("", (broken,), {}))

@@ -17,6 +17,13 @@ else. Each of these was observed on ngspice-47 (macOS arm64, 2026-09-27):
   trailing letters; `F` is femto.
 - `gnd` is ground, and `pa_00`, `pa_01`, ... are nodes that `par()` in a
   `.meas` creates, so a netlist node of that name is taken over.
+- Inside a `.meas`, other names are ngspice's own (2026-09-28): `v(time)`
+  reads the time axis, `v(all)` and `v(allv)` another vector, a node
+  `temper` crashes ngspice (so does a model `TEMPER`), `limit`, `gauss`,
+  `agauss`, `unif` and `aunif` inside `par()` stop it, and a model `GND` is
+  not found. Node names therefore start with `n_` and model names with
+  `SW_`: of 174 names probed, 12 misread as nodes and 2 as models, and none
+  with those prefixes.
 - Line 1 is always the title, so a card written there vanishes, and a file
   whose title starts with `*ng_script` is run as a script.
 - A `+` line joins the line before it; ngspice reads on past `.end`, accepts a
@@ -53,8 +60,8 @@ _SUFFIXES = {"t": 12, "g": 9, "meg": 6, "k": 3, "m": -3, "u": -6, "n": -9, "p": 
 _NUMBER = re.compile(r"([+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+))(?:[eE]([+-]?[0-9]+)|("
                      + "|".join(sorted(_SUFFIXES, key=len, reverse=True)) + "))?")
 _DESIGNATOR = re.compile(r"[RCVIS][A-Z0-9_]{1,31}")
-_MODEL_NAME = re.compile(r"[A-Z][A-Z0-9_]{0,31}")
-_NODE = re.compile(r"0|[a-z][a-z0-9_]{0,31}")
+_MODEL_NAME = re.compile(r"SW_[A-Z0-9_]{1,29}")
+_NODE = re.compile(r"0|n_[a-z0-9_]{1,30}")
 _PAR_NODE = re.compile(r"pa_[0-9]+")
 _NOT_TEXT = re.compile(rb"[^\t\n\x20-\x7e]")
 _RESERVED = re.compile(r"[;$'\"{}`!\\]")
@@ -245,7 +252,8 @@ def _node_problem(node: str) -> Optional[str]:
     if _PAR_NODE.fullmatch(node):
         return f"{node!r} is a name ngspice's par() gives its own nodes, and a netlist node of that name is taken over"
     if not _NODE.fullmatch(node):
-        return f"{node!r} is not a node name: 0, or a lower-case letter and up to 31 of a-z 0-9 _"
+        return (f"{node!r} is not a node name: 0, or n_ and 1 to 30 of a-z 0-9 _; ngspice reads names such as "
+                "time, all or temper in a .meas as its own")
     return None
 
 
@@ -306,7 +314,7 @@ def _element(text: str, where: str) -> Tuple[str, str, Dict[str, str], Dict[str,
     if len(tokens) != 6:
         raise NetlistRefused(f"{where}: {designator}: a switch is S<id> NODE NODE NODE NODE MODEL, exactly")
     if not _MODEL_NAME.fullmatch(tokens[5]):
-        raise NetlistRefused(f"{where}: {designator}: {tokens[5]!r} is not a model name: A-Z then up to 31 of A-Z 0-9 _")
+        raise NetlistRefused(f"{where}: {designator}: {tokens[5]!r} is not a model name: SW_ and 1 to 29 of A-Z 0-9 _")
     return designator, letter, _terminals(designator, ("p", "n", "cp", "cn"), tokens[1:5], where), {}, tokens[5]
 
 
@@ -316,7 +324,7 @@ def _model(text: str, where: str, draft: _Draft) -> Tuple[str, Dict[str, float]]
         raise NetlistRefused(f"{where}: a .model card is .model NAME SW(RON=v ROFF=v VT=v VH=v)")
     name, kind, body = match.groups()
     if not _MODEL_NAME.fullmatch(name):
-        raise NetlistRefused(f"{where}: {name!r} is not a model name: A-Z then up to 31 of A-Z 0-9 _")
+        raise NetlistRefused(f"{where}: {name!r} is not a model name: SW_ and 1 to 29 of A-Z 0-9 _")
     if name in draft.models:
         raise NetlistRefused(f"{where}: model {name} is already declared on line {draft.model_lines[name]}")
     if kind.upper() != "SW":
@@ -458,17 +466,21 @@ def parse_netlist(data: bytes, path: str) -> Netlist:
             the line and why.
 
     Example:
-        >>> netlist = parse_netlist(b"rc charge\nV1 in 0 PWL(0 0 1u 5)\nR1 in out 1k\nC1 out 0 1u\n.end\n", "rc.cir")
+        >>> netlist = parse_netlist(b"rc charge\nV1 n_in 0 PWL(0 0 1u 5)\nR1 n_in n_out 1k\nC1 n_out 0 1u\n.end\n", "rc.cir")
         >>> netlist.title
         'rc charge'
         >>> [(e.designator, e.element, e.terminals, e.values) for e in netlist.elements][1]
-        ('R1', 'resistor', {'p': 'in', 'n': 'out'}, {'resistance': 1000.0})
+        ('R1', 'resistor', {'p': 'n_in', 'n': 'n_out'}, {'resistance': 1000.0})
         >>> netlist.elements[0].values
         {'waveform_time': [0.0, 1e-06], 'waveform_voltage': [0.0, 5.0]}
-        >>> parse_netlist(b"rc charge\nV1 in 0 PWL(0 0 1u 5)\nR1 in out 1k\nC1 out 0 1u\n", "rc.cir")
+        >>> parse_netlist(b"rc charge\nV1 n_in 0 PWL(0 0 1u 5)\nR1 n_in n_out 1k\nC1 n_out 0 1u\n", "rc.cir")
         Traceback (most recent call last):
         ...
         ecad_model.spice.NetlistRefused: rc.cir: no .end line; ngspice accepts a netlist without one
+        >>> parse_netlist(b"rc charge\nV1 n_in 0 PWL(0 0 1u 5)\nR1 n_in time 1k\nC1 time 0 1u\n.end\n", "rc.cir")
+        Traceback (most recent call last):
+        ...
+        ecad_model.spice.NetlistRefused: rc.cir:3: R1: 'time' is not a node name: 0, or n_ and 1 to 30 of a-z 0-9 _; ...
     """
     lines = _refuse_unreadable(data, path)
     draft, ended = _circuit(lines, path)
@@ -510,9 +522,9 @@ def write_elements(netlist: Netlist) -> List[str]:
             a finite number.
 
     Example:
-        >>> netlist = parse_netlist(b"rc charge\nV1 in 0 PWL(0 0 1u 5)\nR1 in out 1k\nC1 out 0 1u\n.end\n", "rc.cir")
+        >>> netlist = parse_netlist(b"rc charge\nV1 n_in 0 PWL(0 0 1u 5)\nR1 n_in n_out 1k\nC1 n_out 0 1u\n.end\n", "rc.cir")
         >>> write_elements(netlist)
-        ['V1 in 0 PWL(0.0 0.0 1e-06 5.0)', 'R1 in out 1000.0', 'C1 out 0 1e-06']
+        ['V1 n_in 0 PWL(0.0 0.0 1e-06 5.0)', 'R1 n_in n_out 1000.0', 'C1 n_out 0 1e-06']
     """
     lines: List[str] = []
     models: List[str] = []
@@ -607,8 +619,8 @@ def read_deck(data: bytes, path: str) -> Tuple[Netlist, List[str]]:
             adapter's section holds anything else.
 
     Example:
-        >>> netlist = parse_netlist(b"rc charge\nV1 in 0 PWL(0 0 1u 5)\nR1 in out 1k\nC1 out 0 1u\n.end\n", "rc.cir")
-        >>> own = [".options noacct", ".tran 1e-07 1e-05 0.0 1e-07", ".meas tran v_out FIND v(out) AT=1e-05"]
+        >>> netlist = parse_netlist(b"rc charge\nV1 n_in 0 PWL(0 0 1u 5)\nR1 n_in n_out 1k\nC1 n_out 0 1u\n.end\n", "rc.cir")
+        >>> own = [".options noacct", ".tran 1e-07 1e-05 0.0 1e-07", ".meas tran v_out FIND v(n_out) AT=1e-05"]
         >>> deck = "\n".join(["* rc charge", *write_elements(netlist), *own, ".end", ""]).encode("ascii")
         >>> circuit, section = read_deck(deck, "rc.deck.cir")
         >>> [e.values for e in circuit.elements] == [e.values for e in netlist.elements], section == own

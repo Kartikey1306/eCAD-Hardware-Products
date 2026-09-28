@@ -598,7 +598,7 @@ def build_circuit_model(netlist: spice.Netlist, annotations: Dict[str, Any], *, 
             a netlist value, or relate a component that does not exist.
 
     Example:
-        >>> netlist = spice.parse_netlist(b"rc\\nV1 a 0 PWL(0 0 1u 5)\\nR1 a 0 1k\\n.end\\n", "rc.cir")
+        >>> netlist = spice.parse_netlist(b"rc\\nV1 n_a 0 PWL(0 0 1u 5)\\nR1 n_a 0 1k\\n.end\\n", "rc.cir")
         >>> annotations = {"design_id": "rc", "materials": {}, "parts": {}, "joints": [], "attachments": [],
         ...                "circuit_elements": {"R1": {"name": "load resistor", "kind": "resistor"}},
         ...                "components_without_cad": [], "relationships": []}

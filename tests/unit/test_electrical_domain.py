@@ -480,6 +480,9 @@ class TestModel(unittest.TestCase):
             "the node gnd": circuit("r_esr", lambda c: c["terminals"].update(n="gnd")),
             "a par() node": circuit("r_esr", lambda c: c["terminals"].update(n="pa_0")),
             "an upper-case node": circuit("r_esr", lambda c: c["terminals"].update(p="N_ESR")),
+            "a node without the n_ prefix": circuit("r_esr", lambda c: c["terminals"].update(p="esr")),
+            "the node time, which a .meas reads as the time axis": circuit("r_esr", lambda c: c["terminals"].update(p="time")),
+            "a model without the SW_ prefix": circuit("s_byp", lambda c: c.update(model="TEMPER")),
             "a lower-case designator": circuit("r_esr", lambda c: c.update(designator="r_esr")),
             "an unknown terminal": circuit("r_esr", lambda c: c["terminals"].update(g="0")),
         }
@@ -1201,6 +1204,26 @@ class TestVerdicts(unittest.TestCase):
                          *(f"v3.REF-EL-00{n}" for n in range(1, 10)), *(f"v4.REQ-EL-00{n}" for n in range(1, 8))):
             with self.subTest(check_id):
                 self.assertEqual(_outcome(checks[check_id]), ("BLOCKED", "DERIVATION_NOT_AVAILABLE"))
+
+    def test_a_name_ngspice_reads_as_its_own_is_refused_before_ngspice_runs(self):
+        """CS-1: a rail node named time made a .meas read the time axis, so a real
+        limit on the bus peak passed at 0.1; a model named TEMPER crashed ngspice."""
+        for label, old, new, refused in (
+            ("the rail named time", b" n_bus", b" time", f"{NETLIST}:15: R_PRE: 'time' is not a node name"),
+            ("the rail named all", b" n_bus", b" all", f"{NETLIST}:15: R_PRE: 'all' is not a node name"),
+            ("the bypass model named TEMPER", b"SW_BYP", b"TEMPER", f"{NETLIST}:16: S_BYP: 'TEMPER' is not a model name"),
+        ):
+            with self.subTest(label), _scratch() as directory:
+                item = _copy(directory, rebuild=False)
+                netlist = item / NETLIST
+                netlist.write_bytes(netlist.read_bytes().replace(old, new))
+                receipt, _ = _validate(item, _stand_in(refuse=True))
+                checks = _checks(receipt)
+                v1 = checks["v1.electrical.extraction-and-sanity"]
+                self.assertEqual(_outcome(v1), ("FAIL", "SOURCE_REJECTED"))
+                self.assertIn(refused, v1["findings"][0])
+                self.assertEqual({_outcome(checks[f"v4.REQ-EL-00{n}"]) for n in range(1, 8)},
+                                 {("BLOCKED", "DERIVATION_NOT_AVAILABLE")})
 
     def test_a_deck_edited_without_a_rebuild_is_divergent_and_not_counted(self):
         with _scratch() as directory:
