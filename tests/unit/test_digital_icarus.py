@@ -333,6 +333,35 @@ class TestRealIcarus(unittest.TestCase):
                         verilog.parse_source(source.encode(), "x.v")
                     self.assertTrue(str(caught.exception).startswith(refusal), str(caught.exception))
 
+    def test_the_grammar_refuses_what_icarus_cannot_compile_and_keeps_what_it_can(self):
+        """Names Icarus reserves under -g2012 and a unary operator applied to another: Icarus refuses each as a
+        syntax error, and so does the grammar; the parenthesised forms compile under both."""
+        from ecad_model import verilog
+
+        leaf = ("`timescale 1ns / 1ps\nmodule m #(parameter P = 1) (input wire clk, output reg [7:0] y);\n"
+                "{body}\nendmodule\n")
+        probes = {
+            **{f"reg {word}": (f"    reg [7:0] {word};\n    always @(posedge clk) begin {word} <= y; y <= {word}; end",
+                               False) for word in ("bool", "wone", "wreal")},
+            **{expression: (f"    always @(posedge clk) y <= {expression};", False)
+               for expression in ("~~y", "!!y", "!~y", "- -y", "y + ~~y", "!-y")},
+            **{expression: (f"    always @(posedge clk) y <= {expression};", True)
+               for expression in ("~(~y)", "-(-y)", "!(!y)", "y - -y", "y + ~y")},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            here = Path(directory)
+            for label, (body, compiles) in probes.items():
+                with self.subTest(label):
+                    source = leaf.format(body=body)
+                    (here / "m.v").write_text(source)
+                    compiled = _run(here, self.capability.executable or "iverilog", "-g2012", "-o", "m.vvp", "m.v")
+                    self.assertEqual(compiled.returncode == 0, compiles, compiled.stderr)
+                    if compiles:
+                        self.assertEqual(verilog.parse_source(source.encode(), "m.v").name, "m")
+                    else:
+                        with self.assertRaises(verilog.HdlRefused):
+                            verilog.parse_source(source.encode(), "m.v")
+
     def test_the_source_top_alone_compiles_and_measures_nothing(self):
         """The declarative top has no clock and no measurement: it compiles with the RTL and prints nothing."""
         from ecad_validation.adapters.base import AdapterRequest

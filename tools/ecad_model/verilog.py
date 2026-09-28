@@ -65,7 +65,8 @@ HARNESS_TASKS = frozenset({"$display", "$finish", "$realtime"})
 HARNESS_KEYWORDS = TOP_KEYWORDS | frozenset(
     "always initial begin end repeat posedge negedge while if else integer realtime for".split())
 
-# Every other reserved word of Verilog-2005 and SystemVerilog-2012, by why it is refused.
+# Every other reserved word of Verilog-2005 and SystemVerilog-2012, and the three more Icarus Verilog 13.0
+# reserves under -g2012 (wone from -g2005 on; bool and wreal with its extended types), by why it is refused.
 _KEYWORD_CLASSES = {
     "calls C code": "import export chandle bind",
     "outside the synchronous RTL subset (PLANNED)": (
@@ -91,7 +92,8 @@ _KEYWORD_CLASSES = {
     "gate-level primitive (PLANNED)": (
         "and nand nor xor xnor not buf bufif0 bufif1 notif0 notif1 cmos nmos pmos rcmos rnmos rpmos tran "
         "tranif0 tranif1 rtran rtranif0 rtranif1 pullup pulldown pull0 pull1 supply0 supply1 strong0 strong1 "
-        "weak0 weak1 highz0 highz1 small medium large tri tri0 tri1 triand trior trireg wand wor uwire"),
+        "weak0 weak1 highz0 highz1 small medium large tri tri0 tri1 triand trior trireg wand wor uwire wone"),
+    "an Icarus Verilog extended type (its -gxtypes, on by default)": "bool wreal",
 }
 _KEYWORDS = {word: reason for reason, words in _KEYWORD_CLASSES.items() for word in words.split()}
 
@@ -532,6 +534,12 @@ def _expression(cursor: _Cursor, scope: Dict[str, Tuple[str, int]], constant: bo
                     raise cursor.refuse(token, f"{text}: outside a localparam's constant expression "
                                                "(+ - * / and parentheses)")
                 cursor.take()
+                # A unary operator's operand is a primary (IEEE 1364-2005 A.8.3), and Icarus refuses ~~y.
+                following = cursor.peek()
+                if following[0] == "op" and following[1] in _UNARY:
+                    raise cursor.refuse(following, f"{following[1]} after {text}: a unary operator's operand is a name, "
+                                                   "a number or a parenthesised expression, never another unary "
+                                                   "operator")
             elif is_op and text == "(":
                 if len(stack) == MAX_DEPTH:
                     raise cursor.refuse(token, f"an expression nested more than {MAX_DEPTH} deep")

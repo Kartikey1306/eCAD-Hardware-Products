@@ -738,6 +738,11 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("vg-decimal-unbounded", VG, "            if number > MAX_DECIMAL:\n", "            if False:\n"),
     ("vg-bidi-control-accepted", VG, '    for pattern, what in ((_CONTROL, "a control character"), (_BIDI, "a bidirectional control character")):\n', '    for pattern, what in ((_CONTROL, "a control character"),):\n'),
     ("vg-harness-any-system-task", VG, "            if not (harness and value in HARNESS_TASKS):\n", "            if not harness:\n"),
+    # the digital review (CS-2): the words Icarus alone reserves, and a unary operator's operand
+    ("vg-icarus-extended-types-accepted", VG, '    "an Icarus Verilog extended type (its -gxtypes, on by default)": "bool wreal",\n', ""),
+    ("vg-wone-accepted", VG, 'wand wor uwire wone"', 'wand wor uwire"'),
+    ("vg-unary-after-unary-accepted", VG, '                if following[0] == "op" and following[1] in _UNARY:\n',
+     "                if False:\n"),
     # the digital domain: the class rules, V1, the closed forms, the harness writer and the model
     ("dg-rule-c2-unchecked", DG, "if shape[2] == TRANSMITTER_PORTS and shape[3] == parameters]",
      "if shape[3] == parameters]"),

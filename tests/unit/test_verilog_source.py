@@ -459,6 +459,7 @@ SUBSET = "outside the synchronous RTL subset (PLANNED)"
 SCOPE = "changes another scope or the simulator"
 SYSTEMVERILOG = "SystemVerilog (PLANNED)"
 GATES = "gate-level primitive (PLANNED)"
+ICARUS_TYPES = "an Icarus Verilog extended type (its -gxtypes, on by default)"
 TOP_ONLY = ("not in a declarative top, which states values and wiring only; the adapter writes the clock, the "
             "stimulus and the measurements")
 FILES = "opens, reads or writes files"
@@ -655,13 +656,21 @@ class TestVerilogGrammar(unittest.TestCase):
             SYSTEMVERILOG: ("logic", "bit", "int", "byte", "always_ff", "always_comb", "interface", "package",
                             "class", "program", "typedef", "enum", "struct", "assert", "string", "void", "unique"),
             GATES: ("and", "nand", "nor", "xor", "xnor", "not", "buf", "bufif0", "pullup", "supply0", "supply1",
-                    "tri", "wand", "wor", "uwire", "nmos"),
+                    "tri", "wand", "wor", "uwire", "nmos", "wone"),
+            # Icarus Verilog 13.0 reserves these under -g2012 too: wone from -g2005 on, bool and wreal with its
+            # extended types (-gxtypes, its default). Each compiled with -gno-xtypes or -g2001 respectively.
+            ICARUS_TYPES: ("bool", "wreal"),
         }
         for reason, words in classes.items():
             with self.subTest(reason=reason):
                 for word in words:
                     self.refused(edit(TX, "    reg [1:0]  state;", f"    {word} reg [1:0]  state;"),
                                  f"x.v:42: {word}: {reason}")
+        # The three words Icarus alone reserves are refused as names too, not only where a keyword may stand.
+        for word, reason in (("wone", GATES), ("bool", ICARUS_TYPES), ("wreal", ICARUS_TYPES)):
+            with self.subTest(name=word):
+                self.refused(edit(TX, "    reg [1:0]  state;", f"    reg [1:0]  state, {word};"),
+                             f"x.v:42: {word}: {reason}")
         # Keywords are lower case: another spelling is an ordinary name.
         self.assertEqual(verilog.parse_source(edit(TX, "    reg [1:0]  state;", "    reg [1:0]  state, Initial;"),
                                               "x.v").name, "uart_tx")
@@ -828,6 +837,13 @@ class TestVerilogGrammar(unittest.TestCase):
                 (("    reg [7:0] r;", "    always @(posedge clk) q <= r[3:0];"),
                  "x.v:4: a part select (name[a:b]): outside the subset"),
                 (("    always @(posedge clk) q <= &a;",), "x.v:3: expected an operand, found '&'"),
+                # Icarus 13.0 refuses each as a syntax error; a unary operator's operand is a primary.
+                (("    always @(posedge clk) q <= ~~a;",), "x.v:3: ~ after ~: a unary operator's operand is a name, a number or a parenthesised expression, never another unary operator"),
+                (("    always @(posedge clk) q <= !!a;",), "x.v:3: ! after !: a unary operator's operand is a name, a number or a parenthesised expression, never another unary operator"),
+                (("    always @(posedge clk) q <= !~a;",), "x.v:3: ~ after !: a unary operator's operand is a name, a number or a parenthesised expression, never another unary operator"),
+                (("    always @(posedge clk) q <= - -a;",), "x.v:3: - after -: a unary operator's operand is a name, a number or a parenthesised expression, never another unary operator"),
+                (("    always @(posedge clk) q <= a + ~~a;",), "x.v:3: ~ after ~: a unary operator's operand is a name, a number or a parenthesised expression, never another unary operator"),
+                (("    always @(posedge clk) q <= a ?", "        !-a : a;"), "x.v:4: - after !: a unary operator's operand is a name, a number or a parenthesised expression, never another unary operator"),
                 (("    always @(posedge clk) q <= (a;",), "x.v:3: expected ')', found ';'"),
                 (("    always @(posedge clk) q <= a ? 1'b1;",), "x.v:3: expected ':', found ';'"),
                 (("    always @(posedge clk) if (a) q <= a; else",), "x.v:4: expected a statement"),
@@ -838,6 +854,9 @@ class TestVerilogGrammar(unittest.TestCase):
         chain = ("    always @(posedge clk)", "        if (a) q <= a;", *["        else if (!a) q <= !a;"] * 100,
                  "        else q <= a ? (a == 1'b1 ? !a : a) : a;")
         self.assertEqual(verilog.parse_source(rtl(*chain), "x.v").name, "m")
+        # A parenthesised operand is a primary, and so is a unary operator's after a binary one: Icarus compiles both.
+        self.assertEqual(verilog.parse_source(rtl("    always @(posedge clk) q <= ~(~a) ^ -(-a) ^ (a - -a) ^ !(!a);"),
+                                              "x.v").name, "m")
 
         nested = "x.v:3: {0}: statements nested more than 32 deep"
         for count, accepted in ((32, True), (33, False)):
