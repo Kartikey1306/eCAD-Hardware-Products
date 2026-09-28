@@ -18,6 +18,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
+SAMPLE = REPO_ROOT / "datasets" / "cad" / "servo_supply_001"
 
 spice = importlib.import_module("ecad_model.spice")
 
@@ -28,11 +29,11 @@ NETLIST = b"""servo_supply_001: 48 V servo-drive supply input -- fuse, precharge
 * The 48 V supply and the 200 W load come from the eServo-200 product sheet
 * (eRobotics_CAD_Design/robot_components/product_datasheet.md). I_LOAD is
 * 200 W / 48 V written to six significant figures: a constant-current
-* stand-in for the drive's input. R_F1 is a fuse's cold resistance only; it
-* never opens. S_BYP is an ideal switch standing for the precharge bypass.
-* S_FLT is a testbench fault injector: it shorts the bus through 100 mohm.
-* Sequence: hot plug 0 -> 48 V in 100 us; bypass closes at 30 ms; the load
-* steps on at 40 ms; the bus is shorted at 100 ms.
+* stand-in for the drive's input, ASSUMING the 200 W is input power (the
+* sheet does not say input or output). R_F1 is a fuse's cold resistance
+* only; it never opens. S_BYP is an ideal switch for the precharge bypass.
+* S_FLT, a testbench fault injector, shorts the bus through 100 mohm. Hot
+* plug 0 -> 48 V in 100 us; bypass at 30 ms; load at 40 ms; short at 100 ms.
 V_IN n_in 0 PWL(0 0 100u 48)
 R_F1 n_in n_f 20m
 R_PRE n_f n_bus 10
@@ -47,7 +48,7 @@ V_FLT n_fc 0 PWL(0 0 100m 0 100.001m 5)
 .model SW_FLT SW(RON=100m ROFF=1g VT=2.5 VH=0)
 .end
 """
-NETLIST_SHA256 = "838cde196936a321bdca5e41eca4a91902b4ee0a8f1fe8dcc86401a7a3ef3344"
+NETLIST_SHA256 = "1ab1b827c1ca3b7c7f026ef04314219393eeb62869be90eed85c0cddb3b6fe30"
 
 DECK = b"""* servo_supply_001: 48 V servo-drive supply input -- fuse, precharge limiter with bypass, bulk capacitor, drive load
 * written by ecad_model.domains.electrical 1.0.0 from derived/engineering_model.json; regenerate with build, never edit
@@ -74,9 +75,10 @@ V_FLT n_fc 0 PWL(0.0 0.0 0.1 0.0 0.100001 5.0)
 .meas tran steady_input_current_a FIND par('-i(V_IN)') AT=0.1
 .meas tran steady_fuse_power_w FIND par('(v(n_in)-v(n_f))*(-i(V_IN))') AT=0.1
 .meas tran fault_input_current_a FIND par('-i(V_IN)') AT=0.11
+.meas tran startup_peak_current_a MAX par('-i(V_IN)') FROM=0.0 TO=0.1
 .end
 """
-DECK_SHA256 = "2840fc040b30a626891a347bb447a242f81ce97cd23aa415a6e32c7ef4451d30"
+DECK_SHA256 = "effee83541b2028dffc8ee1467b314c33e20a6d43bd93c026f9cc232176466c0"
 DECK_LINES = DECK.decode("ascii").split("\n")[:-1]
 
 TITLE = ("servo_supply_001: 48 V servo-drive supply input -- fuse, precharge limiter with bypass, "
@@ -138,7 +140,10 @@ class TestNetlistGrammar(unittest.TestCase):
 
     def test_the_committed_netlist_parses_to_its_hand_read_elements(self):
         self.assertEqual(hashlib.sha256(NETLIST).hexdigest(), NETLIST_SHA256)
-        self.assertEqual(len(NETLIST), 1300)
+        # The texts here are the committed files, so they cannot drift from them unseen.
+        self.assertEqual(NETLIST, (SAMPLE / "source" / "servo_supply_001.cir").read_bytes())
+        self.assertEqual(DECK, (SAMPLE / "derived" / "electrical" / "servo_supply_001.cir").read_bytes())
+        self.assertEqual(len(NETLIST), 1319)
         parsed = spice.parse_netlist(NETLIST, "servo_supply_001.cir")
         self.assertEqual(parsed.title, TITLE)
         self.assertEqual(len(parsed.elements), 10)
@@ -425,7 +430,7 @@ class TestNetlistGrammar(unittest.TestCase):
         self.assertEqual(described(circuit.elements), [entry[:5] for entry in EXPECTED])
         self.assertEqual([element.line for element in circuit.elements], list(range(3, 13)))
         self.assertEqual(circuit.models, MODELS)
-        self.assertEqual(section, DECK_LINES[14:25])
+        self.assertEqual(section, DECK_LINES[14:26])
         self.assertEqual(section[:2], [".options noacct", ".tran 1e-06 0.11 0.0 1e-06"])
 
         def insert(index, line):
@@ -437,15 +442,15 @@ class TestNetlistGrammar(unittest.TestCase):
         read = spice.read_deck
         self.refused(insert(16, ".control"), "x.cir:17: not a .meas line the adapter writes, so not part of its section",
                      read)
-        self.refused(insert(25, "shell touch x"), "x.cir:26: not a .meas line the adapter writes", read)
+        self.refused(insert(26, "shell touch x"), "x.cir:27: not a .meas line the adapter writes", read)
         self.refused(insert(14, ".control"), "x.cir:15: .control: runs commands, including shell", read)
         self.refused(insert(14, "*#shell touch x"), "x.cir:15: a *# comment, which ngspice runs as a command", read)
         self.refused(insert(14, ".meas tran extra FIND v(n_bus) AT=0.05"),
                      "x.cir:15: .meas: the analysis and measurements are written by the adapter", read)
-        self.refused(insert(25, DECK_LINES[20]), "x.cir:26: measurement bus_peak_voltage_v is already declared on "
+        self.refused(insert(26, DECK_LINES[20]), "x.cir:27: measurement bus_peak_voltage_v is already declared on "
                                                  "line 21, and ngspice would print both", read)
         self.refused(insert(16, ".tran 1e-06 0.2 0.0 1e-06"), "x.cir:17: a second .tran; the deck runs one analysis", read)
-        self.refused(insert(25, ".tran 1e-06 0.2 0.0 1e-06"), "x.cir:26: a second .tran", read)
+        self.refused(insert(26, ".tran 1e-06 0.2 0.0 1e-06"), "x.cir:27: a second .tran", read)
         self.refused(replace(15, ".tran 1e-06 0.11 0.0"),
                      "x.cir:16: the line after .options noacct is the adapter's .tran TSTEP TSTOP TSTART TMAX", read)
         self.refused(replace(15, ".tran 1e-06 0.11 0.0 1M"), "x.cir:16: '1M' is not a number", read)
@@ -459,9 +464,9 @@ class TestNetlistGrammar(unittest.TestCase):
         self.refused(deck(DECK_LINES[:14] + DECK_LINES[15:]), "x.cir: no '.options noacct' line", read)
         self.refused(replace(14, ".options noacct "), "x.cir: no '.options noacct' line", read)
         self.refused(insert(14, ".end"), "x.cir: .end comes before the adapter's section", read)
-        self.refused(insert(25, ".end"), "x.cir:26: .end is the deck's last line, and ngspice reads past an earlier one",
+        self.refused(insert(26, ".end"), "x.cir:27: .end is the deck's last line, and ngspice reads past an earlier one",
                      read)
-        self.refused(DECK + b"\n", "x.cir:27: a deck ends with its .end line, and nothing follows it", read)
+        self.refused(DECK + b"\n", "x.cir:28: a deck ends with its .end line, and nothing follows it", read)
         self.refused(deck(DECK_LINES[:16] + [".end"]), "x.cir:17: the deck's section is .options noacct, one .tran, "
                                                         "at least one .meas, and .end", read)
         self.refused(deck(DECK_LINES[14:]), "x.cir:1: line 1 is the title, so SPICE never reads this '.options' card",
@@ -471,7 +476,7 @@ class TestNetlistGrammar(unittest.TestCase):
         # A well-formed line the model does not call for is the caller's to
         # find: the reader returns it with the rest of the section.
         extra = ".meas tran extra_v FIND v(n_bus) AT=0.05"
-        self.assertEqual(spice.read_deck(insert(25, extra), "x.cir")[1], DECK_LINES[14:25] + [extra])
+        self.assertEqual(spice.read_deck(insert(26, extra), "x.cir")[1], DECK_LINES[14:26] + [extra])
 
     def test_the_writer_reproduces_the_committed_deck_from_si_values(self):
         element_lines = DECK_LINES[2:14]
