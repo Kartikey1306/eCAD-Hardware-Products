@@ -1,0 +1,218 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:thing-plus-esp32-c5",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Thing Plus",
+  "board": "SparkFun Thing Plus ESP32 C5",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "ESP32-C5",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "RISC-V RV32IMC",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:11Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32-C5@54d6828b4ddf66997be65d3cfeeec9deda37174d"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:11Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32-C5@54d6828b4ddf66997be65d3cfeeec9deda37174d"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32-C5/54d6828b4ddf66997be65d3cfeeec9deda37174d/docs/static/ref/esp32-c5-wroom-1_wroom-1u_datasheet_en.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2a9b5555cecbeb4fa462f4090b7d7a37847b2ac87d9f810e5dfebc85f04f7b9c",
+        "size_bytes": 1622794,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:11Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32-C5@54d6828b4ddf66997be65d3cfeeec9deda37174d"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:11Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32-C5@54d6828b4ddf66997be65d3cfeeec9deda37174d"
+      }
+    },
+    "gerbers": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32-C5/54d6828b4ddf66997be65d3cfeeec9deda37174d/Hardware/Production/SparkFun_Thing_Plus_ESP32_C5_panelized.GBL",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32-C5/54d6828b4ddf66997be65d3cfeeec9deda37174d/Hardware/SparkFun_Thing_Plus_ESP32_C5.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:46Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f3f75a3e18c32179596dfbb7513fc461987fbe23279e9736ff0d2e97ebdcca9e",
+        "size_bytes": 1636441,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:11Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32-C5@54d6828b4ddf66997be65d3cfeeec9deda37174d"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32-C5/54d6828b4ddf66997be65d3cfeeec9deda37174d/Hardware/Production/SparkFun_Thing_Plus_ESP32_C5_panelized.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ec8ed4d4fa634b560f07045aad66ae73a10f78d7c59fb359419811eecefc6ee8",
+        "size_bytes": 33436,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32-C5/54d6828b4ddf66997be65d3cfeeec9deda37174d/Hardware/SparkFun_Thing_Plus_ESP32_C5.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:46Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f3f75a3e18c32179596dfbb7513fc461987fbe23279e9736ff0d2e97ebdcca9e",
+        "size_bytes": 1636441,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:11Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32-C5@54d6828b4ddf66997be65d3cfeeec9deda37174d"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32-C5/54d6828b4ddf66997be65d3cfeeec9deda37174d/Hardware/SparkFun_Thing_Plus_ESP32_C5.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:45Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "88f253792dc471abc7504c42b10578f65d7c06bfc9703afa87155f0246bf2e81",
+        "size_bytes": 444902,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:11Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32-C5@54d6828b4ddf66997be65d3cfeeec9deda37174d"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:11Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32-C5@54d6828b4ddf66997be65d3cfeeec9deda37174d"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Thing_Plus_ESP32-C5",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Thing_Plus_ESP32-C5",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Thing_Plus_ESP32-C5 pinned at 54d6828b4ddf. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

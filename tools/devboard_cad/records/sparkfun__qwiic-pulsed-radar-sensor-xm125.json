@@ -1,0 +1,269 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:qwiic-pulsed-radar-sensor-xm125",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "Tutorial and hardware files for the SparkFun Qwiic Pulsed Coherent Radar Sensor",
+  "part_number": "SEN-24540",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "assembly_drawing": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/a049212e3c587162418e354e34a03f33e962be72/Firmware/A121%20SDK%20for%20XM125/xm125/doc/A121%20Assembly%20Test%20User%20Guide.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "58b4a6571d2fb06593ab4db7c198c98c9d176c04beee1a151db7d80ad21980b1",
+        "size_bytes": 164951,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/a049212e3c587162418e354e34a03f33e962be72/docs/assets/component_documentation/A121%20datasheet.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ff9756abb48792a04e6aa566f70fee4aeb3bc5b0984b6e8315d34f009f27c812",
+        "size_bytes": 1092130,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/a049212e3c587162418e354e34a03f33e962be72/Hardware/XM125.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "1df180953e090f060bbab3ebd6d7b3d2e44403cbb4c9834a447c799d030e9be9",
+        "size_bytes": 44613,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/a049212e3c587162418e354e34a03f33e962be72/Hardware/XM125.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "1df180953e090f060bbab3ebd6d7b3d2e44403cbb4c9834a447c799d030e9be9",
+        "size_bytes": 44613,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/a049212e3c587162418e354e34a03f33e962be72/Hardware/Production/XM125_Breakout-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f1db77f24be6e42cbc55512b976f4ab0799135b6039b8037682affe8176e39fc",
+        "size_bytes": 2454553,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/a049212e3c587162418e354e34a03f33e962be72/Hardware/XM125_Breakout.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f7308ba1fd39dc606844b016c627829ec2965650c7dfa7b399a7fe1c2380a4df",
+        "size_bytes": 467427,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/a049212e3c587162418e354e34a03f33e962be72/docs/assets/board_files/SparkFun_Qwiic_Pulsed_Coherent_Radar_Sensor_Breakout-XM125_Schematic_v10.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e43d5ed031930c8009de37cae095e1939ca26dabe8df0f87645280f34852cec3",
+        "size_bytes": 340827,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125@a049212e3c587162418e354e34a03f33e962be72"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/a049212e3c587162418e354e34a03f33e962be72/Hardware/XM125.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "1df180953e090f060bbab3ebd6d7b3d2e44403cbb4c9834a447c799d030e9be9",
+        "size_bytes": 44613,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/SEN-24540",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125 pinned at a049212e3c58. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Qwiic_Pulsed_Radar_Sensor_XM125: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

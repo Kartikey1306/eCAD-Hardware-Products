@@ -1,0 +1,107 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "raspberry-pi:3-model-b",
+  "manufacturer": "Raspberry Pi",
+  "family": "Raspberry Pi 3",
+  "board": "Raspberry Pi 3 Model B",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "Broadcom BCM2837",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A53",
+  "product_status": "unknown",
+  "files": {
+    "dxf": {
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008334-DS",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:12Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/520-raspberry-pi-3-model-b/documents/RP-008334-DS-1-raspberry-pi-3-b-mechanical-drawing.dxf",
+        "sha256": "788c104664752c761553c57b11424adeabca06eb73d9a75d5bfff265219b6da5",
+        "size_bytes": 1435223,
+        "media_type": "image/vnd.dxf",
+        "detected_format": "dxf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008335-DS",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/520-raspberry-pi-3-model-b/documents/RP-008335-DS-1-raspberry-pi-3-b-mechanical-drawing.pdf",
+        "sha256": "6f6ecb21b7ba2576c9982d4d555cddb6b697ad2677c250f52bdb57f713d79e7f",
+        "size_bytes": 67939,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008340-DS",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:12Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/520-raspberry-pi-3-model-b/documents/RP-008340-DS-1-raspberry-pi-3-b-reduced-schematics.pdf",
+        "sha256": "59ab7a171a199975525169b233bc2918d5b9208e3b42e456439da6dbbff82626",
+        "size_bytes": 76735,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.raspberrypi.com/products/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://pip.raspberrypi.com/documents/RP-008340-DS",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from raspberrypi/documentation@b47f68f."
+}

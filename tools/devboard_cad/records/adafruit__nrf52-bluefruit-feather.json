@@ -1,0 +1,221 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:nrf52-bluefruit-feather",
+  "manufacturer": "Adafruit Industries",
+  "family": "Feather",
+  "board": "Adafruit nRF52 Bluefruit Feather",
+  "part_number": "3406",
+  "revision": "G",
+  "mcu_soc": "NRF52840",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB/20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a/Adafruit%20nRF52%20Bluefruit%20Feather.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:36Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5cd9829f89c522238ffb0738844730d6bf81c03fcda6b17d2f0638beb2e7a792",
+        "size_bytes": 718778,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB/20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a/Adafruit%20nRF52%20Bluefruit%20Feather.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:36Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5cd9829f89c522238ffb0738844730d6bf81c03fcda6b17d2f0638beb2e7a792",
+        "size_bytes": 718778,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB/20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a/Adafruit%20Feather%20nRF52840%20pinout.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:36Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "770adacd6f591d79b6820eb2bcf21f858f0666f8873e482225e3d928a26ca155",
+        "size_bytes": 416151,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB/20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a/Adafruit%20nRF52%20Bluefruit%20Feather.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:36Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8ad43454df7f5fc46c47b32a426ec2a6609192bd300bb4ee5e2efd4489fcd99f",
+        "size_bytes": 366723,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB@20cfdfdcf656a3c3dd9d07e3db91b0f1ac79b31a"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/3406",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB pinned at 20cfdfdcf656. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-nRF52-Bluefruit-Feather-PCB: \"Creative Commons Attribution, Share-Alike license, check license.txt for more information\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

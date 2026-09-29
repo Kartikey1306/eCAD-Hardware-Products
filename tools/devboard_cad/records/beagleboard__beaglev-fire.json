@@ -1,0 +1,188 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "beagleboard:beaglev-fire",
+  "manufacturer": "BeagleBoard.org Foundation",
+  "family": "BeagleV",
+  "board": "Mirror of https://git",
+  "part_number": "UNVERIFIED",
+  "revision": "A",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:58Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglev-fire@cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c"
+      }
+    },
+    "bom": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglev-fire/cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c/design/BeagleV-Fire_BOM.csv",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:58Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglev-fire@cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c"
+      }
+    },
+    "eagle": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglev-fire/cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c/design/BeagleV-FIRE_REV-A_230911.brd",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:58Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglev-fire@cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:58Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglev-fire@cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:58Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglev-fire@cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglev-fire/cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c/design/gerbers/BeagleV-FIRE_REV-A_230911-1-12.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:18:27Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8a9c049dd5a50777f095e47a753ef7caa6a34868fee9db5ede7b1aa1a682586d",
+        "size_bytes": 29033,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglev-fire/cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c/design/BeagleV-FIRE_REV-A_230911.brd",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pick_and_place": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglev-fire/cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c/design/319015079_BeaglV-Fire_Rev-A_Placement.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:18:28Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "398e37712f16b36af4b8f62a4ad1f13fb4fba99d7a818158d8acf61a55f6f844",
+        "size_bytes": 706205,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglev-fire/cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c/BeagleV-Fire_sch.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:18:28Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2623b4aec41c2eee3df88a9a5bbd04bd40739fc7fc8206b75dc8df3c7ee6da1f",
+        "size_bytes": 1437891,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:58Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglev-fire@cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:58Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglev-fire@cdbd4b6892cebc5eab2d73c5a098b73aa0c2612c"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/beagleboard/beaglev-fire/blob/main/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.beagleboard.org/boards",
+    "official_cad_repository": "https://github.com/beagleboard/beaglev-fire",
+    "official_github_repository": "https://github.com/beagleboard/beaglev-fire",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository beagleboard/beaglev-fire pinned at cdbd4b6892ce. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for beagleboard/beaglev-fire."
+}

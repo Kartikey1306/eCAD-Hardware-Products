@@ -4,10 +4,10 @@
   "board_id": "adafruit:feather-rp2040",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "Adafruit Feather RP2040",
+  "board": "Feather RP2040",
   "part_number": "4884",
-  "revision": "unverified",
-  "mcu_soc": "Raspberry Pi RP2040",
+  "revision": "B",
+  "mcu_soc": "RP2040",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": "Dual Arm Cortex-M0+",
@@ -19,7 +19,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
@@ -31,7 +31,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
@@ -43,7 +43,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
@@ -54,7 +54,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-RP2040-PCB/ea88166891ee0a1697a3899a5d55ab3722a2f125/Adafruit%20Feather%20RP2040.brd",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:53:45Z",
+        "captured_at": "2026-09-29T07:13:16Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "8ed4623de172bab6f33e27ac1675b28ac32fe68f8a6caf89c444167db343dda2",
@@ -70,7 +70,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
@@ -82,7 +82,19 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
@@ -94,7 +106,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
@@ -105,7 +117,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-RP2040-PCB/ea88166891ee0a1697a3899a5d55ab3722a2f125/Adafruit%20Feather%20RP2040.brd",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:53:45Z",
+        "captured_at": "2026-09-29T07:13:16Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "8ed4623de172bab6f33e27ac1675b28ac32fe68f8a6caf89c444167db343dda2",
@@ -121,7 +133,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
@@ -132,7 +144,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-RP2040-PCB/ea88166891ee0a1697a3899a5d55ab3722a2f125/Adafruit%20Feather%20RP2040%20pinout.pdf",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:53:45Z",
+        "captured_at": "2026-09-29T07:13:16Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "e10a2a8c12d489d76631fa72abbc53914a1e2560ac2c23835b462261baa059ea",
@@ -147,7 +159,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-RP2040-PCB/ea88166891ee0a1697a3899a5d55ab3722a2f125/Adafruit%20Feather%20RP2040.sch",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:53:45Z",
+        "captured_at": "2026-09-29T07:13:16Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "f0f409d60c232511f8440582bfaae19f9d25ad8712b831f56e33fa0dc3b9f75a",
@@ -163,7 +175,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
@@ -175,17 +187,11 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:19Z",
+        "captured_at": "2026-09-29T07:04:32Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-Feather-RP2040-PCB@ea88166891ee0a1697a3899a5d55ab3722a2f125"
       }
-    },
-    "mechanical": {
-      "available": null,
-      "url": null,
-      "verified_revision": null,
-      "evidence": null
     }
   },
   "licenses": {
@@ -193,7 +199,7 @@
     "cad_license": "CC BY-SA (version not stated by the manufacturer)",
     "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
     "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
-    "mechanical_cad_license": null,
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
     "redistribution_allowed": true,
     "modification_allowed": true,
     "commercial_use_allowed": true,
@@ -210,6 +216,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
-  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Feather-RP2040-PCB pinned at ea88166891ee. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence stated in the manufacturer's README as \"Creative Commons Attribution, Share-Alike license, check license.txt for more information\". No version is given and license.txt is absent from the repository, so the exact version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Feather-RP2040-PCB pinned at ea88166891ee. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-Feather-RP2040-PCB: \"Creative Commons Attribution, Share-Alike license, check license.txt for more information\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
 }

@@ -1,0 +1,257 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:iot-redboard-esp32",
+  "manufacturer": "SparkFun Electronics",
+  "family": "RedBoard",
+  "board": "SparkFun IoT RedBoard ESP32",
+  "part_number": "WRL-19177",
+  "revision": "not-stated",
+  "mcu_soc": "ESP32",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Xtensa LX6",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_IoT_RedBoard-ESP32@72e78f98fb28f84d8589f292696660ac3f8c1259"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_IoT_RedBoard-ESP32/72e78f98fb28f84d8589f292696660ac3f8c1259/hardware/bom_output.csv",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:30Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "38e75bf8caed84a58a84fdb92d9a6558376c0ca24b8f51f6c2bc2b3624f142a1",
+        "size_bytes": 1980,
+        "media_type": "text/plain",
+        "detected_format": "csv",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_IoT_RedBoard-ESP32/72e78f98fb28f84d8589f292696660ac3f8c1259/documents/esp32_datasheet_en_v4-2.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:30Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c1b7b42ab016b743d24f05552ea345c93f79cb6cf056356490879993e74fd8b9",
+        "size_bytes": 837481,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_IoT_RedBoard-ESP32@72e78f98fb28f84d8589f292696660ac3f8c1259"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_IoT_RedBoard-ESP32/72e78f98fb28f84d8589f292696660ac3f8c1259/hardware/output-ESP32.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:30Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8bc7b2c8027a1e9fe11467fae5b9f3a539ab7e2607a51cab23df5673c974dff7",
+        "size_bytes": 641989,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_IoT_RedBoard-ESP32/72e78f98fb28f84d8589f292696660ac3f8c1259/hardware/output-ESP32.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:30Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8bc7b2c8027a1e9fe11467fae5b9f3a539ab7e2607a51cab23df5673c974dff7",
+        "size_bytes": 641989,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_IoT_RedBoard-ESP32/72e78f98fb28f84d8589f292696660ac3f8c1259/production/SparkFun_IoT_RedBoard-ESP32-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:32Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f09207093d814609c458d0c6e0d20dd259d7bd163dafb9a3879389c0681acb9b",
+        "size_bytes": 4004661,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_IoT_RedBoard-ESP32@72e78f98fb28f84d8589f292696660ac3f8c1259"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_IoT_RedBoard-ESP32@72e78f98fb28f84d8589f292696660ac3f8c1259"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_IoT_RedBoard-ESP32@72e78f98fb28f84d8589f292696660ac3f8c1259"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_IoT_RedBoard-ESP32/72e78f98fb28f84d8589f292696660ac3f8c1259/hardware/SparkFun_IoT_RedBoard-ESP32.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:33Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "394e35e947ad31099a89f40069cbed812acad41f1a73c1fed35405b8d59e42f6",
+        "size_bytes": 1029638,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_IoT_RedBoard-ESP32@72e78f98fb28f84d8589f292696660ac3f8c1259"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_IoT_RedBoard-ESP32/72e78f98fb28f84d8589f292696660ac3f8c1259/hardware/SparkFun_IoT_RedBoard-ESP32.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:33Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "11edad77954b43495488ecd682d25129ec8f4dc15f2c7804b7c681dd4812b49c",
+        "size_bytes": 2145916,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_IoT_RedBoard-ESP32@72e78f98fb28f84d8589f292696660ac3f8c1259"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_IoT_RedBoard-ESP32@72e78f98fb28f84d8589f292696660ac3f8c1259"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_IoT_RedBoard-ESP32/72e78f98fb28f84d8589f292696660ac3f8c1259/hardware/output-ESP32.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:31Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8bc7b2c8027a1e9fe11467fae5b9f3a539ab7e2607a51cab23df5673c974dff7",
+        "size_bytes": 641989,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/WRL-19177",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_IoT_RedBoard-ESP32",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_IoT_RedBoard-ESP32",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_IoT_RedBoard-ESP32 pinned at 72e78f98fb28. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

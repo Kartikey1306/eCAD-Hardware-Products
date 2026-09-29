@@ -181,12 +181,12 @@
     "cad_license": "CC BY-SA 4.0",
     "schematic_license": "CC BY-SA 4.0",
     "pcb_license": "CC BY-SA 4.0",
-    "mechanical_cad_license": null,
+    "mechanical_cad_license": "CC BY-SA 4.0",
     "redistribution_allowed": true,
     "modification_allowed": true,
     "commercial_use_allowed": true,
     "attribution_required": true,
-    "license_url": "http://creativecommons.org/licenses/by-sa/4.0/"
+    "license_url": "https://github.com/sparkfun/SparkFun_Thing_Plus-RP2040/blob/HEAD/LICENSE.md"
   },
   "sources": {
     "source_tier": "manufacturer_official",
@@ -199,5 +199,5 @@
     "direct_gerber_download": null
   },
   "record_status": "partial",
-  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Thing_Plus-RP2040 pinned at 38fd2d27eaa2. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from LICENSE.md in the manufacturer's repository: \"SparkFun hardware is released under Creative Commons Share-alike 4.0 International\". Code in the same repository is licensed separately."
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Thing_Plus-RP2040 pinned at 38fd2d27eaa2. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from LICENSE.md in the manufacturer's repository: \"SparkFun hardware is released under Creative Commons Share-alike 4.0 International\". Code in the same repository is licensed separately. Hardware licence read from sparkfun/SparkFun_Thing_Plus-RP2040: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
 }

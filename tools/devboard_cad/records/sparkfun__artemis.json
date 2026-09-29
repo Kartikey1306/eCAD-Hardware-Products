@@ -1,0 +1,245 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:artemis",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Artemis",
+  "board": "SparkFun Artemis",
+  "part_number": "WRL-15484",
+  "revision": "not-stated",
+  "mcu_soc": "APOLLO3",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:28Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Artemis@e1d026549109ea02264e977fc1f7b8d49bcfdfe9"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:28Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Artemis@e1d026549109ea02264e977fc1f7b8d49bcfdfe9"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:28Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Artemis@e1d026549109ea02264e977fc1f7b8d49bcfdfe9"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Module-Pads.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "eb953eabd64cfe41c63d1542541f0016dbb331c34195d921d2c3e6dff3627c06",
+        "size_bytes": 34550,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Module-Pads.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "eb953eabd64cfe41c63d1542541f0016dbb331c34195d921d2c3e6dff3627c06",
+        "size_bytes": 34550,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "b0d043b0472518f42da9ed70413fc54ab85538cb85434d318906d7eb93b0f8a3",
+        "size_bytes": 990140,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:28Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Artemis@e1d026549109ea02264e977fc1f7b8d49bcfdfe9"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:28Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Artemis@e1d026549109ea02264e977fc1f7b8d49bcfdfe9"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:28Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Artemis@e1d026549109ea02264e977fc1f7b8d49bcfdfe9"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/SparkFun_Artemis.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "877b565be79d75baa3626a1e53ceb6ec0ac4c43489167dcb828ad485485e2174",
+        "size_bytes": 138469,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:28Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Artemis@e1d026549109ea02264e977fc1f7b8d49bcfdfe9"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/SparkFun_Artemis.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "69dbbd8de41de779df43445e5c937f3ba6cf75ef2cd73c5edddfb66d103d9966",
+        "size_bytes": 298743,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Documents/Artemis%20Production%20Model%20V1.step",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "fe6e7ae4e358fa66ad93ab7c32c01f7bd830c41081d39d80c17f96ab439d0b4f",
+        "size_bytes": 5381568,
+        "media_type": "text/plain",
+        "detected_format": "step:AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF { 1 0 10303 442 1 1 4 }",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Documents/Artemis%20Production%20Model%20V1.stl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6bc57ead37b15c50fae9ff0a0b7839cfbedefe8833b62f71a5aef8f3dade5e46",
+        "size_bytes": 849484,
+        "media_type": "application/octet-stream",
+        "detected_format": "stl",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Module-Pads.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "eb953eabd64cfe41c63d1542541f0016dbb331c34195d921d2c3e6dff3627c06",
+        "size_bytes": 34550,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Artemis/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/WRL-15484",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Artemis",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Artemis",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Artemis pinned at e1d026549109. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Artemis: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

@@ -6,8 +6,8 @@
   "family": "QT Py",
   "board": "Adafruit QT Py RP2040",
   "part_number": "4900",
-  "revision": "unverified",
-  "mcu_soc": "Raspberry Pi RP2040",
+  "revision": "not-stated",
+  "mcu_soc": "RP2040",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": "Dual Arm Cortex-M0+",
@@ -19,7 +19,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
@@ -31,7 +31,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
@@ -43,7 +43,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
@@ -54,7 +54,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-QT-Py-RP2040-PCB/5b6ebd1661fd5250b4f60bdba14d5c475259b7f4/Adafruit%20QT%20Py%20RP2040.brd",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:55:16Z",
+        "captured_at": "2026-09-29T07:14:47Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "37043a6cc669c9ba29413a4c00e33724d1de67b6b3cc9f2759a8b3d5101437e2",
@@ -70,7 +70,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
@@ -82,7 +82,19 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
@@ -94,7 +106,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
@@ -105,7 +117,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-QT-Py-RP2040-PCB/5b6ebd1661fd5250b4f60bdba14d5c475259b7f4/Adafruit%20QT%20Py%20RP2040.brd",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:55:16Z",
+        "captured_at": "2026-09-29T07:14:47Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "37043a6cc669c9ba29413a4c00e33724d1de67b6b3cc9f2759a8b3d5101437e2",
@@ -121,7 +133,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
@@ -132,7 +144,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-QT-Py-RP2040-PCB/5b6ebd1661fd5250b4f60bdba14d5c475259b7f4/Adafruit%20QT%20Py%20RP2040%20Pinout.pdf",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:55:19Z",
+        "captured_at": "2026-09-29T07:14:47Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "c4c0d0734aa6eb535b4462a9471a0a7f418126b59e86ef47da36a3714b5afb91",
@@ -147,7 +159,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-QT-Py-RP2040-PCB/5b6ebd1661fd5250b4f60bdba14d5c475259b7f4/Adafruit%20QT%20Py%20RP2040.sch",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:55:30Z",
+        "captured_at": "2026-09-29T07:14:47Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "85226a2d6b08f1f248f57eb88d787cd565669ec78663fe7864383646ff750ccf",
@@ -163,7 +175,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
@@ -175,17 +187,11 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:21Z",
+        "captured_at": "2026-09-29T07:04:41Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-QT-Py-RP2040-PCB@5b6ebd1661fd5250b4f60bdba14d5c475259b7f4"
       }
-    },
-    "mechanical": {
-      "available": null,
-      "url": null,
-      "verified_revision": null,
-      "evidence": null
     }
   },
   "licenses": {
@@ -193,7 +199,7 @@
     "cad_license": "CC BY-SA (version not stated by the manufacturer)",
     "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
     "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
-    "mechanical_cad_license": null,
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
     "redistribution_allowed": true,
     "modification_allowed": true,
     "commercial_use_allowed": true,
@@ -210,6 +216,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
-  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-QT-Py-RP2040-PCB pinned at 5b6ebd1661fd. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence stated in the manufacturer's README as \"Creative Commons Attribution, Share-Alike license, check license.txt for more information\". No version is given and license.txt is absent from the repository, so the exact version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-QT-Py-RP2040-PCB pinned at 5b6ebd1661fd. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-QT-Py-RP2040-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
 }
