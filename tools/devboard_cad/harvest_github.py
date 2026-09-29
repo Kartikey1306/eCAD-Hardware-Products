@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.error
@@ -85,17 +86,30 @@ NAME_HINTS: Tuple[Tuple[Tuple[str, ...], str], ...] = (
 ABSENCE_CLAIMABLE = (
     "pcb_source", "schematic", "gerbers", "step", "dxf", "stl",
     "kicad", "eagle", "altium", "nc_drill", "bom", "pick_and_place",
+    "mechanical",
 )
 
 
+class GitHubError(RuntimeError):
+    """A GitHub API call did not return a result. A 404 is an ordinary outcome here."""
+
+
 def _gh_api(path: str) -> Any:
-    """Call the GitHub API through `gh` when available, else an authenticated urllib GET."""
+    """Call the GitHub API through `gh` when available, else an authenticated urllib GET.
+
+    When `gh` is present and answers, its answer is final. Falling through to urllib on a
+    non-zero exit would turn every 404 -- a repository with no LICENSE file, say -- into an
+    extra *unauthenticated* request against a 60/hour limit, which stalls any bulk run.
+    """
     try:
         out = subprocess.run(["gh", "api", path], capture_output=True, text=True, timeout=60)
         if out.returncode == 0:
             return json.loads(out.stdout)
-    except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError):
-        pass
+        raise GitHubError(f"gh api {path}: {(out.stderr or '').strip()[:120]}")
+    except FileNotFoundError:
+        pass  # gh is not installed; fall back to urllib
+    except (subprocess.TimeoutExpired, json.JSONDecodeError) as exc:
+        raise GitHubError(f"gh api {path}: {exc}") from exc
     request = urllib.request.Request(
         f"https://api.github.com/{path.lstrip('/')}",
         headers={"Accept": "application/vnd.github+json",
@@ -179,6 +193,42 @@ def _pick(paths: Sequence[str], format_name: Optional[str] = None) -> str:
     return sorted(paths, key=rank)[0]
 
 
+# Vendors encode the board revision in the filename far more often than they state it in
+# prose: "Pico-R3.step", "BeagleBone Black_PCB_RevD_250403.brd", "Feather RP2040 rev B.brd".
+_REVISION_PATTERNS: Tuple[str, ...] = (
+    r"[-_ ]rev(?:ision)?[-_ ]?([A-Z]\d?|\d+(?:\.\d+)?)(?![A-Za-z0-9])",
+    r"[-_ ]([A-Z]?R\d+(?:\.\d+)?)(?![A-Za-z0-9])",
+    r"(?<![A-Za-z0-9])v(\d+\.\d+)(?![A-Za-z0-9])",
+)
+
+
+def infer_revision(paths: Sequence[str]) -> Optional[str]:
+    """Return the highest revision token the manufacturer put in its own filenames.
+
+    Returns None when no file names one, which is a different fact from 'we did not look'
+    and is recorded as such by the caller.
+    """
+    seen: List[str] = []
+    for path in paths:
+        stem = Path(path).name
+        for pattern in _REVISION_PATTERNS:
+            for match in re.finditer(pattern, stem, re.I):
+                token = match.group(1).upper()
+                if token and token not in seen:
+                    seen.append(token)
+    if not seen:
+        return None
+
+    def order(token: str) -> Tuple[int, float, str]:
+        digits = re.findall(r"\d+(?:\.\d+)?", token)
+        letters = re.findall(r"[A-Z]", token)
+        return (ord(letters[0]) if letters else 0,
+                float(digits[0]) if digits else 0.0,
+                token)
+
+    return sorted(seen, key=order)[-1]
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -219,6 +269,12 @@ def build_files(repo: str, sha: str, found: Dict[str, List[str]],
 def build_record(board_id: str, repo: str, sha: str, meta: Dict[str, Any],
                  found: Dict[str, List[str]], identity: Dict[str, Any],
                  claim_absence: bool = True) -> "OrderedDict[str, Any]":
+    revision = identity.get("revision", "unverified")
+    if str(revision).strip().lower() in ("", "unverified"):
+        every_path = sorted({p for paths in found.values() for p in paths})
+        # The tree is exhaustive, so "no file names a revision" is a finding about the
+        # manufacturer's design-file distribution, not an unfilled gap in this record.
+        revision = infer_revision(every_path) or "not-stated"
     spdx = (meta.get("license") or {}).get("spdx_id")
     license_name = spdx if spdx and spdx != "NOASSERTION" else "UNVERIFIED"
     record: "OrderedDict[str, Any]" = OrderedDict([
@@ -229,7 +285,7 @@ def build_record(board_id: str, repo: str, sha: str, meta: Dict[str, Any],
         ("family", identity["family"]),
         ("board", identity["board"]),
         ("part_number", identity.get("part_number", "UNVERIFIED")),
-        ("revision", identity.get("revision", "unverified")),
+        ("revision", revision),
         ("mcu_soc", identity.get("mcu_soc", "UNVERIFIED")),
         ("hardware_revision", identity.get("hardware_revision")),
         ("fpga", identity.get("fpga")),

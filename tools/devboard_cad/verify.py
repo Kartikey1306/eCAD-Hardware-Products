@@ -30,6 +30,7 @@ import os
 import re
 import socket
 import sys
+import threading
 import time
 import urllib.error
 import urllib.parse
@@ -37,6 +38,7 @@ import urllib.request
 import zipfile
 from collections import OrderedDict
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -89,8 +91,13 @@ def detect_format(head: bytes) -> Optional[str]:
         return "stl"
     if stripped.startswith(b"<?xml") or stripped.startswith(b"<eagle"):
         return "eagle" if b"<eagle" in stripped[:4096] else "xml"
-    # ASCII DXF: a group code 0 followed by SECTION, tolerating leading whitespace and CRLF.
-    if re.match(rb"^\s*0\s*[\r\n]+\s*SECTION", stripped):
+    # ASCII DXF. Group code 0 / SECTION / 2 / <section name>. It is not enough to anchor
+    # at byte 0: group code 999 is a legal comment and writers put one there (Raspberry
+    # Pi's mechanical DXFs open with "999\ndxfrw 0.6.3"), so the pattern is searched for
+    # within the header and pinned to a real section name to stay specific.
+    if re.search(rb"(?:^|[\r\n])\s*0\s*[\r\n]+\s*SECTION\s*[\r\n]+\s*2\s*[\r\n]+"
+                 rb"\s*(HEADER|CLASSES|TABLES|BLOCKS|ENTITIES|OBJECTS)\b",
+                 stripped[:2048]):
         return "dxf"
     # Excellon NC drill: the format's own header command, e.g. "M48\nINCH\nT01C.006".
     if re.match(rb"^M48\s*[\r\n]", stripped):
@@ -294,19 +301,24 @@ class Fetcher:
         self.offline = offline
         self.refresh = refresh
         self._last_hit: Dict[str, float] = {}
+        self._lock = threading.Lock()
 
     def _paths(self, url: str) -> Tuple[Path, Path]:
         key = hashlib.sha256(url.encode("utf-8")).hexdigest()
         return self.cache_dir / f"{key}.bin", self.cache_dir / f"{key}.json"
 
     def _throttle(self, url: str) -> None:
+        """Reserve the next slot for this host, then wait for it outside the lock."""
+        if self.min_interval <= 0:
+            return
         host = urllib.parse.urlsplit(url).netloc
-        last = self._last_hit.get(host)
-        if last is not None:
-            wait = self.min_interval - (time.monotonic() - last)
-            if wait > 0:
-                time.sleep(wait)
-        self._last_hit[host] = time.monotonic()
+        with self._lock:
+            now = time.monotonic()
+            nxt = max(now, self._last_hit.get(host, 0.0) + self.min_interval)
+            self._last_hit[host] = nxt
+        wait = nxt - time.monotonic()
+        if wait > 0:
+            time.sleep(wait)
 
     def get(self, url: str) -> FetchResult:
         blob, meta = self._paths(url)
@@ -565,6 +577,22 @@ def write_record(path: Path, record: Any) -> None:
         handle.write("\n")
 
 
+# An identity field is resolved when it holds a real value, or when the manufacturer has
+# been checked and demonstrably publishes none. "unverified" means nobody has looked yet;
+# "not-stated" and "not-applicable" are findings. Collapsing the two would make an
+# unfinished record indistinguishable from a complete one about a board with no revision.
+IDENTITY_GAP = {"", "unverified", "unknown", "tbd", "n/a"}
+IDENTITY_RESOLVED_SENTINELS = {"not-stated", "not-applicable"}
+
+
+def identity_is_pinned(record: Dict[str, Any]) -> bool:
+    for field in ("part_number", "mcu_soc", "revision"):
+        value = str(record.get(field, "")).strip().lower()
+        if value in IDENTITY_GAP:
+            return False
+    return True
+
+
 def derive_status(record: Dict[str, Any]) -> str:
     """Derive record_status from the data so it cannot drift out of sync by hand."""
     entries = list(record.get("files", {}).values())
@@ -573,11 +601,7 @@ def derive_status(record: Dict[str, Any]) -> str:
     known = [e for e in entries if e.get("available") is not None]
     if not known:
         return "incomplete"
-    identity_unverified = any(
-        str(record.get(field, "")).strip().lower() in {"", "unverified"}
-        for field in ("part_number", "mcu_soc", "revision")
-    )
-    if len(known) == len(entries) and not identity_unverified:
+    if len(known) == len(entries) and identity_is_pinned(record):
         return "verified"
     return "partial"
 
@@ -585,22 +609,32 @@ def derive_status(record: Dict[str, Any]) -> str:
 def verify_record(record: Dict[str, Any], fetcher: Fetcher,
                   only: Optional[Sequence[str]] = None,
                   verbose: bool = True,
-                  absent_on_404: bool = False) -> List[Tuple[str, Verdict]]:
-    outcomes: List[Tuple[str, Verdict]] = []
-    for name, entry in record.get("files", {}).items():
-        if only and name not in only:
-            continue
-        url = entry.get("url")
-        if not url:
-            continue
+                  absent_on_404: bool = False,
+                  jobs: int = 1) -> List[Tuple[str, Verdict]]:
+    targets = [(name, entry["url"]) for name, entry in record.get("files", {}).items()
+               if entry.get("url") and not (only and name not in only)]
+
+    def check(target: Tuple[str, str]) -> Tuple[str, Verdict, bool]:
+        name, url = target
         result = fetcher.get(url)
-        verdict = classify(name, result, absent_on_404=absent_on_404,
-                           claimed_revision=record.get("revision"))
+        return (name,
+                classify(name, result, absent_on_404=absent_on_404,
+                         claimed_revision=record.get("revision")),
+                result.from_cache)
+
+    if jobs > 1 and len(targets) > 1:
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            checked = list(pool.map(check, targets))
+    else:
+        checked = [check(t) for t in targets]
+
+    outcomes: List[Tuple[str, Verdict]] = []
+    for name, verdict, from_cache in checked:
         outcomes.append((name, verdict))
         if verbose:
             state = {True: "true ", False: "false", None: "null "}[verdict.available]
-            cached = " (cached)" if result.from_cache else ""
-            print(f"    {name:22} -> {state}  {verdict.reason}{cached}")
+            print(f"    {name:22} -> {state}  {verdict.reason}"
+                  f"{' (cached)' if from_cache else ''}")
     return outcomes
 
 
@@ -658,20 +692,25 @@ def cmd_verify(args: argparse.Namespace) -> int:
     total_changed = 0
     for path in paths:
         record = load_record(path)
-        print(f"{record.get('board_id', path.stem)}  ({path.name})")
+        if not args.quiet:
+            print(f"{record.get('board_id', path.stem)}  ({path.name})")
         outcomes = verify_record(record, fetcher, only=args.format or None,
-                                 absent_on_404=args.absent_on_404)
-        if not outcomes:
+                                 absent_on_404=args.absent_on_404,
+                                 verbose=not args.quiet, jobs=args.jobs)
+        if not outcomes and not args.quiet:
             print("    no URLs to check")
         if args.apply and outcomes:
             changed = apply_outcomes(record, outcomes)
             total_changed += changed
             if changed:
                 write_record(path, record)
+            if not args.quiet:
                 print(f"    updated {changed} entr{'y' if changed == 1 else 'ies'}; "
-                      f"record_status={record['record_status']}")
-            else:
-                print("    no change")
+                      f"record_status={record['record_status']}" if changed
+                      else "    no change")
+            elif changed:
+                print(f"{record['board_id']:46} {changed:2} updated  "
+                      f"[{record['record_status']}]", flush=True)
     if args.apply:
         print(f"\n{total_changed} entr{'y' if total_changed == 1 else 'ies'} updated")
     return 0
@@ -705,6 +744,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help="whole-transfer deadline; a slow trickle is not a file")
     verify.add_argument("--min-interval", type=float, default=DEFAULT_MIN_INTERVAL,
                         help="minimum seconds between requests to one host")
+    verify.add_argument("--jobs", type=int, default=1,
+                        help="files checked concurrently; the per-host interval still holds")
+    verify.add_argument("--quiet", action="store_true",
+                        help="one line per changed record instead of one per file")
     verify.set_defaults(func=cmd_verify)
     return parser
 
