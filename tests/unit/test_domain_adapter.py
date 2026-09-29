@@ -228,7 +228,7 @@ def _no_icarus():
     """The Icarus adapter, reporting itself not installed wherever the test runs."""
     from ecad_validation.adapters.base import Capability
 
-    return mock.patch("ecad_validation.adapters.hdl.probe_executable",
+    return mock.patch("ecad_validation.adapters.hdl.probe_iverilog",
                       return_value=Capability(adapter="iverilog", available=False, reason="IVERILOG_NOT_INSTALLED"))
 
 

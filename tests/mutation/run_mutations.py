@@ -705,6 +705,12 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("hdl-reason-unsanitised", HD, "    if RECEIPT_CODE.match(reason):\n", "    if True:\n"),
     ("hdl-timeout-names-compile-step", HD, '        unfinished = self._unfinished("RTL testbench execution", executed)\n',
      '        unfinished = self._unfinished("RTL compilation", __import__("dataclasses").replace(executed, argv=compile_command))\n'),
+    # the digital review (CS-6): the version probe runs through run_process, with its scrubbed environment
+    ("hdl-probe-bypasses-run-process", HD, "        compiler = probe_iverilog()\n",
+     '        compiler = __import__("ecad_validation.adapters.capabilities", fromlist=["probe_executable"])'
+     '.probe_executable("iverilog", ("iverilog", "-V"))\n'),
+    ("hdl-probe-inherits-environment", HD, "timeout_seconds=PROBE_TIMEOUT_S, stdin_devnull=True))",
+     'timeout_seconds=PROBE_TIMEOUT_S, stdin_devnull=True, environment=dict(__import__("os").environ)))'),
     # iverilog's version: the first line of `iverilog -V`, never an invented one
     ("iverilog-version-pattern-added", CP, r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)")}',
      r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)"), "iverilog": re.compile(r"version ([0-9.]+)")}'),

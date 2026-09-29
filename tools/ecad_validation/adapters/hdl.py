@@ -5,7 +5,8 @@ inputs, a scrubbed environment (no IVERILOG_ICONFIG, IVERILOG_VPI_MODULE_PATH
 or secret of the caller), an empty stdin, a capped output and the case's
 timeout: ``iverilog -g2012 -o simulation.vvp <inputs>`` in one workspace,
 whose program is collected out of it, then ``vvp simulation.vvp`` in a second
-workspace holding only that program. Case arguments are refused, never put on
+workspace holding only that program. The version probe, ``iverilog -V``, runs
+through run_process too. Case arguments are refused, never put on
 either command line: ``-s``, ``-D``, ``-y``, ``-c`` or ``-f`` would compile
 something other than the inputs, and ``-m`` or ``-L`` load native code.
 
@@ -28,7 +29,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from ..models import ExecutionStatus, Verdict
 from .base import Adapter, AdapterRequest, AdapterResult, Capability
-from .capabilities import probe_executable
+from .capabilities import version_from_output
 from .process import ProcessRequest, ProcessResult, relative_input_path, run_process
 
 MAX_INPUT_BYTES = 1 << 20
@@ -42,6 +43,7 @@ NUMBER = re.compile(r"^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$")
 TRUNCATED = "[output truncated]"  # what process._limited appends to a capture it cut
 RECEIPT_CODE = re.compile(r"^[A-Z][A-Z0-9_]*$")  # the receipt schema's reason_code pattern
 MAX_SUMMARY_PROBLEMS = 10
+PROBE_TIMEOUT_S = 30  # capabilities.probe_executable's
 
 
 def declared_metrics(texts: Sequence[str]) -> Tuple[List[str], List[str]]:
@@ -128,11 +130,12 @@ def parse_metrics(stdout: str, declared: Sequence[str]) -> Tuple[Dict[str, float
 def _receipt_reason(reason: Optional[str]) -> str:
     """A capability reason as a code the receipt schema accepts (^[A-Z][A-Z0-9_]*$).
 
-    probe_executable reports an OSError as ``VERSION_PROBE_ERROR:<message>``
-    and a signal as ``VERSION_PROBE_EXIT_-<n>``. Neither is a reason code, and
-    a receipt that fails its own schema is not written at all. This is the
-    ngspice adapter's mapping, copied so that no other adapter's error path
-    changes; both copies go when probe_executable itself reports codes
+    The version probe (probe_iverilog, as capabilities.probe_executable)
+    reports an OSError as ``VERSION_PROBE_ERROR:<message>`` and a signal as
+    ``VERSION_PROBE_EXIT_-<n>``. Neither is a reason code, and a receipt that
+    fails its own schema is not written at all. This is the ngspice adapter's
+    mapping, copied so that no other adapter's error path changes; both
+    copies go when the probes themselves report codes
     (fix/version-probe-reason-codes).
 
     Example:
@@ -151,11 +154,56 @@ def _receipt_reason(reason: Optional[str]) -> str:
     return "TOOL_UNAVAILABLE"
 
 
+def probe_iverilog() -> Capability:
+    """Whether Icarus Verilog's compiler is installed, and its version: ``iverilog -V`` through run_process.
+
+    capabilities.probe_executable runs a probe with the caller's
+    environment, and ``iverilog -V`` then writes its configuration to the
+    file IVERILOG_ICONFIG names (Verified, Icarus 13.0). Here the probe gets
+    what both steps get: run_process's scrubbed environment, a throwaway
+    workspace, an empty stdin and a capped output. Its outcome reads as
+    probe_executable's does.
+
+    Returns:
+        TOOL_NOT_INSTALLED when iverilog is not on PATH;
+        VERSION_PROBE_TIMED_OUT after PROBE_TIMEOUT_S seconds;
+        ``VERSION_PROBE_ERROR:<message>`` when it cannot be started;
+        ``VERSION_PROBE_EXIT_<status>`` when it exits non-zero and names no
+        version; otherwise available, with the first line of its output as
+        the version (None when it printed nothing).
+
+    Example:
+        >>> import os
+        >>> from unittest import mock
+        >>> with mock.patch.dict(os.environ, {"PATH": ""}):
+        ...     probe_iverilog()
+        Capability(adapter='iverilog', available=False, executable=None, version=None, reason='TOOL_NOT_INSTALLED')
+        >>> installed = probe_iverilog()  # wherever this runs, installed or not
+        >>> installed.adapter, installed.available == (installed.reason is None)
+        ('iverilog', True)
+    """
+    probe = run_process(ProcessRequest(argv=["iverilog", "-V"], input_root=Path("."), input_files=[],
+                                       timeout_seconds=PROBE_TIMEOUT_S, stdin_devnull=True))
+    if probe.execution_status is ExecutionStatus.UNAVAILABLE:
+        return Capability(adapter="iverilog", available=False, reason="TOOL_NOT_INSTALLED")
+    executable = probe.argv[0]
+    if probe.execution_status is ExecutionStatus.TIMED_OUT:
+        return Capability(adapter="iverilog", available=False, executable=executable, reason="VERSION_PROBE_TIMED_OUT")
+    if probe.execution_status is not ExecutionStatus.COMPLETED:
+        return Capability(adapter="iverilog", available=False, executable=executable,
+                          reason=f"VERSION_PROBE_ERROR:{probe.stderr}")
+    version = version_from_output("iverilog", "\n".join(part for part in (probe.stdout, probe.stderr) if part).strip())
+    if probe.returncode != 0 and not version:
+        return Capability(adapter="iverilog", available=False, executable=executable,
+                          reason=f"VERSION_PROBE_EXIT_{probe.returncode}")
+    return Capability(adapter="iverilog", available=True, executable=executable, version=version)
+
+
 class HDLAdapter(Adapter):
     name = "iverilog"
 
     def capability(self) -> Capability:
-        compiler = probe_executable("iverilog", ("iverilog", "-V"))
+        compiler = probe_iverilog()
         if not compiler.available:
             return compiler
         if shutil.which("vvp") is None:

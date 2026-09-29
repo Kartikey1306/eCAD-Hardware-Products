@@ -257,7 +257,7 @@ def _no_icarus():
     """The real Icarus adapter, reporting Icarus not installed wherever the test runs."""
     from ecad_validation.adapters.base import Capability
 
-    return mock.patch("ecad_validation.adapters.hdl.probe_executable",
+    return mock.patch("ecad_validation.adapters.hdl.probe_iverilog",
                       return_value=Capability(adapter="iverilog", available=False, reason="TOOL_NOT_INSTALLED"))
 
 
@@ -1402,7 +1402,7 @@ class TestRegistryAndSimulator(unittest.TestCase):
             ("installed, not Icarus", Capability(adapter="iverilog", available=True, executable="/x/iverilog",
                                                  version="iverilog 13")),
         ):
-            with self.subTest(label), mock.patch("ecad_validation.adapters.hdl.probe_executable", return_value=capability), \
+            with self.subTest(label), mock.patch("ecad_validation.adapters.hdl.probe_iverilog", return_value=capability), \
                     mock.patch("ecad_validation.adapters.hdl.shutil.which", return_value="/x/vvp"):
                 with mock.patch.dict(os.environ, {"ECAD_REQUIRE_HDL_TOOLS": ""}):
                     with self.assertRaises(unittest.SkipTest):
@@ -1411,11 +1411,11 @@ class TestRegistryAndSimulator(unittest.TestCase):
                     with self.assertRaisesRegex(AssertionError, "ECAD_REQUIRE_HDL_TOOLS=1 but"):
                         require_icarus()
         installed = Capability(adapter="iverilog", available=True, executable="/x/iverilog", version=banner)
-        with mock.patch("ecad_validation.adapters.hdl.probe_executable", return_value=installed), \
+        with mock.patch("ecad_validation.adapters.hdl.probe_iverilog", return_value=installed), \
                 mock.patch("ecad_validation.adapters.hdl.shutil.which", return_value="/x/vvp"), \
                 mock.patch.dict(os.environ, {"ECAD_REQUIRE_HDL_TOOLS": "1"}):
             self.assertEqual(require_icarus(), installed)
-        with mock.patch("ecad_validation.adapters.hdl.probe_executable", return_value=installed), \
+        with mock.patch("ecad_validation.adapters.hdl.probe_iverilog", return_value=installed), \
                 mock.patch("ecad_validation.adapters.hdl.shutil.which", return_value=None), \
                 mock.patch.dict(os.environ, {"ECAD_REQUIRE_HDL_TOOLS": "1"}):
             with self.assertRaisesRegex(AssertionError, "VVP_NOT_INSTALLED"):

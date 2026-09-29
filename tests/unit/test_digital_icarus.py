@@ -294,20 +294,28 @@ class TestRealIcarus(unittest.TestCase):
                                   measured["rx_framing_errors"]), (bit_cycles, 2.0, 0.0, 0.0))
 
     def test_the_compiler_sees_only_the_scrubbed_environment(self):
-        """IVERILOG_ICONFIG names a file iverilog writes its configuration to. The capability is probed
-        before the variable is set: the version probe runs with the caller's environment (a known trap,
-        MEMORY.md), and this test is about the two steps the adapter runs."""
+        """IVERILOG_ICONFIG names a file iverilog writes its configuration to, when it compiles and when it only
+        reports its version. The version probe and both steps run through run_process (review CS-6: the probe
+        used to run with the caller's environment and wrote the file)."""
         from ecad_validation.adapters.base import AdapterRequest
         from ecad_validation.adapters.hdl import HDLAdapter
 
         with tempfile.TemporaryDirectory() as directory:
             config = Path(directory) / "i.txt"
-            with mock.patch.object(HDLAdapter, "capability", return_value=self.capability), \
-                    mock.patch.dict(os.environ, {"IVERILOG_ICONFIG": str(config)}):
+            with mock.patch.dict(os.environ, {"IVERILOG_ICONFIG": str(config)}):
+                capability = HDLAdapter().capability()
+                self.assertFalse(config.exists(), "the version probe saw IVERILOG_ICONFIG")
                 result = HDLAdapter().run(AdapterRequest(case_id="env", product_root=ITEM, input_files=[ITEM / SIM],
                                                          timeout_seconds=60))
+            self.assertEqual(capability, self.capability)
             self.assertEqual((result.verdict.value, result.metrics), ("PASS", CLOSED_FORMS))
-            self.assertFalse(config.exists(), "the compile step saw IVERILOG_ICONFIG")
+            self.assertFalse(config.exists(), "the version probe or the compile step saw IVERILOG_ICONFIG")
+            # `iverilog -V` with the caller's environment does write it: the probe's check can fail.
+            done = subprocess.run([self.capability.executable or "iverilog", "-V"], cwd=directory,
+                                  env={**os.environ, "IVERILOG_ICONFIG": str(config)}, capture_output=True, text=True,
+                                  timeout=120, stdin=subprocess.DEVNULL)
+            self.assertTrue(config.exists(), done.stderr)
+            config.unlink()
             # The same compile with the caller's environment does write it: the check can fail.
             (Path(directory) / "sim.v").write_bytes((ITEM / SIM).read_bytes())
             done = subprocess.run([self.capability.executable or "iverilog", "-g2012", "-o", "sim.vvp", "sim.v"],

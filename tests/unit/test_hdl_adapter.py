@@ -3,8 +3,9 @@
 Nothing here runs Icarus. The process boundary is replaced where the
 adapter meets it: ``subprocess.run`` and ``shutil.which`` as
 ecad_validation.adapters.process sees them. Those are the modules
-themselves, so the version probe in capabilities.py meets the same fake,
-which answers ``iverilog -V`` separately and never counts it as a step. The
+themselves, so anything else that runs a process meets the same fake. The
+version probe runs through run_process too; the fake answers ``iverilog -V``
+separately, records how it was called, and never counts it as a step. The
 run_process tests that need a real child run ``sys.executable``.
 
 Recorded texts, byte for byte:
@@ -147,6 +148,7 @@ class _Tools:
         self.installed = set(installed)
         self.steps: List[Dict[str, Any]] = []
         self.probes: List[List[str]] = []
+        self.probe_calls: List[Dict[str, Any]] = []
         self._patches = [mock.patch("ecad_validation.adapters.process.subprocess.run", side_effect=self.run),
                          mock.patch("ecad_validation.adapters.process.shutil.which", side_effect=self.which)]
 
@@ -167,6 +169,7 @@ class _Tools:
         tool = Path(argv[0]).name
         if argv[1:] == ["-V"]:
             self.probes.append(list(argv))
+            self.probe_calls.append(kwargs)
             return subprocess.CompletedProcess(argv, 0, stdout=self.banner, stderr="")
         cwd = Path(kwargs["cwd"])
         step: Dict[str, Any] = {"tool": tool, "argv": list(argv), "kwargs": kwargs,
@@ -201,6 +204,18 @@ def _run(inputs: Sequence[Path], arguments: Sequence[str] = (), timeout: int = 1
                                            input_files=list(inputs), arguments=list(arguments), timeout_seconds=timeout))
 
 
+def _only_the_probe():
+    """run_process as the adapter sees it, failing the test on anything but the version probe, ``iverilog -V``."""
+    from ecad_validation.adapters.process import run_process
+
+    def probe_only(request):
+        if request.argv[1:] != ["-V"]:
+            raise AssertionError(f"ran {request.argv}")
+        return run_process(request)
+
+    return mock.patch("ecad_validation.adapters.hdl.run_process", side_effect=probe_only)
+
+
 def _outcome(result) -> tuple:
     return (result.verdict.value, result.execution_status.value, result.reason_code)
 
@@ -232,6 +247,14 @@ class TestTheTwoSteps(unittest.TestCase):
         self.assertEqual(compile_step["files"], [SOURCE])
         self.assertEqual(run_step["files"], ["simulation.vvp"])
         self.assertEqual(tools.probes, [["/fake/iverilog", "-V"]])
+        # Review CS-6: the version probe, too, sees only run_process's environment, in a workspace of its own.
+        [probe] = tools.probe_calls
+        self.assertLessEqual(set(probe["env"]), SCRUBBED)
+        self.assertFalse(set(probe["env"]) & set(CALLER_ONLY), probe["env"])
+        self.assertEqual(Path(probe["env"]["HOME"]).parent, Path(probe["cwd"]))
+        self.assertNotIn(Path(probe["cwd"]).resolve(), {product.resolve(), Path.cwd().resolve()})
+        self.assertIs(probe["stdin"], subprocess.DEVNULL)
+        self.assertEqual(probe["timeout"], 30)
         self.assertEqual(_outcome(result), ("PASS", "completed", "RTL_TESTBENCH_PASSED"))
         self.assertEqual(result.metrics, RECORDED_METRICS)
         self.assertEqual(result.summary, "committed RTL testbench executed: 9 of 9 declared metrics read")
@@ -291,7 +314,7 @@ class TestRefusals(unittest.TestCase):
         """-N writes a file, -m loads native code, and -s picks another top."""
         for arguments in (["-N/tmp/x"], ["-mevil"], ["-s", "b"]):
             with self.subTest(arguments), tempfile.TemporaryDirectory() as directory, _Tools() as tools, \
-                    mock.patch("ecad_validation.adapters.hdl.run_process", side_effect=AssertionError("ran")):
+                    _only_the_probe():
                 result = _run(_product(Path(directory)), arguments)
                 self.assertEqual(_outcome(result), ("BLOCKED", "unavailable", "RTL_ARGUMENTS_REFUSED"))
                 self.assertEqual(result.summary,
@@ -418,7 +441,7 @@ class TestProcessOutcomes(unittest.TestCase):
         # The domain-adapter fixture's reason passes through unchanged.
         fixture = Capability(adapter="iverilog", available=False, reason="IVERILOG_NOT_INSTALLED")
         with tempfile.TemporaryDirectory() as directory, _Tools() as tools, \
-                mock.patch("ecad_validation.adapters.hdl.probe_executable", return_value=fixture):
+                mock.patch("ecad_validation.adapters.hdl.probe_iverilog", return_value=fixture):
             result = _run(_product(Path(directory)))
         self.assertEqual(_outcome(result), ("BLOCKED", "unavailable", "IVERILOG_NOT_INSTALLED"))
         self.assertEqual(tools.steps, [])
@@ -448,7 +471,7 @@ class TestProcessOutcomes(unittest.TestCase):
                 if vanished == "iverilog":
                     fixed = Capability(adapter="iverilog", available=True, executable="/fake/iverilog", version=VERSION)
                     tools.installed.discard("iverilog")
-                    with mock.patch("ecad_validation.adapters.hdl.probe_executable", return_value=fixed):
+                    with mock.patch("ecad_validation.adapters.hdl.probe_iverilog", return_value=fixed):
                         result = _run(_product(Path(directory)))
                 else:
                     tools.program = uninstall
@@ -475,7 +498,7 @@ class TestProcessOutcomes(unittest.TestCase):
             with self.subTest(label), tempfile.TemporaryDirectory() as directory, \
                     mock.patch("ecad_validation.adapters.capabilities.shutil.which", return_value="/fake/iverilog"), \
                     mock.patch("ecad_validation.adapters.capabilities.subprocess.run", **probe), \
-                    mock.patch("ecad_validation.adapters.hdl.run_process", side_effect=AssertionError("ran")):
+                    _only_the_probe():
                 result = _run(_product(Path(directory)))
                 self.assertEqual(_outcome(result), ("BLOCKED", "unavailable", code))
                 self.assertRegex(result.reason_code, RECEIPT_REASON)
