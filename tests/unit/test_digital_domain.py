@@ -1359,6 +1359,15 @@ class TestVerdicts(unittest.TestCase):
                 outside = link.relative_to(REPO_ROOT).as_posix()
                 cases.append(("an origin outside the repository", lambda item: copied_from(item, outside),
                               lambda item: None, f"{TX}'s origin {outside} lies outside the repository; it is not read"))
+            # Review CS-3: where letter case does not tell two names apart, the item in capitals is the item.
+            (Path(elsewhere) / "case-probe").write_bytes(b"")
+            if (Path(elsewhere) / "CASE-PROBE").exists():
+                cases.append(("an origin inside the item, spelled in capitals",
+                              lambda item: copied_from(item, f"{item.parent.relative_to(REPO_ROOT).as_posix()}/"
+                                                             f"UART_LOOPBACK_001/{TX}"),
+                              lambda item: None,
+                              f"{TX}'s origin {{parent}}/UART_LOOPBACK_001/{TX} lies inside the item; a copy's origin "
+                              "is a repository file outside it"))
             for number, (label, before, after, expected) in enumerate(cases):
                 with self.subTest(label):
                     item = Path(directory) / str(number) / "uart_loopback_001"
@@ -1366,7 +1375,8 @@ class TestVerdicts(unittest.TestCase):
                     before(item)
                     build(item)
                     after(item)
-                    problem = expected.replace("{here}", item.relative_to(REPO_ROOT).as_posix())
+                    problem = expected.replace("{here}", item.relative_to(REPO_ROOT).as_posix()).replace(
+                        "{parent}", item.parent.relative_to(REPO_ROOT).as_posix())
                     self.assertEqual(check(item), [problem])
                     receipt, _ = _validate(item)
                     v0 = _checks(receipt)["v0.dataset-schemas-and-hashes"]

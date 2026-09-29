@@ -837,8 +837,11 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      ""),
     ("reuse-copy-unchecked", D, '        if _sha256(item.read(artifact["path"])) != origin["sha256"]:\n',
      "        if False:\n"),
-    ("reuse-origin-inside-item-allowed", D, '        if (REPOSITORY_ROOT / origin["path"]).resolve().is_relative_to(item.root):\n',
+    ("reuse-origin-inside-item-allowed", D, '        if _lies_within((REPOSITORY_ROOT / origin["path"]).resolve(), item.root):\n',
      "        if False:\n"),
+    # the digital review (CS-3): the item's directory is compared by file identity, not by spelling
+    ("reuse-origin-inside-compared-by-spelling", D, "            if os.path.samefile(ancestor, directory):\n",
+     "            if ancestor == directory:\n"),
     # the format rules of the hdl member, the digital facet and copied_from
     ("schema-hdl-any-version", MS, '"then": {"properties": {"model_version": {"const": "1.2.0"}}}',
      '"then": {}'),

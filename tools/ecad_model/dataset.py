@@ -751,6 +751,23 @@ def manifest_problems(item: Item, derived: Optional[Derivation] = None,
         return [f"{MANIFEST}: nested too deeply to compare with the manifest build writes"]
 
 
+def _lies_within(path: Path, directory: Path) -> bool:
+    """Whether path is directory or lies below it, by file identity rather than spelling.
+
+    On a case-insensitive filesystem datasets/cad/UART_LOOPBACK_001/x names a
+    file of datasets/cad/uart_loopback_001 and is not textually below it, so
+    each existing ancestor is compared with os.path.samefile, as
+    ecad_validation.adapters.process.relative_input_path does.
+    """
+    for ancestor in (path, *path.parents):
+        try:
+            if os.path.samefile(ancestor, directory):
+                return True
+        except OSError:
+            continue  # an ancestor that does not exist is no directory's alias
+    return False
+
+
 def cited_source_problems(item: Item) -> List[str]:
     """Every file an annotation cites by hash, the licence text, and the origin
     of every copied source must still have that hash; a copy must be byte-identical
@@ -802,8 +819,9 @@ def cited_source_problems(item: Item) -> List[str]:
         origin = artifact.get("copied_from")
         if origin is None:
             continue
-        if (REPOSITORY_ROOT / origin["path"]).resolve().is_relative_to(item.root):
-            # A copy of a file of the item itself binds nothing: editing both is one edit.
+        if _lies_within((REPOSITORY_ROOT / origin["path"]).resolve(), item.root):
+            # A copy of a file of the item itself binds nothing: editing both is one edit. Letter case or
+            # another alias of the item's directory is the item too.
             problems.append(f"{artifact['path']}'s origin {origin['path']} lies inside the item; "
                             "a copy's origin is a repository file outside it")
             continue
