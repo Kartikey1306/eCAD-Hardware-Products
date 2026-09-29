@@ -1,0 +1,293 @@
+{
+  "$comment": "Curated candidate URLs for manufacturers that do not publish board design files on GitHub. Issue #28 section 10 ranks the official product page and official documentation above a repository, but neither is machine-enumerable: raspberrypi.com answers an automated client with a Cloudflare interstitial, and st.com does not answer one at all. So a human supplies candidate URLs from the official source and verify.py decides availability from the retrieved bytes, exactly as it does for a GitHub tree. Nothing here asserts that a file exists.",
+  "contract_version": "1.0.0",
+  "boards": [
+    {
+      "board_id": "raspberry-pi:cm4io",
+      "manufacturer": "Raspberry Pi",
+      "family": "Compute Module 4 IO Board datasheet",
+      "board": "Raspberry Pi Compute Module 4 IO Board datasheet",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "not-applicable",
+      "cpu_architecture": "not-applicable",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "datasheet": "https://pip.raspberrypi.com/documents/RP-008172-DS",
+        "kicad": "https://pip.raspberrypi.com/documents/RP-008173-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:cmio",
+      "manufacturer": "Raspberry Pi",
+      "family": "Compute Module IO Board schematics",
+      "board": "Raspberry Pi Compute Module IO Board schematics",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "not-applicable",
+      "cpu_architecture": "not-applicable",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008256-DS",
+        "pcb_source": "https://pip.raspberrypi.com/documents/RP-008376-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:1-model-a-plus",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi 1",
+      "board": "Raspberry Pi 1 Model A+",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2835",
+      "cpu_architecture": "Arm1176JZF-S",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008350-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:1-model-b-plus",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi 1",
+      "board": "Raspberry Pi 1 Model B+",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2835",
+      "cpu_architecture": "Arm1176JZF-S",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008353-DS",
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008351-DS",
+        "dxf": "https://pip.raspberrypi.com/documents/RP-008352-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:2-model-b",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi 2",
+      "board": "Raspberry Pi 2 Model B",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2836",
+      "cpu_architecture": "Arm Cortex-A7",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008327-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:3-model-a-plus",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi 3",
+      "board": "Raspberry Pi 3 Model A+",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2837B0",
+      "cpu_architecture": "Arm Cortex-A53",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008332-DS",
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008330-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:3-model-b",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi 3",
+      "board": "Raspberry Pi 3 Model B",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2837",
+      "cpu_architecture": "Arm Cortex-A53",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008340-DS",
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008335-DS",
+        "dxf": "https://pip.raspberrypi.com/documents/RP-008334-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:3-model-b-plus",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi 3",
+      "board": "Raspberry Pi 3 Model B+",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2837B0",
+      "cpu_architecture": "Arm Cortex-A53",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008339-DS",
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008337-DS",
+        "dxf": "https://pip.raspberrypi.com/documents/RP-008336-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:4-model-b",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi 4",
+      "board": "Raspberry Pi 4 Model B",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2711",
+      "cpu_architecture": "Arm Cortex-A72",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008345-DS",
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008343-DS",
+        "dxf": "https://pip.raspberrypi.com/documents/RP-008342-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:5",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi 5",
+      "board": "Raspberry Pi 5",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2712",
+      "cpu_architecture": "Arm Cortex-A76",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008347-DS",
+        "step": "https://pip.raspberrypi.com/documents/RP-010083-CA"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:zero",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi Zero",
+      "board": "Raspberry Pi Zero",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2835",
+      "cpu_architecture": "Arm1176JZF-S",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008366-DS",
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008365-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:zero-2-w",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi Zero 2 W",
+      "board": "Raspberry Pi Zero 2 W",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Raspberry Pi RP3A0 (Broadcom BCM2710A1)",
+      "cpu_architecture": "Arm Cortex-A53",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008360-DS",
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008358-DS"
+      }
+    },
+    {
+      "board_id": "raspberry-pi:zero-w",
+      "manufacturer": "Raspberry Pi",
+      "family": "Raspberry Pi Zero W",
+      "board": "Raspberry Pi Zero W",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Broadcom BCM2835",
+      "cpu_architecture": "Arm1176JZF-S",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.raspberrypi.com/products/",
+      "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+      "index_ref": "raspberrypi/documentation@b47f68f",
+      "files": {
+        "schematic": "https://pip.raspberrypi.com/documents/RP-008368-DS",
+        "mechanical": "https://pip.raspberrypi.com/documents/RP-008367-DS"
+      }
+    },
+    {
+      "board_id": "arduino:uno-rev3",
+      "manufacturer": "Arduino",
+      "family": "Uno",
+      "board": "Arduino UNO Rev3",
+      "part_number": "A000066",
+      "revision": "Rev3e",
+      "mcu_soc": "Microchip ATmega328P",
+      "cpu_architecture": "AVR",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://store.arduino.cc/products/arduino-uno-rev3",
+      "official_documentation": "https://docs.arduino.cc/hardware/uno-rev3",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://content.arduino.cc/assets/UNO-TH_Rev3e_sch.pdf",
+        "pcb_source": "https://content.arduino.cc/assets/UNO-TH_Rev3e.zip",
+        "step": "https://content.arduino.cc/assets/A000066-full-pinout.zip"
+      }
+    },
+    {
+      "board_id": "espressif:esp32-devkitc-v4",
+      "manufacturer": "Espressif Systems",
+      "family": "ESP32-DevKitC",
+      "board": "ESP32-DevKitC V4",
+      "part_number": "ESP32-DevKitC-32D",
+      "revision": "V4",
+      "mcu_soc": "Espressif ESP32-WROOM-32D",
+      "cpu_architecture": "Xtensa LX6",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.espressif.com/en/products/devkits/esp32-devkitc",
+      "official_documentation": "https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch.pdf"
+      }
+    }
+  ]
+}
