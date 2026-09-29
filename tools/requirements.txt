@@ -58,3 +58,14 @@ numpy>=1.26
 # as passes, and the real-ngspice tests skip with the reason;
 # ECAD_REQUIRE_SPICE_TOOLS=1, set by the CI spice job, makes that skip a
 # failure.
+#
+# Icarus Verilog (iverilog and vvp) compiles and runs the digital dataset
+# item's simulation file (datasets/cad/uart_loopback_001) for its V3/V4
+# cases, and the version each receipt records is the first line of
+# `iverilog -V`:
+#     sudo apt install iverilog
+#     brew install icarus-verilog
+# Without it those cases are reported as BLOCKED (TOOL_NOT_INSTALLED, or
+# VVP_NOT_INSTALLED), never as passes, and the real-Icarus tests skip with
+# the reason; ECAD_REQUIRE_HDL_TOOLS=1, set by the CI hdl job, makes that skip
+# a failure.

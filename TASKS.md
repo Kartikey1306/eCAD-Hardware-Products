@@ -21,6 +21,7 @@ Status is one of: `todo`, `in-progress`, `blocked`, `review`, `done`.
 | T-010 | CAD dataset, engineering semantic model, and robotic-joint mechanical validation (issue #27) | — | build | review | independent review |
 | T-011 | Multi-domain foundation: domain adapters, null statuses, per-requirement results, spec §4 metadata (plan §21 item 3) | — | build | review | T-010 |
 | T-012 | Electrical domain: the servo supply input on ngspice (plan §21 item 4) | — | build | review | T-011 |
+| T-013 | Digital domain: the UART loopback on Icarus Verilog (plan §21 item 5) | — | build | review | T-012 |
 
 ### T-008 — Real land patterns
 
@@ -382,6 +383,95 @@ Verification of the branch review (2026-09-28/29, macOS arm64, Python 3.14.4, ng
   | ngspice-44.2, the CI job, Linux x86_64 | a real run | `NOT RUN` for the branch review -- 44.2 last ran at `f6dee36` (above); push access is read-only; the containers are arm64 |
   | Coverage of new and changed code | a coverage tool | `NOT RUN` -- none is installed |
   | The parser test's texts, `49887ac` | after `5917365`: `test_spice_netlist.py`'s NETLIST and DECK compared with the committed files | Found stale: `555bfd7` changed the netlist's comment and the deck's measurements and left the constants, though the file says they are the committed texts. `49887ac` updates them and asserts they equal the files. Then, on clean clones of `49887ac`: the 16 mutants that file kills, `--workers 4` in two batches of 8, each after a green baseline -- 16 of 16 killed, each by the same test as before; the complete suite -- 410 passed, 0 failed, 0 skipped (217 s) |
+
+### T-013 — Digital domain: the UART loopback on Icarus Verilog
+
+Owner: unassigned
+Mode: build
+Status: review (local branch `feat/domain-digital`; not pushed; two independent reviews at `905294f` (`6fbae29` on this branch), whose 12 distinct findings are fixed at `2b2d1d0` to `0a5ff00` (plan §7.7); the fixes have had no review of their own)
+Depends on: T-012 (`feat/domain-electrical` at `7368641`, which this branch builds on)
+
+Goal
+: Verilog sources become an engineering model whose every value states its
+  source and status, Icarus Verilog runs a harness written from that model,
+  and the digital domain is validated end to end through the same V0-V4
+  runner as mechanical and electrical, on a sample that invents no part,
+  device or requirement.
+
+Acceptance criteria (verbatim from `ECAD_MULTI_DOMAIN_DATASET_PLAN.md` §21 item 5)
+: "5. **Digital**: `rtl/` UART loopback on Icarus. First, `iverilog` onto `run_process`, with a test and a mutant that both the compile and the run step get the scrubbed environment and the output cap (ARCH-10); `hdl` CI job; `tests/test_rtl_models.py` unchanged."
+  1. "`rtl/` UART loopback on Icarus."
+  2. "First, `iverilog` onto `run_process`, with a test and a mutant that both the compile and the run step get the scrubbed environment and the output cap (ARCH-10)"
+  3. "`hdl` CI job"
+  4. "`tests/test_rtl_models.py` unchanged."
+
+Acceptance criteria (verbatim from the plan §10, for every domain)
+: 5. "Each domain lands as one PR with: at least one sample; a met limit (`PASS` against a real requirement, `WARNING` against an illustrative one), a `FAIL` from a mutated input and a `BLOCKED` from a missing input; an invalid-input and a boundary sample (spec §21); negative tests and mutants; per-domain documentation (spec §28); and a CI job that makes a skip a failure."
+
+State of each criterion (the plan §21 item 5 carries the same markers)
+: 1. IMPLEMENTED for the UART 8N1 loopback class only (rules C1-C7): `datasets/cad/uart_loopback_001` builds, checks and validates as designed (Verification). Every metric is `SIMPLIFIED`.
+  2. IMPLEMENTED (ARCH-10): both steps and the version probe run through `run_process`; the tests `test_both_icarus_steps_run_through_run_process_with_the_scrubbed_environment`, `test_both_steps_are_capped_at_the_process_output_limit` and `test_the_compiler_sees_only_the_scrubbed_environment` (real Icarus), and the mutants `hdl-compile-bypasses-run-process`, `hdl-run-bypasses-run-process`, `hdl-compile-inherits-environment` and `hdl-run-inherits-environment`, killed (Verification). `capabilities.detect_capabilities` still probes with the caller's environment (plan §7.2 ARCH-10).
+  3. PARTIAL: the `hdl` job is written, placed between `validation-evidence` and `spice`, and its shape is tested (`test_hdl_job_cannot_skip_silently`); it has never run on a runner, and Icarus is not pinned (BLOCKED until the runner's version is known, plan §20 Q16). Its steps passed in an ubuntu:22.04 arm64 container on Icarus 11.0 (Verification, run by the coordinator).
+  4. IMPLEMENTED: `tests/test_rtl_models.py` was last changed in `f15a4aa`, and its sha256 at `0a5ff00` is `7a9ced8edde3a4100b67a3cfddfc8096d53f0222b8747087df5e70eb471a2866`, as the design recorded.
+  5. Sample IMPLEMENTED. Met limit: `WARNING` against the illustrative limits IMPLEMENTED; `PASS` against a real requirement only on a test-built copy with a fixture device limit, since no device is selected. `FAIL` from a mutated input IMPLEMENTED (test-built copies, real Icarus: 230 400 Bd fails REQ-DIG-002; RTL defect copies fail their references). `BLOCKED` from a missing input IMPLEMENTED (REQ-DIG-007: no target device is selected, so its `min_clock_period` is `UNKNOWN`). Invalid-input and boundary samples PARTIAL: test-built copies, not committed items. Negative tests IMPLEMENTED; mutants IMPLEMENTED: 451 at `0a5ff00`, the 129 of the digital branch killed at `11e8c09` and the re-anchored `electrical-unregistered` at `0a5ff00`, each after a green baseline; the other 321 last run at `ec37115` or `57f4fee` (Verification). Documentation IMPLEMENTED (`docs/digital-domain-v1.md`). CI job PARTIAL, as in 3.
+
+Files in scope
+: `tools/ecad_model/verilog.py`, `tools/ecad_model/domains/digital.py`,
+  `tools/ecad_model/domains/__init__.py`, `tools/ecad_model/__init__.py`,
+  `tools/ecad_model/dataset.py` (REUSE-1, `VALIDATOR_VERSION`),
+  `tools/ecad_validation/adapters/hdl.py`,
+  `tools/ecad_validation/adapters/process.py`, `schemas/engineering-model/v1/`
+  (engineering-model, design-annotations, digital-vocabulary),
+  `schemas/cad-dataset/v1/source-provenance.schema.json`,
+  `datasets/cad/uart_loopback_001/`, the regenerated `dataset-item.json` of
+  `robotic_joint_001` and `servo_supply_001`, `.gitattributes`,
+  `tests/unit/test_verilog_source.py`, `tests/unit/test_hdl_adapter.py`,
+  `tests/unit/test_digital_domain.py`, `tests/unit/test_digital_icarus.py`,
+  the edited `test_ci_and_runner.py`, `test_domain_adapter.py`,
+  `test_electrical_domain.py`, `test_engineering_model.py` and
+  `test_validation_adapters.py`, `tests/mutation/run_mutations.py`, the `hdl`
+  job in `.github/workflows/ci.yml`, documentation, the plan.
+
+Out of scope
+: Other design classes and RTL forms (negedge, asynchronous reset, `assign`,
+  `generate`, `$clog2`, SystemVerilog, VHDL); FSM extraction and timing
+  analysis; a Verilator adapter and ModelSim/Questa (PLANNED); the SEC-2
+  runner guard (its own foundation change, plan §7.2) and the SEC-3 program
+  screen; the general RESULT-2 fix; `detect_capabilities`' probe; moving
+  `datasets/cad/` (the brief kept the layout, plan §20 Q8); training
+  records.
+
+Risks
+: The CI runner's Icarus is Unknown until the `hdl` job runs: apt gave 11.0
+  in an arm64 container, every local run used 13.0, and nothing ran on
+  x86_64. Only marker lines are read, and 11.0 and 13.0 printed the same ones
+  for the sample and five copies, but their stdout differs in 13.0's
+  `$finish called at` line. A hand-edited committed simulation file runs
+  during `validate` before it is marked stale (SEC-2, Verification). The
+  sampling condition W is conservative, so a borderline design gets
+  `REFERENCE_NOT_APPLICABLE`; framing-error detection is never exercised by
+  the committed sample. The regression test of REUSE-1's letter-case alias,
+  and so its mutant's kill, exists only on a case-insensitive filesystem. The
+  mutation harness now needs Icarus, ngspice, the CAD kernel and MuJoCo on
+  one machine. Push access is read-only for this account.
+
+Verification (2026-09-29, macOS 26.6.2 arm64, Python 3.14.4, Icarus Verilog 13.0, ngspice-47; code at `0a5ff00`, which the documentation commit changes only in Markdown and in comments of `tools/requirements.txt`; `git diff 11e8c09 0a5ff00` is exactly the electrical design-document commit `7368641`)
+: | Check | Command | Result |
+  |-------|---------|--------|
+  | Complete suite, CAD, ngspice and Icarus tests mandatory | `ECAD_REQUIRE_CAD_TOOLS=1 ECAD_REQUIRE_SPICE_TOOLS=1 ECAD_REQUIRE_HDL_TOOLS=1 python3 run_all_tests.py -q -p no:cacheprovider --tb=short`, at the documentation commit | `PASS` -- 489 passed, 0 failed, 0 skipped, 8 warnings, exit 0 (259 s), on the tree this commit records; at `0a5ff00`, before the documentation, the same 489 (262 s). The 77 digital tests (14 grammar, 18 hdl adapter, 35 domain, 10 real Icarus) are among them |
+  | Lint, changed Python | `ruff check <the 17 Python files changed since 7368641> --select=E,F,W --ignore=E501 --no-cache` | `PASS` -- "All checks passed!" |
+  | Type check | `mypy tools run_all_tests.py tests/mutation/run_mutations.py --ignore-missing-imports --no-strict-optional` | `PASS` for changed code -- "Found 11 errors in 7 files (checked 46 source files)", the baseline set (discovery 2, contract 1, python_control 1, cases 4, engine 1, cli 1, validate_products 1), none in a file this branch changed |
+  | Derivation reproduces, clean clone | `python3 tools/cad_dataset.py build datasets/cad/uart_loopback_001`, then `git status --short`, then `check` of all three samples | `PASS` -- `build` exit 0, five files written, 0 lines of `git status`; `check` exit 0 for `uart_loopback_001`, `robotic_joint_001` and `servo_supply_001` |
+  | V0-V4 receipt, clean clone | `python3 tools/cad_dataset.py validate datasets/cad/uart_loopback_001 --output <dir>` | `PASS` as designed -- exit 0; V0-V3 `PASS` (REF-DIG-001..008); V4 `BLOCKED`: REQ-DIG-001..006 `WARNING WITHIN_ILLUSTRATIVE_LIMIT`, REQ-DIG-007 `BLOCKED MISSING_REQUIRED_INPUT` (2e-08 s measured by `v3.REF-DIG-001`); overall `BLOCKED`, not eligible; 15 results, each `SIMPLIFIED`, bound to the receipt's digest; 86 evidence entries (45 digests) re-hash; source `0a5ff00` not dirty; `ecad-validator` 1.1.0, `Icarus Verilog version 13.0 (stable) (v13_0)`. The same in the worktree at `0a5ff00` |
+  | SEC-2 on the digital path | a scratch clone of `0a5ff00` with a `$fopen(<file outside the item>, "a")` added to the committed simulation file's harness, then `validate` | Verified, the defect stands -- the file was written 14 times, once per compiled case; then V0 `FAIL`, `v2.dataset-reproduction` `FAIL DERIVATION_DIVERGED`, `v2.digital.model-invariants` `PASS`, the 14 cases `BLOCKED COMMITTED_CASE_STALE`, overall `FAIL`; `check` exit 1 |
+  | Test discrimination, the digital branch | `python3 tests/mutation/run_mutations.py --workers 4 --only <batch>`, 23 batches covering the 129 mutants `38680e0` did not have, on the code of `11e8c09` | `PASS` -- 129 of 129 killed, none surviving, no `ANCHOR` or `HARNESS` outcome, each batch after its own green baseline (23 green baselines). First killers by file: 57 `test_digital_domain.py`, 29 `test_hdl_adapter.py`, 27 `test_verilog_source.py`, 14 `test_engineering_model.py` (the modules' doctests), 1 `test_domain_adapter.py`, 1 `test_ngspice_adapter.py`. Five batches took longer than 8 minutes (up to 647 s). This is the review's fixer's run of 2026-09-29, not this session's; the code at `0a5ff00` equals `11e8c09`'s apart from the electrical design-document commit underneath |
+  | Test discrimination, the re-anchored mutant | `python3 tests/mutation/run_mutations.py --workers 1 --only electrical-unregistered` on a clean clone of `0a5ff00` | `PASS` -- "baseline green; running 1 mutants", killed by `test_engineering_model.py::TestDocumentationExamples::test_examples_in_modules_that_need_no_cad_kernel [domains]`, "1 of 1 mutants killed", exit 0 (3 min 57 s). It is the only one of the 322 older mutants whose definition the digital branch changed |
+  | Test discrimination, the other 321 | `run_mutations.py` | `NOT RUN` here -- last run at `ec37115` or `57f4fee` (T-012) |
+  | The `hdl` job's steps on Linux, Icarus 11.0 | an ubuntu:22.04 arm64 container, a clean copy of `11e8c09`: apt `iverilog` (`Icarus Verilog version 11.0 (stable) ()`), Python 3.12.14 (uv's standalone build, where CI uses actions/setup-python), `pip install -r tools/requirements.txt pytest`, then with `ECAD_REQUIRE_HDL_TOOLS=1` the job's `run_all_tests.py --tb=short`, `check` and `validate` | `PASS` -- 428 passed, 61 skipped (the CAD and ngspice tests the job does not install for), 0 failed; `check` exit 0; `validate` exit 0: V0-V3 `PASS`, V4 `BLOCKED` (6 `WARNING`, REQ-DIG-007 `BLOCKED`), source not dirty. Run by the coordinator of the digital branch, not by this session |
+  | Independent review | CLAUDE.md rule 4: two reviewers, correctness and security (CS) and honesty and tests (HT), at `905294f` | `PASS` -- 12 distinct findings (14 IDs, two found by both), all fixed (plan §7.7). The fixes themselves have had no review of their own |
+  | CI `hdl` job, Linux x86_64 | the job itself | `NOT RUN` -- the branch is not pushed and push access is read-only; the container above is arm64 |
+  | Verilator | a run of the harness under Verilator | `NOT RUN` -- Verilator is PLANNED, not an adapter (plan §20 Q9) |
+  | Coverage of new and changed code | a coverage tool | `NOT RUN` -- none is installed (no `coverage`, no `pytest-cov`) |
 
 ## Completed
 

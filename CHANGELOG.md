@@ -7,7 +7,42 @@ two independent reviews at `bf04f1b` (2026-09-28), whose findings are fixed
 below (plan §7.6); the fixes have had no review of their own, and the CI
 `spice` job has never run.
 
+On it, the local branch `feat/domain-digital`, not pushed and not released.
+It had two independent reviews at `905294f`, whose findings are fixed below
+(plan §7.7); the fixes have had no review of their own, and the CI `hdl` job
+has never run.
+
 ### Added
+
+- The digital domain (issue #27, plan §21 item 5): Verilog sources are read
+  by a strict allow-list grammar (`tools/ecad_model/verilog.py`) into the
+  engineering model, the adapter (`tools/ecad_model/domains/digital.py`)
+  writes one simulation file from the model -- each module's text verbatim,
+  then a harness that drives the clock, reset and stimulus and measures --
+  and Icarus Verilog runs it. Nine `SIMPLIFIED` metrics are compared with
+  closed-form references (V3) and requirements (V4). One design class is
+  validated: the UART 8N1 loopback.
+- The dataset item `datasets/cad/uart_loopback_001`: `rtl/uart_tx.v` and
+  `rtl/uart_rx.v`, copied unmodified, in a self-authored loopback testbench.
+  Its receipt is `BLOCKED` by design: V0-V3 `PASS`, six illustrative limits
+  met (`WARNING`), and REQ-DIG-007 `BLOCKED` because no target device is
+  selected.
+- Engineering-model format 1.2.0: a component's `hdl` member (module,
+  source, ports, signals, parameter facets and the module's text verbatim);
+  annotations 1.2.0: a `digital` facet on a component without CAD;
+  `digital-vocabulary.schema.json`.
+- REUSE-1: a provenance artefact may record the repository file it is a
+  byte-identical copy of (`copied_from`, provenance format 1.1.0), which
+  `check` and V0 re-hash; the origin must lie outside the item, compared by
+  file identity. `VALIDATOR_VERSION` is 1.1.0.
+- `run_process` can copy the files a request declares out of its workspace
+  (`collect`, `collect_into`: regular files of at most 64 MiB, after a
+  completed run only) and give the child an empty stdin (`stdin_devnull`);
+  both are opt-in, so no other caller changes.
+- A CI `hdl` job that installs Icarus Verilog and runs the complete suite
+  with `ECAD_REQUIRE_HDL_TOOLS=1`, `check` and `validate` on the digital
+  item.
+- `docs/digital-domain-v1.md` and `docs/design/digital-domain-design.md`.
 
 - The electrical domain (issue #27, plan §21 item 4): a SPICE netlist is
   read by a strict allow-list parser (`tools/ecad_model/spice.py`) into the
@@ -30,6 +65,15 @@ below (plan §7.6); the fixes have had no review of their own, and the CI
 
 ### Changed
 
+- The Icarus Verilog tool adapter runs both of its steps, and its version
+  probe, through `run_process`, with the scrubbed environment, the output cap
+  and an empty stdin (ARCH-10); it returns the metrics its inputs declare as
+  `ECAD_METRIC` lines, read from vvp's stdout (ARCH-2, iverilog half); and it
+  refuses case arguments rather than passing them to `iverilog`.
+- The robotic joint's and the servo supply's digital domain is
+  `NOT_APPLICABLE` rather than `NOT_IMPLEMENTED`; no derived number changed.
+- `.gitattributes` keeps `rtl/uart_tx.v` and `rtl/uart_rx.v`, the origins
+  the digital item copies, byte-exact on checkout.
 - The ngspice tool adapter runs `ngspice -b <deck>` only and returns the
   `.meas` results the deck declares, read from stdout (ARCH-2, ngspice half);
   it read none before. Its version comes from the `--version` banner
@@ -63,6 +107,22 @@ below (plan §7.6); the fixes have had no review of their own, and the CI
 - Documentation that said ngspice only runs the regenerated deck, or that
   V2's invariants read the committed deck; untested conditions and
   branches; a CI test that let a skip hide (HT-1 to HT-8).
+
+### Fixed (review of the digital branch, plan §7.7)
+
+- A byte that never arrives counts its 8 bits in `rx_bit_errors`, and no
+  framing-error count of 0 is reported while a byte is missing: a receiver
+  that never set `rx_valid` had passed the bit and framing checks (CS-1).
+- The grammar refuses the names Icarus reserves (`bool`, `wone`, `wreal`) and
+  a unary operator applied to another (CS-2); extraction refuses a parameter
+  above 2^31 - 1, which the harness's unsized decimal cannot hold (CS-4).
+- REUSE-1 tells an origin inside the item by file identity, not spelling
+  (CS-3); the adapter's version probe runs through `run_process` (CS-6).
+- V1 compares an instance's clock with the harness's in whole Hz (HT-1);
+  REQ-DIG-006 names the one instant its metric is measured at (HT-6).
+- Rules and guards no test reached, a stuck receiver bit, depth limits at
+  5000 levels, a CI step under `if: false`, and `MEMORY.md` rows that
+  overstated what was tested or checked (CS-5, HT-3, HT-4, HT-7, HT-8).
 
 ## [3.0.1] - 2026-05-16
 
