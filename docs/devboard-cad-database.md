@@ -117,6 +117,21 @@ python3 tools/devboard_cad/validate_records.py
 python3 tools/devboard_cad/validate_records.py --revalidate
 ```
 
+### Coverage
+
+29 of the 31 ecosystems in issue #28 §2 have at least one record. Two do not, and both are
+access walls rather than gaps in this tooling — each was checked from three directions and
+the result recorded rather than worked around:
+
+| Ecosystem | What was tried | Result |
+|---|---|---|
+| 2.10 Silicon Labs | `silabs.com` document URLs; `docs.silabs.com`; the `SiliconLabs` GitHub org | every file URL returns **403** to an automated client; the org's two hardware repos hold 3 and 6 blobs, no CAD |
+| 2.18 Digilent | `digilent.com/reference/...`; `files.digilent.com`; all 16 `Digilent/*-HW` repos | site returns **403**; every `-HW` repo is a *Vivado project* (HDL, constraints, block design), zero CAD files |
+
+Two further negative results worth keeping, so they are not re-investigated:
+`Xilinx/XilinxBoardStore` holds DRAM part CSVs, not board CAD, and Terasic's DE-series
+pages carry no direct file links.
+
 ### Manufacturers that cannot be enumerated
 
 Issue #28 section 10 ranks the official product page and documentation above a repository,
