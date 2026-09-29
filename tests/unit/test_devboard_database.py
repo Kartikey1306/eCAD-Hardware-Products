@@ -52,6 +52,21 @@ def _run(command, args) -> str:
     return buffer.getvalue()
 
 
+def _matched_ids(output: str) -> set[str]:
+    """Parse board_ids out of query output.
+
+    A substring test is wrong here: 'sparkfun:red-v' is a prefix of
+    'sparkfun:red-vision-kit-for-redboard', so `assertNotIn` on the raw text reports a
+    board as matching when a different, longer id did.
+    """
+    ids = set()
+    for line in output.splitlines():
+        head = line.split(" ", 1)[0]
+        if ":" in head and not head.startswith("matched="):
+            ids.add(head)
+    return ids
+
+
 class TestDevboardDatabase(unittest.TestCase):
     def test_every_record_conforms_to_schema(self) -> None:
         schema = _schema()
@@ -182,19 +197,19 @@ class TestDevboardDatabase(unittest.TestCase):
             r["board_id"] for r in records
             if r["files"].get("step", {}).get("available") is True
         }
-        output = _run(cmd_mechanical, FakeArgs(REPO_ROOT))
-        for board_id in verified_step:
-            self.assertIn(board_id, output, f"{board_id} has STEP but 'mechanical' missed it")
+        matched = _matched_ids(_run(cmd_mechanical, FakeArgs(REPO_ROOT)))
+        missed = verified_step - matched
+        self.assertEqual(missed, set(), f"have STEP but 'mechanical' missed them: {missed}")
 
         not_available = {
             r["board_id"] for r in records
             if r["files"].get("step", {}).get("available") is not True
             and r["files"].get("mechanical", {}).get("available") is not True
         }
-        for board_id in not_available:
-            self.assertNotIn(
-                board_id, output, f"{board_id} has no verified mechanical CAD but matched"
-            )
+        spurious = not_available & matched
+        self.assertEqual(
+            spurious, set(), f"matched with no verified mechanical CAD: {spurious}"
+        )
 
     def test_unknown_is_never_counted_as_a_yes(self) -> None:
         records = load_records(REPO_ROOT)

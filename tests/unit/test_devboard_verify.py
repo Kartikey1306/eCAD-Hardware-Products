@@ -26,7 +26,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
+from devboard_cad import discover_github as discover  # noqa: E402
 from devboard_cad import harvest_github as harvest  # noqa: E402
+from devboard_cad import read_licenses as licences  # noqa: E402
 from devboard_cad.verify import (  # noqa: E402
     FetchResult,
     Fetcher,
@@ -89,6 +91,16 @@ class TestContentSniffing(unittest.TestCase):
         """The Pico case: HEAD said text/html and length 0 for a genuine ZIP."""
         result = _result(_zip({"Pico-R3.step": STEP_BODY}), media_type="text/html")
         self.assertEqual(classify("step", result).available, True)
+
+    def test_a_dxf_comment_line_does_not_hide_the_dxf(self) -> None:
+        """Group code 999 is a legal comment; Raspberry Pi's mechanical DXFs open with one,
+        so anchoring the SECTION pattern at byte 0 silently rejected real files."""
+        self.assertEqual(detect_format(b"999\ndxfrw 0.6.3\n  0\nSECTION\n  2\nHEADER\n"),
+                         "dxf")
+        self.assertEqual(detect_format(b"  0\r\nSECTION\r\n  2\r\nHEADER\r\n"), "dxf")
+        # Still specific: prose that happens to contain the words is not a drawing.
+        self.assertIsNone(
+            detect_format(b"Some prose mentioning SECTION and HEADER in a sentence.\n"))
 
     def test_recognises_pcb_fabrication_output(self) -> None:
         """Gerber and Excellon are what 'gerbers' and 'nc_drill' actually resolve to."""
@@ -261,6 +273,44 @@ class TestDerivedStatus(unittest.TestCase):
         record = self._record({"a": {"available": True}}, part_number="UNVERIFIED")
         self.assertEqual(derive_status(record), "partial")
 
+    def test_a_recorded_finding_is_not_treated_as_an_unfilled_gap(self) -> None:
+        """'The vendor publishes no revision' is an answer; 'unverified' is a to-do."""
+        files = {"a": {"available": True}, "b": {"available": False}}
+        self.assertEqual(derive_status(self._record(files, revision="not-stated")),
+                         "verified")
+        self.assertEqual(derive_status(self._record(files, mcu_soc="not-applicable")),
+                         "verified")
+        self.assertEqual(derive_status(self._record(files, revision="unverified")),
+                         "partial")
+        self.assertEqual(derive_status(self._record(files, mcu_soc="UNVERIFIED")),
+                         "partial")
+
+
+class TestRevisionInference(unittest.TestCase):
+    """Vendors put the revision in the filename far more often than in prose."""
+
+    def test_reads_the_revision_the_manufacturer_wrote(self) -> None:
+        cases = [
+            (["Pico-R3.step"], "R3"),
+            (["ALLEGRO/BeagleBone Black_PCB_RevD_250403.brd"], "D"),
+            (["thing_plus_v1.2.brd"], "1.2"),
+            (["Feather RP2040.brd", "Feather RP2040 rev B.brd"], "B"),
+        ]
+        for paths, expected in cases:
+            self.assertEqual(harvest.infer_revision(paths), expected, paths)
+
+    def test_an_underscore_does_not_hide_a_revision(self) -> None:
+        """\\b fails between 'D' and '_', which silently lost every RevX_date filename."""
+        self.assertEqual(harvest.infer_revision(["Board_RevC_210222.brd"]), "C")
+        self.assertEqual(harvest.infer_revision(["board_v2.1_final.brd"]), "2.1")
+
+    def test_no_revision_in_any_filename_returns_none(self) -> None:
+        self.assertIsNone(harvest.infer_revision(["board.kicad_pcb", "README.md"]))
+
+    def test_the_latest_revision_wins(self) -> None:
+        self.assertEqual(harvest.infer_revision(["x rev A.brd", "x rev C.brd",
+                                                 "x rev B.brd"]), "C")
+
 
 class TestGithubHarvester(unittest.TestCase):
     PATHS = [
@@ -313,6 +363,12 @@ class TestGithubHarvester(unittest.TestCase):
         # A repository is not evidence about documents that live on product pages.
         self.assertNotIn("user_manual", files)
 
+    def test_mechanical_absence_is_claimable_like_any_other_design_file(self) -> None:
+        """It is the only required format that was not, which made 'verified' unreachable."""
+        self.assertIn("mechanical", harvest.ABSENCE_CLAIMABLE)
+        files = harvest.build_files("o/r", "c" * 40, harvest.classify_paths(self.PATHS))
+        self.assertIs(files["mechanical"]["available"], False)
+
     def test_the_index_only_proposes_presence(self) -> None:
         """Presence is decided by verify.py from bytes, never by a filename in a tree."""
         files = harvest.build_files("adafruit/X", "b" * 40, harvest.classify_paths(self.PATHS))
@@ -320,6 +376,131 @@ class TestGithubHarvester(unittest.TestCase):
         self.assertTrue(files["pcb_source"]["url"].startswith(
             "https://raw.githubusercontent.com/adafruit/X/" + "b" * 40))
         self.assertIn("%20", files["pcb_source"]["url"])
+
+
+class TestDiscovery(unittest.TestCase):
+    """Matching repositories to the families issue #28 section 2 names."""
+
+    FAMILIES = ["Feather", "FeatherWing", "QT Py", "Thing Plus", "Pro Micro"]
+
+    def test_the_longest_matching_family_wins(self) -> None:
+        self.assertEqual(
+            discover.match_family("Adafruit-Feather-RP2040-PCB", "", self.FAMILIES),
+            "Feather")
+        self.assertEqual(
+            discover.match_family("Adafruit-OLED-FeatherWing-PCB", "", self.FAMILIES),
+            "FeatherWing")
+
+    def test_a_family_name_must_be_a_whole_token(self) -> None:
+        self.assertIsNone(discover.match_family("Weathervane-PCB", "", self.FAMILIES))
+
+    def test_separators_do_not_defeat_matching(self) -> None:
+        self.assertEqual(
+            discover.match_family("SparkFun_Thing_Plus-RP2040", "", self.FAMILIES),
+            "Thing Plus")
+
+    def test_part_numbers_are_read_in_each_vendors_own_notation(self) -> None:
+        self.assertEqual(
+            discover.extract_part_number("see https://www.adafruit.com/product/4884"), "4884")
+        self.assertEqual(
+            discover.extract_part_number("SparkFun Thing Plus (DEV-17745)"), "DEV-17745")
+        self.assertIsNone(discover.extract_part_number("no product number here"))
+
+    def test_the_longest_mcu_match_wins_so_variants_are_not_truncated(self) -> None:
+        self.assertEqual(discover.extract_mcu("ESP32-S3 board"), "ESP32-S3")
+        self.assertEqual(discover.extract_mcu("plain ESP32 board"), "ESP32")
+        self.assertEqual(discover.extract_mcu("RP2350A"), "RP2350A")
+        self.assertIsNone(discover.extract_mcu("a board with no named part"))
+
+    def test_architecture_follows_from_the_mcu(self) -> None:
+        self.assertEqual(discover.arch_for("RP2040"), "Dual Arm Cortex-M0+")
+        self.assertEqual(discover.arch_for("ESP32-C6"), "RISC-V RV32IMC")
+        self.assertEqual(discover.arch_for("ESP32"), "Xtensa LX6")
+        self.assertIsNone(discover.arch_for(None))
+
+    def test_add_on_boards_are_recognised(self) -> None:
+        """Issue #28 section 2.20 includes FeatherWings; most carry no MCU at all."""
+        for name in ("Adafruit-OLED-FeatherWing-PCB", "Motor-Shield-PCB",
+                     "Sensor-Breakout-PCB", "BeagleBone-Proto-Cape"):
+            self.assertTrue(discover.ADDON.search(name), name)
+        self.assertFalse(discover.ADDON.search("Adafruit-Feather-RP2040-PCB"))
+
+    def test_board_id_is_stable_and_filename_safe(self) -> None:
+        """The org is already the namespace, so a repeated vendor prefix is dropped."""
+        self.assertEqual(
+            discover.board_id("adafruit", "Adafruit-Feather-RP2040-PCB"),
+            "adafruit:feather-rp2040")
+        self.assertEqual(
+            discover.board_id("sparkfun", "SparkFun_Thing_Plus-RP2040_Hardware"),
+            "sparkfun:thing-plus-rp2040")
+        # The ':' separator maps to '__' for the filename, which the gate cross-checks.
+        self.assertNotIn("/", discover.board_id("adafruit", "A/B-PCB"))
+
+
+class TestLicenceReading(unittest.TestCase):
+    """Licensing is read from the manufacturer's own words, never inferred from a habit."""
+
+    def _match(self, text: str):
+        import re
+        return next((name for pattern, name in licences.TEXT_PATTERNS
+                     if re.search(pattern, text, re.I)), None)
+
+    def test_house_styles_differ_and_all_of_them_count(self) -> None:
+        """Adafruit writes a slash, others a comma; one house style is not the standard."""
+        unversioned = "CC BY-SA (version not stated by the manufacturer)"
+        self.assertEqual(
+            self._match("Creative Commons Attribution/Share-Alike, all text above"),
+            unversioned)
+        self.assertEqual(
+            self._match("Creative Commons Attribution, Share-Alike license, check license.txt"),
+            unversioned)
+        self.assertEqual(
+            self._match("SparkFun hardware is released under Creative Commons "
+                        "Share-alike 4.0 International"),
+            "CC BY-SA 4.0")
+
+    def test_a_stated_version_outranks_the_unversioned_fallback(self) -> None:
+        self.assertEqual(
+            self._match("Creative Commons Attribution-ShareAlike 4.0 International"),
+            "CC BY-SA 4.0")
+
+    def test_unrecognised_prose_yields_nothing(self) -> None:
+        """An unrecognised statement must leave the record UNVERIFIED, not guess."""
+        self.assertIsNone(self._match("You may use the design materials as you choose."))
+        self.assertIsNone(self._match("Adafruit invests time and resources providing "
+                                      "this open source design."))
+
+    def test_every_recognised_licence_has_settled_permissions(self) -> None:
+        for name, (_url, redist, mod, comm, attrib) in licences.KNOWN.items():
+            for value in (redist, mod, comm, attrib):
+                self.assertIsInstance(value, bool, name)
+
+    def test_non_commercial_variants_are_not_recorded_as_commercial(self) -> None:
+        """The one way this table could do real downstream harm."""
+        for name, (_u, _r, _m, commercial, _a) in licences.KNOWN.items():
+            if "NC" in name:
+                self.assertFalse(commercial, f"{name} recorded as commercially reusable")
+
+    def test_every_spdx_alias_maps_into_the_permissions_table(self) -> None:
+        for spdx, name in licences.SPDX_ALIASES.items():
+            self.assertIn(name, licences.KNOWN, f"{spdx} maps to an unknown licence")
+
+    def test_applying_a_licence_records_a_citation(self) -> None:
+        record = {"licenses": {"hardware_license": "UNVERIFIED"}, "notes": ""}
+        licences.apply_licence(record, "CC BY-SA 4.0", None,
+                               "SparkFun hardware is released under CC Share-alike 4.0",
+                               "sparkfun/X")
+        self.assertEqual(record["licenses"]["hardware_license"], "CC BY-SA 4.0")
+        self.assertTrue(record["licenses"]["commercial_use_allowed"])
+        self.assertTrue(record["licenses"]["license_url"])
+        self.assertIn("sparkfun/X", record["notes"])
+
+    def test_the_unversioned_case_records_what_is_unknown(self) -> None:
+        record = {"licenses": {"hardware_license": "UNVERIFIED"}, "notes": ""}
+        licences.apply_licence(record, "CC BY-SA (version not stated by the manufacturer)",
+                               None, None, "adafruit/X")
+        self.assertIn("version is unverified", record["notes"])
+        self.assertTrue(record["licenses"]["commercial_use_allowed"])
 
 
 if __name__ == "__main__":
