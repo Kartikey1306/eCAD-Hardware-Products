@@ -25,6 +25,25 @@ FILE_FORMATS = (
     "eagle",
     "altium",
     "mechanical",
+    # Issue #28 section 8 formats added in contract 1.1.0. A format the schema can express
+    # but the CLI cannot filter on would be invisible to every query, so the two lists are
+    # kept in step by tests/unit/test_devboard_database.py.
+    "nc_drill",
+    "ipc2581",
+    "odb",
+    "iges",
+    "fusion360",
+    "solidworks",
+    "orcad",
+    "allegro",
+    "symbol_library",
+    "footprint_library",
+    "datasheet",
+    "user_manual",
+    "hardware_design_guide",
+    "assembly_drawing",
+    "pinout",
+    "reference_design",
 )
 
 
