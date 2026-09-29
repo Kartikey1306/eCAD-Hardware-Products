@@ -174,7 +174,6 @@ def run_process(request: ProcessRequest) -> ProcessResult:
         for name in request.collect:
             if not _plain_file_name(name):
                 raise ValueError(f"collect name is not one plain file name: {name!r}")
-    root = request.input_root.resolve()
     with tempfile.TemporaryDirectory(prefix="ecad-validation-") as temporary:
         workspace = Path(temporary)
         input_relatives = set()
