@@ -235,7 +235,7 @@
     },
     {
       "requirement_id": "REQ-DIG-006",
-      "title": "No output is unknown once reset is released",
+      "title": "No output is unknown at the first falling clock edge after reset is released",
       "domain": "digital",
       "component": "tb_uart_loopback",
       "metric": "outputs_unknown_after_reset",

@@ -851,6 +851,10 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      '"copied_from": {"path": "rtl/uart_tx.v", "sha256": "c1bebcc6e894e86abd4b39af5501031b8c817f4395048ef65059eebfb710ab81"}'),
     ("item-artifact-type-changed", DP, '"artifact_type": "hdl_source"',
      '"artifact_type": "other"'),
+    # the digital review (HT-6): the requirement on a one-instant metric says the instant
+    ("item-unknown-outputs-title-overstated", DQ,
+     '"title": "No output is unknown at the first falling clock edge after reset is released"',
+     '"title": "No output is unknown once reset is released"'),
     # the origins REUSE-1 binds are never converted on checkout
     ("rtl-origin-converted-on-checkout", GA, "rtl/uart_tx.v -text\n",
      ""),

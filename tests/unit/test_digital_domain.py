@@ -962,6 +962,20 @@ class TestSample(unittest.TestCase):
         self.assertEqual(manifest["source"]["origin"], {"kind": "self_authored",
                                                         "author": "EmbeddedOS (EoS) Research Foundation"})
 
+    def test_the_unknown_outputs_requirement_names_the_one_instant_it_is_measured_at(self):
+        """Review HT-6: outputs_unknown_after_reset samples the outputs once, at the first falling clock edge after
+        reset is released, so REQ-DIG-006 says that instant rather than every instant after reset."""
+        from ecad_model.domains.digital import METRICS
+
+        document = json.loads((ITEM / "requirements" / "requirements.json").read_bytes())
+        [requirement] = [r for r in document["requirements"] if r["requirement_id"] == "REQ-DIG-006"]
+        self.assertEqual((requirement["metric"], requirement["title"]),
+                         ("outputs_unknown_after_reset",
+                          "No output is unknown at the first falling clock edge after reset is released"))
+        self.assertEqual(METRICS["outputs_unknown_after_reset"].description,
+                         "outputs with an X or Z bit at the first falling edge after reset is released (4-state "
+                         "simulation only)")
+
     def test_hash_cited_rtl_is_never_converted_on_checkout(self):
         listed = subprocess.run(["git", "-C", str(REPO_ROOT), "ls-files", "-co", "--exclude-standard", "-z", "--",
                                  SAMPLE], check=True, capture_output=True, timeout=60).stdout.decode()
