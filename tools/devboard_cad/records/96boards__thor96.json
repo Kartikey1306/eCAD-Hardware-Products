@@ -1,0 +1,113 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "96boards:thor96",
+  "manufacturer": "Arrow Electronics",
+  "family": "96Boards",
+  "board": "Thor96",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "NXP i.MX8M",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "datasheet": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-board-product-brief.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:22Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-board-product-brief.pdf",
+        "sha256": "c17209984bc6829433935f062e2af45ba5195ab8ead58c478553f24407e07cfc",
+        "size_bytes": 269767,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-schematics.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:22Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-schematics.pdf",
+        "sha256": "96308cd2d3d7de2858907bfc0b766f227bb32c20507ceebabb0e8983265faef3",
+        "size_bytes": 1642326,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-hw-user-manual.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:22Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-hw-user-manual.pdf",
+        "sha256": "7927f0aa42b981d01e3a765619a3e473f346034e67f2d860d574951e26fae6e8",
+        "size_bytes": 1685667,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "community",
+    "official_product_page": "https://www.96boards.org/product/thor96/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://github.com/96boards/documentation",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-schematics.pdf",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from 96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7."
+}

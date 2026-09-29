@@ -1,0 +1,117 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "96boards:ultra96-v2",
+  "manufacturer": "UNVERIFIED",
+  "family": "96Boards",
+  "board": "Ultra96 V2",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "bom": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-bom.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:26Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-bom.pdf",
+        "sha256": "ac3c2860bff8a89b86128c9ef02f1e50e7d106bcac5f622e15ece09249fd2b09",
+        "size_bytes": 103654,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-product-brief.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:26Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-product-brief.pdf",
+        "sha256": "84e9e80b33e54a2b77c8a679f13f2c14ed19b6aad9ba61de9ec8f82be9015472",
+        "size_bytes": 540889,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-mechanical.PDF",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:26Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-mechanical.PDF",
+        "sha256": "7196fe8eadbf31ac32539e84bd1eb90a16888ffc6ba07b5556a891ddda52b9c2",
+        "size_bytes": 3289213,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-schematics.PDF",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:29Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-schematics.PDF",
+        "sha256": "08208e55e2737288499743e4cc955e53955583ff8e067390b341c50ce5302d92",
+        "size_bytes": 7728870,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "community",
+    "official_product_page": "https://www.96boards.org/product/ultra96-v2/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://github.com/96boards/documentation",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-schematics.PDF",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from 96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7."
+}
