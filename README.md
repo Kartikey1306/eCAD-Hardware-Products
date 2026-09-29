@@ -10,3 +10,7 @@ code; nothing here is read by the pipeline.
   voltage and supply current, from ngspice-47 running the committed deck
   `datasets/cad/servo_supply_001/derived/electrical/servo_supply_001.cir`
   with a data-dump block added to a scratch copy only.
+- `images/uart_loopback_001_timing.png` -- the digital sample's serial line and
+  `rx_valid` over the two 8N1 frames (0x35, 0xCA), from Icarus Verilog 13 running
+  the committed harness `datasets/cad/uart_loopback_001/derived/digital/uart_loopback_001.v`
+  (sha256 597eebf2...) with a line-change logger added to a scratch copy only.
