@@ -1401,6 +1401,9 @@ class TestVerdicts(unittest.TestCase):
         reproduction = checks["v2.dataset-reproduction"]
         self.assertEqual(_outcome(reproduction), ("FAIL", "DERIVATION_DIVERGED"))
         self.assertIn(f"{SIM}: bytes differ from a fresh derivation", reproduction["findings"])
+        # Review CS-5: the digital invariants read the file regenerated from the fresh model, not the committed
+        # one, so they pass; only the reproduction check reads the committed file.
+        self.assertEqual(_outcome(checks["v2.digital.model-invariants"]), ("PASS", "DOMAIN_MODEL_CONSISTENT"))
         compiled = [f"v3.REF-DIG-00{n}" for n in range(1, 9)] + [f"v4.REQ-DIG-00{n}" for n in range(1, 7)]
         for check_id in compiled:
             with self.subTest(check_id):

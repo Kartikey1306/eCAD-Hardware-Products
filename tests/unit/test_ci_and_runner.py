@@ -108,7 +108,9 @@ class TestCIWorkflow(unittest.TestCase):
         Each of these read as green with the simulation tests skipped, and
         the substring checks of the tests below let every one through: an
         `if:` on the job, `|| true` after the suite, `--ignore`, `--deselect`
-        or `-k` on it, and the variable set to 0 in a step's own env.
+        or `-k` on it, and the variable set to 0 in a step's own env. So did
+        `if: false` on the check or the validate step (review HT-8): no step
+        runs conditionally except the evidence upload, and that one always.
         """
         job = _job(self.workflow, name)
         self.assertEqual(set(job["keys"]), {"name", "runs-on", "env", "steps"}, "no if:, continue-on-error or matrix")
@@ -119,6 +121,9 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertEqual(set(suite[0]), {"name", "run"}, "the suite step has no if:, env or continue-on-error")
         self.assertEqual(suite[0]["run"], "python run_all_tests.py --tb=short")
         for step in job["steps"]:
+            if "if" in step:
+                self.assertEqual((step["if"], step.get("uses", "").partition("@")[0]),
+                                 ("always()", "actions/upload-artifact"), f"only the upload runs conditionally: {step}")
             self.assertNotIn("continue-on-error", step)
             self.assertNotIn(variable, step.get("env", ""))
             for flag in ("||", "--ignore", "--deselect", " -k ", " -k="):

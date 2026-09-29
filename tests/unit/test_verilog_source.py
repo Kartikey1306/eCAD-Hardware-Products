@@ -885,12 +885,18 @@ class TestVerilogGrammar(unittest.TestCase):
                 else:
                     self.refused(parentheses, "x.v:3: an expression nested more than 32 deep")
                     self.refused(selects, "x.v:4: an expression nested more than 32 deep")
-        # Far deeper still is the same refusal at the 33rd level, never a RecursionError:
-        # the first begin or parenthesis is on line 4, so the 33rd is on line 36.
+        # Far deeper still is the same refusal at the 33rd level, never a RecursionError: the first begin, if,
+        # case or parenthesis is on line 4, so the 33rd is on line 36; the first select follows a reg, on line 5.
         self.refused(rtl("    always @(posedge clk)", *["begin"] * 5000, "q <= a;", *["end"] * 5000),
                      "x.v:36: begin: statements nested more than 32 deep")
+        self.refused(rtl("    always @(posedge clk)", *["if (a)"] * 5000, "q <= a;"),
+                     "x.v:36: if: statements nested more than 32 deep")
+        self.refused(rtl("    always @(posedge clk)", *["case (a) 1'b1:"] * 5000, "q <= a;", *["endcase"] * 5000),
+                     "x.v:36: case: statements nested more than 32 deep")
         self.refused(rtl("    always @(posedge clk) q <=", *["("] * 5000, "a", *[")"] * 5000, ";"),
                      "x.v:36: an expression nested more than 32 deep")
+        self.refused(rtl("    reg [7:0] r;", "    always @(posedge clk) q <=", *["r["] * 5000, "0", *["]"] * 5000, ";"),
+                     "x.v:37: an expression nested more than 32 deep")
 
     def test_rtl_headers_outside_the_subset_are_refused(self):
         for header, expected in (
