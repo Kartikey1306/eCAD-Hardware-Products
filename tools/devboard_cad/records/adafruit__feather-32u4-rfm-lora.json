@@ -7,10 +7,10 @@
   "board": "Adafruit Feather 32u4 RFM/LoRa",
   "part_number": "3076",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "32U4",
   "hardware_revision": null,
   "fpga": null,
-  "cpu_architecture": null,
+  "cpu_architecture": "AVR",
   "product_status": "unknown",
   "files": {
     "altium": {
@@ -216,6 +216,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
+  "record_status": "verified",
   "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Feather-32u4-RFM-LoRa-PCB pinned at ace22faec73d. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-Feather-32u4-RFM-LoRa-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution. See license.txt for additional details.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
 }

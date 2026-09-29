@@ -7,10 +7,10 @@
   "board": "BeagleBoard.org BeagleY-AI",
   "part_number": "UNVERIFIED",
   "revision": "A",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "AM67",
   "hardware_revision": null,
   "fpga": null,
-  "cpu_architecture": null,
+  "cpu_architecture": "Arm Cortex-A53",
   "product_status": "unknown",
   "files": {
     "altium": {

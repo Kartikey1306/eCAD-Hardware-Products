@@ -7,7 +7,7 @@
   "board": "SparkFun SMD LED Light Pipe",
   "part_number": "COM-25893",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "not-applicable",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": null,

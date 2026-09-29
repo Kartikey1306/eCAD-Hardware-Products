@@ -55,6 +55,14 @@ PART_PATTERNS: Tuple[Tuple[str, str], ...] = (
 # MCU/SoC families, longest first so 'ESP32-S3' is not truncated to 'ESP32'.
 MCU_PATTERNS: Tuple[str, ...] = (
     r"RP2350[AB]?", r"RP2040",
+    # Parts the manufacturers name in their own README but that the first pass missed.
+    r"ATSAMD51[A-Z0-9]*", r"SAMD51[A-Z0-9]*", r"ATSAMD21[A-Z0-9]*",
+    r"ATmega32[Uu]4", r"(?<![A-Za-z0-9])32[Uu]4(?![A-Za-z0-9])",
+    r"TDA4VM", r"AM572[0-9]", r"AM67[A-Z]?", r"AM62[0-9A-Z]*", r"AM335[0-9]",
+    r"OSD335[0-9][A-Z-]*", r"CC13[0-9]{2}[A-Z0-9]*", r"CC26[0-9]{2}[A-Z0-9]*",
+    r"TH1520", r"MPFS[0-9]+[A-Z]*", r"PolarFire\s?SoC",
+    r"i\.?MX\s?RT10[0-9]{2}", r"(?:FE|Freedom\s+E)310[A-Z0-9-]*", r"ICE40[A-Z0-9]*",
+    r"MAX3262[0-9]", r"nRF5182[0-9]",
     r"ESP32-(?:S2|S3|C2|C3|C5|C6|H2|P4)", r"ESP32", r"ESP8266",
     r"nRF5340", r"nRF52840", r"nRF52832", r"nRF9160", r"nRF7002",
     r"SAMD51", r"SAMD21", r"SAME5[0-9]", r"ATSAMD[0-9]+[A-Z0-9]*",
@@ -69,6 +77,17 @@ MCU_PATTERNS: Tuple[str, ...] = (
 )
 ARCH_BY_MCU: Tuple[Tuple[str, str], ...] = (
     (r"RP2350", "Arm Cortex-M33 / RISC-V Hazard3 (dual)"),
+    (r"TDA4VM|AM67|AM62", "Arm Cortex-A53"),
+    (r"AM572", "Arm Cortex-A15"),
+    (r"TH1520", "RISC-V RV64GC"),
+    (r"MPFS|PolarFire", "RISC-V RV64GC"),
+    (r"FE310", "RISC-V RV32IMAC"),
+    (r"ICE40", "FPGA (no CPU core)"),
+    (r"i\.?MX\s?RT10", "Arm Cortex-M7"),
+    (r"CC13|CC26", "Arm Cortex-M4F"),
+    (r"ATSAMD51|SAMD51", "Arm Cortex-M4F"),
+    (r"ATSAMD21", "Arm Cortex-M0+"),
+    (r"32[Uu]4", "AVR"),
     (r"RP2040", "Dual Arm Cortex-M0+"),
     (r"ESP32-(S2|S3)", "Xtensa LX7"),
     (r"ESP32-(C2|C3|C5|C6|H2)", "RISC-V RV32IMC"),
@@ -90,8 +109,40 @@ ARCH_BY_MCU: Tuple[Tuple[str, str], ...] = (
 # Add-on boards -- FeatherWings, shields, HATs, capes, Qwiic breakouts -- are in scope per
 # issue #28 section 2.20, but most carry no MCU. Recording "UNVERIFIED" for them would
 # describe a gap in this database rather than the board, so they get their own sentinel.
-ADDON = re.compile(r"(wing\b|shield|\bhat\b|\bcape\b|bonnet|breakout|doubler|tripler|"
-                   r"\bquad\b|proto\b|terminal block|stacking|header)", re.I)
+# Matched against the PRODUCT NAME only, never the description. A description that happens
+# to mention a connector or an enclosure ("an Arduino Uno compatible board with a USB-C
+# connector") says nothing about whether the board carries a processor, and treating it as
+# though it did put "not-applicable" on real MCU boards.
+ADDON = re.compile(
+    r"(wing\b|shield|\bhat\b|\bcape[sd]?\b|bonnet|breakout|doubler|tripler|"
+    r"\bquad\b|proto\b|terminal block|stacking|header|"
+    # Product lines that are add-ons by definition of what the line is.
+    r"\bgizmo\b|\bbff\b|add[- ]on|carrier|notecarrier|function board|"
+    r"\badapter\b|\bpack\b|update tool|light pipe)", re.I)
+
+# Phrases with which a vendor *classifies* the product, as opposed to words that merely
+# appear in prose about it. Only these are trusted from a description; the generic ADDON
+# words are matched against the product name alone.
+ADDON_CLASS = re.compile(
+    r"(breakout board|carrier board|function board|add[- ]on board|daughter ?board|"
+    r"\bshield\b|\bHAT for\b|\bcape for\b|featherwing|qwiic[- ]enabled breakout|"
+    r"expansion board|adapter board|\bbonnet\b)", re.I)
+
+
+def is_addon(product_name: str, description: str = "") -> bool:
+    """True when the product line carries no processor by definition of what the line is.
+
+    Separators are normalised first: `\\b` does not fire between "_" and "G", so
+    "Adafruit_TFT_Gizmo" would otherwise never match \\bgizmo\\b.
+
+    The description is only consulted for phrases that classify the product. Matching
+    generic words there put "not-applicable" on 22 real MCU boards, because "an Arduino
+    Uno compatible board with a USB-C connector" mentions a connector without being one.
+    """
+    if ADDON.search(re.sub(r"[-_]+", " ", product_name)):
+        return True
+    return bool(description and ADDON_CLASS.search(description))
+
 
 NOISE = re.compile(r"[-_]+(pcb|hardware|hw|files?|design|eagle|kicad|altium|board)$", re.I)
 
@@ -127,12 +178,24 @@ def extract_part_number(text: str) -> Optional[str]:
     return None
 
 
+# Part numbers are conventionally upper-case, but a few carry their own spelling.
+_MCU_SPELLING = (
+    (r"^I\.?MX\s?RT", "i.MX RT"),
+    (r"^I\.?MX", "i.MX "),
+    (r"^FREEDOM\s+E310", "SiFive FE310"),
+)
+
+
 def extract_mcu(*texts: str) -> Optional[str]:
     blob = " ".join(texts)
     for pattern in MCU_PATTERNS:
         found = re.search(pattern, blob, re.I)
         if found:
-            return found.group(0).upper().replace("  ", " ")
+            part = re.sub(r"\s+", " ", found.group(0).upper()).strip()
+            for spelling, replacement in _MCU_SPELLING:
+                if re.match(spelling, part):
+                    return re.sub(spelling, replacement, part, count=1).replace("  ", " ").strip()
+            return part
     return None
 
 
@@ -303,7 +366,7 @@ def build(entry: Dict[str, Any], vendor: Dict[str, Any]) -> Optional[Dict[str, A
         "part_number": part or "UNVERIFIED",
         "revision": "unverified",
         "mcu_soc": mcu or ("not-applicable"
-                           if ADDON.search(f"{entry['name']} {entry['description']}")
+                           if is_addon(entry["name"], entry["description"] or "")
                            else "UNVERIFIED"),
         "cpu_architecture": arch_for(mcu),
         "product_status": "unknown",

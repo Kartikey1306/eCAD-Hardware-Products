@@ -7,7 +7,7 @@
   "board": "Official BeagleBoard.org capes",
   "part_number": "UNVERIFIED",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "not-applicable",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": null,

@@ -7,10 +7,10 @@
   "board": "BeagleBone AI",
   "part_number": "UNVERIFIED",
   "revision": "A2",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "AM5729",
   "hardware_revision": null,
   "fpga": null,
-  "cpu_architecture": null,
+  "cpu_architecture": "Arm Cortex-A15",
   "product_status": "unknown",
   "files": {
     "altium": {

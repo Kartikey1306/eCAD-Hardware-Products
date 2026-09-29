@@ -7,10 +7,10 @@
   "board": "BeagleBoard.org BeagleConnect Freedom",
   "part_number": "UNVERIFIED",
   "revision": "2.0",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "CC1352P7",
   "hardware_revision": null,
   "fpga": null,
-  "cpu_architecture": null,
+  "cpu_architecture": "Arm Cortex-M4F",
   "product_status": "unknown",
   "files": {
     "altium": {

@@ -7,10 +7,10 @@
   "board": "SparkFun Red V Thing Plus",
   "part_number": "DEV-15799",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "SiFive FE310",
   "hardware_revision": null,
   "fpga": null,
-  "cpu_architecture": null,
+  "cpu_architecture": "RISC-V RV32IMAC",
   "product_status": "unknown",
   "files": {
     "altium": {
@@ -201,6 +201,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
+  "record_status": "verified",
   "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Red-V_Thing_Plus pinned at f070a3296188. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Red-V_Thing_Plus: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
 }
