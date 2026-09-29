@@ -629,6 +629,23 @@ class TestClassAndSanity(unittest.TestCase):
             "the 40 MHz copy": (_set(model, (tx, "clk_freq", 40000000), (rx, "clk_freq", 40000000)), [
                 "u_tx CLK_FREQ 40000000 Hz is not the frequency of its clock (half period 1e-08 s, 50000000 Hz)",
                 "u_rx CLK_FREQ 40000000 Hz is not the frequency of its clock (half period 1e-08 s, 50000000 Hz)"]),
+            # Review HT-1: a 6 ns clock runs at 166 666 666.67 Hz, which no whole-Hz CLK_FREQ names exactly; the
+            # integers either side of it are its frequency to whole Hz, and the next ones out are not.
+            "a 6 ns clock told 166666667 Hz": (
+                _set(model, (tb, "clock_half_period", 3e-09), (tx, "clk_freq", 166666667), (rx, "clk_freq", 166666667)),
+                []),
+            "a 6 ns clock told 166666666 Hz": (
+                _set(model, (tb, "clock_half_period", 3e-09), (tx, "clk_freq", 166666666), (rx, "clk_freq", 166666666)),
+                []),
+            "a 6 ns clock told 166666668 Hz": (
+                _set(model, (tb, "clock_half_period", 3e-09), (tx, "clk_freq", 166666668), (rx, "clk_freq", 166666667)),
+                ["u_tx CLK_FREQ 166666668 Hz is not the frequency of its clock (half period 3e-09 s, 166666666.667 Hz)"]),
+            "a 6 ns clock told 166666665 Hz": (
+                _set(model, (tb, "clock_half_period", 3e-09), (tx, "clk_freq", 166666667), (rx, "clk_freq", 166666665)),
+                ["u_rx CLK_FREQ 166666665 Hz is not the frequency of its clock (half period 3e-09 s, 166666666.667 Hz)"]),
+            # 20 ns is exactly 50 MHz: 1 Hz off is off.
+            "50000001 Hz at 20 ns": (_set(model, (tx, "clk_freq", 50000001)), [
+                "u_tx CLK_FREQ 50000001 Hz is not the frequency of its clock (half period 1e-08 s, 50000000 Hz)"]),
             "a 1 MHz clock at 115200 Bd": (
                 _set(model, (tb, "clock_half_period", 5e-07), (tx, "clk_freq", 1000000), (rx, "clk_freq", 1000000)),
                 ["u_rx: CLK_FREQ // (BAUD_RATE * OVERSAMPLE) = 1000000 // (115200 * 16) is 0: the receiver's divider "

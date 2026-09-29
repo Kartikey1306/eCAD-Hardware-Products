@@ -1015,7 +1015,14 @@ class DigitalAdapter:
         return []  # the simulation file is derived; no script runs
 
     def sanity_problems(self, model: Dict[str, Any]) -> List[str]:
-        """Why the design's values or units are impossible, or its clock is not the one its instances are told."""
+        """Why the design's values or units are impossible, or its clock is not the one its instances are told.
+
+        An instance's CLK_FREQ is its clock's when it is within 1 Hz of the
+        frequency the harness drives, 10^9 / (2 N) Hz for the half period of
+        N whole ns that ``always #N`` writes: that frequency rounded down or
+        up to whole Hz. The comparison is in integers, |2 N CLK_FREQ - 10^9|
+        < 2 N, so no floating-point rounding decides it.
+        """
         problems = []
         for component in model["components"]:
             for name, facet in component["domains"].get("digital", {}).items():
@@ -1037,6 +1044,7 @@ class DigitalAdapter:
         if isinstance(half, bool) or not isinstance(half, (int, float)) or not half > 0:
             problems.append(f"{top}: clock_half_period {half!r} is not positive")
             half = None
+        half_ns = None if half is None else round(half * 1e9)  # N of the harness's `always #N`
         if not _positive_integer(reset):
             problems.append(f"{top}: reset_cycles {reset!r} is not an integer of at least 1")
         if (not isinstance(sent, list) or not 1 <= len(sent) <= MAX_BYTES
@@ -1053,7 +1061,7 @@ class DigitalAdapter:
                 continue
             if rate > clock:
                 problems.append(f"{label}: baud_rate {rate} Bd is above clk_freq {clock} Hz")
-            if half is not None and abs(2 * half * clock - 1) > 1e-9:
+            if half_ns is not None and not abs(2 * half_ns * clock - 10**9) < 2 * half_ns:
                 problems.append(f"{label} CLK_FREQ {clock} Hz is not the frequency of its clock (half period {half!r} "
                                 f"s, {1 / (2 * half):.12g} Hz)")
         oversample = _value(roles.receiver, "oversample")

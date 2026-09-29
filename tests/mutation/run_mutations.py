@@ -752,7 +752,8 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      "    if False:\n"),
     ("dg-resource-guard-off", DG, "        if end > MAX_CYCLES:\n",
      "        if end > 10**12:\n"),
-    ("dg-clock-consistency-unchecked", DG, "            if half is not None and abs(2 * half * clock - 1) > 1e-9:\n",
+    ("dg-clock-consistency-unchecked", DG,
+     "            if half_ns is not None and not abs(2 * half_ns * clock - 10**9) < 2 * half_ns:\n",
      "            if False:\n"),
     ("dg-receiver-ticks-unchecked", DG, "and clock // (rate * oversample) < 1:\n",
      "and False:\n"),
@@ -817,6 +818,12 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      '        "            if (ecad_received < 2) ecad_missing = 2 - ecad_received;",\n'),
     ("dg-v2-awaited-not-compared", DG, '            "bytes awaited": len(sent),\n', ""),
     ("vg-harness-awaited-count-unbound", VG, r'ecad_missing = \1 - ecad_received;")', r'ecad_missing = [0-9]+ - ecad_received;")'),
+    # the digital review (HT-1): the clock is compared in whole Hz, within 1 Hz of what the harness drives
+    ("dg-clock-tolerance-inclusive", DG, "not abs(2 * half_ns * clock - 10**9) < 2 * half_ns:",
+     "not abs(2 * half_ns * clock - 10**9) <= 2 * half_ns:"),
+    ("dg-clock-compared-in-seconds", DG,
+     "            if half_ns is not None and not abs(2 * half_ns * clock - 10**9) < 2 * half_ns:\n",
+     "            if half is not None and abs(2 * half * clock - 1) > 1e-9:\n"),
     # the digital domain: the registry
     ("digital-unregistered", DR, ',\n                                      "digital": DigitalAdapter()}',
      "}"),
