@@ -1,0 +1,204 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "robotis-git:xelnetwork",
+  "manufacturer": "ROBOTIS",
+  "family": "XelNetwork",
+  "board": "ROBOTIS XelNetwork",
+  "part_number": "UNVERIFIED",
+  "revision": "F",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:27Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/XelNetwork_Hardware@bf6f45a90c175428961625bdb07929d9b5adb9a6"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/XelNetwork_Hardware/bf6f45a90c175428961625bdb07929d9b5adb9a6/powerXel/BOM/POWERXEL_REVF-bom.xls",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:12Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "627f9d50933b3d7fef5b970423478191c3482a1075ec3129f401e0443d01dce9",
+        "size_bytes": 33792,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/XelNetwork_Hardware/bf6f45a90c175428961625bdb07929d9b5adb9a6/powerXel/CAD/powerxel_revf-%EA%B8%B0%EA%B5%AC%EB%8F%84%28top%29.dxf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c4c911de6e940c33f86900e8cd6d4a43d821571999c55172aa1d68f34434f937",
+        "size_bytes": 2134471,
+        "media_type": "text/plain",
+        "detected_format": "dxf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "eagle": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/XelNetwork_Hardware/bf6f45a90c175428961625bdb07929d9b5adb9a6/powerXel/Schematic/POWERXEL_REVF.sch",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/XelNetwork_Hardware/bf6f45a90c175428961625bdb07929d9b5adb9a6/powerXel/Gerber/POWERXEL_REVF-gerber.zip",
+      "verified_revision": "F",
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6b64bb934f9d9fc2019cdd1e8a3d4eb9580b32526c6ab7c4ea10f759092f2e8b",
+        "size_bytes": 253019,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "POWERXEL_REVF-gerber(191011)/drill.drl"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:27Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/XelNetwork_Hardware@bf6f45a90c175428961625bdb07929d9b5adb9a6"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:27Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/XelNetwork_Hardware@bf6f45a90c175428961625bdb07929d9b5adb9a6"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:27Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/XelNetwork_Hardware@bf6f45a90c175428961625bdb07929d9b5adb9a6"
+      }
+    },
+    "pcb_source": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:27Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/XelNetwork_Hardware@bf6f45a90c175428961625bdb07929d9b5adb9a6"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:27Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/XelNetwork_Hardware@bf6f45a90c175428961625bdb07929d9b5adb9a6"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/XelNetwork_Hardware/bf6f45a90c175428961625bdb07929d9b5adb9a6/powerXel/Schematic/POWERXEL_REVF.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "277a79e3f748908f096a2f7b26341a903cc95395bd5029e024541f311a1b1530",
+        "size_bytes": 288971,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:27Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/XelNetwork_Hardware@bf6f45a90c175428961625bdb07929d9b5adb9a6"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:27Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/XelNetwork_Hardware@bf6f45a90c175428961625bdb07929d9b5adb9a6"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "Apache-2.0",
+    "cad_license": "Apache-2.0",
+    "schematic_license": "Apache-2.0",
+    "pcb_license": "Apache-2.0",
+    "mechanical_cad_license": "Apache-2.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://www.apache.org/licenses/LICENSE-2.0"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.robotis.us/",
+    "official_cad_repository": "https://github.com/ROBOTIS-GIT/XelNetwork_Hardware",
+    "official_github_repository": "https://github.com/ROBOTIS-GIT/XelNetwork_Hardware",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository ROBOTIS-GIT/XelNetwork_Hardware pinned at bf6f45a90c17. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for ROBOTIS-GIT/XelNetwork_Hardware."
+}

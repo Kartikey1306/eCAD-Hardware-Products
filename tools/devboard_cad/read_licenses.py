@@ -166,6 +166,11 @@ def apply_licence(record: Dict[str, Any], name: str, url: Optional[str],
     return json.dumps(licenses, sort_keys=True) != before
 
 
+def repo_slug(record: Dict[str, Any]) -> str:
+    repo = record["sources"].get("official_github_repository") or ""
+    return repo.split("github.com/", 1)[1].strip("/") if "github.com/" in repo else "its repository"
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", default=str(REPO_ROOT))
@@ -176,9 +181,28 @@ def main(argv: Optional[List[str]] = None) -> int:
     read = unknown = 0
     for path in sorted(records_dir(Path(args.root).resolve()).glob("*.json")):
         record = json.loads(path.read_text(encoding="utf-8"))
-        current = str(record["licenses"].get("hardware_license", "")).strip()
-        if current and current.upper() != "UNVERIFIED" and not args.overwrite:
+        licenses = record["licenses"]
+        current = str(licenses.get("hardware_license", "")).strip()
+        undecided = all(licenses.get(f) is None for f in
+                        ("redistribution_allowed", "modification_allowed",
+                         "commercial_use_allowed"))
+        # A licence name with no permissions behind it is invisible to the commercial-reuse
+        # queries. harvest_github records GitHub's SPDX tag as the name, so those records
+        # arrive named but undecided and must still be resolved.
+        if current and current.upper() != "UNVERIFIED" and not undecided and not args.overwrite:
             continue
+        if current and current.upper() != "UNVERIFIED" and undecided:
+            name = SPDX_ALIASES.get(current, current if current in KNOWN else None)
+            if name:
+                apply_licence(record, name, None, None,
+                              f"the SPDX licence GitHub detects for {repo_slug(record)}")
+                record["record_status"] = derive_status(record)
+                with path.open("w", encoding="utf-8", newline="\n") as handle:
+                    json.dump(record, handle, indent=2)
+                    handle.write("\n")
+                read += 1
+                print(f"  {record['board_id']:44} {name} (permissions filled)", flush=True)
+                continue
         repo = record["sources"].get("official_github_repository")
         if not repo or "github.com/" not in repo:
             unknown += 1
