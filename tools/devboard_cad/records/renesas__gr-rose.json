@@ -1,0 +1,89 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "renesas:gr-rose",
+  "manufacturer": "Renesas Electronics (Gadget Renesas; board designed by Core Corporation)",
+  "family": "RX / RX65N (Gadget Renesas)",
+  "board": "GR-ROSE",
+  "part_number": "UNVERIFIED",
+  "revision": "X65A-M01-C",
+  "mcu_soc": "Renesas R5F565NEHDFP (RX65N, 100-pin LFQFP)",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Renesas RXv2",
+  "product_status": "unknown",
+  "files": {
+    "mechanical": {
+      "available": true,
+      "url": "https://www.renesas.com/en/document/oth/gr-rose-dimension",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:45Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "85e4be8781d78bf56a2e41f2ec4fa1bf09f323cf00012e4bf4cb4917e6b4e751",
+        "size_bytes": 802114,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": "https://www.renesas.com/en/document/lbr/gr-rose-fritzing-data-file",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://www.renesas.com/en/document/oth/gr-rose-schematic",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:46Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9aacb0dfad5c266042c9c47b4c01d3d549a9bdfd6f2ff705b9392cda02dd87d2",
+        "size_bytes": 385937,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.renesas.com/en/products/gadget-renesas/boards/gr-rose",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.renesas.com/en/products/gadget-renesas/boards/gr-rose",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://www.renesas.com/en/document/oth/gr-rose-schematic",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

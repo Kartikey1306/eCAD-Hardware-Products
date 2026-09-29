@@ -1,0 +1,86 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nxp:frdm-ke16z",
+  "manufacturer": "NXP Semiconductors",
+  "family": "Kinetis E / FRDM (Freedom) Development Platform",
+  "board": "FRDM-KE16Z Freedom Board",
+  "part_number": "FRDM-KE16Z",
+  "revision": "unverified",
+  "mcu_soc": "MKE16Z64VLF4",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M0+ (32-bit)",
+  "product_status": "unknown",
+  "files": {
+    "user_manual": {
+      "available": true,
+      "url": "https://www.nxp.com/docs/en/user-guide/UM11204.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:34Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3d58ca22bfb9339b0ad4c9d27428a1c1bd805d009a8f4c654b6cdbc034a8d5f6",
+        "size_bytes": 756034,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.nxp.com/part/FRDM-KE16Z",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.nxp.com/docs/en/user-guide/UM11204.pdf",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

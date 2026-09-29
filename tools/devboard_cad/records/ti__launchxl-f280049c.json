@@ -1,0 +1,98 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "ti:launchxl-f280049c",
+  "manufacturer": "Texas Instruments",
+  "family": "C2000 Piccolo LaunchPad",
+  "board": "F280049C LaunchPad Development Kit for C2000 Piccolo MCU",
+  "part_number": "LAUNCHXL-F280049C",
+  "revision": "Rev A (design package MCU025A)",
+  "mcu_soc": "TMS320F280049C",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "TI C28x 32-bit real-time core with CLA",
+  "product_status": "active",
+  "files": {
+    "altium": {
+      "available": true,
+      "url": "https://www.ti.com/lit/zip/SPRR421",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/sprr421/sprr421.zip?ts=1790670725382",
+        "sha256": "156f0e115fa70b92891d1ba3fbbcf9bfda4c758c339a229e3dca9b3e9d6e1e64",
+        "size_bytes": 12010199,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "LAUNCHXL-F280049C/RevA/MCU025A_design_files/MCU025A.PcbDoc"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://www.ti.com/lit/pdf/SPRR423",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:06Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/sprr423/sprr423.pdf?ts=1790659122193",
+        "sha256": "92fe838f7068526f79fd5e6c884727f457c3571a430198c342c2f14ecae8c4da",
+        "size_bytes": 712223,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.ti.com/tool/LAUNCHXL-F280049C",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.ti.com/tool/LAUNCHXL-F280049C",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://www.ti.com/lit/pdf/SPRR423",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

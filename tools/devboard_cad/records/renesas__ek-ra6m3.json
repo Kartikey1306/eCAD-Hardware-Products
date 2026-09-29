@@ -1,0 +1,86 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "renesas:ek-ra6m3",
+  "manufacturer": "Renesas Electronics",
+  "family": "RA / RA6 Series",
+  "board": "EK-RA6M3 - Evaluation Kit for RA6M3 MCU Group",
+  "part_number": "RTK7EKA6M3S00001BU",
+  "revision": "v1",
+  "mcu_soc": "Renesas R7FA6M3AH3CFC (RA6M3 Group)",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "active",
+  "files": {
+    "user_manual": {
+      "available": true,
+      "url": "https://www.renesas.com/en/document/mat/ek-ra6m3-v1-users-manual",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "d4da47a12c9cab562f4160d756a97b628e2e7032e51cda7011336aa67854db8e",
+        "size_bytes": 1529445,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/ek-ra6m3",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.renesas.com/en/document/mat/ek-ra6m3-v1-users-manual",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

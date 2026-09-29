@@ -1,0 +1,97 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nvidia:jetson-agx-xavier-developer-kit",
+  "manufacturer": "NVIDIA",
+  "family": "Jetson AGX Xavier",
+  "board": "NVIDIA Jetson AGX Xavier Developer Kit",
+  "part_number": "P2972",
+  "revision": "Carrier board P2822 rev B03 per NVIDIA's",
+  "mcu_soc": "NVIDIA Jetson AGX Xavier module",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "arm64 (Armv8.2-A, NVIDIA Carmel)",
+  "product_status": "not_recommended",
+  "files": {
+    "mechanical": {
+      "available": true,
+      "url": "https://developer.nvidia.com/assets/embedded/secure/jetson/xavier/docs/jetson_agx_xavier_product_marking_specification_da-10737-001_v1.1.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/xavier/docs/Jetson_AGX_Xavier_Product_Marking_Specification_DA-10737-001_v1.1.pdf?__token__=exp=1790672467~hmac=37a6685df346b972b711ce7a4a0669dbf23e60424f2e9b333db80c73ddd00c8d",
+        "sha256": "4d3d3eafd19c2e98dd9faa37447c70c17b8339a652ef5d27efaddbf811491c8f",
+        "size_bytes": 1110557,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://developer.nvidia.com/embedded/dlc/jetson_agx_xavier_developer_kit_user_guide",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:09Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/xavier/docs/nv_jetson_agx_xavier_developer_kit_user_guide.pdf?__token__=exp=1790672467~hmac=e14105f47ac269e82f6950cacc8cc377892408e2e21ae564568b66e6fa556ca0",
+        "sha256": "18b8de4ff56f482af06f7e0ff3b1118b167d776c776d180f0fb4497da3584aca",
+        "size_bytes": 2404051,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://developer.nvidia.com/embedded/jetson-agx-xavier-developer-kit",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://developer.nvidia.com/embedded/downloads",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}
