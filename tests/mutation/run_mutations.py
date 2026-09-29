@@ -857,7 +857,7 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("dg-v2-hdl-source-unchecked", DG, '            if hdl["source"] not in sources:\n', "            if False:\n"),
     ("dg-v2-harness-offset-dropped", DG, 'view = verilog.read_harness("\\n" * offset + harness, path)',
      "view = verilog.read_harness(harness, path)"),
-    ("process-collect-follows-symlinks", PR, "shutil.copyfile(candidate, destination / name, follow_symlinks=False)",
+    ("process-collect-copies-link-target", PR, "shutil.copyfile(candidate, destination / name, follow_symlinks=False)",
      "shutil.copyfile(candidate, destination / name)"),
     # the digital domain: the registry
     ("digital-unregistered", DR, ',\n                                      "digital": DigitalAdapter()}',
