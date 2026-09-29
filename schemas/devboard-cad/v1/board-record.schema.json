@@ -49,10 +49,11 @@
     "revision": {
       "type": "string",
       "minLength": 1,
-      "description": "Exact hardware revision this record was verified against, or 'unverified' when the revision could not be confirmed."
+      "description": "Exact hardware revision this record was verified against. Three reserved values distinguish outcomes that must not be conflated: 'unverified' means nobody has looked; 'not-stated' means an exhaustive official index was consulted and the manufacturer publishes no revision; anything else is the revision itself. Only 'unverified' blocks record_status from reaching 'verified'."
     },
     "mcu_soc": {
-      "$ref": "#/definitions/nonEmptyString"
+      "$ref": "#/definitions/nonEmptyString",
+      "description": "The board's MCU or SoC. Reserved value 'not-applicable' for passive add-on boards (FeatherWings, shields, HATs, capes, breakouts), which issue #28 section 2.20 includes in scope and which carry no processor. 'UNVERIFIED' means not yet determined and blocks 'verified'."
     },
     "hardware_revision": {
       "type": [
