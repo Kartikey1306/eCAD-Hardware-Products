@@ -4,7 +4,7 @@
   "board_id": "adafruit:circuit-playground-bluefruit",
   "manufacturer": "Adafruit Industries",
   "family": "Circuit Playground",
-  "board": "Adafruit Circuit Playground Bluefruit",
+  "board": "Adafruit Adafruit Circuit Playground Bluefruit",
   "part_number": "4333",
   "revision": "not-stated",
   "mcu_soc": "NRF52840",

@@ -4,7 +4,7 @@
   "board_id": "adafruit:esp32-s3-tft-feather",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "Adafruit ESP32 S3 TFT Feather",
+  "board": "Adafruit ESP32-S3 TFT Feather",
   "part_number": "5483",
   "revision": "not-stated",
   "mcu_soc": "ESP32-S3",

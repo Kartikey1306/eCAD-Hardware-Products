@@ -4,7 +4,7 @@
   "board_id": "beagleboard:beaglev-ahead",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "BeagleV",
-  "board": "Mirror of https://git",
+  "board": "BeagleBoard.org BeagleV Ahead",
   "part_number": "UNVERIFIED",
   "revision": "1.0",
   "mcu_soc": "UNVERIFIED",

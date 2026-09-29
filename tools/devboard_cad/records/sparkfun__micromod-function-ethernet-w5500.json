@@ -4,7 +4,7 @@
   "board_id": "sparkfun:micromod-function-ethernet-w5500",
   "manufacturer": "SparkFun Electronics",
   "family": "MicroMod",
-  "board": "MicroMod Function board for Ethernet and PoE",
+  "board": "SparkFun MicroMod Function Ethernet W5500",
   "part_number": "COM-18708",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

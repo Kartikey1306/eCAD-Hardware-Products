@@ -4,7 +4,7 @@
   "board_id": "adafruit:rp2040-can-bus-feather",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "EagleCAD PCB files for the RP2040 CAN Bus Feather",
+  "board": "RP2040 CAN Bus Feather",
   "part_number": "5724",
   "revision": "not-stated",
   "mcu_soc": "RP2040",

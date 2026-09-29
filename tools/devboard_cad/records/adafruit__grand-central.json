@@ -4,7 +4,7 @@
   "board_id": "adafruit:grand-central",
   "manufacturer": "Adafruit Industries",
   "family": "Grand Central",
-  "board": "Adafruit Grand Central",
+  "board": "Adafruit Grand Central M4 Express",
   "part_number": "4064",
   "revision": "B",
   "mcu_soc": "SAMD51",

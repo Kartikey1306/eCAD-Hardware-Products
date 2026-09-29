@@ -4,7 +4,7 @@
   "board_id": "sparkfun:pro-micro-esp32c3",
   "manufacturer": "SparkFun Electronics",
   "family": "Pro Micro",
-  "board": "Documentation and Hardware Files for the SparkFun Pro Micro ESP32-C3",
+  "board": "SparkFun Pro Micro ESP32-C3",
   "part_number": "DEV-23484",
   "revision": "not-stated",
   "mcu_soc": "ESP32-C3",

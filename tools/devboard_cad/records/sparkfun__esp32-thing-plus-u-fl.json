@@ -4,7 +4,7 @@
   "board_id": "sparkfun:esp32-thing-plus-u-fl",
   "manufacturer": "SparkFun Electronics",
   "family": "Thing Plus",
-  "board": "ESP32 Thing-compatible board using the WROOM-32U module (U",
+  "board": "SparkFun ESP32 Thing Plus U.FL",
   "part_number": "WRL-17381",
   "revision": "not-stated",
   "mcu_soc": "ESP32",

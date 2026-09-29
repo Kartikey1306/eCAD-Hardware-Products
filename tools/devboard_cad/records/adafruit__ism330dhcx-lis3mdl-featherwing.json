@@ -4,7 +4,7 @@
   "board_id": "adafruit:ism330dhcx-lis3mdl-featherwing",
   "manufacturer": "Adafruit Industries",
   "family": "FeatherWing",
-  "board": "Adafruit ISM330DHCX LIS3MDL FeatherWing",
+  "board": "Adafruit ISM330DHCX + LIS3MDL FeatherWing",
   "part_number": "4569",
   "revision": "not-stated",
   "mcu_soc": "STM32F405",

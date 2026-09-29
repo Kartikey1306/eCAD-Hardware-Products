@@ -4,7 +4,7 @@
   "board_id": "adafruit:can-bus-featherwing",
   "manufacturer": "Adafruit Industries",
   "family": "FeatherWing",
-  "board": "Adafruit CAN Bus FeatherWing",
+  "board": "CAN Bus FeatherWing",
   "part_number": "5709",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",

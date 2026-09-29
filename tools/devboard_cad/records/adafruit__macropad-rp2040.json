@@ -4,7 +4,7 @@
   "board_id": "adafruit:macropad-rp2040",
   "manufacturer": "Adafruit Industries",
   "family": "MacroPad",
-  "board": "EagleCAD PCB files for Adafruit MacroPad RP2040",
+  "board": "Adafruit MacroPad RP2040",
   "part_number": "5100",
   "revision": "D",
   "mcu_soc": "RP2040",

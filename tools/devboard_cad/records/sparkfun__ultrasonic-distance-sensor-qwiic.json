@@ -4,7 +4,7 @@
   "board_id": "sparkfun:ultrasonic-distance-sensor-qwiic",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Documentation and Hardware for the SparkFun Ultrasonic Distance Sensor -Qwiic",
+  "board": "SparkFun Ultrasonic Distance Sensor -Qwiic",
   "part_number": "SEN-24805",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

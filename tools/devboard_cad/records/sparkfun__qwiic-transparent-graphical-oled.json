@@ -4,7 +4,7 @@
   "board_id": "sparkfun:qwiic-transparent-graphical-oled",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Hardware repo for the Transparent Graphical OLED",
+  "board": "Transparent Graphical OLED",
   "part_number": "15173",
   "revision": "not-stated",
   "mcu_soc": "ATMEGA328",

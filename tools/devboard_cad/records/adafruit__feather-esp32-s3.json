@@ -4,7 +4,7 @@
   "board_id": "adafruit:feather-esp32-s3",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "EagleCAD PCB files for the Adafruit Feather ESP32-S3",
+  "board": "Adafruit Feather ESP32-S3",
   "part_number": "5323",
   "revision": "not-stated",
   "mcu_soc": "ESP32-S3",

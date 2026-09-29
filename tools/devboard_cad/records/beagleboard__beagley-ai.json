@@ -4,7 +4,7 @@
   "board_id": "beagleboard:beagley-ai",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "BeagleY",
-  "board": "BeagleBoard",
+  "board": "BeagleBoard.org BeagleY-AI",
   "part_number": "UNVERIFIED",
   "revision": "A",
   "mcu_soc": "UNVERIFIED",

@@ -4,7 +4,7 @@
   "board_id": "sparkfun:qwiic-adxl313",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "SparkFun Qwiic ADXL313",
+  "board": "Qwiic-enabled breakout board for the ADXL313",
   "part_number": "SEN-17241",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",

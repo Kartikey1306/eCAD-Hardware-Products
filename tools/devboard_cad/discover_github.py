@@ -145,19 +145,85 @@ def arch_for(mcu: Optional[str]) -> Optional[str]:
     return None
 
 
+# Repository descriptions are written for humans browsing GitHub, not as product names.
+# These prefixes wrap the product name and are stripped; the patterns below reject a
+# description outright, because nothing usable can be recovered from it.
+_DESC_PREFIX = re.compile(
+    r"^\s*(?:(?:open[- ]?source|eagle ?cad|eagle|kicad|altium|pcb|hardware|design|"
+    r"documentation|tutorial|schematics?|repo(?:sitory)?|files?|and)\s+)+"
+    r"(?:for|of)\s+(?:the\s+)?", re.I)
+_DESC_REJECT = re.compile(
+    r"^\s*(mirror of|presented by|an? |the |tiny |dev board for|breakout board for|"
+    r"qwiic enabled|micromod function board|https?://)", re.I)
+
+
+def _prefix(name: str, manufacturer: str) -> str:
+    """Prepend the manufacturer only when the name does not already carry it."""
+    brand = manufacturer.split()[0]
+    if brand.lower().rstrip(".") in name.lower().replace(".", ""):
+        return re.sub(r"\s+", " ", name).strip()
+    return re.sub(r"\s+", " ", f"{brand} {name}").strip()
+
+
 def board_name(repo_name: str, description: str, manufacturer: str) -> str:
-    """Prefer the manufacturer's own description; fall back to a de-slugged repo name."""
-    head = (description or "").split(".")[0].split(" - ")[0].strip()
-    head = re.sub(r"^(open source |open-source )?(pcb|eagle|kicad|altium)?\s*"
-                  r"(files?|design files?|hardware files?)?\s*(for|of)\s+", "", head, flags=re.I)
+    """Prefer the manufacturer's own description; fall back to a de-slugged repo name.
+
+    A description is only usable when it names the product. "Mirror of https://openbeagle"
+    and "An mbed os enabled board based on the Artemis module" do not, so they are rejected
+    in favour of the repository name, which always encodes the board.
+    """
+    head = (description or "").split(". ")[0].split(" - ")[0].strip()
+    # A description often continues into a relative clause or pairs two products.
+    # Everything after these joins describes rather than names.
+    head = re.split(r",\s+(?:which|that|a\b)|\s+and the\s+|\s+\(?aka\b",
+                    head, maxsplit=1, flags=re.I)[0].strip()
+    head = head.split(":")[0].strip() if 3 < len(head.split(":")[0]) < 60 else head
+    for _ in range(2):                      # "Open source PCB files for the X"
+        stripped = _DESC_PREFIX.sub("", head)
+        if stripped == head:
+            break
+        head = stripped.strip()
     head = re.sub(r"\s*\(?(pcb|eagle ?cad|kicad|altium)( files?)?\)?\s*$", "", head, flags=re.I)
-    if 3 < len(head) < 80 and not head.lower().startswith(("a ", "the ")):
-        return head.strip()
+    head = head.strip(" .,-–—")
+    if (3 < len(head) < 70 and "http" not in head.lower()
+            and not _DESC_REJECT.match(head)):
+        return re.sub(r"\s+", " ", head)
+
     slug = NOISE.sub("", repo_name)
+    slug = re.sub(r"^(oshw|hardware)[-_]+", "", slug, flags=re.I)
     slug = slug.replace("_", " ").replace("-", " ").strip()
-    if manufacturer.split()[0].lower() not in slug.lower():
-        slug = f"{manufacturer.split()[0]} {slug}"
-    return re.sub(r"\s+", " ", slug)
+    slug = " ".join(_recase(w, i == 0) for i, w in enumerate(slug.split()))
+    return _prefix(slug, manufacturer)
+
+
+# Repository names are lowercase slugs, so a de-slugged fallback reads as prose unless the
+# tokens that are acronyms or part numbers are put back into their conventional case.
+_ACRONYMS = {
+    "ai", "io", "hat", "usb", "rf", "rfm", "adc", "dac", "imu", "gps", "gnss", "led",
+    "sd", "spi", "i2c", "uart", "pcb", "fpga", "arm", "oled", "lcd", "tft", "can",
+    "ble", "nfc", "lte", "poe", "hdmi", "mcu", "soc",
+}
+# Words whose conventional casing is neither lower, Title nor UPPER.
+_MIXED = {"iot": "IoT", "wifi": "WiFi", "featherwing": "FeatherWing",
+          "itsybitsy": "ItsyBitsy", "redboard": "RedBoard", "micromod": "MicroMod",
+          "beaglebone": "BeagleBone", "beagleplay": "BeaglePlay", "beaglev": "BeagleV",
+          "beagley": "BeagleY", "pocketbeagle": "PocketBeagle", "sparkfun": "SparkFun",
+          "beagleconnect": "BeagleConnect", "macropad": "MacroPad", "qwiic": "Qwiic"}
+# Joining words stay lowercase unless they lead the name.
+_MINOR = {"for", "to", "and", "with", "of", "the", "a", "in", "on"}
+
+
+def _recase(word: str, first: bool = False) -> str:
+    low = word.lower()
+    if low in _MIXED:
+        return _MIXED[low]
+    if low in _ACRONYMS:
+        return low.upper()
+    if low in _MINOR and not first:
+        return low
+    if any(ch.isdigit() for ch in low):     # rp2040, esp32, samd21e, f9p
+        return low.upper()
+    return word[:1].upper() + word[1:] if word.islower() else word
 
 
 def board_id(org: str, repo_name: str) -> str:

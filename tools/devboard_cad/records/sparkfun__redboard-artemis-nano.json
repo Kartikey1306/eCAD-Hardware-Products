@@ -4,7 +4,7 @@
   "board_id": "sparkfun:redboard-artemis-nano",
   "manufacturer": "SparkFun Electronics",
   "family": "RedBoard",
-  "board": "Tiny Arduino compatible carrier board for SparkFun's Artemis module",
+  "board": "SparkFun RedBoard Artemis Nano",
   "part_number": "DEV-15443",
   "revision": "not-stated",
   "mcu_soc": "APOLLO3",

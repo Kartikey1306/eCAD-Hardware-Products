@@ -4,7 +4,7 @@
   "board_id": "sparkfun:digi-xbee-regulated-qwiic",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Documentation and Hardware for the SparkFun XBee Regulated Qwiic",
+  "board": "SparkFun XBee Regulated Qwiic",
   "part_number": "22032",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

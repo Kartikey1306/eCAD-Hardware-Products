@@ -4,7 +4,7 @@
   "board_id": "sparkfun:qwiic-pulsed-radar-sensor-xm125",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Tutorial and hardware files for the SparkFun Qwiic Pulsed Coherent Radar Sensor",
+  "board": "SparkFun Qwiic Pulsed Coherent Radar Sensor",
   "part_number": "SEN-24540",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

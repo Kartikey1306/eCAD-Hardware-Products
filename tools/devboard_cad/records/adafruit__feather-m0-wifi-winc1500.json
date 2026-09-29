@@ -4,7 +4,7 @@
   "board_id": "adafruit:feather-m0-wifi-winc1500",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "Adafruit Feather M0 WiFi WINC1500",
+  "board": "Adafruit Feather M0 WiFi (with WINC1500)",
   "part_number": "3010",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

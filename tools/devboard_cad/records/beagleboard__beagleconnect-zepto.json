@@ -4,7 +4,7 @@
   "board_id": "beagleboard:beagleconnect-zepto",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "BeagleConnect",
-  "board": "Mirror of https://openbeagle",
+  "board": "BeagleBoard.org BeagleConnect Zepto",
   "part_number": "UNVERIFIED",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

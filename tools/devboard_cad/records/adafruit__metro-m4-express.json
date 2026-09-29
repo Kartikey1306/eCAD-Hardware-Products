@@ -4,7 +4,7 @@
   "board_id": "adafruit:metro-m4-express",
   "manufacturer": "Adafruit Industries",
   "family": "Metro",
-  "board": "Adafruit Metro M4 Express",
+  "board": "Adafruit Metro M4",
   "part_number": "3382",
   "revision": "not-stated",
   "mcu_soc": "SAMD51",

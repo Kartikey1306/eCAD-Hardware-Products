@@ -4,7 +4,7 @@
   "board_id": "beagleboard:beagleconnect-freedom",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "BeagleConnect",
-  "board": "BeagleBoard.org beagleconnect freedom",
+  "board": "BeagleBoard.org BeagleConnect Freedom",
   "part_number": "UNVERIFIED",
   "revision": "2.0",
   "mcu_soc": "UNVERIFIED",

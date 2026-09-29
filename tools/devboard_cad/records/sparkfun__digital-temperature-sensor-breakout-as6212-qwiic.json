@@ -4,7 +4,7 @@
   "board_id": "sparkfun:digital-temperature-sensor-breakout-as6212-qwiic",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Qwiic enabled breakout board for the AS6212 digital temperature sensor by AMS",
+  "board": "SparkFun Digital Temperature Sensor Breakout AS6212 Qwiic",
   "part_number": "SEN-18521",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",
