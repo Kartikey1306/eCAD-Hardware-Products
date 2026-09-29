@@ -778,7 +778,8 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      '        "        if (ecad_cycle == 20836) begin",\n'),
     ("dg-byte-count-hard-coded", DG, '        f"            if (ecad_received < {count}) begin",\n',
      '        "            if (ecad_received < 2) begin",\n'),
-    ("dg-marker-dropped", DG, '        \'            $display("ECAD_METRIC rx_framing_errors %0d", ecad_framing_errors);\',\n',
+    ("dg-marker-dropped", DG, '        \'            if (ecad_framing_errors > 0 || ecad_missing == 0) $display("ECAD_METRIC rx_framing_errors %0d", \'\n'
+     '        \'ecad_framing_errors);\',\n',
      ""),
     ("dg-rtl-not-verbatim", DG, '                    "text": leaf.text},\n',
      '                    "text": leaf.text.encode("ascii", "replace").decode("ascii")},\n'),
@@ -805,6 +806,17 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      '            if (False and facet["source"]["ref"] != origin\n'),
     ("dg-v2-harness-position-unchecked", DG, "            if found != HARNESS_SEPARATOR:\n",
      "            if False:\n"),
+    # the digital review (CS-1): a byte that never arrives counts 8 bit errors, and no framing count of 0 stands for it
+    ("dg-missing-bytes-not-counted", DG,
+     '''        '            $display("ECAD_METRIC rx_bit_errors %0d", ecad_bit_errors + 8 * ecad_missing);',\n''',
+     '''        '            $display("ECAD_METRIC rx_bit_errors %0d", ecad_bit_errors);',\n'''),
+    ("dg-framing-reported-while-bytes-missing", DG,
+     '''        '            if (ecad_framing_errors > 0 || ecad_missing == 0) $display("ECAD_METRIC rx_framing_errors %0d", '\n''',
+     '''        '            $display("ECAD_METRIC rx_framing_errors %0d", '\n'''),
+    ("dg-awaited-count-hard-coded", DG, '        f"            if (ecad_received < {count}) ecad_missing = {count} - ecad_received;",\n',
+     '        "            if (ecad_received < 2) ecad_missing = 2 - ecad_received;",\n'),
+    ("dg-v2-awaited-not-compared", DG, '            "bytes awaited": len(sent),\n', ""),
+    ("vg-harness-awaited-count-unbound", VG, r'ecad_missing = \1 - ecad_received;")', r'ecad_missing = [0-9]+ - ecad_received;")'),
     # the digital domain: the registry
     ("digital-unregistered", DR, ',\n                                      "digital": DigitalAdapter()}',
      "}"),

@@ -151,6 +151,7 @@ _BYTE_LINE = re.compile(rf"({_NAME}) <= 8'd([0-9]+);")
 _EXPECTED_ARRAY = re.compile(r"reg +\[7:0\] ecad_expected \[0:([0-9]+)\];")
 _EXPECTED_LINE = re.compile(r"ecad_expected\[([0-9]+)\] = 8'd([0-9]+);")
 _COMPARED_LINE = re.compile(r"if \(ecad_received < ([0-9]+)\) begin")
+_AWAITED_LINE = re.compile(r"if \(ecad_received < ([0-9]+)\) ecad_missing = \1 - ecad_received;")
 _END_LINE = re.compile(r"if \(ecad_cycle == ([0-9]+)\) begin")
 
 # A token: (kind, text, line, value). kind is timescale, keyword, name, number,
@@ -249,8 +250,10 @@ class HarnessView:
     half_period, in the 1 ns time unit), `repeat (N) @(posedge clk);`
     (reset_cycles), each `NAME <= 8'dV;` (stimulus), the `ecad_expected`
     array's `[0:N-1]` (expected_size) and assignments (expected, in index
-    order), `if (ecad_received < N) begin` (compared) and
-    `if (ecad_cycle == N) begin` (end_cycle). metrics are the names of the
+    order), `if (ecad_received < N) begin` (compared),
+    `if (ecad_received < N) ecad_missing = N - ecad_received;` (awaited: the
+    bytes a missing one is counted against) and `if (ecad_cycle == N) begin`
+    (end_cycle). metrics are the names of the
     `$display("ECAD_METRIC <name> %0d"|"%.17g", ...)` declarations in order;
     system_identifiers are the distinct `$` names used, sorted.
     """
@@ -265,6 +268,7 @@ class HarnessView:
     expected: Tuple[int, ...]
     expected_size: int
     compared: int
+    awaited: int
     end_cycle: int
     metrics: Tuple[str, ...]
     system_identifiers: Tuple[str, ...]
@@ -1145,6 +1149,7 @@ def _harness_values(lines: List[str], first: int, last: int, path: str) -> Dict[
     forms = (("clock", _CLOCK_LINE, "always #N clk = ~clk;"), ("reset", _RESET_LINE, "repeat (N) @(posedge clk);"),
              ("array", _EXPECTED_ARRAY, "reg [7:0] ecad_expected [0:N-1];"),
              ("compared", _COMPARED_LINE, "if (ecad_received < N) begin"),
+             ("awaited", _AWAITED_LINE, "if (ecad_received < N) ecad_missing = N - ecad_received;"),
              ("end", _END_LINE, "if (ecad_cycle == N) begin"))
     shapes = {key: shape for key, _, shape in forms}
     for number in range(first, last):
@@ -1177,6 +1182,7 @@ def _harness_values(lines: List[str], first: int, last: int, path: str) -> Dict[
     return {"clock": clock[1], "half_period": int(clock[0]), "reset_cycles": int(reset[0]),
             "stimulus": tuple(stimulus), "expected": tuple(expected),
             "expected_size": int(once["array"][1][0]) + 1, "compared": int(once["compared"][1][0]),
+            "awaited": int(once["awaited"][1][0]),
             "end_cycle": int(once["end"][1][0])}
 
 
@@ -1212,6 +1218,7 @@ def read_harness(text: str, path: str) -> HarnessView:
         ...     "    reg  [7:0] ecad_expected [0:0];", "    initial begin", "        ecad_expected[0] = 8'd53;",
         ...     "    end", "    always @(negedge clk) begin", "        if (ecad_received < 1) begin", "        end",
         ...     "        if (ecad_cycle == 100) begin",
+        ...     "            if (ecad_received < 1) ecad_missing = 1 - ecad_received;",
         ...     '            $display("ECAD_METRIC rx_bytes_received %0d", ecad_received);',
         ...     "            $finish;", "        end", "    end", "endmodule", ""])
         >>> view = read_harness(harness, "h.v")
@@ -1220,7 +1227,7 @@ def read_harness(text: str, path: str) -> HarnessView:
         >>> read_harness(harness.replace("$finish", '$fopen("x")'), "h.v")
         Traceback (most recent call last):
         ...
-        ecad_model.verilog.HdlRefused: h.v:21: $fopen: opens, reads or writes files; the harness uses only ...
+        ecad_model.verilog.HdlRefused: h.v:22: $fopen: opens, reads or writes files; the harness uses only ...
     """
     try:
         data = text.encode("utf-8")

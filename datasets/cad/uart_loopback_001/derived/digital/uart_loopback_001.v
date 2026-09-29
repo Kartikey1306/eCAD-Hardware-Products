@@ -299,6 +299,7 @@ module ecad_harness;
     integer    ecad_received = 0;
     integer    ecad_bit_errors = 0;
     integer    ecad_framing_errors = 0;
+    integer    ecad_missing = 0;
     integer    ecad_k;
     reg  [7:0] ecad_expected [0:1];
     reg  [7:0] ecad_difference;
@@ -343,8 +344,11 @@ module ecad_harness;
             end
             if (ecad_busy_to >= 0) $display("ECAD_METRIC tx_frame_cycles %0d", ecad_busy_to - ecad_busy_from);
             $display("ECAD_METRIC rx_bytes_received %0d", ecad_received);
-            $display("ECAD_METRIC rx_bit_errors %0d", ecad_bit_errors);
-            $display("ECAD_METRIC rx_framing_errors %0d", ecad_framing_errors);
+            // A byte sent that never arrived counts its 8 bits as errors, and a framing-error count of 0 is
+            // not reported while a byte is missing: it says nothing of frames the receiver never finished.
+            if (ecad_received < 2) ecad_missing = 2 - ecad_received;
+            $display("ECAD_METRIC rx_bit_errors %0d", ecad_bit_errors + 8 * ecad_missing);
+            if (ecad_framing_errors > 0 || ecad_missing == 0) $display("ECAD_METRIC rx_framing_errors %0d", ecad_framing_errors);
             if (ecad_unknown_after_reset >= 0) $display("ECAD_METRIC outputs_unknown_after_reset %0d", ecad_unknown_after_reset);
             $finish;
         end

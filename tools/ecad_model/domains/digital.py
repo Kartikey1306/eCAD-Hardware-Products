@@ -69,9 +69,11 @@ METRICS = {
     "tx_bit_rate_bd": Metric("Bd", "SIMPLIFIED", "1 / the simulated duration of that low run"),
     "tx_frame_cycles": Metric("cycles", "SIMPLIFIED", "clock cycles tx_ready stays low for the first byte"),
     "rx_bytes_received": Metric("1", "SIMPLIFIED", "rx_valid pulses before the run ends"),
-    "rx_bit_errors": Metric("bits", "SIMPLIFIED", "bits that differ between each byte sent and the byte received in "
-                                                  "its place"),
-    "rx_framing_errors": Metric("1", "SIMPLIFIED", "rx_error pulses before the run ends"),
+    "rx_bit_errors": Metric("bits", "SIMPLIFIED", "bits of the bytes sent not received as sent: each bit that differs "
+                                                  "between a byte sent and the byte received in its place, and all 8 "
+                                                  "of each byte sent that never arrived"),
+    "rx_framing_errors": Metric("1", "SIMPLIFIED", "rx_error pulses before the run ends; not reported when there are "
+                                                   "none and a byte sent never arrived"),
     "outputs_unknown_after_reset": Metric("1", "SIMPLIFIED", "outputs with an X or Z bit at the first falling edge "
                                                              "after reset is released (4-state simulation only)"),
 }
@@ -551,8 +553,12 @@ def write_harness(model: Dict[str, Any]) -> str:
     tx_ready is high, and measures the nine metrics, sampling every signal on
     the falling clock edge. At END it prints one ``ECAD_METRIC <name> <value>``
     line per metric it observed -- a metric never observed is not printed --
-    and finishes. Its only system identifiers are $display, $finish and
-    $realtime. Signals, parameters and connections are written sorted by name.
+    and finishes. A byte sent that never arrived counts all 8 of its bits in
+    rx_bit_errors, and rx_framing_errors is not printed when it is 0 and a
+    byte never arrived: a count of 0 then says nothing about the frames the
+    receiver never finished. Its only system identifiers are $display,
+    $finish and $realtime. Signals, parameters and connections are written
+    sorted by name.
 
     Args:
         model: An engineering model of this domain.
@@ -618,6 +624,7 @@ def write_harness(model: Dict[str, Any]) -> str:
         "    integer    ecad_received = 0;",
         "    integer    ecad_bit_errors = 0;",
         "    integer    ecad_framing_errors = 0;",
+        "    integer    ecad_missing = 0;",
         "    integer    ecad_k;",
         f"    reg  [7:0] ecad_expected [0:{count - 1}];",
         "    reg  [7:0] ecad_difference;",
@@ -663,8 +670,12 @@ def write_harness(model: Dict[str, Any]) -> str:
         "            end",
         '            if (ecad_busy_to >= 0) $display("ECAD_METRIC tx_frame_cycles %0d", ecad_busy_to - ecad_busy_from);',
         '            $display("ECAD_METRIC rx_bytes_received %0d", ecad_received);',
-        '            $display("ECAD_METRIC rx_bit_errors %0d", ecad_bit_errors);',
-        '            $display("ECAD_METRIC rx_framing_errors %0d", ecad_framing_errors);',
+        "            // A byte sent that never arrived counts its 8 bits as errors, and a framing-error count of 0 is",
+        "            // not reported while a byte is missing: it says nothing of frames the receiver never finished.",
+        f"            if (ecad_received < {count}) ecad_missing = {count} - ecad_received;",
+        '            $display("ECAD_METRIC rx_bit_errors %0d", ecad_bit_errors + 8 * ecad_missing);',
+        '            if (ecad_framing_errors > 0 || ecad_missing == 0) $display("ECAD_METRIC rx_framing_errors %0d", '
+        'ecad_framing_errors);',
         '            if (ecad_unknown_after_reset >= 0) $display("ECAD_METRIC outputs_unknown_after_reset %0d", '
         'ecad_unknown_after_reset);',
         "            $finish;",
@@ -814,11 +825,14 @@ def reference_value(model: Dict[str, Any], derivation: str,
       bit_rate               1 / (2h * D_t), if the first byte is odd;
       frame_cycles           FRAME_BITS * D_t;
       bytes_sent             N, if W holds (see sampling_holds);
-      lossless_loopback      0 bits in error, if W holds;
+      lossless_loopback      0 bits in error or lost, if W holds;
       no_framing_errors      0, if W holds.
 
     The harness measures the line's first low run: with an odd first byte
     that is the start bit alone, with an even one the start bit and bit 0.
+    It counts all 8 bits of a byte that never arrived as bits in error, and
+    reports no framing-error count of 0 while a byte is missing, so the last
+    two forms' 0 also says that every byte arrived.
 
     Args:
         model: An engineering model of this domain.
@@ -1142,6 +1156,7 @@ class DigitalAdapter:
             "expected bytes": list(sent),
             "expected array size": len(sent),
             "bytes compared": len(sent),
+            "bytes awaited": len(sent),
             "end cycle": end_cycle(model),
             "metrics": list(METRICS),
         }
@@ -1156,6 +1171,7 @@ class DigitalAdapter:
             "expected bytes": list(view.expected),
             "expected array size": view.expected_size,
             "bytes compared": view.compared,
+            "bytes awaited": view.awaited,
             "end cycle": view.end_cycle,
             "metrics": list(view.metrics),
         }

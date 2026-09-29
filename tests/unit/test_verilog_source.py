@@ -2,9 +2,10 @@
 
 No simulator is needed. TB, TX and RX are the three sources of the digital
 sample uart_loopback_001 -- its declarative top and its byte copies of
-rtl/uart_tx.v and rtl/uart_rx.v -- and HARNESS is the harness the design has
-the digital domain write for them, all byte for byte: each is checked against
-the digest the design recorded for the files it ran on Icarus Verilog. Every
+rtl/uart_tx.v and rtl/uart_rx.v -- and HARNESS is the harness the digital
+domain writes for them, all byte for byte: the sources are checked against
+the digests the design recorded for the files it ran on Icarus Verilog, and
+HARNESS against the digest of the committed simulation file. Every
 expected module, port, value, line and reason is typed by hand from those
 texts, never obtained by calling the code under test.
 """
@@ -322,8 +323,10 @@ module uart_rx #(
 endmodule
 """.encode("utf-8")
 
-# The harness of the design's section 4.2, lines 242-353 of the simulation file
-# it ran; its bytes are checked through that whole file's digest.
+# The harness of the design's section 4.2 as the review's CS-1 change writes it
+# (a byte that never arrives counts 8 bit errors, and no framing count of 0 is
+# printed then): lines 242-357 of the committed simulation file, its bytes
+# checked through that whole file's digest.
 HARNESS = """// ---- harness ----
 `timescale 1ns / 1ps
 
@@ -384,6 +387,7 @@ module ecad_harness;
     integer    ecad_received = 0;
     integer    ecad_bit_errors = 0;
     integer    ecad_framing_errors = 0;
+    integer    ecad_missing = 0;
     integer    ecad_k;
     reg  [7:0] ecad_expected [0:1];
     reg  [7:0] ecad_difference;
@@ -428,8 +432,11 @@ module ecad_harness;
             end
             if (ecad_busy_to >= 0) $display("ECAD_METRIC tx_frame_cycles %0d", ecad_busy_to - ecad_busy_from);
             $display("ECAD_METRIC rx_bytes_received %0d", ecad_received);
-            $display("ECAD_METRIC rx_bit_errors %0d", ecad_bit_errors);
-            $display("ECAD_METRIC rx_framing_errors %0d", ecad_framing_errors);
+            // A byte sent that never arrived counts its 8 bits as errors, and a framing-error count of 0 is
+            // not reported while a byte is missing: it says nothing of frames the receiver never finished.
+            if (ecad_received < 2) ecad_missing = 2 - ecad_received;
+            $display("ECAD_METRIC rx_bit_errors %0d", ecad_bit_errors + 8 * ecad_missing);
+            if (ecad_framing_errors > 0 || ecad_missing == 0) $display("ECAD_METRIC rx_framing_errors %0d", ecad_framing_errors);
             if (ecad_unknown_after_reset >= 0) $display("ECAD_METRIC outputs_unknown_after_reset %0d", ecad_unknown_after_reset);
             $finish;
         end
@@ -445,12 +452,12 @@ RX_PATH = SAMPLE + "source/uart_rx.v"
 TB_SHA256 = "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
 TX_SHA256 = "5be9e1bdd20b37a3b79cb40c98fbfe241e8d6faca5ecb443b0e93378d7b4f01a"
 RX_SHA256 = "c1bebcc6e894e86abd4b39af5501031b8c817f4395048ef65059eebfb710ab81"
-# The whole simulation file the design ran (its section 4.1): two header lines,
-# each leaf behind its separator, then HARNESS.
+# The whole committed simulation file (the design's section 4.1): two header
+# lines, each leaf behind its separator, then HARNESS.
 SIMULATION_HEADER = ("// uart_loopback_001: the RTL of tb_uart_loopback verbatim, then the harness the digital domain "
                      "writes from the model\n// written by ecad_model.domains.digital 1.0.0 from "
                      "derived/engineering_model.json; regenerate with build, never edit\n")
-SIMULATION_SHA256 = "191bd8f16c0167764878d099ac5a1fc8c4a2e509e06e433997452cb5944d3e84"
+SIMULATION_SHA256 = "597eebf2679d10a236d344a6df5ff5d0fb4573ca0a863cf1b94bfdde3a94fd83"
 METRICS = ("clock_period_s", "tx_idle_after_reset", "tx_bit_cycles", "tx_bit_rate_bd", "tx_frame_cycles",
            "rx_bytes_received", "rx_bit_errors", "rx_framing_errors", "outputs_unknown_after_reset")
 
@@ -1072,7 +1079,7 @@ class TestVerilogGrammar(unittest.TestCase):
                              for path, digest, data in ((TX_PATH, TX_SHA256, TX), (RX_PATH, RX_SHA256, RX)))
         simulation = (SIMULATION_HEADER + separators + HARNESS).encode("utf-8")
         self.assertEqual(hashlib.sha256(simulation).hexdigest(), SIMULATION_SHA256)
-        self.assertEqual((len(simulation), simulation.count(b"\n")), (12852, 353))
+        self.assertEqual((len(simulation), simulation.count(b"\n")), (13240, 357))
 
         view = verilog.read_harness(HARNESS, "derived/digital/uart_loopback_001.v")
         self.assertEqual(list(view.signals.items()), [
@@ -1090,42 +1097,42 @@ class TestVerilogGrammar(unittest.TestCase):
                               "rx_error": "rx_error", "rx_valid": "rx_valid"}, 17)))
         self.assertEqual((view.clock, view.half_period, view.reset_cycles), ("clk", 10, 4))
         self.assertEqual(view.stimulus, (("tx_data", 53), ("tx_data", 202)))
-        self.assertEqual((view.expected, view.expected_size, view.compared), ((53, 202), 2, 2))
+        self.assertEqual((view.expected, view.expected_size, view.compared, view.awaited), ((53, 202), 2, 2, 2))
         self.assertEqual(view.end_cycle, 20836)
         self.assertEqual(view.metrics, METRICS)
         self.assertEqual(view.system_identifiers, ("$display", "$finish", "$realtime"))
 
-        finish = "            $finish;\n"  # line 108
+        finish = "            $finish;\n"  # line 112
         for old, new, expected in (
-                (finish, '            $fopen("x", "w");\n' + finish, f"h.v:108: $fopen: {FILES}{HARNESS_ONLY}"),
+                (finish, '            $fopen("x", "w");\n' + finish, f"h.v:112: $fopen: {FILES}{HARNESS_ONLY}"),
                 (finish, '            $readmemh("/etc/hosts", ecad_expected);\n' + finish,
-                 f"h.v:108: $readmemh: {FILES}{HARNESS_ONLY}"),
-                (finish, '            $system("true");\n' + finish, f"h.v:108: $system: runs a shell command{HARNESS_ONLY}"),
-                (finish, "            $stop;\n" + finish, f"h.v:108: $stop: {RUN_CONTROL}{HARNESS_ONLY}"),
+                 f"h.v:112: $readmemh: {FILES}{HARNESS_ONLY}"),
+                (finish, '            $system("true");\n' + finish, f"h.v:112: $system: runs a shell command{HARNESS_ONLY}"),
+                (finish, "            $stop;\n" + finish, f"h.v:112: $stop: {RUN_CONTROL}{HARNESS_ONLY}"),
                 (finish, "            case (ecad_k) default: ecad_k = 0; endcase\n" + finish,
-                 "h.v:108: case: not in the harness, which declares signals and instances, then measures"),
-                (finish, "            fork join\n" + finish, f"h.v:108: fork: {SUBSET}"),
-                (finish, '            import "DPI-C" function int getpid();\n' + finish, f"h.v:108: import: {C_CODE}"),
-                (finish, "            module inner;\n" + finish, "h.v:108: a second module: the harness is one "
+                 "h.v:112: case: not in the harness, which declares signals and instances, then measures"),
+                (finish, "            fork join\n" + finish, f"h.v:112: fork: {SUBSET}"),
+                (finish, '            import "DPI-C" function int getpid();\n' + finish, f"h.v:112: import: {C_CODE}"),
+                (finish, "            module inner;\n" + finish, "h.v:112: a second module: the harness is one "
                                                                   "module, ecad_harness"),
                 ("module ecad_harness;\n", "module ecad_harness;\n`timescale 1ns / 1ps\n",
                  "h.v:5: `timescale: compiler directive: only one"),
                 ("module ecad_harness;\n", 'module ecad_harness;\n`include "x.v"\n', "h.v:5: `include: reads another file"),
                 ("module ecad_harness;", "module harness;", "h.v:4: the harness module is ecad_harness, not harness"),
                 ('"ECAD_METRIC rx_bit_errors %0d"', '"rx_bit_errors %0d"',
-                 'h.v:105: "rx_bit_errors %0d": a string other than an ECAD_METRIC declaration'),
+                 'h.v:109: "rx_bit_errors %0d": a string other than an ECAD_METRIC declaration'),
                 ('"ECAD_METRIC rx_bit_errors %0d"', '"ECAD_METRIC rx_bit_errors %d"',
-                 'h.v:105: "ECAD_METRIC rx_bit_errors %d": a string other than an ECAD_METRIC declaration'),
+                 'h.v:109: "ECAD_METRIC rx_bit_errors %d": a string other than an ECAD_METRIC declaration'),
                 ('"ECAD_METRIC rx_bit_errors %0d"', '"ECAD_METRIC rx_bit_errors %0d\\n"',
-                 "h.v:105: an unterminated string, or one with a backslash escape"),
+                 "h.v:109: an unterminated string, or one with a backslash escape"),
                 ("    // ecad: clock, stimulus and measurements\n", '    // $display("ECAD_METRIC rx_bit_errors %0d", 0);\n',
                  "h.v:19: ECAD_METRIC: reserved for the harness's metric markers"),
                 ("        ecad_line_before = line;\n", '        ecad_line_before = "ECAD_METRIC rx_bit_errors %0d";\n',
-                 'h.v:94: "ECAD_METRIC rx_bit_errors %0d": an ECAD_METRIC declaration stands in $display( ) only'),
+                 'h.v:95: "ECAD_METRIC rx_bit_errors %0d": an ECAD_METRIC declaration stands in $display( ) only'),
                 ("    // ecad: clock, stimulus and measurements\n", "    /* ECAD_METRIC */\n",
                  "h.v:19: ECAD_METRIC: reserved for the harness's metric markers"),
                 ("    integer    ecad_k;", "    integer    ECAD_METRIC_k;",
-                 "h.v:61: ECAD_METRIC_k: ECAD_METRIC is reserved for the harness's metric markers"),
+                 "h.v:62: ECAD_METRIC_k: ECAD_METRIC is reserved for the harness's metric markers"),
                 ("    reg        clk = 1'b0;\n", "    localparam K = 1;\n    reg        clk = 1'b0;\n",
                  "h.v:6: a localparam in the harness: it writes every value as a literal"),
                 ("uart_tx #(.BAUD_RATE(115200)", "uart_tx #(.BAUD_RATE(BAUD)",
@@ -1141,18 +1148,25 @@ class TestVerilogGrammar(unittest.TestCase):
                  "h.v: no line of the form 'always #N clk = ~clk;'"),
                 ("        if (ecad_cycle == 20836) begin", "        if (ecad_cycle >= 20836) begin",
                  "h.v: no line of the form 'if (ecad_cycle == N) begin'"),
+                # The count a missing byte is taken from is one number, stated once.
+                ("ecad_missing = 2 - ecad_received;", "ecad_missing = 3 - ecad_received;",
+                 "h.v: no line of the form 'if (ecad_received < N) ecad_missing = N - ecad_received;'"),
+                ("            if (ecad_received < 2) ecad_missing = 2 - ecad_received;\n",
+                 "            if (ecad_received < 2) ecad_missing = 2 - ecad_received;\n" * 2,
+                 "h.v:109: a second line of the form 'if (ecad_received < N) ecad_missing = N - ecad_received;'; "
+                 "the first is line 108"),
                 ("        repeat (4) @(posedge clk);", "        repeat (4) @(posedge rst_n);",
                  "h.v:23: the reset waits on posedge rst_n, not on the clock clk"),
                 ("        ecad_expected[0] = 8'd53;\n        ecad_expected[1] = 8'd202;\n",
                  "        ecad_expected[1] = 8'd202;\n        ecad_expected[0] = 8'd53;\n",
-                 "h.v:65: ecad_expected[1]: the expected bytes are assigned in index order, and the next is [0]"),
-                ("\nendmodule\n", "\n    end endmodule\n", "h.v:112: endmodule stands on a line of its own")):
+                 "h.v:66: ecad_expected[1]: the expected bytes are assigned in index order, and the next is [0]"),
+                ("\nendmodule\n", "\n    end endmodule\n", "h.v:116: endmodule stands on a line of its own")):
             with self.subTest(new=new):
                 self.refused_harness(edit(HARNESS.encode("utf-8"), old, new).decode("utf-8"), expected)
         self.refused_harness(HARNESS + "module ecad_extra;\nendmodule\n",
-                             "h.v:113: a second module: the harness is one module, ecad_harness")
-        self.refused_harness(HARNESS + "wire stray;\n", "h.v:113: text after endmodule: 'wire'")
-        self.refused_harness(HARNESS[:-len("endmodule\n")], "h.v:111: module ecad_harness has no endmodule")
+                             "h.v:117: a second module: the harness is one module, ecad_harness")
+        self.refused_harness(HARNESS + "wire stray;\n", "h.v:117: text after endmodule: 'wire'")
+        self.refused_harness(HARNESS[:-len("endmodule\n")], "h.v:115: module ecad_harness has no endmodule")
         self.refused_harness(HARNESS.replace("\n", "\r\n"), "h.v:1: a carriage return: lines end in LF only")
 
     def test_what_icarus_was_seen_to_run_or_read_is_refused(self):

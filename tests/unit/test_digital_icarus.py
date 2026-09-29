@@ -10,8 +10,10 @@ silent where it matters.
 Expected values are typed by hand from the sources and the closed forms of
 the design (§5.3, §6.4), and, for the copies whose metrics no closed form
 predicts, from Icarus Verilog 13.0's own output on macOS arm64, 2026-09-27
-(design-digital.md §5.4 and §6.4), never obtained by calling the code under
-test. Every sample copy is a fixture in a scratch directory.
+(design-digital.md §5.4 and §6.4) and, for the harness as the review's CS-1
+change writes it, 2026-09-29, never obtained by calling the code under test.
+A metric expected as None is one the harness does not print. Every sample
+copy is a fixture in a scratch directory.
 """
 
 from __future__ import annotations
@@ -25,7 +27,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -45,6 +47,8 @@ V4_COMMITTED = {**{f"v4.REQ-DIG-00{n}": ("WARNING", "WITHIN_ILLUSTRATIVE_LIMIT")
 NOT_APPLICABLE = ("BLOCKED", "REFERENCE_NOT_APPLICABLE")
 GOLDEN_FAILED = ("FAIL", "GOLDEN_COMPARISON_FAILED")
 CORNER_FAILED = ("FAIL", "CORNER_LIMITS_FAILED")
+GOLDEN_INCONCLUSIVE = ("INCONCLUSIVE", "GOLDEN_METRICS_INCONCLUSIVE")
+CORNER_INCONCLUSIVE = ("INCONCLUSIVE", "CORNER_METRICS_INCONCLUSIVE")
 
 
 def require_icarus() -> Any:
@@ -170,7 +174,7 @@ class TestRealIcarus(unittest.TestCase):
                              ("CLK_FREQ           = 50_000_000;", "CLK_FREQ           = 20_000_000;")]},
                        {"clock_period_s": 4.9999999999999998e-08, "tx_bit_cycles": 173.0,
                         "tx_bit_rate_bd": 115606.93641618497, "tx_frame_cycles": 1730.0, "rx_bytes_received": 1.0,
-                        "rx_bit_errors": 7.0, "rx_framing_errors": 1.0},
+                        "rx_bit_errors": 15.0, "rx_framing_errors": 1.0},
                        [], {**V3_PASSED, **{f"v3.REF-DIG-00{n}": NOT_APPLICABLE for n in (6, 7, 8)}},
                        {**V4_COMMITTED, **{f"v4.REQ-DIG-00{n}": CORNER_FAILED for n in (3, 4, 5)}}),
             # The instances are told 40 MHz, the harness drives 50 MHz: V1's clock rule.
@@ -179,13 +183,15 @@ class TestRealIcarus(unittest.TestCase):
                 {"tx_bit_cycles": 347.0, "tx_bit_rate_bd": 144092.21902017292, "tx_frame_cycles": 3470.0},
                 [f"u_tx CLK_FREQ 40000000 {told}", f"u_rx CLK_FREQ 40000000 {told}"], V3_PASSED,
                 {**V4_COMMITTED, "v4.REQ-DIG-002": CORNER_FAILED}),
-            # The receiver alone at 57 600 Bd: W fails at D_r = 54.
+            # The receiver alone at 57 600 Bd: W fails at D_r = 54. One byte of two arrives with 4 bits wrong, and
+            # the missing one's 8 count too; with a byte missing and no framing error, no framing count is printed.
             "receiver at 57600 Bd": (
                 {TB: ("uart_rx #(.CLK_FREQ(CLK_FREQ), .BAUD_RATE(BAUD_RATE)) u_rx",
                       "uart_rx #(.CLK_FREQ(CLK_FREQ), .BAUD_RATE(57_600)) u_rx")},
-                {"rx_bytes_received": 1.0, "rx_bit_errors": 4.0, "rx_framing_errors": 0.0},
+                {"rx_bytes_received": 1.0, "rx_bit_errors": 12.0, "rx_framing_errors": None},
                 [], {**V3_PASSED, **{f"v3.REF-DIG-00{n}": NOT_APPLICABLE for n in (6, 7, 8)}},
-                {**V4_COMMITTED, **{f"v4.REQ-DIG-00{n}": CORNER_FAILED for n in (3, 4)}}),
+                {**V4_COMMITTED, **{f"v4.REQ-DIG-00{n}": CORNER_FAILED for n in (3, 4)},
+                 "v4.REQ-DIG-005": CORNER_INCONCLUSIVE}),
         }
         for label, (edits, metrics, sanity, v3, v4) in copies.items():
             with self.subTest(label), helpers._scratch() as directory:
@@ -197,7 +203,7 @@ class TestRealIcarus(unittest.TestCase):
                 self.assertEqual(_outcomes(checks, "v3."), v3)
                 self.assertEqual(_outcomes(checks, "v4."), v4)
                 measured = checks["v3.REF-DIG-001"]["metrics"]
-                self.assertEqual({metric: measured[metric] for metric in metrics}, metrics)
+                self.assertEqual({metric: measured.get(metric) for metric in metrics}, metrics)
 
     def test_rtl_defects_fail_their_references(self):
         """The §5.4 copies: an RTL defect changes the metrics a reference or requirement checks. The last row
@@ -205,7 +211,7 @@ class TestRealIcarus(unittest.TestCase):
         framing check changes nothing."""
         helpers = _helpers()
         passed = {**V3_PASSED, **V4_COMMITTED}
-        defects: Dict[str, Tuple[Any, List[str], Dict[str, float], Dict[str, Tuple[str, str]]]] = {
+        defects: Dict[str, Tuple[Any, List[str], Dict[str, Optional[float]], Dict[str, Tuple[str, str]]]] = {
             "the receiver's bit order reversed": (
                 {RX: ("shift_reg[bit_idx] <= rx_sync;", "shift_reg[7 - bit_idx] <= rx_sync;")}, [RX],
                 {"rx_bit_errors": 8.0}, {**passed, "v3.REF-DIG-007": GOLDEN_FAILED, "v4.REQ-DIG-004": CORNER_FAILED}),
@@ -216,6 +222,14 @@ class TestRealIcarus(unittest.TestCase):
                       "    localparam [7:0] TX_BYTE_0    = 8'hA5;\n"),
                  RX: ("shift_reg[bit_idx] <= rx_sync;", "shift_reg[7 - bit_idx] <= rx_sync;")}, [RX],
                 {"rx_bytes_received": 1.0, "rx_bit_errors": 0.0, "tx_bit_cycles": 434.0}, passed),
+            # Review CS-1: a receiver that delivers no byte. Before, the harness counted bit errors only in bytes
+            # that arrived and printed 0 framing errors, so REF-DIG-007/008 and REQ-DIG-004/005 passed.
+            "the receiver never sets rx_valid": (
+                {RX: ("                                rx_valid <= 1;", "                                rx_valid <= 0;")},
+                [RX], {"rx_bytes_received": 0.0, "rx_bit_errors": 16.0, "rx_framing_errors": None},
+                {**passed, "v3.REF-DIG-006": GOLDEN_FAILED, "v3.REF-DIG-007": GOLDEN_FAILED,
+                 "v3.REF-DIG-008": GOLDEN_INCONCLUSIVE, "v4.REQ-DIG-003": CORNER_FAILED,
+                 "v4.REQ-DIG-004": CORNER_FAILED, "v4.REQ-DIG-005": CORNER_INCONCLUSIVE}),
             "the transmitter's divider off by one": (
                 {TX: [("if (baud_cnt == BAUD_DIV - 1) begin\n                        baud_cnt <= 0;\n"
                        "                        bit_idx  <= 0;",
@@ -248,7 +262,7 @@ class TestRealIcarus(unittest.TestCase):
                     self.assertEqual(checks[check_id]["verdict"], "PASS", checks[check_id]["findings"])
                 self.assertEqual({**_outcomes(checks, "v3."), **_outcomes(checks, "v4.")}, outcomes)
                 measured = checks["v3.REF-DIG-001"]["metrics"]
-                self.assertEqual({metric: measured[metric] for metric in metrics}, metrics)
+                self.assertEqual({metric: measured.get(metric) for metric in metrics}, metrics)
 
     def test_the_limit_boundaries_with_real_icarus(self):
         helpers = _helpers()

@@ -7,8 +7,9 @@ These tests need neither a CAD kernel nor Icarus Verilog. Where a case must
 "run", a stand-in for the Icarus adapter answers the simulation file with
 one of RECORDED_STDOUT, read through the real adapter's own parser: the
 output Icarus Verilog 13.0 printed through the real adapter on macOS arm64
-on 2026-09-27 (identical over two runs, empty stderr), whose ECAD_METRIC lines
-are identical on Icarus 11.0, ubuntu:22.04 arm64 (design-digital.md §4.2).
+on 2026-09-29 (identical over two runs, empty stderr) for the simulation
+file as the review's CS-1 change writes it, whose ECAD_METRIC lines are
+identical on Icarus 11.0 (apt 11.0-1.1, ubuntu:22.04 arm64, 2026-09-29).
 tests/unit/test_digital_icarus.py runs the real Icarus.
 
 Expected values are typed by hand from the source texts and the closed forms
@@ -45,7 +46,7 @@ ANNOTATIONS_REF = f"{SAMPLE}/design/annotations.json"
 TB_SHA256 = "2962c844a2191ab756ad190e184365ab1893650ae67fee5a078b610ff7719fed"
 TX_SHA256 = "5be9e1bdd20b37a3b79cb40c98fbfe241e8d6faca5ecb443b0e93378d7b4f01a"
 RX_SHA256 = "c1bebcc6e894e86abd4b39af5501031b8c817f4395048ef65059eebfb710ab81"
-SIM_SHA256 = "191bd8f16c0167764878d099ac5a1fc8c4a2e509e06e433997452cb5944d3e84"
+SIM_SHA256 = "597eebf2679d10a236d344a6df5ff5d0fb4573ca0a863cf1b94bfdde3a94fd83"
 LICENSE_SHA256 = "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"
 EMPTY_SET = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 DEVICE_LIMIT = "components/target_device/domains/digital/min_clock_period"
@@ -60,16 +61,17 @@ METRICS = ("clock_period_s", "tx_idle_after_reset", "tx_bit_cycles", "tx_bit_rat
 
 def _stdout(values: Sequence[str], finished_at: str) -> str:
     return "".join(f"ECAD_METRIC {name} {value}\n" for name, value in zip(METRICS, values)) + (
-        f"{SIM}:349: $finish called at {finished_at} (1ps)\n")
+        f"{SIM}:353: $finish called at {finished_at} (1ps)\n")
 
 
-# Icarus Verilog 13.0, macOS arm64, 2026-09-27, through the real adapter; identical
+# Icarus Verilog 13.0, macOS arm64, 2026-09-29, through the real adapter; identical
 # ECAD_METRIC lines on 11.0, ubuntu:22.04 arm64. The committed file, BAUD_RATE =
-# 230_400, and CLK_HALF_PERIOD_NS = 25 with CLK_FREQ = 20_000_000.
+# 230_400, and CLK_HALF_PERIOD_NS = 25 with CLK_FREQ = 20_000_000, whose one
+# missing byte counts 8 of its 15 bit errors.
 RECORDED_STDOUT = {
     "committed": _stdout(("2e-08", "1", "434", "115207.3732718894", "4340", "2", "0", "0", "0"), "416720000"),
     "baud230400": _stdout(("2e-08", "1", "217", "230414.74654377881", "2170", "2", "0", "0", "0"), "208400000"),
-    "clk20m": _stdout(("4.9999999999999998e-08", "1", "173", "115606.93641618497", "1730", "1", "7", "1", "0"),
+    "clk20m": _stdout(("4.9999999999999998e-08", "1", "173", "115606.93641618497", "1730", "1", "15", "1", "0"),
                       "415400000"),
 }
 # Typed from the committed lines above.
@@ -670,7 +672,7 @@ class TestSimulationFile(unittest.TestCase):
                     + (ITEM / RX).read_bytes().decode("utf-8") + HARNESS)
         self.assertEqual(data.decode("utf-8"), expected)
         lines = data.decode("utf-8").split("\n")
-        self.assertEqual((len(data), len(lines) - 1), (12852, 353))
+        self.assertEqual((len(data), len(lines) - 1), (13240, 357))
         self.assertEqual([number for number, line in enumerate(lines, start=1) if line.startswith("// ---- ")],
                          [3, 115, 242])
         with _scratch() as directory:
@@ -689,6 +691,7 @@ class TestSimulationFile(unittest.TestCase):
         self.assertIn("        ecad_expected[0] = 8'd53;\n        ecad_expected[1] = 8'd202;\n"
                       "        ecad_expected[2] = 8'd90;\n    end\n", three)
         self.assertIn("            if (ecad_received < 3) begin\n", three)
+        self.assertIn("            if (ecad_received < 3) ecad_missing = 3 - ecad_received;\n", three)
         # END = 4 + (3 + 2) * 12 * (50e6 // 9600 = 5208)
         self.assertIn("        if (ecad_cycle == 312484) begin\n", three)
         self.assertIn("    uart_tx #(.BAUD_RATE(9600), .CLK_FREQ(50000000)) u_tx (", three)
@@ -698,7 +701,8 @@ class TestSimulationFile(unittest.TestCase):
         model = _model()
         data = (ITEM / SIM).read_bytes()
         self.assertEqual(adapter.invariant_problems(model, {}, {SIM: data}), [])
-        display = '            $display("ECAD_METRIC rx_framing_errors %0d", ecad_framing_errors);\n'
+        display = ('            if (ecad_framing_errors > 0 || ecad_missing == 0) $display("ECAD_METRIC rx_framing_errors %0d", '
+                   'ecad_framing_errors);\n')
         edits = {
             # uart_tx.v line 53 is line 56 of the file: two header lines and a separator come first.
             "one RTL byte": ("1'b1;   // Idle line is high", "1'b0;   // Idle line is high",
@@ -712,6 +716,9 @@ class TestSimulationFile(unittest.TestCase):
             "an expected byte": ("ecad_expected[1] = 8'd202;", "ecad_expected[1] = 8'd203;",
                                  "the harness's expected bytes [53, 203] != the model's [53, 202]"),
             "the end": ("ecad_cycle == 20836", "ecad_cycle == 20835", "the harness's end cycle 20835 != the model's 20836"),
+            "the bytes a missing one is counted against": (
+                "if (ecad_received < 2) ecad_missing = 2 - ecad_received;",
+                "if (ecad_received < 1) ecad_missing = 1 - ecad_received;", "the harness's bytes awaited 1 != the model's 2"),
             "a dropped $display": (display, "", "declares the metrics ['clock_period_s'"),
             "a duplicated $display": (display, display + display, "and ['rx_framing_errors'] more than once"),
             "an inserted $fopen": ("            $finish;\n", '            $fopen("x");\n            $finish;\n',
@@ -720,7 +727,7 @@ class TestSimulationFile(unittest.TestCase):
                                      "'rx': 'tx_valid'"),
             # Only the writer's own text says where the harness samples: nothing the reader reads changes.
             "the sampling edge": ("    always @(negedge clk) begin", "    always @(posedge clk) begin",
-                                  f"{SIM}:311: the harness differs from the one this adapter writes from the model: "
+                                  f"{SIM}:312: the harness differs from the one this adapter writes from the model: "
                                   "'    always @(posedge clk) begin', not '    always @(negedge clk) begin'"),
             "a wrong separator hash": (f"sha256 {RX_SHA256}", f"sha256 {TX_SHA256}",
                                        "is not line 115 of what the model holds (the separator before u_rx's text"),
@@ -1109,7 +1116,7 @@ class TestVerdicts(unittest.TestCase):
             **V4_WARNED, **V4_BLOCKED, **{f"v4.REQ-DIG-00{n}": ("FAIL", "CORNER_LIMITS_FAILED") for n in (3, 4, 5)}})
         self.assertEqual({metric: checks["v4.REQ-DIG-004"]["metrics"][metric]
                           for metric in ("rx_bytes_received", "rx_bit_errors", "rx_framing_errors")},
-                         {"rx_bytes_received": 1.0, "rx_bit_errors": 7.0, "rx_framing_errors": 1.0})
+                         {"rx_bytes_received": 1.0, "rx_bit_errors": 15.0, "rx_framing_errors": 1.0})
 
     def test_the_limit_boundaries_are_exact(self):
         """The recorded 115207.3732718894 Bd against limits one float away; a tolerance is folded into the bound."""

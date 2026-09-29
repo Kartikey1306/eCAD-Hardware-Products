@@ -30,8 +30,8 @@
       "artifact": {
         "media_type": "text/x-verilog",
         "path": "derived/digital/uart_loopback_001.v",
-        "sha256": "191bd8f16c0167764878d099ac5a1fc8c4a2e509e06e433997452cb5944d3e84",
-        "size_bytes": 12852
+        "sha256": "597eebf2679d10a236d344a6df5ff5d0fb4573ca0a863cf1b94bfdde3a94fd83",
+        "size_bytes": 13240
       },
       "derived_from": [
         "derived/engineering_model.json"
@@ -127,7 +127,7 @@
       "status": "NOT_IMPLEMENTED"
     }
   ],
-  "hash": "sha256:9f8c691f85012c5887800da7d152239a2a953f9ccdb40f945c4473d4ab24f0bb",
+  "hash": "sha256:7c75394b620f93f9259a93a355c34dec3b82580e0748d1fb6480fddae8ecbef8",
   "inputs": {
     "annotations": {
       "media_type": "application/json",
@@ -144,8 +144,8 @@
     "requirements": {
       "media_type": "application/json",
       "path": "requirements/requirements.json",
-      "sha256": "b65f1f79788e0c216a0da7d0f12a677279ca404795522794aea6f72855c79c28",
-      "size_bytes": 8639
+      "sha256": "ad4720515212284843ffd0be7dd2ec4dc81c5d34c8b49e0d2fd60556eb73e4a4",
+      "size_bytes": 8647
     },
     "simulation": []
   },

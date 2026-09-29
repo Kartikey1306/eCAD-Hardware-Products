@@ -195,7 +195,7 @@
     },
     {
       "requirement_id": "REQ-DIG-004",
-      "title": "No bit is received wrong",
+      "title": "No bit is lost or received wrong",
       "domain": "digital",
       "component": "u_rx",
       "metric": "rx_bit_errors",
