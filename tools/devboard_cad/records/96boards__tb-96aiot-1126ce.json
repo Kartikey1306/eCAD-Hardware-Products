@@ -1,0 +1,97 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "96boards:tb-96aiot-1126ce",
+  "manufacturer": "UNVERIFIED",
+  "family": "96Boards",
+  "board": "Tb 96Aiot 1126Ce",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "schematic": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96aiot-1126ce/hardware-docs/files/tb-96aiot-1126ce-schematics.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:20Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96aiot-1126ce/hardware-docs/files/tb-96aiot-1126ce-schematics.pdf",
+        "sha256": "a4ad7dae00d40debf7e71b5874d4c106f27da93b3b3badb8631113407a3b9d9c",
+        "size_bytes": 469560,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96aiot-1126ce/hardware-docs/files/tb-96aiot-1126ce-hardware-user-manual.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:21Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96aiot-1126ce/hardware-docs/files/tb-96aiot-1126ce-hardware-user-manual.pdf",
+        "sha256": "661d60dd09f62a57c148ebcfc2e10e7a79ecade1e7b70edfa424f94c3a43f7e3",
+        "size_bytes": 910151,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "community",
+    "official_product_page": "https://www.96boards.org/product/tb-96aiot-1126ce/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://github.com/96boards/documentation",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96aiot-1126ce/hardware-docs/files/tb-96aiot-1126ce-schematics.pdf",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from 96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7."
+}

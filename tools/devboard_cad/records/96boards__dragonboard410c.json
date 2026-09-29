@@ -1,0 +1,107 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "96boards:dragonboard410c",
+  "manufacturer": "Arrow Electronics",
+  "family": "96Boards",
+  "board": "DragonBoard 410c",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "Qualcomm APQ8016E",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "bom": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/DragonBoard410c_BOM.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:03Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/DragonBoard410c_BOM.pdf",
+        "sha256": "1997143fb0d319ab361a19525b5197c8ea28a15a5442aa06a8d9ea42be49d163",
+        "size_bytes": 71815,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/Schematics_DragonBoard.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:03Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/Schematics_DragonBoard.pdf",
+        "sha256": "6c8ffb114833b2984bda58f26773e9fc617f4e202f4ba5fe20449578d4d66287",
+        "size_bytes": 952772,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/HardwareManual_DragonBoard.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:03Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/HardwareManual_DragonBoard.pdf",
+        "sha256": "ba89dee337ccbb5dbd503b23e1d988372ef8e08e674deccd4cea5eac4f9db4ea",
+        "size_bytes": 1875260,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "community",
+    "official_product_page": "https://www.96boards.org/product/dragonboard410c/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://github.com/96boards/documentation",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/Schematics_DragonBoard.pdf",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from 96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7."
+}

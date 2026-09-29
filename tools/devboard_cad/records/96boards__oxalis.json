@@ -1,0 +1,97 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "96boards:oxalis",
+  "manufacturer": "Arrow Electronics",
+  "family": "96Boards",
+  "board": "Oxalis",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "NXP LS1012A",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "schematic": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/enterprise/oxalis/hardware-docs/files/oxalis-schematics.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/enterprise/oxalis/hardware-docs/files/oxalis-schematics.pdf",
+        "sha256": "cc7168e500bc1a2c651c447ad74acda96ca88f2fae05e3cb2ae234fd2cece82d",
+        "size_bytes": 5922243,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/enterprise/oxalis/hardware-docs/files/oxalis-test-suite-user-manual-v003.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:47:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://raw.githubusercontent.com/96boards/documentation/6d1bfef069e6462cbd34de6fc34793db73f88cf7/enterprise/oxalis/hardware-docs/files/oxalis-test-suite-user-manual-v003.pdf",
+        "sha256": "5d9020c3fb8c0c6f69e9c43c8ad9c7d4fd8dc8856da21a9ce0d6adce2b4a13c3",
+        "size_bytes": 891936,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "community",
+    "official_product_page": "https://www.96boards.org/product/oxalis/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://github.com/96boards/documentation",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/enterprise/oxalis/hardware-docs/files/oxalis-schematics.pdf",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from 96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7."
+}

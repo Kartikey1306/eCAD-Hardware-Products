@@ -886,6 +886,429 @@
         "pcb_source": "https://www.ti.com/lit/zip/TIDC179",
         "bom": "https://www.ti.com/lit/zip/TIDR339"
       }
+    },
+    {
+      "board_id": "96boards:aiml",
+      "manufacturer": "Thundercomm",
+      "family": "96Boards",
+      "board": "96Boards AI/ML Board",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Qualcomm QCS403",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/aiml/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/aiml/hardware-docs/files/aiml-hw-user-guide.pdf",
+        "datasheet": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/aiml/hardware-docs/files/aiml-product-brief.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/aiml/hardware-docs/files/aiml-sch.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:akebi96",
+      "manufacturer": "Socionext",
+      "family": "96Boards",
+      "board": "Akebi96",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Socionext SC2A11",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/akebi96/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/enterprise/akebi96/hardware-docs/akebi96-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:avenger96",
+      "manufacturer": "Arrow Electronics",
+      "family": "96Boards",
+      "board": "Avenger96",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "STMicroelectronics STM32MP157A",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/avenger96/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/avenger96/hardware-docs/files/avenger96-hardware-user-manual.pdf",
+        "datasheet": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/avenger96/hardware-docs/files/avenger96-product-brief.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/avenger96/hardware-docs/files/avenger96-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:b2260",
+      "manufacturer": "STMicroelectronics",
+      "family": "96Boards",
+      "board": "B2260 (96Boards CE)",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "STiH410",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/b2260/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "bom": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/b2260/hardware-docs/B2260_BOM.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:bubblegum-96",
+      "manufacturer": "uCRobotics",
+      "family": "96Boards",
+      "board": "Bubblegum-96",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Actions Semiconductor S900",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/bubblegum-96/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/bubblegum-96/hardware-docs/HardwareManual_Bubblegum96_S900_V1.1.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/bubblegum-96/hardware-docs/Schematics_Bubblegum96.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:chameleon96",
+      "manufacturer": "Novtech",
+      "family": "96Boards",
+      "board": "Chameleon96",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Intel Cyclone V SoC",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/chameleon96/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/chameleon96/hardware-docs/files/chameleon96-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:db4",
+      "manufacturer": "UNVERIFIED",
+      "family": "96Boards",
+      "board": "Db4",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "UNVERIFIED",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/db4/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/db4/hardware-docs/files/db4-hw-user-guide.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/db4/hardware-docs/files/db4-sch.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:dragonboard410c",
+      "manufacturer": "Arrow Electronics",
+      "family": "96Boards",
+      "board": "DragonBoard 410c",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Qualcomm APQ8016E",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/dragonboard410c/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "bom": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/DragonBoard410c_BOM.pdf",
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/HardwareManual_DragonBoard.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard410c/hardware-docs/Schematics_DragonBoard.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:dragonboard820c",
+      "manufacturer": "Arrow Electronics",
+      "family": "96Boards",
+      "board": "DragonBoard 820c",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Qualcomm APQ8096SG",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/dragonboard820c/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard820c/hardware-docs/files/db820c-hw-user-manual.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard820c/hardware-docs/files/db820c-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:dragonboard845c",
+      "manufacturer": "UNVERIFIED",
+      "family": "96Boards",
+      "board": "Dragonboard845C",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "UNVERIFIED",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/dragonboard845c/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard845c/hardware-docs/files/db845c-main-schematic.pdf",
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/dragonboard/dragonboard845c/hardware-docs/files/rb3-hardware-user-manual.PDF"
+      }
+    },
+    {
+      "board_id": "96boards:e850-96b",
+      "manufacturer": "WinLink",
+      "family": "96Boards",
+      "board": "E850-96 Board",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Samsung Exynos 850",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/e850-96b/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/e850-96b/hardware-docs/files/e850-96b-hardware-user-manual.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/e850-96b/hardware-docs/files/e850-96b-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:hikey970",
+      "manufacturer": "UNVERIFIED",
+      "family": "96Boards",
+      "board": "Hikey970",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "UNVERIFIED",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/hikey970/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/hikey/hikey970/hardware-docs/files/hikey970-schematics.pdf",
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/hikey/hikey970/hardware-docs/files/hikey970-user-manual.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:imx7-96",
+      "manufacturer": "Boundary Devices",
+      "family": "96Boards",
+      "board": "iMX7-96 Board",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "NXP i.MX7 Dual",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/imx7-96/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "bom": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/imx7-96/hardware-docs/files/iMX7-96-bom.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/imx7-96/hardware-docs/files/iMX7-96-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:mediatekx20",
+      "manufacturer": "MediaTek",
+      "family": "96Boards",
+      "board": "MediaTek X20 Development Board",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "MediaTek MT6797",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/mediatekx20/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "bom": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/mediatekx20/hardware-docs/MediaTekX20_BOM.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:oxalis",
+      "manufacturer": "Arrow Electronics",
+      "family": "96Boards",
+      "board": "Oxalis",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "NXP LS1012A",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/oxalis/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/enterprise/oxalis/hardware-docs/files/oxalis-schematics.pdf",
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/enterprise/oxalis/hardware-docs/files/oxalis-test-suite-user-manual-v003.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:parrot",
+      "manufacturer": "Parrot",
+      "family": "96Boards",
+      "board": "Parrot 96Boards",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Marvell PXA1908",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/parrot/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/parrot/hardware-docs/files/parrot-hardware-user-manual.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/parrot/hardware-docs/files/parrot-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:sophon-edge",
+      "manufacturer": "Bitmain",
+      "family": "96Boards",
+      "board": "Sophon Edge",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "Bitmain BM1880",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/sophon-edge/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "bom": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/sophon-edge/hardware-docs/files/sophon-edge-bom.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/sophon-edge/hardware-docs/files/sophon-edge-schematics.pdf",
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/sophon-edge/hardware-docs/files/sophon-hardware-user-manual.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:tb-96ai-3586ce",
+      "manufacturer": "UNVERIFIED",
+      "family": "96Boards",
+      "board": "Tb 96Ai 3586Ce",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "UNVERIFIED",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/tb-96ai-3586ce/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96ai-3586ce/hardware-docs/files/tb-96ai-3586ce-hardware-user-manual.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96ai-3586ce/hardware-docs/files/tb-96ai-3586ce-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:tb-96aiot-1126ce",
+      "manufacturer": "UNVERIFIED",
+      "family": "96Boards",
+      "board": "Tb 96Aiot 1126Ce",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "UNVERIFIED",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/tb-96aiot-1126ce/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96aiot-1126ce/hardware-docs/files/tb-96aiot-1126ce-hardware-user-manual.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/tb-96aiot-1126ce/hardware-docs/files/tb-96aiot-1126ce-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:thor96",
+      "manufacturer": "Arrow Electronics",
+      "family": "96Boards",
+      "board": "Thor96",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "NXP i.MX8M",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/thor96/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "datasheet": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-board-product-brief.pdf",
+        "user_manual": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-hw-user-manual.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/thor96/hardware-docs/files/thor96-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:ultra96-v1",
+      "manufacturer": "UNVERIFIED",
+      "family": "96Boards",
+      "board": "Ultra96 V1",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "UNVERIFIED",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/ultra96-v1/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "bom": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v1/hardware-docs/files/ultra96-bom.pdf",
+        "mechanical": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v1/hardware-docs/files/ultra96-mechanical.pdf",
+        "datasheet": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v1/hardware-docs/files/ultra96-product-brief.pdf",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v1/hardware-docs/files/ultra96-schematics.pdf"
+      }
+    },
+    {
+      "board_id": "96boards:ultra96-v2",
+      "manufacturer": "UNVERIFIED",
+      "family": "96Boards",
+      "board": "Ultra96 V2",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "UNVERIFIED",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "community",
+      "official_product_page": "https://www.96boards.org/product/ultra96-v2/",
+      "official_documentation": "https://github.com/96boards/documentation",
+      "index_ref": "96boards/documentation@6d1bfef069e6462cbd34de6fc34793db73f88cf7",
+      "files": {
+        "datasheet": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-product-brief.pdf",
+        "bom": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-bom.pdf",
+        "mechanical": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-mechanical.PDF",
+        "schematic": "https://github.com/96boards/documentation/raw/6d1bfef069e6462cbd34de6fc34793db73f88cf7/consumer/ultra96/ultra96-v2/hardware-docs/files/ultra96-v2-schematics.PDF"
+      }
     }
   ]
 }
