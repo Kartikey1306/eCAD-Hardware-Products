@@ -30,7 +30,9 @@ The dataset layout, gates and results are those of
 this page covers what is specific to the electrical domain. The code is
 `tools/ecad_model/spice.py` (the format layer),
 `tools/ecad_model/domains/electrical.py` (the adapter) and
-`tools/ecad_validation/adapters/ngspice.py` (the tool adapter).
+`tools/ecad_validation/adapters/ngspice.py` (the tool adapter). The design
+it was built from, with the alternatives each decision rejected, is
+[design/electrical-domain-design.md](design/electrical-domain-design.md).
 
 Every statement marked **Verified** below was run on 2026-09-27, or for
 what the review of the branch changed on 2026-09-28, on macOS arm64 with
