@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "radxa:hw",
+  "manufacturer": "Radxa",
+  "family": "HW Design",
+  "board": "Radxa hardware design files",
+  "part_number": "UNVERIFIED",
+  "revision": "1.3",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/hw-design/d1fdb2be2045bdc7488c0989382c62b63100fad6/rockpi_n10/AD/ROCK-PI-N10-SCH-V1.3.PrjPcb/01.SchDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:43Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "23a3d1580a7e5f19ee32979ddf2aac29c0c52f15d9e07efe1727166005dcefc1",
+        "size_bytes": 347648,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/hw-design/d1fdb2be2045bdc7488c0989382c62b63100fad6/rockpi_n10/AD/ROCK-PI-N10-PCB-V1.3.PrjPcb/dalang-v1.3_20211125.PcbDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0844034091baf164cf56a1068b09cc9dbc343b01fdf03c09d9b30e10417d6b45",
+        "size_bytes": 2272768,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/hw-design/d1fdb2be2045bdc7488c0989382c62b63100fad6/rockpi_n10/AD/ROCK-PI-N10-SCH-V1.3.PrjPcb/01.SchDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:43Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "23a3d1580a7e5f19ee32979ddf2aac29c0c52f15d9e07efe1727166005dcefc1",
+        "size_bytes": 347648,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/hw-design@d1fdb2be2045bdc7488c0989382c62b63100fad6"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "MIT",
+    "cad_license": "MIT",
+    "schematic_license": "MIT",
+    "pcb_license": "MIT",
+    "mechanical_cad_license": "MIT",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://opensource.org/license/mit"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://radxa.com/products",
+    "official_cad_repository": "https://github.com/radxa/hw-design",
+    "official_github_repository": "https://github.com/radxa/hw-design",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository radxa/hw-design pinned at d1fdb2be2045. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for radxa/hw-design."
+}

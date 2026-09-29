@@ -1,0 +1,212 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "radxa:som-projects",
+  "manufacturer": "Radxa",
+  "family": "Radxa",
+  "board": "Radxa SoM carrier board design files + agentic hardware-db",
+  "part_number": "UNVERIFIED",
+  "revision": "2.2",
+  "mcu_soc": "RK3588S",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/radxa-som-projects/cf5a4b1984fb4321233d2439320bcaea05af4817/cm3s/radxa_cm3s_io_board/radxa_cm3s_io_board_v1510_schematic_PrjPcb/01.SchDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:45Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "58365eadaa09e6cd23140ee8428a4495b197e204697a529ccdbbbfc89710fc30",
+        "size_bytes": 7168,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "bom": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/radxa/radxa-som-projects/cf5a4b1984fb4321233d2439320bcaea05af4817/cm4/radxa-cm4-io-board/radxa_cm4_io_bom_v1.10.xlsx",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "dxf": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/radxa-som-projects/cf5a4b1984fb4321233d2439320bcaea05af4817/c200/radxa-c200/radxa_c200_2d_bot_v1.11.dxf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:59Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "1403198831d2f5bee169bfdb614839a958ddcebfcd7a1efb3cae33aad1103588",
+        "size_bytes": 24777414,
+        "media_type": "text/plain",
+        "detected_format": "dxf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:13Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/radxa-som-projects@cf5a4b1984fb4321233d2439320bcaea05af4817"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:13Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/radxa-som-projects@cf5a4b1984fb4321233d2439320bcaea05af4817"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:13Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/radxa-som-projects@cf5a4b1984fb4321233d2439320bcaea05af4817"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/radxa-som-projects/cf5a4b1984fb4321233d2439320bcaea05af4817/cm4/radxa-cm4-io-board/radxa_cm4_io_dimensions_drawing.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0bb0234a514fa9f8351facf2877f0b82d9b11bdb1b5d79743a175da3f8ec90ce",
+        "size_bytes": 524012,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:13Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/radxa-som-projects@cf5a4b1984fb4321233d2439320bcaea05af4817"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/radxa-som-projects/cf5a4b1984fb4321233d2439320bcaea05af4817/cm3s/radxa_cm3s_io_board/radxa_cm3s_io_board_v1510_pcb_layout_PrjPcb/radxa_cm3s_io_board_V1510.PcbDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3dd596da7f7916fefcd3ef819c14e135a4425b81e983914e3c9491ff8d5ba44e",
+        "size_bytes": 4898816,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/radxa-som-projects/cf5a4b1984fb4321233d2439320bcaea05af4817/c200/radxa-c200/radxa_c200_components_placement_map_v1.11.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "4bf90a900a98b74d1ecb8e386b9e506f4d16d48f658dd81b3c4627d736c89a7f",
+        "size_bytes": 1022161,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/radxa-som-projects/cf5a4b1984fb4321233d2439320bcaea05af4817/c200/radxa-c200/radxa_c200_schematic_v1.11.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8c0fd492e2c409c58158e8646b56d736830f5a67b389f077abb1a510f214f287",
+        "size_bytes": 985879,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/radxa-som-projects/cf5a4b1984fb4321233d2439320bcaea05af4817/c200/radxa-c200/radxa_c200_3d_stp_v1.11.stp",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:01Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6f547ffd20ee0920b65a6c5abe0122e5c257e00403b12d7dd756e96618eeba24",
+        "size_bytes": 21031457,
+        "media_type": "text/plain",
+        "detected_format": "step:CONFIG_CONTROL_DESIGN",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:13Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/radxa-som-projects@cf5a4b1984fb4321233d2439320bcaea05af4817"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://radxa.com/products",
+    "official_cad_repository": "https://github.com/radxa/radxa-som-projects",
+    "official_github_repository": "https://github.com/radxa/radxa-som-projects",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository radxa/radxa-som-projects pinned at cf5a4b1984fb. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}
