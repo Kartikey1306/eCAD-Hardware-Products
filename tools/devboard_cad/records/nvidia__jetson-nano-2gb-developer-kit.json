@@ -1,0 +1,104 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nvidia:jetson-nano-2gb-developer-kit",
+  "manufacturer": "NVIDIA",
+  "family": "Jetson Nano",
+  "board": "NVIDIA Jetson Nano 2GB Developer Kit",
+  "part_number": "P3541",
+  "revision": "unverified",
+  "mcu_soc": "NVIDIA Jetson Nano 2GB module - Tegra X1",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "arm64 (Armv8-A, Arm Cortex-A57)",
+  "product_status": "unknown",
+  "files": {
+    "step": {
+      "available": true,
+      "url": "https://developer.nvidia.com/jetson-nano-2gb-developer-kit-3d-cad-step-model",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:12Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/Nano/docs/Jetson_Nano_2GB_DevKit_P3541_3D_STEP_Model_nv.zip?__token__=exp=1790672469~hmac=f9903831eeafb3a33e742e1987ac4c407c5be7596cca1eacf6ad5f8ef8fd8abc",
+        "sha256": "bc0ed165c82688f489a22c2afa88fc763926bf0c006d55785f7df83f9f91bb42",
+        "size_bytes": 6464242,
+        "media_type": "application/zip",
+        "detected_format": "step:CONFIG_CONTROL_DESIGN",
+        "verification_method": "http_get_step_header",
+        "contained_member": "675_13541_batuu_dev_kit_top_ass_asm.stp"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://developer.nvidia.com/jetson-nano-2gb-support-guide-r3",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:12Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/docs/jetson_developer_support_guides/jetson-nano-2gb-support-guide-r3.pdf",
+        "sha256": "a81b0efedc1baa3cc9f1fed0cf9b401fc066814fb906502cc42c67d86e7479d7",
+        "size_bytes": 1050296,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://developer.nvidia.com/embedded/jetson-nano-2gb-developer-kit",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://developer.nvidia.com/embedded/learn/jetson-nano-2gb-devkit-user-guide",
+    "direct_cad_download": "https://developer.nvidia.com/jetson-nano-2gb-developer-kit-3d-cad-step-model",
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "ti:ek-tm4c123gxl",
+  "manufacturer": "Texas Instruments",
+  "family": "Tiva C Series LaunchPad",
+  "board": "Tiva C Series TM4C123G LaunchPad Evaluation Board",
+  "part_number": "EK-TM4C123GXL",
+  "revision": "Rev A",
+  "mcu_soc": "TM4C123GH6PM",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "active",
+  "files": {
+    "schematic": {
+      "available": true,
+      "url": "https://www.ti.com/lit/zip/SPMR240",
+      "verified_revision": "Rev A",
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:01Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/spmr240/spmr240.zip?ts=1790670721288",
+        "sha256": "051a822491d814465d3d8205bb11565681cd4522eac0860d5e04d36f8bf5f7ac",
+        "size_bytes": 695810,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "EK-TM4C123GXL Rev A Design Package/EK-TM4C123GXL Rev A Schematic.pdf"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://www.ti.com/lit/pdf/SPMU296",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/ug/spmu296/spmu296.pdf?ts=1790670722160",
+        "sha256": "e1807bcaaa6e5a39a3aa1218946bb18e3f414aadccfc1d262bec961eb127e102",
+        "size_bytes": 1090462,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.ti.com/tool/EK-TM4C123GXL",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.ti.com/lit/pdf/SPMU296",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://www.ti.com/lit/zip/SPMR240",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

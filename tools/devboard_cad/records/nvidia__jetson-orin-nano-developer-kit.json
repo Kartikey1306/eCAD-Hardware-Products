@@ -1,0 +1,132 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nvidia:jetson-orin-nano-developer-kit",
+  "manufacturer": "NVIDIA",
+  "family": "Jetson Orin Nano",
+  "board": "NVIDIA Jetson Orin Nano Developer Kit (Jetson Orin Nano Super Develope",
+  "part_number": "P3766",
+  "revision": "Carrier board P3768 rev A04 (20230320) -",
+  "mcu_soc": "NVIDIA Jetson Orin Nano 8GB module",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "arm64 (Armv8.2-A, Arm Cortex-A78AE)",
+  "product_status": "active",
+  "files": {
+    "datasheet": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/orin_nano/docs/jetson_orin_nano_devkit_carrier_board_specification_sp.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:17Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/orin_nano/docs/Jetson-Orin-Nano-DevKit-Carrier-Board-Specification_SP-11324-001_v1.3.pdf?__token__=exp=1790672475~hmac=ba0eaa624c29de7eff34b0f5a553f4f306b372149bef96499e3baa963ca211b8",
+        "sha256": "4a0f7ba948bce4881e176f0f8636ef3dbd40e3df9dd33134e6a7433359d18c02",
+        "size_bytes": 979573,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "hardware_design_guide": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/jetson-orin-nx-series-nano-series-design-guide",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:18Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/orin_nx/docs/Jetson-Orin-NX-Nano-Design-Guide_DG-10931-001_v1.5.pdf?__token__=exp=1790672476~hmac=990d6ece54c19c755b0b5b0d577cfcce6573f83069e887c668e07f306cb71036",
+        "sha256": "e441774faf45de4c351bd991daadbe347610e4fde99939d03c5ea2adf6c0a2a9",
+        "size_bytes": 2787282,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pinout": {
+      "available": null,
+      "url": "https://developer.nvidia.com/downloads/jetson-orin-nx-and-orin-nano-series-pinmux-config-template",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "reference_design": {
+      "available": null,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/orin_nano/docs/jetson_orin_nano_devkit_carrier_board_reference_design_files_a04_20230320.zip/",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "step": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/orin_nano/docs/jetson_orin_nano_devkit_3d_step_model.zip/",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:26Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/orin_nano/docs/Jetson_Orin_Nano_DevKit_3D_STEP_Model.zip?__token__=exp=1790672477~hmac=4a5a180f7e0eb41be6317ea37c2d0a9ef7ff70fc56c04b09e7fc871a37accbde",
+        "sha256": "9f00ff9b7fc36265842e6463bee6954350c461d4b0cd52c87aef3872baf8fe1c",
+        "size_bytes": 12998544,
+        "media_type": "application/zip",
+        "detected_format": "step:CONFIG_CONTROL_DESIGN",
+        "verification_method": "http_get_step_header",
+        "contained_member": "P3766-P3768SKU4-P3767ENVELOPE.stp"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://docs.nvidia.com/jetson/orin-nano-devkit/user-guide/latest/quick_start.html",
+    "direct_cad_download": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/orin_nano/docs/jetson_orin_nano_devkit_3d_step_model.zip/",
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

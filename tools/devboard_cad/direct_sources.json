@@ -288,6 +288,604 @@
       "files": {
         "schematic": "https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch.pdf"
       }
+    },
+    {
+      "board_id": "nvidia:jetson-agx-orin-developer-kit",
+      "manufacturer": "NVIDIA",
+      "family": "Jetson AGX Orin",
+      "board": "NVIDIA Jetson AGX Orin Developer Kit",
+      "part_number": "P3730",
+      "revision": "Carrier board P3737 rev A05 (20250205) p",
+      "mcu_soc": "NVIDIA Jetson AGX Orin 64GB module",
+      "cpu_architecture": "arm64 (Armv8.2-A, Arm Cortex-A78AE)",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/",
+      "official_documentation": "https://docs.nvidia.com/jetson/agx-orin-devkit/user-guide/latest/index.html",
+      "index_ref": null,
+      "files": {
+        "datasheet": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/agx_orin/jetson_agx_orin_devkit_carrier_board_specification_sp",
+        "step": "https://developer.nvidia.com/downloads/jetson-agx-orin-module-3d-step-modelzip",
+        "pinout": "https://developer.nvidia.com/jetson-agx-orin-pin-function-names-guide",
+        "user_manual": "https://developer.nvidia.com/assets/embedded/secure/jetson/agx_orin/jetson-agx-orin-devkit-online-guide-200x200-20220223-r4.pdf",
+        "hardware_design_guide": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/agx_orin/jetson_agx_orin_series_tuning_compliance_guide/"
+      }
+    },
+    {
+      "board_id": "nvidia:jetson-agx-thor-developer-kit",
+      "manufacturer": "NVIDIA",
+      "family": "Jetson AGX Thor",
+      "board": "NVIDIA Jetson AGX Thor Developer Kit",
+      "part_number": "P4070",
+      "revision": "Carrier board P4071 rev A02 (20260818) -",
+      "mcu_soc": "NVIDIA Jetson T5000 module",
+      "cpu_architecture": "arm64 (Armv9-A, Arm Neoverse-V3AE)",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-thor/",
+      "official_documentation": "https://developer.nvidia.com/embedded/downloads",
+      "index_ref": null,
+      "files": {
+        "reference_design": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/jetson_thor_devkit_carrier_board_design_files.zip",
+        "step": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/Jetson_Thor_DevKit_V01.zip",
+        "datasheet": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/jetson-thor-developer-kit-carrier-board-specification.pdf",
+        "hardware_design_guide": "https://developer.nvidia.com/downloads/jetson/thor/docs/jetson-thor-series-modules-designguide-dg12084001.pdf",
+        "pinout": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/Jetson_Thor_Series_Modules_Pinmux_Template.xlsm"
+      }
+    },
+    {
+      "board_id": "nvidia:jetson-agx-xavier-developer-kit",
+      "manufacturer": "NVIDIA",
+      "family": "Jetson AGX Xavier",
+      "board": "NVIDIA Jetson AGX Xavier Developer Kit",
+      "part_number": "P2972",
+      "revision": "Carrier board P2822 rev B03 per NVIDIA's",
+      "mcu_soc": "NVIDIA Jetson AGX Xavier module",
+      "cpu_architecture": "arm64 (Armv8.2-A, NVIDIA Carmel)",
+      "product_status": "not_recommended",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://developer.nvidia.com/embedded/jetson-agx-xavier-developer-kit",
+      "official_documentation": "https://developer.nvidia.com/embedded/downloads",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://developer.nvidia.com/embedded/dlc/jetson_agx_xavier_developer_kit_user_guide",
+        "mechanical": "https://developer.nvidia.com/assets/embedded/secure/jetson/xavier/docs/jetson_agx_xavier_product_marking_specification_da-10737-001_v1.1.pdf"
+      }
+    },
+    {
+      "board_id": "nvidia:jetson-nano-2gb-developer-kit",
+      "manufacturer": "NVIDIA",
+      "family": "Jetson Nano",
+      "board": "NVIDIA Jetson Nano 2GB Developer Kit",
+      "part_number": "P3541",
+      "revision": "unverified",
+      "mcu_soc": "NVIDIA Jetson Nano 2GB module - Tegra X1",
+      "cpu_architecture": "arm64 (Armv8-A, Arm Cortex-A57)",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://developer.nvidia.com/embedded/jetson-nano-2gb-developer-kit",
+      "official_documentation": "https://developer.nvidia.com/embedded/learn/jetson-nano-2gb-devkit-user-guide",
+      "index_ref": null,
+      "files": {
+        "step": "https://developer.nvidia.com/jetson-nano-2gb-developer-kit-3d-cad-step-model",
+        "user_manual": "https://developer.nvidia.com/jetson-nano-2gb-support-guide-r3"
+      }
+    },
+    {
+      "board_id": "nvidia:jetson-nano-developer-kit",
+      "manufacturer": "NVIDIA",
+      "family": "Jetson Nano",
+      "board": "NVIDIA Jetson Nano Developer Kit",
+      "part_number": "P3450",
+      "revision": "Carrier board P3449 rev B01 (20221017) p",
+      "mcu_soc": "NVIDIA Jetson Nano module",
+      "cpu_architecture": "arm64 (Armv8-A, Arm Cortex-A57)",
+      "product_status": "not_recommended",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://developer.nvidia.com/embedded/jetson-nano-developer-kit",
+      "official_documentation": "https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://developer.nvidia.com/embedded/dlc/Jetson_Nano_Developer_Kit_User_Guide",
+        "mechanical": "https://developer.nvidia.com/assets/embedded/secure/jetson/nano/docs/jetson_nano_product_marking_specification_da-10740-001_v1.0.pdf",
+        "hardware_design_guide": "https://developer.nvidia.com/embedded/dlc/jetson-nano-scl"
+      }
+    },
+    {
+      "board_id": "nvidia:jetson-orin-nano-developer-kit",
+      "manufacturer": "NVIDIA",
+      "family": "Jetson Orin Nano",
+      "board": "NVIDIA Jetson Orin Nano Developer Kit (Jetson Orin Nano Super Develope",
+      "part_number": "P3766",
+      "revision": "Carrier board P3768 rev A04 (20230320) -",
+      "mcu_soc": "NVIDIA Jetson Orin Nano 8GB module",
+      "cpu_architecture": "arm64 (Armv8.2-A, Arm Cortex-A78AE)",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/",
+      "official_documentation": "https://docs.nvidia.com/jetson/orin-nano-devkit/user-guide/latest/quick_start.html",
+      "index_ref": null,
+      "files": {
+        "reference_design": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/orin_nano/docs/jetson_orin_nano_devkit_carrier_board_reference_design_files_a04_20230320.zip/",
+        "step": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/orin_nano/docs/jetson_orin_nano_devkit_3d_step_model.zip/",
+        "datasheet": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/orin_nano/docs/jetson_orin_nano_devkit_carrier_board_specification_sp.pdf",
+        "hardware_design_guide": "https://developer.nvidia.com/downloads/jetson-orin-nx-series-nano-series-design-guide",
+        "pinout": "https://developer.nvidia.com/downloads/jetson-orin-nx-and-orin-nano-series-pinmux-config-template"
+      }
+    },
+    {
+      "board_id": "nvidia:jetson-xavier-nx-developer-kit",
+      "manufacturer": "NVIDIA",
+      "family": "Jetson Xavier NX",
+      "board": "NVIDIA Jetson Xavier NX Developer Kit",
+      "part_number": "P3518",
+      "revision": "Carrier board P3509 rev A01 per NVIDIA's",
+      "mcu_soc": "NVIDIA Jetson Xavier NX module",
+      "cpu_architecture": "arm64 (Armv8.2-A, NVIDIA Carmel)",
+      "product_status": "not_recommended",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://developer.nvidia.com/embedded/jetson-xavier-nx-devkit",
+      "official_documentation": "https://developer.nvidia.com/embedded/learn/get-started-jetson-xavier-nx-devkit",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://developer.nvidia.com/jetson-xavier-nx-support-guide-r4",
+        "mechanical": "https://developer.nvidia.com/assets/embedded/secure/jetson/xavier_nx/jetson_xavier_nx_product_marking_specification_da-10738-001_v1.1.pdf"
+      }
+    },
+    {
+      "board_id": "nxp:frdm-k28f",
+      "manufacturer": "NXP Semiconductors",
+      "family": "Kinetis K / FRDM (Freedom) Development Platform",
+      "board": "FRDM-K28F Freedom Board for Kinetis K28F",
+      "part_number": "FRDM-K28F",
+      "revision": "unverified",
+      "mcu_soc": "MK28FN2M0VMI15",
+      "cpu_architecture": "Arm Cortex-M4F (32-bit)",
+      "product_status": "discontinued",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nxp.com/design/design-center/development-boards-and-designs/general-purpose-mcus/freedom-development-platform-for-kinetis-k27-k28-mcus:FRDM-K28F",
+      "official_documentation": "https://www.nxp.com/docs/en/user-guide/FRDMK28FUG.pdf",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.nxp.com/docs/en/user-guide/FRDMK28FUG.pdf"
+      }
+    },
+    {
+      "board_id": "nxp:frdm-k64f",
+      "manufacturer": "NXP Semiconductors",
+      "family": "Kinetis K / FRDM (Freedom) Development Platform",
+      "board": "FRDM-K64F",
+      "part_number": "FRDM-K64F",
+      "revision": "unverified",
+      "mcu_soc": "MK64FN1M0VLL12",
+      "cpu_architecture": "Arm Cortex-M4F (32-bit)",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nxp.com/part/FRDM-K64F",
+      "official_documentation": "https://www.nxp.com/design/design-center/development-boards-and-designs/FRDM-K64F",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.nxp.com/docs/en/errata/FRDMK64F_ERRATA.pdf",
+        "datasheet": "https://www.nxp.com/docs/en/data-sheet/K64P144M120SF5.pdf"
+      }
+    },
+    {
+      "board_id": "nxp:frdm-ke16z",
+      "manufacturer": "NXP Semiconductors",
+      "family": "Kinetis E / FRDM (Freedom) Development Platform",
+      "board": "FRDM-KE16Z Freedom Board",
+      "part_number": "FRDM-KE16Z",
+      "revision": "unverified",
+      "mcu_soc": "MKE16Z64VLF4",
+      "cpu_architecture": "Arm Cortex-M0+ (32-bit)",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nxp.com/part/FRDM-KE16Z",
+      "official_documentation": "https://www.nxp.com/docs/en/user-guide/UM11204.pdf",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.nxp.com/docs/en/user-guide/UM11204.pdf"
+      }
+    },
+    {
+      "board_id": "nxp:frdm-kl25z",
+      "manufacturer": "NXP Semiconductors",
+      "family": "Kinetis L / FRDM (Freedom) Development Platform",
+      "board": "FRDM-KL25Z",
+      "part_number": "FRDM-KL25Z",
+      "revision": "I",
+      "mcu_soc": "MKL25Z128VLK4",
+      "cpu_architecture": "Arm Cortex-M0+ (32-bit)",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nxp.com/design/design-center/development-boards-and-designs/FRDM-KL25Z",
+      "official_documentation": "https://www.nxp.com/design/design-center/development-boards-and-designs/FRDM-KL25Z",
+      "index_ref": null,
+      "files": {
+        "pinout": "https://www.nxp.com/docs/en/supporting-information/FRDM-KL25Z-Quick-Reference-Card.pdf",
+        "datasheet": "https://www.nxp.com/docs/en/data-sheet/KL25P80M48SF0.pdf"
+      }
+    },
+    {
+      "board_id": "nxp:frdm-mcxn947",
+      "manufacturer": "NXP Semiconductors",
+      "family": "MCX N / FRDM Development Board",
+      "board": "FRDM-MCXN947",
+      "part_number": "FRDM-MCXN947",
+      "revision": "C",
+      "mcu_soc": "MCXN947",
+      "cpu_architecture": "Dual Arm Cortex-M33 (32-bit) + NPU",
+      "product_status": "active",
+      "source_tier": "community",
+      "official_product_page": "https://www.nxp.com/design/design-center/development-boards-and-designs/FRDM-MCXN947",
+      "official_documentation": "https://docs.nxp.com/bundle/UM12018/page/topics/Evk_overview.html",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://akizukidenshi.com/goodsaffix/FRDM-MCXN947_User%20Manual.pdf"
+      }
+    },
+    {
+      "board_id": "nxp:lpc55s69-evk",
+      "manufacturer": "NXP Semiconductors",
+      "family": "LPCXpresso / LPC55S6x Development Board",
+      "board": "LPCXpresso55S69 Development Board (LPC55S69-EVK)",
+      "part_number": "LPC55S69-EVK",
+      "revision": "unverified",
+      "mcu_soc": "LPC55S69JBD100",
+      "cpu_architecture": "Dual Arm Cortex-M33 (32-bit)",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nxp.com/design/design-center/development-boards-and-designs/LPC55S69-EVK",
+      "official_documentation": "https://www.nxp.com/design/design-center/development-boards-and-designs/LPC55S69-EVK",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.avnet.com/wcm/connect/80b69b5c-17d9-43e4-a011-6e34142e00e9/lpcpresso55S28-development-board-user-manual.pdf?MOD=AJPERES",
+        "datasheet": "https://www.nxp.com/docs/en/data-sheet/LPC55S6x.pdf"
+      }
+    },
+    {
+      "board_id": "nxp:mimxrt1060-evk",
+      "manufacturer": "NXP Semiconductors",
+      "family": "i.MX RT1060 Crossover MCU Evaluation Kit",
+      "board": "MIMXRT1060-EVK",
+      "part_number": "MIMXRT1060-EVK",
+      "revision": "unverified",
+      "mcu_soc": "MIMXRT1062DVL6A",
+      "cpu_architecture": "Arm Cortex-M7 (32-bit)",
+      "product_status": "discontinued",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.nxp.com/part/MIMXRT1060-EVK",
+      "official_documentation": "https://www.nxp.com/design/design-center/development-boards-and-designs/MIMXRT1060-EVKB",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.nxp.com/docs/en/quick-reference-guide/IMXRT1060QSG.pdf"
+      }
+    },
+    {
+      "board_id": "nxp:mimxrt1060-evkb",
+      "manufacturer": "NXP Semiconductors",
+      "family": "i.MX RT1060 Crossover MCU Evaluation Kit",
+      "board": "MIMXRT1060-EVKB",
+      "part_number": "MIMXRT1060-EVKB",
+      "revision": "B",
+      "mcu_soc": "MIMXRT1062DVL6B",
+      "cpu_architecture": "Arm Cortex-M7 (32-bit)",
+      "product_status": "discontinued",
+      "source_tier": "authorized_distributor",
+      "official_product_page": "https://www.nxp.com/design/design-center/development-boards-and-designs/MIMXRT1060-EVKB",
+      "official_documentation": "https://www.nxp.com/design/design-center/development-boards-and-designs/MIMXRT1060-EVKB",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/5783/MIMXRT1060-EVKB.pdf"
+      }
+    },
+    {
+      "board_id": "renesas:ek-ra2e1",
+      "manufacturer": "Renesas Electronics",
+      "family": "RA / RA2 Series",
+      "board": "EK-RA2E1 - Evaluation Kit for RA2E1 MCU Group",
+      "part_number": "RTK7EKA2E1S00001BE",
+      "revision": "v1",
+      "mcu_soc": "Renesas R7FA2E1A92DFM (RA2E1 Group)",
+      "cpu_architecture": "Arm Cortex-M23",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/ek-ra2e1",
+      "official_documentation": "https://www.renesas.com/en/document/man/ek-ra2e1-v1-users-manual",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.renesas.com/en/document/man/ek-ra2e1-v1-users-manual"
+      }
+    },
+    {
+      "board_id": "renesas:ek-ra4m2",
+      "manufacturer": "Renesas Electronics",
+      "family": "RA / RA4 Series",
+      "board": "EK-RA4M2 - Evaluation Kit for RA4M2 MCU Group",
+      "part_number": "RTK7EKA4M2S00001BE",
+      "revision": "v1",
+      "mcu_soc": "Renesas R7FA4M2AD3CFP (RA4M2 Group)",
+      "cpu_architecture": "Arm Cortex-M33",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/ek-ra4m2",
+      "official_documentation": "https://www.renesas.com/en/document/man/ek-ra4m2-v1-users-manual",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.renesas.com/en/document/man/ek-ra4m2-v1-users-manual"
+      }
+    },
+    {
+      "board_id": "renesas:ek-ra6m3",
+      "manufacturer": "Renesas Electronics",
+      "family": "RA / RA6 Series",
+      "board": "EK-RA6M3 - Evaluation Kit for RA6M3 MCU Group",
+      "part_number": "RTK7EKA6M3S00001BU",
+      "revision": "v1",
+      "mcu_soc": "Renesas R7FA6M3AH3CFC (RA6M3 Group)",
+      "cpu_architecture": "Arm Cortex-M4F",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/ek-ra6m3",
+      "official_documentation": "https://www.renesas.com/en/document/mat/ek-ra6m3-v1-users-manual",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.renesas.com/en/document/mat/ek-ra6m3-v1-users-manual"
+      }
+    },
+    {
+      "board_id": "renesas:gr-rose",
+      "manufacturer": "Renesas Electronics (Gadget Renesas; board designed by Core Corporation)",
+      "family": "RX / RX65N (Gadget Renesas)",
+      "board": "GR-ROSE",
+      "part_number": "UNVERIFIED",
+      "revision": "X65A-M01-C",
+      "mcu_soc": "Renesas R5F565NEHDFP (RX65N, 100-pin LFQFP)",
+      "cpu_architecture": "Renesas RXv2",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.renesas.com/en/products/gadget-renesas/boards/gr-rose",
+      "official_documentation": "https://www.renesas.com/en/products/gadget-renesas/boards/gr-rose",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://www.renesas.com/en/document/oth/gr-rose-schematic",
+        "mechanical": "https://www.renesas.com/en/document/oth/gr-rose-dimension",
+        "pcb_source": "https://www.renesas.com/en/document/lbr/gr-rose-fritzing-data-file"
+      }
+    },
+    {
+      "board_id": "renesas:tbb-ra8-audio-dsp",
+      "manufacturer": "Renesas Electronics",
+      "family": "RA / RA8 (Technology Building Block)",
+      "board": "TBB-RA8-AUDIO-DSP (Audio DSP Technology Building Block board)",
+      "part_number": "UNVERIFIED",
+      "revision": "unverified",
+      "mcu_soc": "not-applicable",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://github.com/renesas/tbb_ra8_audio_dsp_public",
+      "official_documentation": "https://github.com/renesas/tbb_ra8_audio_dsp_public",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/Codec.SchDoc",
+        "pcb_source": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/TBB-RA8-AUDIO-DSP1.PcbDoc",
+        "altium": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/TBB-RA8-AUDIO-DSP_public.PrjPcb",
+        "bom": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/TBB-RA8-AUDIO-DSP.BomDoc",
+        "assembly_drawing": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/Assembly_dwg.PCBDwf",
+        "mechanical": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/Fab_dwg.PCBDwf"
+      }
+    },
+    {
+      "board_id": "renesas:tbb-ra8-audio-dsp-ra8d1-interposer",
+      "manufacturer": "Renesas Electronics",
+      "family": "RA / RA8 (Technology Building Block)",
+      "board": "TBB-RA8-AUDIO-DSP RA8D1 Interposer (bridges EK-RA8D1 pin headers to th",
+      "part_number": "UNVERIFIED",
+      "revision": "vB1",
+      "mcu_soc": "not-applicable",
+      "cpu_architecture": null,
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://github.com/renesas/tbb_ra8_audio_dsp_ra8d1_interposer_public",
+      "official_documentation": "https://github.com/renesas/tbb_ra8_audio_dsp_ra8d1_interposer_public",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_ra8d1_interposer_public/main/hardware/Connectors.SchDoc",
+        "pcb_source": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_ra8d1_interposer_public/main/hardware/TBB-AUDIO_RA8D1_INTERPOSER_v2.PcbDoc",
+        "bom": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_ra8d1_interposer_public/main/hardware/TBB-RA8-AUDIO-DSP_RA8D1_Interposer.BomDoc",
+        "assembly_drawing": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_ra8d1_interposer_public/main/hardware/Assembly_dwg.PCBDwf",
+        "mechanical": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_ra8d1_interposer_public/main/hardware/Fab_dwg.PCBDwf"
+      }
+    },
+    {
+      "board_id": "renesas:yrpbrl78g13",
+      "manufacturer": "Renesas Electronics",
+      "family": "RL78 / RL78-G13",
+      "board": "YRPBRL78G13 Promotion Board for RL78/G13 (RL78/G13 Stick)",
+      "part_number": "YRPBRL78G13",
+      "revision": "unverified",
+      "mcu_soc": "Renesas R5F100LEAFB (RL78/G13)",
+      "cpu_architecture": "Renesas RL78 (S2 core, 16-bit CISC)",
+      "product_status": "unknown",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/yrpbrl78g13",
+      "official_documentation": "https://www.renesas.com/en/document/mah/rl78g13-stick-yrpbrl78g13",
+      "index_ref": null,
+      "files": {
+        "user_manual": "https://www.renesas.com/en/document/mah/rl78g13-stick-yrpbrl78g13"
+      }
+    },
+    {
+      "board_id": "renesas:yrpbrl78l12",
+      "manufacturer": "Renesas Electronics",
+      "family": "RL78 / RL78-L12",
+      "board": "YRPBRL78L12 Evaluation Board for RL78/L12 (Renesas Promotion Board)",
+      "part_number": "YRPBRL78L12",
+      "revision": "1.00",
+      "mcu_soc": "Renesas R5F10RLCAFB (RL78/L12)",
+      "cpu_architecture": "Renesas RL78 (S2 core, 16-bit CISC)",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/yrpbrl78l12",
+      "official_documentation": "https://www.renesas.com/en/document/mat/yrpbrl78l12-users-manual-rev100",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://www.renesas.com/en/document/sch/rpbrl78l12-renesas-promotion-board-schematics-rev100",
+        "user_manual": "https://www.renesas.com/en/document/mat/yrpbrl78l12-users-manual-rev100"
+      }
+    },
+    {
+      "board_id": "ti:ek-tm4c123gxl",
+      "manufacturer": "Texas Instruments",
+      "family": "Tiva C Series LaunchPad",
+      "board": "Tiva C Series TM4C123G LaunchPad Evaluation Board",
+      "part_number": "EK-TM4C123GXL",
+      "revision": "Rev A",
+      "mcu_soc": "TM4C123GH6PM",
+      "cpu_architecture": "Arm Cortex-M4F",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.ti.com/tool/EK-TM4C123GXL",
+      "official_documentation": "https://www.ti.com/lit/pdf/SPMU296",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://www.ti.com/lit/zip/SPMR240",
+        "user_manual": "https://www.ti.com/lit/pdf/SPMU296"
+      }
+    },
+    {
+      "board_id": "ti:ek-tm4c1294xl",
+      "manufacturer": "Texas Instruments",
+      "family": "Tiva C Series Connected LaunchPad",
+      "board": "Tiva C Series TM4C1294 Connected LaunchPad Evaluation Kit",
+      "part_number": "EK-TM4C1294XL",
+      "revision": "Rev D",
+      "mcu_soc": "TM4C1294NCPDT",
+      "cpu_architecture": "Arm Cortex-M4F",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.ti.com/tool/EK-TM4C1294XL",
+      "official_documentation": "https://www.ti.com/lit/pdf/SPMU365",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://www.ti.com/lit/zip/SPMR241",
+        "user_manual": "https://www.ti.com/lit/pdf/SPMU365"
+      }
+    },
+    {
+      "board_id": "ti:launchxl-f280049c",
+      "manufacturer": "Texas Instruments",
+      "family": "C2000 Piccolo LaunchPad",
+      "board": "F280049C LaunchPad Development Kit for C2000 Piccolo MCU",
+      "part_number": "LAUNCHXL-F280049C",
+      "revision": "Rev A (design package MCU025A)",
+      "mcu_soc": "TMS320F280049C",
+      "cpu_architecture": "TI C28x 32-bit real-time core with CLA",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.ti.com/tool/LAUNCHXL-F280049C",
+      "official_documentation": "https://www.ti.com/tool/LAUNCHXL-F280049C",
+      "index_ref": null,
+      "files": {
+        "altium": "https://www.ti.com/lit/zip/SPRR421",
+        "schematic": "https://www.ti.com/lit/pdf/SPRR423"
+      }
+    },
+    {
+      "board_id": "ti:lp-em-cc1354p10-6",
+      "manufacturer": "Texas Instruments",
+      "family": "SimpleLink CC13x4/CC26x4 LaunchPad",
+      "board": "CC1354P10 LaunchPad Development Kit for SimpleLink Sub-1 GHz and 2.4 G",
+      "part_number": "LP-EM-CC1354P10-6",
+      "revision": "Rev B (design file package SWRC391A)",
+      "mcu_soc": "CC1354P10",
+      "cpu_architecture": "Arm Cortex-M33F",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.ti.com/tool/LP-EM-CC1354P10",
+      "official_documentation": "https://www.ti.com/tool/LP-EM-CC1354P10",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://www.ti.com/lit/zip/SWRC391"
+      }
+    },
+    {
+      "board_id": "ti:msp-exp430g2et",
+      "manufacturer": "Texas Instruments",
+      "family": "MSP430 LaunchPad (MSP430G2xx value line)",
+      "board": "MSP430G2553 LaunchPad Development Kit",
+      "part_number": "MSP-EXP430G2ET",
+      "revision": "1.0 (design package MCU021_V1.0)",
+      "mcu_soc": "MSP430G2553IN20",
+      "cpu_architecture": "TI MSP430 16-bit RISC",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.ti.com/tool/MSP-EXP430G2ET",
+      "official_documentation": "https://www.ti.com/lit/pdf/SLAU772",
+      "index_ref": null,
+      "files": {
+        "altium": "https://www.ti.com/lit/zip/SLAR153",
+        "user_manual": "https://www.ti.com/lit/pdf/SLAU772"
+      }
+    },
+    {
+      "board_id": "ti:msp-exp432e401y",
+      "manufacturer": "Texas Instruments",
+      "family": "SimpleLink MSP432E4 LaunchPad",
+      "board": "SimpleLink Ethernet MSP432E401Y Microcontroller LaunchPad Development ",
+      "part_number": "MSP-EXP432E401Y",
+      "revision": "1.0 (design package MCU023, gerbers MCU0",
+      "mcu_soc": "MSP432E401Y",
+      "cpu_architecture": "Arm Cortex-M4F",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.ti.com/tool/MSP-EXP432E401Y",
+      "official_documentation": "https://www.ti.com/lit/pdf/SLAU748",
+      "index_ref": null,
+      "files": {
+        "altium": "https://www.ti.com/lit/zip/SLAR147",
+        "user_manual": "https://www.ti.com/lit/pdf/SLAU748"
+      }
+    },
+    {
+      "board_id": "ti:sk-am62b-p1",
+      "manufacturer": "Texas Instruments",
+      "family": "Sitara AM62x Starter Kit",
+      "board": "AM62x Starter Kit Evaluation Module with PMIC",
+      "part_number": "SK-AM62B-P1",
+      "revision": "PROC142B (package also contains PROC142A",
+      "mcu_soc": "AM6254 (Sitara AM62x)",
+      "cpu_architecture": "Arm Cortex-A53 (quad) + Cortex-M4F + Cortex-R5F",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.ti.com/tool/SK-AM62B-P1",
+      "official_documentation": "https://www.ti.com/lit/pdf/SPRUJ40",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://www.ti.com/lit/zip/SPRM860",
+        "user_manual": "https://www.ti.com/lit/pdf/SPRUJ40"
+      }
+    },
+    {
+      "board_id": "ti:tmdsice3359",
+      "manufacturer": "Texas Instruments",
+      "family": "Sitara AM335x (AM3359 Industrial Communications Engine)",
+      "board": "AM3359 Industrial Communications Engine (ICE)",
+      "part_number": "TMDSICE3359",
+      "revision": "3H0013 Rev 2.1A",
+      "mcu_soc": "AM3359 (Sitara AM335x)",
+      "cpu_architecture": "Arm Cortex-A8",
+      "product_status": "active",
+      "source_tier": "manufacturer_official",
+      "official_product_page": "https://www.ti.com/tool/TMDSICE3359",
+      "official_documentation": "https://www.ti.com/tool/TMDSICE3359",
+      "index_ref": null,
+      "files": {
+        "schematic": "https://www.ti.com/lit/zip/TIDR336",
+        "pcb_source": "https://www.ti.com/lit/zip/TIDC179",
+        "bom": "https://www.ti.com/lit/zip/TIDR339"
+      }
     }
   ]
 }

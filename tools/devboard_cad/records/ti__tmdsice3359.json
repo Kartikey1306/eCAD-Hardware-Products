@@ -1,0 +1,104 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "ti:tmdsice3359",
+  "manufacturer": "Texas Instruments",
+  "family": "Sitara AM335x (AM3359 Industrial Communications Engine)",
+  "board": "AM3359 Industrial Communications Engine (ICE)",
+  "part_number": "TMDSICE3359",
+  "revision": "3H0013 Rev 2.1A",
+  "mcu_soc": "AM3359 (Sitara AM335x)",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A8",
+  "product_status": "active",
+  "files": {
+    "bom": {
+      "available": true,
+      "url": "https://www.ti.com/lit/zip/TIDR339",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:34:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/tidr339a/tidr339a.zip?ts=1790669678706",
+        "sha256": "caa817429174f9aaf080fde2642adf542cffc21da5f1e3d227bbb45c3f2ca850",
+        "size_bytes": 37918,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "TMDSICE3359_3H0013_BOM_rev2_1A.xlsx"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://www.ti.com/lit/zip/TIDC179",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:34:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/tidc179a/tidc179a.zip?ts=1790669676325",
+        "sha256": "4c16d3fd8b079981af73c6a8b337a0f50363c95b03332ab3ba9c0eca8b687514",
+        "size_bytes": 3088655,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "AM335x_ICE_3H0013_PCB_REV_2_1A.brd"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://www.ti.com/lit/zip/TIDR336",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:34:16Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/tidr336/tidr336.zip?ts=1790669673889",
+        "sha256": "a249446aa676abfec8260733c3a50065e981e91de686a0fe18e909192a527a6e",
+        "size_bytes": 786851,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "tmdxice3359_sch_3h0013_v2_1a.pdf"
+      }
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.ti.com/tool/TMDSICE3359",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.ti.com/tool/TMDSICE3359",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://www.ti.com/lit/zip/TIDR336",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

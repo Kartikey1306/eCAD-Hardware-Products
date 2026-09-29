@@ -1,0 +1,86 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nxp:mimxrt1060-evkb",
+  "manufacturer": "NXP Semiconductors",
+  "family": "i.MX RT1060 Crossover MCU Evaluation Kit",
+  "board": "MIMXRT1060-EVKB",
+  "part_number": "MIMXRT1060-EVKB",
+  "revision": "B",
+  "mcu_soc": "MIMXRT1062DVL6B",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M7 (32-bit)",
+  "product_status": "discontinued",
+  "files": {
+    "user_manual": {
+      "available": true,
+      "url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/5783/MIMXRT1060-EVKB.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "382e92dd023025a6ffb3695d082831c8954fb1309a2bf5ad5f57761f09ee415d",
+        "size_bytes": 6796834,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "authorized_distributor",
+    "official_product_page": "https://www.nxp.com/design/design-center/development-boards-and-designs/MIMXRT1060-EVKB",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.nxp.com/design/design-center/development-boards-and-designs/MIMXRT1060-EVKB",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

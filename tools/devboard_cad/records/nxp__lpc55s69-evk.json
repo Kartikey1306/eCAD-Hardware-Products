@@ -1,0 +1,92 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nxp:lpc55s69-evk",
+  "manufacturer": "NXP Semiconductors",
+  "family": "LPCXpresso / LPC55S6x Development Board",
+  "board": "LPCXpresso55S69 Development Board (LPC55S69-EVK)",
+  "part_number": "LPC55S69-EVK",
+  "revision": "unverified",
+  "mcu_soc": "LPC55S69JBD100",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Dual Arm Cortex-M33 (32-bit)",
+  "product_status": "active",
+  "files": {
+    "datasheet": {
+      "available": true,
+      "url": "https://www.nxp.com/docs/en/data-sheet/LPC55S6x.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:37Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9ec53e8300e4bd140f0602b7ae925a2d5a4a1e8c716891564a2291290fb1dd0e",
+        "size_bytes": 3294076,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": null,
+      "url": "https://www.avnet.com/wcm/connect/80b69b5c-17d9-43e4-a011-6e34142e00e9/lpcpresso55S28-development-board-user-manual.pdf?MOD=AJPERES",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.nxp.com/design/design-center/development-boards-and-designs/LPC55S69-EVK",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.nxp.com/design/design-center/development-boards-and-designs/LPC55S69-EVK",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

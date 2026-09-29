@@ -1,0 +1,152 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nvidia:jetson-agx-orin-developer-kit",
+  "manufacturer": "NVIDIA",
+  "family": "Jetson AGX Orin",
+  "board": "NVIDIA Jetson AGX Orin Developer Kit",
+  "part_number": "P3730",
+  "revision": "Carrier board P3737 rev A05 (20250205) p",
+  "mcu_soc": "NVIDIA Jetson AGX Orin 64GB module",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "arm64 (Armv8.2-A, Arm Cortex-A78AE)",
+  "product_status": "active",
+  "files": {
+    "datasheet": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/agx_orin/jetson_agx_orin_devkit_carrier_board_specification_sp",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:30:21Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/agx_orin/Jetson-AGX-Orin-Module-Carrier-Board-Specification_SP-10900-001_v1.2.pdf?__token__=exp=1790672419~hmac=d4b1c12dfefc9503229a3914628a0f4e551cc1203bd94e8f736d6c1a961784a8",
+        "sha256": "d817a69767b9e11efaa9b54037b87039a16bff3e5a7c41255ce3b75e47322cac",
+        "size_bytes": 1222936,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "hardware_design_guide": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/agx_orin/jetson_agx_orin_series_tuning_compliance_guide/",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:30:20Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/agx_orin/Jetson-AGX-Orin-Series-Tuning-Compliance-Guide_DA-11040-001_v1.5.pdf?__token__=exp=1790672419~hmac=325764b660366b8ff0cea97db5cfe1544502bdd22bc4ad7608787f28b48829f6",
+        "sha256": "062b9f7b2c6d5bd877665205040023978b2b7514b979a9e8e5d4234588de899b",
+        "size_bytes": 1600481,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://developer.nvidia.com/jetson-agx-orin-pin-function-names-guide",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:30:21Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/agx_orin/Jetson_AGX_Orin_Pin_Function_Names_Guide_DA-11060-001_v1.0.pdf?__token__=exp=1790672420~hmac=6f4c71ef772412961904a3af7ddec4f126037bb8560ee6bef8f09acc3367daf7",
+        "sha256": "b65ed2b6ca66966ce85c204202bfc64ccc073fc4adbe700a1e4c4fbebb398f30",
+        "size_bytes": 777061,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/jetson-agx-orin-module-3d-step-modelzip",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:30:21Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/agx_orin/Jetson_AGX_Orin_Module_3D_STEP_Model.zip?__token__=exp=1790672420~hmac=318d5d0452e5e75fbd2553834f9c52fc691647c770a570ba650723166e47455a",
+        "sha256": "c2e469b0a5b3dacc49fbc80ac719e2f20b7b329ff5f55e5a89f0d3d3463b864b",
+        "size_bytes": 850660,
+        "media_type": "application/zip",
+        "detected_format": "step:CONFIG_CONTROL_DESIGN",
+        "verification_method": "http_get_step_header",
+        "contained_member": "p3701-sku0-simplified.stp"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://developer.nvidia.com/assets/embedded/secure/jetson/agx_orin/jetson-agx-orin-devkit-online-guide-200x200-20220223-r4.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:30:21Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/agx_orin/jetson-agx-orin-devkit-online-guide-200x200-20220223-r4.pdf?__token__=exp=1790672420~hmac=a3e55c2cc79f67e8ea202d67b827fa352597867cb6f5c9349758df01a5500aef",
+        "sha256": "4328be63771e213857c61d6e34029b4feb0890286f0b89bc13d58fab2daf8f20",
+        "size_bytes": 1194687,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://docs.nvidia.com/jetson/agx-orin-devkit/user-guide/latest/index.html",
+    "direct_cad_download": "https://developer.nvidia.com/downloads/jetson-agx-orin-module-3d-step-modelzip",
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

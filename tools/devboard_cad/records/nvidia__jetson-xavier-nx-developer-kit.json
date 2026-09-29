@@ -1,0 +1,97 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nvidia:jetson-xavier-nx-developer-kit",
+  "manufacturer": "NVIDIA",
+  "family": "Jetson Xavier NX",
+  "board": "NVIDIA Jetson Xavier NX Developer Kit",
+  "part_number": "P3518",
+  "revision": "Carrier board P3509 rev A01 per NVIDIA's",
+  "mcu_soc": "NVIDIA Jetson Xavier NX module",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "arm64 (Armv8.2-A, NVIDIA Carmel)",
+  "product_status": "not_recommended",
+  "files": {
+    "mechanical": {
+      "available": true,
+      "url": "https://developer.nvidia.com/assets/embedded/secure/jetson/xavier_nx/jetson_xavier_nx_product_marking_specification_da-10738-001_v1.1.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:32Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/Xavier%20NX/Jetson_Xavier_NX_Product_Marking_Specification_DA-10738-001_v1.1.pdf?__token__=exp=1790672491~hmac=6a09d042ef794861f6dc8ef8ffcb0a5ad1d20a2d3d8699dd16145b55cce025ad",
+        "sha256": "9cf3d65e9db88a88be7fd0c4429246cfdc5b1f12adbcc11486cd0559bd6fe9d4",
+        "size_bytes": 363614,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://developer.nvidia.com/jetson-xavier-nx-support-guide-r4",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:33Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/docs/jetson_developer_support_guides/jetson-xavier-nx-support-guide-r4.pdf",
+        "sha256": "3115dd4a38fa28581c07a1e3d0decd949b886f2ed6cf05d377ad1bbe48414a95",
+        "size_bytes": 1146605,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://developer.nvidia.com/embedded/jetson-xavier-nx-devkit",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://developer.nvidia.com/embedded/learn/get-started-jetson-xavier-nx-devkit",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

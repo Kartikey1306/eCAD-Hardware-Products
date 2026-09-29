@@ -1,0 +1,82 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "ti:lp-em-cc1354p10-6",
+  "manufacturer": "Texas Instruments",
+  "family": "SimpleLink CC13x4/CC26x4 LaunchPad",
+  "board": "CC1354P10 LaunchPad Development Kit for SimpleLink Sub-1 GHz and 2.4 G",
+  "part_number": "LP-EM-CC1354P10-6",
+  "revision": "Rev B (design file package SWRC391A)",
+  "mcu_soc": "CC1354P10",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M33F",
+  "product_status": "active",
+  "files": {
+    "schematic": {
+      "available": true,
+      "url": "https://www.ti.com/lit/zip/SWRC391",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:16Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/swrc391a/swrc391a.zip?ts=1790669410487",
+        "sha256": "469b70bea5db9b3534d296fff534415c5320ba093b0b7b251d94d988454c7cfc",
+        "size_bytes": 6412647,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "Assembly Drawing/MCU088_LP-EM-CC1354P10-6_RevB_ASSY.pdf"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.ti.com/tool/LP-EM-CC1354P10",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.ti.com/tool/LP-EM-CC1354P10",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://www.ti.com/lit/zip/SWRC391",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "renesas:tbb-ra8-audio-dsp",
+  "manufacturer": "Renesas Electronics",
+  "family": "RA / RA8 (Technology Building Block)",
+  "board": "TBB-RA8-AUDIO-DSP (Audio DSP Technology Building Block board)",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/TBB-RA8-AUDIO-DSP_public.PrjPcb",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "assembly_drawing": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/Assembly_dwg.PCBDwf",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/TBB-RA8-AUDIO-DSP.BomDoc",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/Fab_dwg.PCBDwf",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/TBB-RA8-AUDIO-DSP1.PcbDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2499d43242e73a9278d44cb15e83fc82bb284fa4694dc443b9672818bfe22338",
+        "size_bytes": 7917056,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/Codec.SchDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "857acc30b6280a0740783a95e97a70280463dbf7a1c8546e7dc3663c890b8979",
+        "size_bytes": 594944,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://github.com/renesas/tbb_ra8_audio_dsp_public",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://github.com/renesas/tbb_ra8_audio_dsp_public",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://raw.githubusercontent.com/renesas/tbb_ra8_audio_dsp_public/main/hardware/Codec.SchDoc",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

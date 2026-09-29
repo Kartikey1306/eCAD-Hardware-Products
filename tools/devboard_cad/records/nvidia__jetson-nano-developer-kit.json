@@ -1,0 +1,113 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nvidia:jetson-nano-developer-kit",
+  "manufacturer": "NVIDIA",
+  "family": "Jetson Nano",
+  "board": "NVIDIA Jetson Nano Developer Kit",
+  "part_number": "P3450",
+  "revision": "Carrier board P3449 rev B01 (20221017) p",
+  "mcu_soc": "NVIDIA Jetson Nano module",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "arm64 (Armv8-A, Arm Cortex-A57)",
+  "product_status": "not_recommended",
+  "files": {
+    "hardware_design_guide": {
+      "available": true,
+      "url": "https://developer.nvidia.com/embedded/dlc/jetson-nano-scl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/Nano/docs/Jetson_Nano_Supported_Components_List_NV.pdf?__token__=exp=1790672473~hmac=6987ec05cfd309a0abd9d9bb2c5c4110f97c00e80ab5921480724fb3547d29ed",
+        "sha256": "b8572ba51a71bdd6a869383d581b8f44166caeeda2d50232015448c770341662",
+        "size_bytes": 166428,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://developer.nvidia.com/assets/embedded/secure/jetson/nano/docs/jetson_nano_product_marking_specification_da-10740-001_v1.0.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/Nano/docs/Jetson_Nano_Product_Marking_Specification_DA-10740-001_v1.0.pdf?__token__=exp=1790672473~hmac=e8815d041a70366423187ed48cb6f5c64c4ffa82fc441d861c8ee5d707658b86",
+        "sha256": "12045d34c5ed950b7d4f9fa27d2d31582a1bf14d7b4468327b5149c2af96a31b",
+        "size_bytes": 541489,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://developer.nvidia.com/embedded/dlc/Jetson_Nano_Developer_Kit_User_Guide",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/Nano/docs/NV_Jetson_Nano_Developer_Kit_User_Guide.pdf?__token__=exp=1790672473~hmac=d29674267223facb7aad19cddeafd85deb6e52272871af18dbdfd4428b19e40c",
+        "sha256": "96e07c785c55969e35b0a69fc58fdea0542b2c3ce8f565a659240e53c6ce3f34",
+        "size_bytes": 1680990,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://developer.nvidia.com/embedded/jetson-nano-developer-kit",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

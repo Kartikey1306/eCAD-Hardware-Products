@@ -1,0 +1,132 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "nvidia:jetson-agx-thor-developer-kit",
+  "manufacturer": "NVIDIA",
+  "family": "Jetson AGX Thor",
+  "board": "NVIDIA Jetson AGX Thor Developer Kit",
+  "part_number": "P4070",
+  "revision": "Carrier board P4071 rev A02 (20260818) -",
+  "mcu_soc": "NVIDIA Jetson T5000 module",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "arm64 (Armv9-A, Arm Neoverse-V3AE)",
+  "product_status": "active",
+  "files": {
+    "datasheet": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/jetson-thor-developer-kit-carrier-board-specification.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:30:24Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/thor/docs/Jetson_Thor_Module_Carrier_Board_Spec_SP-12533-001_v1.2.pdf?__token__=exp=1790672422~hmac=4bc672c95cebb1201dbe044e5616a27078019a80f3c272a81b75cfd719888a13",
+        "sha256": "707e06290af1cb3be046957437d9c0af2f85e95304ee5ad1cfdead9d803762ca",
+        "size_bytes": 1283354,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "hardware_design_guide": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/jetson/thor/docs/jetson-thor-series-modules-designguide-dg12084001.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:30:29Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/thor/docs/Jetson_Thor_Series_Modules_DesignGuide_DG12084001_v1.5.pdf?__token__=exp=1790672422~hmac=8077547b3d2813a4509938b7ea2d4f67a34800753ada950b44803218862f1b72",
+        "sha256": "c94189a300a6c3d3a49a9326a445e4a2f88893d6c0fffa71491c668bab6a1c07",
+        "size_bytes": 3332299,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pinout": {
+      "available": null,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/Jetson_Thor_Series_Modules_Pinmux_Template.xlsm",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "reference_design": {
+      "available": null,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/jetson_thor_devkit_carrier_board_design_files.zip",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "step": {
+      "available": true,
+      "url": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/Jetson_Thor_DevKit_V01.zip",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:30:45Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://developer.download.nvidia.com/assets/embedded/secure/jetson/thor/docs/Jetson_Thor_DevKit_V01.zip?__token__=exp=1790672423~hmac=a3e3ab9a3f7d602a708debce14615a6f83e35d612ead1341cdff7fa6627c0b74",
+        "sha256": "198455b6c77871a0043d43e68d7a944d178f9f9a3d5966c56895cd0966f6d0dc",
+        "size_bytes": 36107659,
+        "media_type": "application/zip",
+        "detected_format": "step:CONFIG_CONTROL_DESIGN",
+        "verification_method": "http_get_step_header",
+        "contained_member": "Jetson_Thor_DevKit_V01.stp"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-thor/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://developer.nvidia.com/embedded/downloads",
+    "direct_cad_download": "https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/thor/docs/Jetson_Thor_DevKit_V01.zip",
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

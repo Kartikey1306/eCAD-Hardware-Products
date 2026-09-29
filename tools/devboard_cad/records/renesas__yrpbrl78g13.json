@@ -1,0 +1,86 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "renesas:yrpbrl78g13",
+  "manufacturer": "Renesas Electronics",
+  "family": "RL78 / RL78-G13",
+  "board": "YRPBRL78G13 Promotion Board for RL78/G13 (RL78/G13 Stick)",
+  "part_number": "YRPBRL78G13",
+  "revision": "unverified",
+  "mcu_soc": "Renesas R5F100LEAFB (RL78/G13)",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Renesas RL78 (S2 core, 16-bit CISC)",
+  "product_status": "unknown",
+  "files": {
+    "user_manual": {
+      "available": true,
+      "url": "https://www.renesas.com/en/document/mah/rl78g13-stick-yrpbrl78g13",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ae5ecacb253770d51c99d5f2da3ede5e2226d05feb5a1e117a4d7d40d2f63f24",
+        "size_bytes": 3628303,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/yrpbrl78g13",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.renesas.com/en/document/mah/rl78g13-stick-yrpbrl78g13",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}
