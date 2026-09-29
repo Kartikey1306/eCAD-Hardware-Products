@@ -518,6 +518,11 @@ class TestClassAndSanity(unittest.TestCase):
             "C4: one parameter overridden": (
                 {TB: ("uart_tx #(.CLK_FREQ(CLK_FREQ), .BAUD_RATE(BAUD_RATE)) u_tx", "uart_tx #(.CLK_FREQ(CLK_FREQ)) u_tx")},
                 "rule C4: u_tx overrides CLK_FREQ; each instance overrides both CLK_FREQ and BAUD_RATE"),
+            # Review CS-4: a sized top localparam can hold what the harness's unsized decimal cannot.
+            "C4: a parameter above 2^31 - 1": (
+                {TB: ("CLK_FREQ           = 50_000_000;", "CLK_FREQ           = 64'd2147483648;")},
+                "rule C4: u_tx CLK_FREQ = CLK_FREQ = 2147483648 is above 2147483647: the harness states each parameter "
+                "as an unsized decimal, which Verilog guarantees only as a 32-bit signed integer"),
             "C5: rx fed from tx_valid": (
                 {TB: (".rx(line)", ".rx(tx_valid)")},
                 "rule C5: the line, which the transmitter's tx and the receiver's rx share, must be one wire that "
@@ -656,6 +661,27 @@ class TestClassAndSanity(unittest.TestCase):
                 self.assertEqual(adapter.sanity_problems(changed), expected)
         known = with_limit(1e-08)
         self.assertEqual(adapter.sanity_problems(known), [], "a positive known device limit is sane")
+
+    def test_a_parameter_is_at_most_what_an_unsized_decimal_holds(self):
+        """Review CS-4: 2^31 - 1 is written into the harness; 2^31 and 5e9 are refused at extraction, where before
+        the harness took them and V2's reader of it refused the file build had written."""
+        from ecad_model.dataset import build
+        from ecad_model.importers import ExtractionError
+
+        with _scratch() as directory:
+            item = _copy(directory, {TB: ("CLK_FREQ           = 50_000_000;", "CLK_FREQ           = 64'd2147483647;")})
+            harness = (item / SIM).read_text()
+        self.assertIn("    uart_tx #(.BAUD_RATE(115200), .CLK_FREQ(2147483647)) u_tx (", harness)
+        for literal, number in (("64'd2147483648", "2147483648"), ("64'd5000000000", "5000000000")):
+            with self.subTest(literal), _scratch() as directory:
+                item = _copy(directory, {TB: ("CLK_FREQ           = 50_000_000;", f"CLK_FREQ           = {literal};")},
+                             rebuild=False)
+                with self.assertRaises(ExtractionError) as caught:
+                    build(item)
+                self.assertEqual(caught.exception.kind, "rejected")
+                self.assertIn(f"{item.relative_to(REPO_ROOT).as_posix()}/{TB}: {REJECTED} C4: u_tx CLK_FREQ = CLK_FREQ = "
+                              f"{number} is above 2147483647", str(caught.exception))
+                self.assertFalse((item / SIM).read_bytes().count(number.encode()), "nothing was written")
 
     def test_the_resource_guard_refuses_a_run_longer_than_max_cycles(self):
         """END = 4 + 4 * 12 * T: 50e6 // 1200 = 41666 gives 1 999 972 cycles; 50e6 // 1199 = 41701 gives 2 001 652."""

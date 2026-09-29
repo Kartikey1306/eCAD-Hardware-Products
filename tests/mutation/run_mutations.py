@@ -824,6 +824,11 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("dg-clock-compared-in-seconds", DG,
      "            if half_ns is not None and not abs(2 * half_ns * clock - 10**9) < 2 * half_ns:\n",
      "            if half is not None and abs(2 * half * clock - 1) > 1e-9:\n"),
+    # the digital review (CS-4): a parameter the harness's unsized decimal cannot hold is refused at extraction
+    ("dg-parameter-above-max-decimal-accepted", DG, "            if number > verilog.MAX_DECIMAL:\n",
+     "            if False:\n"),
+    ("dg-parameter-bound-off-by-one", DG, "            if number > verilog.MAX_DECIMAL:\n",
+     "            if number >= verilog.MAX_DECIMAL:\n"),
     # the digital domain: the registry
     ("digital-unregistered", DR, ',\n                                      "digital": DigitalAdapter()}',
      "}"),

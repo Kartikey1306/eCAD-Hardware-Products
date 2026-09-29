@@ -219,6 +219,14 @@ def _classify(design: verilog.Design) -> Tuple[verilog.Instance, verilog.Instanc
         raise _refusal(top.path, "C3", f"{receiver.module} declares no localparam OVERSAMPLE = <decimal literal>, the "
                                        "receiver's ticks per bit")
     localparams = top.localparams
+    # A sized top localparam may hold up to 64 bits, but the harness writes each parameter as an unsized decimal.
+    for instance in (transmitter, receiver):
+        for parameter, value in sorted(instance.overrides.items()):
+            number = localparams[value][0] if isinstance(value, str) else value
+            if number > verilog.MAX_DECIMAL:
+                raise _refusal(top.path, "C4", f"{instance.name} {parameter} = {value} = {number} is above "
+                                               f"{verilog.MAX_DECIMAL}: the harness states each parameter as an unsized "
+                                               "decimal, which Verilog guarantees only as a 32-bit signed integer")
     count = sum(name.startswith("TX_BYTE_") for name in localparams)
     stated = [f"TX_BYTE_{index}" for index in range(count)]
     if not 1 <= count <= MAX_BYTES or set(stated) - set(localparams):
@@ -435,8 +443,9 @@ def loopback_roles(model: Dict[str, Any]) -> Roles:
       C6  the top carries the clock half-period, the reset length, the bytes
           and their count.
     The extraction also refuses what only the sources show (an OVERSAMPLE
-    that is not a decimal literal, inert or misnumbered localparams, an even
-    first byte) and the resource guard C7.
+    that is not a decimal literal, a parameter value above
+    verilog.MAX_DECIMAL, inert or misnumbered localparams, an even first
+    byte) and the resource guard C7.
 
     Args:
         model: An engineering model of this domain.
