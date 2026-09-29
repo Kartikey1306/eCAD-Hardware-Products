@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:qwiic-adc-ads1219",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "Qwiic breakout board for the ADS1219 4-channel 24-bit ADC from TI",
+  "part_number": "SEN-27544",
+  "revision": "not-stated",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_ADC_ADS1219/de0f42821a29a3d36fa2ad246ed3274344f4e731/Hardware/Qwiic_ADC_ADS1219.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:46Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c2ecbd687854b01a8483543bb254dca09d791b127e6815431bbce3a08bf4c0bc",
+        "size_bytes": 642268,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_ADC_ADS1219/de0f42821a29a3d36fa2ad246ed3274344f4e731/Hardware/Qwiic_ADC_ADS1219.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:46Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c2ecbd687854b01a8483543bb254dca09d791b127e6815431bbce3a08bf4c0bc",
+        "size_bytes": 642268,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_ADC_ADS1219/de0f42821a29a3d36fa2ad246ed3274344f4e731/Hardware/Qwiic_ADC_ADS1219.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:46Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c066c21d4413a7a0502cd155f5ac12869205450f9ace25c651bf4cd3669f87a1",
+        "size_bytes": 248145,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_ADC_ADS1219@de0f42821a29a3d36fa2ad246ed3274344f4e731"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Qwiic_ADC_ADS1219/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/SEN-27544",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Qwiic_ADC_ADS1219",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Qwiic_ADC_ADS1219",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Qwiic_ADC_ADS1219 pinned at de0f42821a29. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Qwiic_ADC_ADS1219: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

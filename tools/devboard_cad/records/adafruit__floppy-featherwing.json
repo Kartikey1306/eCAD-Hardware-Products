@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:floppy-featherwing",
+  "manufacturer": "Adafruit Industries",
+  "family": "FeatherWing",
+  "board": "Adafruit Floppy FeatherWing",
+  "part_number": "5679",
+  "revision": "not-stated",
+  "mcu_soc": "RP2040",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Dual Arm Cortex-M0+",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit_Floppy_FeatherWing_PCB/8793e86222bd62b1ee243e07e97a8de9ff6a7e7e/Adafruit%20Floppy%20FeatherWing.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:22Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "4292b97d36e58b6ca39cec23a032506d6ac68e747b6868d6ca5c4972ddd02dc4",
+        "size_bytes": 996204,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit_Floppy_FeatherWing_PCB/8793e86222bd62b1ee243e07e97a8de9ff6a7e7e/Adafruit%20Floppy%20FeatherWing.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:22Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "4292b97d36e58b6ca39cec23a032506d6ac68e747b6868d6ca5c4972ddd02dc4",
+        "size_bytes": 996204,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit_Floppy_FeatherWing_PCB/8793e86222bd62b1ee243e07e97a8de9ff6a7e7e/Adafruit%20Floppy%20FeatherWing.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:22Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "764d1e03cc2e10074eb1d07ff7ea39782d118baba7222c09c8b35f1e398c74fa",
+        "size_bytes": 460029,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit_Floppy_FeatherWing_PCB@8793e86222bd62b1ee243e07e97a8de9ff6a7e7e"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit_Floppy_FeatherWing_PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/5679",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit_Floppy_FeatherWing_PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit_Floppy_FeatherWing_PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit_Floppy_FeatherWing_PCB pinned at 8793e86222bd. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit_Floppy_FeatherWing_PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

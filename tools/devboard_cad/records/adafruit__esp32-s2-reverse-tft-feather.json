@@ -1,0 +1,221 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:esp32-s2-reverse-tft-feather",
+  "manufacturer": "Adafruit Industries",
+  "family": "Feather",
+  "board": "EagleCAD PCB files for Adafruit ESP32-S2 Reverse TFT Feather",
+  "part_number": "5345",
+  "revision": "not-stated",
+  "mcu_soc": "ESP32-S2",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Xtensa LX7",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB/ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3/Adafruit%20Feather%20ESP32-S2%20Reverse%20TFT.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:29Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "df882a54b640c12b1475ef399cd9252569d2a1511fddca1177e7cbf0d7818e1b",
+        "size_bytes": 727661,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB/ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3/Adafruit%20Feather%20ESP32-S2%20Reverse%20TFT.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:29Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "df882a54b640c12b1475ef399cd9252569d2a1511fddca1177e7cbf0d7818e1b",
+        "size_bytes": 727661,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB/ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3/Adafruit_Reverse_TFT_Feather_ESP32-S2_Pinout.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:29Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "71f1c77520263189f64a734a33b12a89f14f405fe26075b8b12ccbd3c170007b",
+        "size_bytes": 244536,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB/ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3/Adafruit%20Feather%20ESP32-S2%20Reverse%20TFT.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:30Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0ba7d89b9a2b664e1d1625faad16094551739e9a3be788d267d1b00e1fcd76fc",
+        "size_bytes": 644782,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB@ce3ce90565b9e49af0ebbd1c2e0abd300d2fd0d3"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/5345",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB pinned at ce3ce90565b9. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-ESP32-S2-Reverse-TFT-Feather-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

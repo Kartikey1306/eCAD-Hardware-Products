@@ -1,0 +1,254 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:pro-micro-rp2350",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Pro Micro",
+  "board": "SparkFun Pro Micro RP2350",
+  "part_number": "DEV-24870",
+  "revision": "not-stated",
+  "mcu_soc": "RP2350",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M33 / RISC-V Hazard3 (dual)",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro_RP2350/8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f/Documents/APS6404L_3SQR_Datasheet.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:32Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ed2bcb7a5934c4cf7af58b2998eaa23ce77e2498f65ffe6ef736ac9b8907011b",
+        "size_bytes": 1064072,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro_RP2350/8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f/Hardware/RP2350A.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:31Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "afeb26ca86a2508c202929be830d9232dffee27ca654318675177862b2f451d1",
+        "size_bytes": 40582,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro_RP2350/8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f/Hardware/RP2350A.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:31Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "afeb26ca86a2508c202929be830d9232dffee27ca654318675177862b2f451d1",
+        "size_bytes": 40582,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro_RP2350/8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f/Production/SparkFun_ProMicro_RP2350-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "665afc0c94ebd59ff2552edb853392ef1f32ff2cf39251f76bf22fcb4de08822",
+        "size_bytes": 7476861,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro_RP2350/8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f/Hardware/SparkFun_ProMicro_RP2350.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:32Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0aaf71600adcbd461f30306e014095e07f807cf1954a7e50600578c6760a6177",
+        "size_bytes": 379030,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro_RP2350/8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f/Hardware/SparkFun_ProMicro_RP2350.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:32Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a9dcdd9a48f11deeb2c9cda7ede9b17c9f0ee419c81f018aa9478bacb13dce06",
+        "size_bytes": 1469586,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro_RP2350@8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro_RP2350/8d3bbac8c3b9e6e75fa5fe34d8421efa4c211f1f/Hardware/RP2350A.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:32Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "afeb26ca86a2508c202929be830d9232dffee27ca654318675177862b2f451d1",
+        "size_bytes": 40582,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-24870",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Pro_Micro_RP2350",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Pro_Micro_RP2350",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Pro_Micro_RP2350 pinned at 8d3bbac8c3b9. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

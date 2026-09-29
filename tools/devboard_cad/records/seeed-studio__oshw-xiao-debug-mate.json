@@ -1,0 +1,203 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "seeed-studio:oshw-xiao-debug-mate",
+  "manufacturer": "Seeed Studio",
+  "family": "XIAO",
+  "board": "Seeed Studio XIAO Debug Mate: The all-in-one ESP32-S3 debugging solution",
+  "part_number": "6588",
+  "revision": "1.0",
+  "mcu_soc": "ESP32-S3",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Xtensa LX7",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "pcb_source": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Debug-Mate/51769f4dcb8829d95728eb34c37da2b4a58948bc/4_Hardware/Seeed_Studio_XIAO_Debug_Mate_V1.0_SCH_20250926.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "129a15acc7d7330ad6b9929c45bafd1a8ccceb8745e9899a7e67fb033ae771c9",
+        "size_bytes": 5678521,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Debug-Mate/51769f4dcb8829d95728eb34c37da2b4a58948bc/3_Product_housing/Debugger%20Screen%20Mounting%20Block%3B%20FDM%2C%20ABS%2C%20L57.5W47.5H6.4%2C%20Black%2C%20Deburred.stp",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:06Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "593fe0df6e158e2710dafd6eab1429ed8beb0cd4e68a7cee14fc9f2def23831a",
+        "size_bytes": 340568,
+        "media_type": "text/plain",
+        "detected_format": "step:CONFIG_CONTROL_DESIGN",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Debug-Mate@51769f4dcb8829d95728eb34c37da2b4a58948bc"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.seeedstudio.com/",
+    "official_cad_repository": "https://github.com/Seeed-Studio/OSHW-XIAO-Debug-Mate",
+    "official_github_repository": "https://github.com/Seeed-Studio/OSHW-XIAO-Debug-Mate",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository Seeed-Studio/OSHW-XIAO-Debug-Mate pinned at 51769f4dcb88. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

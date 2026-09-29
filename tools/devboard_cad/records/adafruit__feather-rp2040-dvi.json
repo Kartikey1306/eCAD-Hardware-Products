@@ -1,0 +1,221 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:feather-rp2040-dvi",
+  "manufacturer": "Adafruit Industries",
+  "family": "Feather",
+  "board": "Adafruit Feather RP2040 DVI",
+  "part_number": "5710",
+  "revision": "not-stated",
+  "mcu_soc": "RP2040",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Dual Arm Cortex-M0+",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-RP2040-DVI-PCB/24f7c1cde8c7284bbd626f78e2b853be24d32ee6/Adafruit%20Feather%20RP2040%20DVI.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:01Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "eccf97c162f49bd097ca31a22e18b3386749f30fdd20bc6a37c6bb54a0cba3b2",
+        "size_bytes": 3221088,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-RP2040-DVI-PCB/24f7c1cde8c7284bbd626f78e2b853be24d32ee6/Adafruit%20Feather%20RP2040%20DVI.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "eccf97c162f49bd097ca31a22e18b3386749f30fdd20bc6a37c6bb54a0cba3b2",
+        "size_bytes": 3221088,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-RP2040-DVI-PCB/24f7c1cde8c7284bbd626f78e2b853be24d32ee6/Adafruit_Feather_RP2040_DVI_Pinout_2.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:01Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7e82cfbbdcab1e1fee9b1780cc979303534484ecfb244a4fbf0177ff76d1b77d",
+        "size_bytes": 287617,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-RP2040-DVI-PCB/24f7c1cde8c7284bbd626f78e2b853be24d32ee6/Adafruit%20Feather%20RP2040%20DVI.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:01Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "972a3d4d42fe79f792eb76ae114e9551ebbb3e09caf1892c11503d8591f16aff",
+        "size_bytes": 724861,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:05:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-RP2040-DVI-PCB@24f7c1cde8c7284bbd626f78e2b853be24d32ee6"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-Feather-RP2040-DVI-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/5710",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-Feather-RP2040-DVI-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-Feather-RP2040-DVI-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Feather-RP2040-DVI-PCB pinned at 24f7c1cde8c7. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-Feather-RP2040-DVI-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

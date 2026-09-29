@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:tft-gizmo",
+  "manufacturer": "Adafruit Industries",
+  "family": "Circuit Playground",
+  "board": "Adafruit TFT Gizmo",
+  "part_number": "4367",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-TFT-Gizmo-PCB/dc9a7479381c01421a630a93f891c7142f4dfde0/Adafruit%20Circuit%20Playground%20TFT%20Gizmo.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "bae4cc1b7a25a60073ec25b01e94f6e061e1bff05d2eb8eb00b75a7ac170be18",
+        "size_bytes": 1023384,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-TFT-Gizmo-PCB/dc9a7479381c01421a630a93f891c7142f4dfde0/Adafruit%20Circuit%20Playground%20TFT%20Gizmo.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "bae4cc1b7a25a60073ec25b01e94f6e061e1bff05d2eb8eb00b75a7ac170be18",
+        "size_bytes": 1023384,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-TFT-Gizmo-PCB/dc9a7479381c01421a630a93f891c7142f4dfde0/Adafruit%20Circuit%20Playground%20TFT%20Gizmo.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0aa030e870380d9c2c1f313474d843709f97ce6f00bd9b22378197371c9b0cf7",
+        "size_bytes": 400758,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-TFT-Gizmo-PCB@dc9a7479381c01421a630a93f891c7142f4dfde0"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-TFT-Gizmo-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/4367",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-TFT-Gizmo-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-TFT-Gizmo-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-TFT-Gizmo-PCB pinned at dc9a7479381c. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-TFT-Gizmo-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

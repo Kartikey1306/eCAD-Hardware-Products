@@ -1,0 +1,254 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:micromod-lte-gnss-function-board-u-blox-sara-r5",
+  "manufacturer": "SparkFun Electronics",
+  "family": "MicroMod",
+  "board": "SparkFun MicroMod LTE GNSS Function Board u blox SARA R5",
+  "part_number": "DEV-18431",
+  "revision": "R5",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5/03c140076301289bb70f1c39d53b693328f720d9/docs/assets/component_documentation/SARA-R5_DataSheet_UBX-19016638.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "4f3bebc246da10d14cd86d4a46d5f5fc68e6ed42483fced18c7df212877c0855",
+        "size_bytes": 1216977,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5/03c140076301289bb70f1c39d53b693328f720d9/Hardware/SparkFun_MicroMod_Function_SARA-R5.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "172ef8680e00933bf4f00ccf1dede1c907e05397fc54ca451eecb6f075e25e17",
+        "size_bytes": 550586,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5/03c140076301289bb70f1c39d53b693328f720d9/Hardware/lbrs/New_Parts.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "029be0c204936b6e465b6e97f31746c835eb9c0403ae17920ed2d4105614e14a",
+        "size_bytes": 16661,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5/03c140076301289bb70f1c39d53b693328f720d9/Hardware/Production/SparkFun_MicroMod_Function_SARA-R5-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "65dbd5964e463cbf1e22ac7be26e0240798456745d9ff4be15ea0c9a72933f67",
+        "size_bytes": 1461233,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5/03c140076301289bb70f1c39d53b693328f720d9/Hardware/SparkFun_MicroMod_Function_SARA-R5.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "172ef8680e00933bf4f00ccf1dede1c907e05397fc54ca451eecb6f075e25e17",
+        "size_bytes": 550586,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5/03c140076301289bb70f1c39d53b693328f720d9/docs/assets/board_files/SparkFun_MicroMod_Function_SARA-R5_Schematic_v11.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "36d0338dfa806e3991eb67ce0c3d408e9c85e4e5715d2c1fbbfaefe457c394aa",
+        "size_bytes": 513906,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5@03c140076301289bb70f1c39d53b693328f720d9"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5/03c140076301289bb70f1c39d53b693328f720d9/Hardware/lbrs/New_Parts.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "029be0c204936b6e465b6e97f31746c835eb9c0403ae17920ed2d4105614e14a",
+        "size_bytes": 16661,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-18431",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5 pinned at 03c140076301. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_MicroMod_LTE_GNSS_Function_Board_u-blox_SARA-R5: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

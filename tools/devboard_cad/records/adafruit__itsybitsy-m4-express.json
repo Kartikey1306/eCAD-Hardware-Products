@@ -1,0 +1,221 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:itsybitsy-m4-express",
+  "manufacturer": "Adafruit Industries",
+  "family": "ItsyBitsy",
+  "board": "Adafruit ItsyBitsy M4 Express",
+  "part_number": "3800",
+  "revision": "not-stated",
+  "mcu_soc": "SAMD51",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-M4-Express-PCB/77ccac24a6eb36fca6f780fd45511d039f0e574f/Adafruit%20ItsyBitsy%20M4.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:43Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7aee256c713399db4e0063beb1693ef89b45b38206c9395f13bd85bed933a99f",
+        "size_bytes": 2159546,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-M4-Express-PCB/77ccac24a6eb36fca6f780fd45511d039f0e574f/Adafruit%20ItsyBitsy%20M4.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:43Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7aee256c713399db4e0063beb1693ef89b45b38206c9395f13bd85bed933a99f",
+        "size_bytes": 2159546,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-M4-Express-PCB/77ccac24a6eb36fca6f780fd45511d039f0e574f/Adafruit%20ItsyBitsy%20M4%20Pinout.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2dd5ae5ab1acab8d786b116e11465430560fc9d9d08815feba06be92baead58b",
+        "size_bytes": 2586689,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-M4-Express-PCB/77ccac24a6eb36fca6f780fd45511d039f0e574f/Adafruit%20ItsyBitsy%20M4.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:43Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c1c04d10ccced481ec02d7e697f8585132fbf3176fbecb933d42a77f3dbfca3f",
+        "size_bytes": 271218,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-M4-Express-PCB@77ccac24a6eb36fca6f780fd45511d039f0e574f"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-ItsyBitsy-M4-Express-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/3800",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-ItsyBitsy-M4-Express-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-ItsyBitsy-M4-Express-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-ItsyBitsy-M4-Express-PCB pinned at 77ccac24a6eb. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-ItsyBitsy-M4-Express-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution. See license.txt for additional details.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

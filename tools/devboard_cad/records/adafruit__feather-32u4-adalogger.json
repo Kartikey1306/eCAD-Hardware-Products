@@ -1,0 +1,221 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:feather-32u4-adalogger",
+  "manufacturer": "Adafruit Industries",
+  "family": "Feather",
+  "board": "Adafruit Feather 32u4 Adalogger",
+  "part_number": "2795",
+  "revision": "not-stated",
+  "mcu_soc": "ATMEGA32U4",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "AVR",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-32u4-Adalogger-PCB/c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0/Adafruit%20Feather%2032u4%20Adalogger.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:34Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2d4114b9801c7fb54a7a4b30004daf894802c3752a97dbe67a96cfb64f257026",
+        "size_bytes": 612927,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-32u4-Adalogger-PCB/c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0/Adafruit%20Feather%2032u4%20Adalogger.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:34Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2d4114b9801c7fb54a7a4b30004daf894802c3752a97dbe67a96cfb64f257026",
+        "size_bytes": 612927,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-32u4-Adalogger-PCB/c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0/Adafruit%20Feather%2032u4%20Adalogger%20Pinout.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:34Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "814d81dad6f3a69737d71540301134098cc6f4015cb934ea45304e399595143e",
+        "size_bytes": 65634,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-32u4-Adalogger-PCB/c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0/Adafruit%20Feather%2032u4%20Adalogger.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:34Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "673ca5582f77746f75eb2954783d07100a959334ec545b28e21d7d341a25a644",
+        "size_bytes": 294409,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:15Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-32u4-Adalogger-PCB@c7e87d6e0feb5d3e048c3715038c0e4ce71cdfa0"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-Feather-32u4-Adalogger-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/2795",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-Feather-32u4-Adalogger-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-Feather-32u4-Adalogger-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Feather-32u4-Adalogger-PCB pinned at c7e87d6e0feb. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-Feather-32u4-Adalogger-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

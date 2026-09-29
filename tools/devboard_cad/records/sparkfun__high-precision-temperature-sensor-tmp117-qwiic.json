@@ -1,0 +1,212 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:high-precision-temperature-sensor-tmp117-qwiic",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "Breakout board for the TMP117 High Precision Temperature Sensor (Qwiic)",
+  "part_number": "SEN-15805",
+  "revision": "not-stated",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "datasheet": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic/aa763eaee71d9245e5c31daa6883f6f5c6186f16/Documentation/tmp117%20datasheet.pdf",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic/aa763eaee71d9245e5c31daa6883f6f5c6186f16/Hardware/Sparkfun_TMP117_Qwiic.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:27Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9196c5492020bb2594d0c5d9a7b672514d58f515563dcc4f2a4b9c7ab03ebce3",
+        "size_bytes": 298605,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic/aa763eaee71d9245e5c31daa6883f6f5c6186f16/Hardware/Sparkfun_TMP117_Qwiic.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:27Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9196c5492020bb2594d0c5d9a7b672514d58f515563dcc4f2a4b9c7ab03ebce3",
+        "size_bytes": 298605,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic/aa763eaee71d9245e5c31daa6883f6f5c6186f16/Hardware/Sparkfun_TMP117_Qwiic.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:28Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5e3cf56fdfcc25a93e8df168ca9120950517c5294b5f28dfadacdc029c0724b5",
+        "size_bytes": 760418,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:53Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic@aa763eaee71d9245e5c31daa6883f6f5c6186f16"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/SEN-15805",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic pinned at aa763eaee71d. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_High_Precision_Temperature_Sensor_TMP117_Qwiic: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

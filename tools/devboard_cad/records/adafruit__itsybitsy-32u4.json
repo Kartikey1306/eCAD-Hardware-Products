@@ -1,0 +1,221 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:itsybitsy-32u4",
+  "manufacturer": "Adafruit Industries",
+  "family": "ItsyBitsy",
+  "board": "Adafruit ItsyBitsy 32u4",
+  "part_number": "3677",
+  "revision": "not-stated",
+  "mcu_soc": "ATMEGA32U4",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "AVR",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-32u4-PCB/b48fb1454afa84d1d83d4641d6c31fb49d360222/Itsy%20Bitsy%2032u4%203V.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "319a5c9e3cd721dc4224bfbf2377ca70942c98314dbb0d449b209acdc44f8434",
+        "size_bytes": 280514,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-32u4-PCB/b48fb1454afa84d1d83d4641d6c31fb49d360222/Itsy%20Bitsy%2032u4%203V.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "319a5c9e3cd721dc4224bfbf2377ca70942c98314dbb0d449b209acdc44f8434",
+        "size_bytes": 280514,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-32u4-PCB/b48fb1454afa84d1d83d4641d6c31fb49d360222/Itsy%20Bitsy%2032u4%203V%20Pinout.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "b7260a7671726338cf7d4fd1efda03d1c343400a68d3460d55594b89c5522b3e",
+        "size_bytes": 50456,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-32u4-PCB/b48fb1454afa84d1d83d4641d6c31fb49d360222/Itsy%20Bitsy%2032u4%203V.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "dcdef4643478211d5c60e94739b9d3b808b90b1737347ceb3f31234a53c499e1",
+        "size_bytes": 245858,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:39Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-32u4-PCB@b48fb1454afa84d1d83d4641d6c31fb49d360222"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-ItsyBitsy-32u4-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/3677",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-ItsyBitsy-32u4-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-ItsyBitsy-32u4-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-ItsyBitsy-32u4-PCB pinned at b48fb1454afa. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-ItsyBitsy-32u4-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution. See license.txt for additional details.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

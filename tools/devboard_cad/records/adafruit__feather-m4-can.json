@@ -1,0 +1,221 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:feather-m4-can",
+  "manufacturer": "Adafruit Industries",
+  "family": "Feather",
+  "board": "Feather M4 CAN Express",
+  "part_number": "4759",
+  "revision": "not-stated",
+  "mcu_soc": "SAMD51",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-M4-CAN-PCB/d82af0d26250cb47e0685715276474798bb79470/Adafruit%20Feather%20M4%20Express%20CAN.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5a11b0efbffc4e5a73d0cd666415147fe3eb355e4660a24928d40a1df9a8b3d9",
+        "size_bytes": 516803,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-M4-CAN-PCB/d82af0d26250cb47e0685715276474798bb79470/Adafruit%20Feather%20M4%20Express%20CAN.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5a11b0efbffc4e5a73d0cd666415147fe3eb355e4660a24928d40a1df9a8b3d9",
+        "size_bytes": 516803,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-M4-CAN-PCB/d82af0d26250cb47e0685715276474798bb79470/Adafruit%20Feather%20M4%20Express%20CAN%20Pinout.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7ad577dc573197303fbf4758b277891851be643fc3d97b3b57c0a44bb56f9950",
+        "size_bytes": 71518,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-M4-CAN-PCB/d82af0d26250cb47e0685715276474798bb79470/Adafruit%20Feather%20M4%20Express%20CAN.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a1caf749e48154f8b0e059f3856503e2179dc1e05c7a9a61ae5c9baad16ce9eb",
+        "size_bytes": 444253,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:31Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-M4-CAN-PCB@d82af0d26250cb47e0685715276474798bb79470"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-Feather-M4-CAN-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/4759",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-Feather-M4-CAN-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-Feather-M4-CAN-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Feather-M4-CAN-PCB pinned at d82af0d26250. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-Feather-M4-CAN-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

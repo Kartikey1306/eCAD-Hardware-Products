@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:joy-featherwing",
+  "manufacturer": "Adafruit Industries",
+  "family": "FeatherWing",
+  "board": "joy featherwing",
+  "part_number": "3632",
+  "revision": "C",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Joy-Featherwing-PCB/45f843d490a5968f4642ff970e8e867918c80b8d/Joypad%20FeatherWing%20rev%20C.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7f6a7f3a1d6a4b3db19cb0c323af9e3b0a131aad40bf5828af7ca086ab4913a6",
+        "size_bytes": 415475,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Joy-Featherwing-PCB/45f843d490a5968f4642ff970e8e867918c80b8d/Joypad%20FeatherWing%20rev%20C.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7f6a7f3a1d6a4b3db19cb0c323af9e3b0a131aad40bf5828af7ca086ab4913a6",
+        "size_bytes": 415475,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Joy-Featherwing-PCB/45f843d490a5968f4642ff970e8e867918c80b8d/Joypad%20FeatherWing%20rev%20C.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:13:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "aebb53b73b550e6e03662131dd6cddc9afeac961711f17b11987addcee130ec5",
+        "size_bytes": 173251,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:35Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Joy-Featherwing-PCB@45f843d490a5968f4642ff970e8e867918c80b8d"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-Joy-Featherwing-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/3632",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-Joy-Featherwing-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-Joy-Featherwing-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Joy-Featherwing-PCB pinned at 45f843d490a5. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-Joy-Featherwing-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution. See license.txt for additional details.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

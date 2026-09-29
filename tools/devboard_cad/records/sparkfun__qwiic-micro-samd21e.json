@@ -1,0 +1,254 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:qwiic-micro-samd21e",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "Hardware repo for the Qwiic Micro SAMD21E development board",
+  "part_number": "DEV-15423",
+  "revision": "not-stated",
+  "mcu_soc": "SAMD21",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M0+",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E/fa536a4f7180cfc7450435ef9c204fd86e037201/Documents/Atmel-42181-SAM-D21_Datasheet.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:07Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f37d9c3461da07917dc706c0f6a336bb219e0ebcc285295c651e256a7bc89132",
+        "size_bytes": 17685114,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E/fa536a4f7180cfc7450435ef9c204fd86e037201/Hardware/SparkFun_Qwiic_Micro_SAMD21E.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a87b4779add4496cd3b0913b8220afd61e99acc598f3cf8d5a813ec15d0eda52",
+        "size_bytes": 444833,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E/fa536a4f7180cfc7450435ef9c204fd86e037201/Hardware/Buzzard%20Labels/D0.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a7145fffa23b6fe2df6bd9a1dd8d984a17e5fe63cc3b39afd66fdcc1e4e44a9a",
+        "size_bytes": 50105,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E/fa536a4f7180cfc7450435ef9c204fd86e037201/Production/SparkFun_Qwiic_Micro_SAMD21E-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2f07cca6b050f55eb99110952082e87c407ef03f3e710a392a0fc716119b2867",
+        "size_bytes": 736887,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E/fa536a4f7180cfc7450435ef9c204fd86e037201/Hardware/SparkFun_Qwiic_Micro_SAMD21E.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a87b4779add4496cd3b0913b8220afd61e99acc598f3cf8d5a813ec15d0eda52",
+        "size_bytes": 444833,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E/fa536a4f7180cfc7450435ef9c204fd86e037201/Hardware/SparkFun_Qwiic_Micro_SAMD21E.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f5e3e71e9d7d146892be3c586f10ee465f098a659a94e7cbfef92f914eb65619",
+        "size_bytes": 1205105,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:42Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_Micro_SAMD21E@fa536a4f7180cfc7450435ef9c204fd86e037201"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E/fa536a4f7180cfc7450435ef9c204fd86e037201/Hardware/Buzzard%20Labels/D0.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a7145fffa23b6fe2df6bd9a1dd8d984a17e5fe63cc3b39afd66fdcc1e4e44a9a",
+        "size_bytes": 50105,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-15423",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Qwiic_Micro_SAMD21E",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Qwiic_Micro_SAMD21E pinned at fa536a4f7180. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Qwiic_Micro_SAMD21E: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

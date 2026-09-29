@@ -1,0 +1,255 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:qwiic-gps-rtk2",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "SparkFun Qwiic GPS RTK2",
+  "part_number": "16481",
+  "revision": "not-stated",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_GPS-RTK2/898a676f3136b68118331e3683299951df3e7133/Documents/ZED-F9P-02B_DataSheet_UBX-21023276.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3729bd81334a66f550cb5d09614d775fdb497f621c5a3e2862495bcb3bcb59b8",
+        "size_bytes": 1141066,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_GPS-RTK2/898a676f3136b68118331e3683299951df3e7133/Hardware/ZED-F9P.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "35ef51d2535a95f9e01e867df4207bbe255c3d6f374962d11d106c753af8008a",
+        "size_bytes": 23437,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_GPS-RTK2/898a676f3136b68118331e3683299951df3e7133/Hardware/ZED-F9P.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "35ef51d2535a95f9e01e867df4207bbe255c3d6f374962d11d106c753af8008a",
+        "size_bytes": 23437,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_GPS-RTK2/898a676f3136b68118331e3683299951df3e7133/Hardware/Production/Qwiic%20GPS-RTK-SMA%20v12-Panel.zip",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "bbe57e78d84d186e028dff632fcfa7a4f16accb494e6f3586769434a945cc6ab",
+        "size_bytes": 1560899,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "ordering_instructions.txt"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_GPS-RTK2/898a676f3136b68118331e3683299951df3e7133/Hardware/Qwiic%20GPS-RTK2%20-%20ublox%20ZED-F9P.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "1cb88be8984942835f81bb83f78aab4d97c9b51927139990c6632aa20d75f259",
+        "size_bytes": 633076,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_GPS-RTK2/898a676f3136b68118331e3683299951df3e7133/Hardware/Qwiic%20GPS-RTK2%20-%20ublox%20ZED-F9P.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "07a8af85ce0608ebf143d2958efff88c25de08f2baa251dd6682a029eb038b7d",
+        "size_bytes": 1095381,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:21Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_GPS-RTK2@898a676f3136b68118331e3683299951df3e7133"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_GPS-RTK2/898a676f3136b68118331e3683299951df3e7133/Hardware/ZED-F9P.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "35ef51d2535a95f9e01e867df4207bbe255c3d6f374962d11d106c753af8008a",
+        "size_bytes": 23437,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/Qwiic_GPS-RTK2/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/16481",
+    "official_cad_repository": "https://github.com/sparkfun/Qwiic_GPS-RTK2",
+    "official_github_repository": "https://github.com/sparkfun/Qwiic_GPS-RTK2",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/Qwiic_GPS-RTK2 pinned at 898a676f3136. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/Qwiic_GPS-RTK2: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

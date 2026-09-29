@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:airlift-featherwing",
+  "manufacturer": "Adafruit Industries",
+  "family": "FeatherWing",
+  "board": "Adafruit AirLift FeatherWing",
+  "part_number": "4264",
+  "revision": "C",
+  "mcu_soc": "ESP32",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Xtensa LX6",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-AirLift-FeatherWing-PCB/c8631c7eeed9f69f61403827fa0e0d247da1ea8e/Adafruit%20AirLift%20FeatherWing%20rev%20B.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e8eb28503cd21bcfd9842799ac03665f8ecd5e38ae20e52fa4db90c9c8dfd56a",
+        "size_bytes": 547935,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-AirLift-FeatherWing-PCB/c8631c7eeed9f69f61403827fa0e0d247da1ea8e/Adafruit%20AirLift%20FeatherWing%20rev%20B.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e8eb28503cd21bcfd9842799ac03665f8ecd5e38ae20e52fa4db90c9c8dfd56a",
+        "size_bytes": 547935,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-AirLift-FeatherWing-PCB/c8631c7eeed9f69f61403827fa0e0d247da1ea8e/Adafruit%20AirLift%20FeatherWing%20rev%20B.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f0a55c0c607cb36d69d6e323238d01989c3c4d69bc553004cc32fd50da8958e9",
+        "size_bytes": 238115,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-AirLift-FeatherWing-PCB@c8631c7eeed9f69f61403827fa0e0d247da1ea8e"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-AirLift-FeatherWing-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/4264",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-AirLift-FeatherWing-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-AirLift-FeatherWing-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-AirLift-FeatherWing-PCB pinned at c8631c7eeed9. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-AirLift-FeatherWing-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

@@ -6,8 +6,8 @@
   "family": "ItsyBitsy",
   "board": "Adafruit ItsyBitsy RP2040",
   "part_number": "4888",
-  "revision": "unverified",
-  "mcu_soc": "Raspberry Pi RP2040",
+  "revision": "not-stated",
+  "mcu_soc": "RP2040",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": "Dual Arm Cortex-M0+",
@@ -19,7 +19,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
@@ -31,7 +31,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
@@ -43,7 +43,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
@@ -54,7 +54,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-RP2040-PCB/b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4/Adafruit%20ItsyBitsy%20RP2040.brd",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:54:46Z",
+        "captured_at": "2026-09-29T07:13:48Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "19f4c443f199bff671ac3399383cb59d64aa33ef6ba941ee7a8ac1967d201ff3",
@@ -70,7 +70,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
@@ -82,7 +82,19 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
@@ -94,7 +106,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
@@ -105,7 +117,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-RP2040-PCB/b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4/Adafruit%20ItsyBitsy%20RP2040.brd",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:54:46Z",
+        "captured_at": "2026-09-29T07:13:48Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "19f4c443f199bff671ac3399383cb59d64aa33ef6ba941ee7a8ac1967d201ff3",
@@ -121,7 +133,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
@@ -132,7 +144,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-RP2040-PCB/b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4/Adafruit%20ItsyBitsy%20RP2040%20pinout.pdf",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:54:50Z",
+        "captured_at": "2026-09-29T07:13:48Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "136e7de75fa88aa48d68861c12b757ede3f8aad5d9a533f2b98b2b0cda743738",
@@ -147,7 +159,7 @@
       "url": "https://raw.githubusercontent.com/adafruit/Adafruit-ItsyBitsy-RP2040-PCB/b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4/Adafruit%20ItsyBitsy%20RP2040.sch",
       "verified_revision": null,
       "evidence": {
-        "captured_at": "2026-09-29T05:54:57Z",
+        "captured_at": "2026-09-29T07:13:48Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
         "sha256": "8d5d6a3b01a20e27f033d9ecd89bc9c35e5861065f3d9de93c058b50bf08d3a2",
@@ -163,7 +175,7 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
@@ -175,17 +187,11 @@
       "verified_revision": null,
       "evidence": {
         "sha256": null,
-        "captured_at": "2026-09-29T05:53:23Z",
+        "captured_at": "2026-09-29T07:04:40Z",
         "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
         "verification_method": "official_index_absent",
         "index_ref": "adafruit/Adafruit-ItsyBitsy-RP2040-PCB@b12f7b3f1ebf71c53b30fb2f254b85aeb1e6d6f4"
       }
-    },
-    "mechanical": {
-      "available": null,
-      "url": null,
-      "verified_revision": null,
-      "evidence": null
     }
   },
   "licenses": {
@@ -193,7 +199,7 @@
     "cad_license": "CC BY-SA (version not stated by the manufacturer)",
     "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
     "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
-    "mechanical_cad_license": null,
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
     "redistribution_allowed": true,
     "modification_allowed": true,
     "commercial_use_allowed": true,
@@ -210,6 +216,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
-  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-ItsyBitsy-RP2040-PCB pinned at b12f7b3f1ebf. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence stated in the manufacturer's README as \"Creative Commons Attribution, Share-Alike license, check license.txt for more information\". No version is given and license.txt is absent from the repository, so the exact version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-ItsyBitsy-RP2040-PCB pinned at b12f7b3f1ebf. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-ItsyBitsy-RP2040-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
 }

@@ -1,0 +1,257 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:thing-plus-ra6m5",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Thing Plus",
+  "board": "SparkFun Thing Plus RA6M5",
+  "part_number": "WRL-24243",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_RA6M5@b655d23b286b797c6edc95dcd18786b6abdef8cd"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_RA6M5@b655d23b286b797c6edc95dcd18786b6abdef8cd"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_RA6M5/b655d23b286b797c6edc95dcd18786b6abdef8cd/docs/assets/board_files/graphical_datasheet.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "319fd97445a03dd73a1e6c64dbef13bd4713847c47ce8f8ea1774cfd8bbf5a72",
+        "size_bytes": 1368118,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_RA6M5@b655d23b286b797c6edc95dcd18786b6abdef8cd"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_RA6M5/b655d23b286b797c6edc95dcd18786b6abdef8cd/Hardware/SparkFun_Thing_Plus_RA6M5.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "d6fc593b7d90bc93ae7c2bdb465ac2c2f126186ef1f9428ac153638711fd69ea",
+        "size_bytes": 623660,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_RA6M5/b655d23b286b797c6edc95dcd18786b6abdef8cd/Hardware/SparkFun_Thing_Plus_RA6M5.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a39cec9aa6d6ab7a75f1ce30c676ff9b05089ba0cb99e41f88f31e04c6b00dae",
+        "size_bytes": 125853,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_RA6M5/b655d23b286b797c6edc95dcd18786b6abdef8cd/Production/Single%20Board/SparkFun_Thing_Plus_RA6M5.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ccd8781bd35855904c1517910c3e9ec0243ea4dfad06db4a1362f9d36597da76",
+        "size_bytes": 413637,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_RA6M5@b655d23b286b797c6edc95dcd18786b6abdef8cd"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_RA6M5/b655d23b286b797c6edc95dcd18786b6abdef8cd/docs/assets/board_files/dimensions.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "293cf3d33467aaf7df0e6cdfe3b9f450ced4265adfcb3223c719d38b7200654e",
+        "size_bytes": 179084,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_RA6M5@b655d23b286b797c6edc95dcd18786b6abdef8cd"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_RA6M5/b655d23b286b797c6edc95dcd18786b6abdef8cd/Hardware/SparkFun_Thing_Plus_RA6M5.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "d6fc593b7d90bc93ae7c2bdb465ac2c2f126186ef1f9428ac153638711fd69ea",
+        "size_bytes": 623660,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_RA6M5@b655d23b286b797c6edc95dcd18786b6abdef8cd"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_RA6M5/b655d23b286b797c6edc95dcd18786b6abdef8cd/docs/assets/board_files/schematic.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "01162d73633bf4a7e40da9969bb300632c7e7b308a9da5a84add1cf4ec618a93",
+        "size_bytes": 272258,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_RA6M5@b655d23b286b797c6edc95dcd18786b6abdef8cd"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_RA6M5@b655d23b286b797c6edc95dcd18786b6abdef8cd"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_RA6M5/b655d23b286b797c6edc95dcd18786b6abdef8cd/Hardware/SparkFun_Thing_Plus_RA6M5.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a39cec9aa6d6ab7a75f1ce30c676ff9b05089ba0cb99e41f88f31e04c6b00dae",
+        "size_bytes": 125853,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Thing_Plus_RA6M5/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/WRL-24243",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Thing_Plus_RA6M5",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Thing_Plus_RA6M5",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Thing_Plus_RA6M5 pinned at b655d23b286b. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Thing_Plus_RA6M5: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:feather-risc-v",
+  "manufacturer": "Adafruit Industries",
+  "family": "Feather",
+  "board": "Feather with SiFive Freedom E310, an open source RISC-V processor",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:30Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-RISC-V-PCB@d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:30Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-RISC-V-PCB@d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:30Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-RISC-V-PCB@d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9"
+      }
+    },
+    "eagle": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-RISC-V-PCB/d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9/feather_five.sch",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-RISC-V-PCB/d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9/gerber/feather_five-B.Cu.gbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7bd3ad44b3da857ced2cbae04e5458254f1a7fe68893f9075475b54cb417dabe",
+        "size_bytes": 61593,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-RISC-V-PCB/d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9/feather_five.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0e9d0000d125a552bd7377a001198e6002829b5854dfae3842c191f01686372f",
+        "size_bytes": 389134,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:30Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-RISC-V-PCB@d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-RISC-V-PCB/d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9/gerber/feather_five-PTH.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5edfbf9d1c975c51f06c4c080830a2ffd14e20849c79f67b400fef72c355da5f",
+        "size_bytes": 1592,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-RISC-V-PCB/d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9/feather_five.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0e9d0000d125a552bd7377a001198e6002829b5854dfae3842c191f01686372f",
+        "size_bytes": 389134,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:30Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-RISC-V-PCB@d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-RISC-V-PCB/d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9/feather_five.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f83f98e8a2d8bb95b5396e956130e35a5bbd8b3887576a97e10ce710ff76d514",
+        "size_bytes": 35437,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:30Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-RISC-V-PCB@d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:30Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-RISC-V-PCB@d1b705eca6b0b992383a75706f3e1aeb1fdcd9a9"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Feather-RISC-V-PCB/blob/master/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/",
+    "official_cad_repository": "https://github.com/adafruit/Feather-RISC-V-PCB",
+    "official_github_repository": "https://github.com/adafruit/Feather-RISC-V-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Feather-RISC-V-PCB pinned at d1b705eca6b0. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for adafruit/Feather-RISC-V-PCB."
+}

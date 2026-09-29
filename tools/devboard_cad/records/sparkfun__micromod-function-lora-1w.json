@@ -1,0 +1,224 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:micromod-function-lora-1w",
+  "manufacturer": "SparkFun Electronics",
+  "family": "MicroMod",
+  "board": "MicroMod functional board for LoRa 1W SPX1276 module",
+  "part_number": "DEV-18573",
+  "revision": "1.3",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Function_LoRa_1W/fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2/Hardware/MicroMod-LoRa-1W-Function-Board.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:51Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "4110e7309642d1f9c9eb9232836d5226c507219b4fb55e44bccf31fb527c208c",
+        "size_bytes": 252962,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Function_LoRa_1W/fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2/Hardware/Production/MicroMod-LoRa-1W-Function-Board-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:51Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "86dfb9487d0be2bfe83342211dbc6e37926a80f3f1c3af5d0118948d4e250761",
+        "size_bytes": 609732,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Function_LoRa_1W/fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2/Hardware/MicroMod-LoRa-1W-Function-Board.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:51Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "4110e7309642d1f9c9eb9232836d5226c507219b4fb55e44bccf31fb527c208c",
+        "size_bytes": 252962,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Function_LoRa_1W/fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2/Hardware/MicroMod-LoRa-1W-Function-Board.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:51Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0c203714525f0041e54763fa9695257a4034e9cd638e4d4ae4359ab6f36dab5b",
+        "size_bytes": 864547,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Function_LoRa_1W@fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Function_LoRa_1W/fb2274d8bc2ca06e6c730d7efaf8bbe07b7a18f2/Documents/E19-433M30S_Usermanual_EN_v1.3%EF%BC%89.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:51Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3831a24bcfab715f1338b2735923ddfb4a1651f0e7d1768d48b6f79ac93adec3",
+        "size_bytes": 864537,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/MicroMod_Function_LoRa_1W/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-18573",
+    "official_cad_repository": "https://github.com/sparkfun/MicroMod_Function_LoRa_1W",
+    "official_github_repository": "https://github.com/sparkfun/MicroMod_Function_LoRa_1W",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/MicroMod_Function_LoRa_1W pinned at fb2274d8bc2c. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/MicroMod_Function_LoRa_1W: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

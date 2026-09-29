@@ -1,0 +1,104 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "raspberry-pi:cm4io",
+  "manufacturer": "Raspberry Pi",
+  "family": "Compute Module 4 IO Board datasheet",
+  "board": "Raspberry Pi Compute Module 4 IO Board datasheet",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "not-applicable",
+  "product_status": "unknown",
+  "files": {
+    "datasheet": {
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008172-DS",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/756-raspberry-pi-compute-module-4-io-board/documents/RP-008172-DS-1-cm4io-datasheet.pdf",
+        "sha256": "5e89840aba4011f416513ba59f6ca671dae3b342b9e07641bcfe215177f03969",
+        "size_bytes": 10591801,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008173-DS",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/1210-design-files/documents/RP-008173-DS-1-CM4IO-KiCAD.zip",
+        "sha256": "5ea867e17968cb9c117fbce7a982ea395d66a6ee605253a9a0879483bbfcb0aa",
+        "size_bytes": 6819369,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "CM4_GPIO.kicad_sch"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.raspberrypi.com/products/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from raspberrypi/documentation@b47f68f."
+}

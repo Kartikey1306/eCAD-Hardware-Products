@@ -1,0 +1,201 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "radxa:oshw",
+  "manufacturer": "Radxa",
+  "family": "OSHW",
+  "board": "Hardware design from radxa",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:11:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/oshw@788eeb051d01400a959d5243f0adb3a1bd3ebe03"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/oshw/788eeb051d01400a959d5243f0adb3a1bd3ebe03/rock_pro/03.Manufacturing/RADXA_ROCK_PRO_BOM.xls",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:19:58Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9242ed8c5280d376a0b6fb79110cb772887cfa35498d26d25aa5d36f0cf288e5",
+        "size_bytes": 36864,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/oshw/788eeb051d01400a959d5243f0adb3a1bd3ebe03/rock_pro/02.DXF/radxa_rock_pro.dxf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6f2ac50be02c89a55cd0d14cdbde00c4d6e81e343a630056658e2cbd2cd6ec79",
+        "size_bytes": 3681316,
+        "media_type": "application/octet-stream",
+        "detected_format": "dxf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "eagle": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/radxa/oshw/788eeb051d01400a959d5243f0adb3a1bd3ebe03/rock2_square_baseboard/00.Schmatic/PADS%20LOGIC/RADXA_ROCK2_SQUARE_VER1.sch",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/oshw/788eeb051d01400a959d5243f0adb3a1bd3ebe03/rock_pro/03.Manufacturing/RADXA_ROCK_PRO-gerber.zip",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:01Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8e7bbefc4144d0763dd645ab5498c8178c8f183f461ca6dc60003ee3348941cf",
+        "size_bytes": 3950782,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "drl001.drl"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:11:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/oshw@788eeb051d01400a959d5243f0adb3a1bd3ebe03"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/oshw/788eeb051d01400a959d5243f0adb3a1bd3ebe03/rock_pro/03.Manufacturing/PCB_prouduction_outline.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:19:59Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "495c27e7d4e37b366080c10ae233d2d5c44b6cfa7dc47dd809e36d65a083f830",
+        "size_bytes": 140544,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:11:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/oshw@788eeb051d01400a959d5243f0adb3a1bd3ebe03"
+      }
+    },
+    "pcb_source": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:11:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/oshw@788eeb051d01400a959d5243f0adb3a1bd3ebe03"
+      }
+    },
+    "pick_and_place": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/radxa/oshw/788eeb051d01400a959d5243f0adb3a1bd3ebe03/rock_pro/03.Manufacturing/RADXA_ROCK_PRO_COMPNENT_POSITION.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:19:59Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c5c5cd13555aa64bfe3c0fbd6bdae3df69723f1537f94101faf36a2bae23490f",
+        "size_bytes": 188463,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/radxa/oshw/788eeb051d01400a959d5243f0adb3a1bd3ebe03/rock2_square_baseboard/00.Schmatic/PADS%20LOGIC/RADXA_ROCK2_SQUARE_VER1.sch",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:11:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/oshw@788eeb051d01400a959d5243f0adb3a1bd3ebe03"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:11:23Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "radxa/oshw@788eeb051d01400a959d5243f0adb3a1bd3ebe03"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/radxa/oshw"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://radxa.com/products",
+    "official_cad_repository": "https://github.com/radxa/oshw",
+    "official_github_repository": "https://github.com/radxa/oshw",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository radxa/oshw pinned at 788eeb051d01. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from radxa/oshw: \"These files are licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/), you can use it for both personal and commercial usage.\"."
+}

@@ -1,0 +1,248 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:particulate-matter-sensor-breakout-bmv080",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "SparkFun Particulate Matter Sensor Breakout BMV080",
+  "part_number": "SEN-26554",
+  "revision": "not-stated",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:50Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080@9b743ece12fa7d6a445bf179f87f604dbc85621a"
+      }
+    },
+    "assembly_drawing": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Enclosure/Enclosure_%28STEP%29/HMV080_Enclosure_Assembly.zip",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:50Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080@9b743ece12fa7d6a445bf179f87f604dbc85621a"
+      }
+    },
+    "dxf": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/HMV080_2D_Dimensional_top_down-Sketch.dxf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "1c340bf411f44d5e79d6e96123923f3c75b2e8ed0a85497020c0b56ea1bb7247",
+        "size_bytes": 2331,
+        "media_type": "text/plain",
+        "detected_format": "dxf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:50Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080@9b743ece12fa7d6a445bf179f87f604dbc85621a"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/BMV080.pretty/FPC_0.3mm-13_molex_503566-1302.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8dbdfa141060f4b294e4a337c20dce95da98f4b3ab9e7a3101981f04baa2d03e",
+        "size_bytes": 15816,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/Production/SparkFun_BMV080_panelized.GBL",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/BMV080.kicad_sym",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a388347495338f2165ae8e2de7fe0794b56b571781af3b5cef7d9165bbc3ebaa",
+        "size_bytes": 4680,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:50Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080@9b743ece12fa7d6a445bf179f87f604dbc85621a"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/Production/SparkFun_BMV080_panelized.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "fa827a286b03bb756253edc0ba95af5556772c4b1f08c4a7b8f21df8f03f78de",
+        "size_bytes": 50757,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/SparkFun_BMV080.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "61e73529a8efe079beb329f90d07973c74fb7e505f3dfd4bbaabb86fc0fa20ed",
+        "size_bytes": 461338,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:50Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080@9b743ece12fa7d6a445bf179f87f604dbc85621a"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/SparkFun_BMV080.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "d711eadc9f72402f9582f2b19db62d2e6b5cef6f85822ff66d4163badd79f7d8",
+        "size_bytes": 198609,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/SparkFun_BMV080_v10.step",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0caf86ffa99efa37125b8c012153f2d079d4ad16ed9c8f4ec0d63b6daf13914d",
+        "size_bytes": 4557047,
+        "media_type": "text/plain",
+        "detected_format": "step:AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Enclosure/Enclosure_%28STL%29/BMV080_Enclosure_Part_A_Inside_Shell_V12.stl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "34911fc12e68ebc552113c34ca43627a18d985c460db33b4f00b5374bfa6c035",
+        "size_bytes": 240734,
+        "media_type": "application/octet-stream",
+        "detected_format": "stl",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/9b743ece12fa7d6a445bf179f87f604dbc85621a/Hardware/BMV080.kicad_sym",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:14Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a388347495338f2165ae8e2de7fe0794b56b571781af3b5cef7d9165bbc3ebaa",
+        "size_bytes": 4680,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/SEN-26554",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080 pinned at 9b743ece12fa. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Particulate_Matter_Sensor_Breakout_BMV080: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

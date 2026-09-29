@@ -1,0 +1,209 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:micromod-atp-carrier-board-promo-constellation",
+  "manufacturer": "SparkFun Electronics",
+  "family": "MicroMod",
+  "board": "MicroMod ATP Carrier Board",
+  "part_number": "KIT-21224",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation/1051add80007fcb66cafabd7a748cae69efc4dcb/Hardware/MicroMod_ATP_Constellation.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "38d60f76cc173c550f184aa8d3beafbef7ae143d508542dff6906f87a48ce674",
+        "size_bytes": 1328177,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation/1051add80007fcb66cafabd7a748cae69efc4dcb/Hardware/MicroMod_ATP_Constellation.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6e1af8216390fdca6fd8192f9fa51f1db302aaf47cb3747b84bc551b6423e681",
+        "size_bytes": 218332,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation/1051add80007fcb66cafabd7a748cae69efc4dcb/Hardware/MicroMod_ATP_Constellation.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "38d60f76cc173c550f184aa8d3beafbef7ae143d508542dff6906f87a48ce674",
+        "size_bytes": 1328177,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation/1051add80007fcb66cafabd7a748cae69efc4dcb/Hardware/MicroMod_ATP_Constellation.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "d2ec47299b8cf4e065aec111226286a15175ee4d49467d8e9e299ec55a4d68b7",
+        "size_bytes": 1395735,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:12Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation@1051add80007fcb66cafabd7a748cae69efc4dcb"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/KIT-21224",
+    "official_cad_repository": "https://github.com/sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation",
+    "official_github_repository": "https://github.com/sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation pinned at 1051add80007. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/MicroMod_ATP_Carrier_Board_Promo_Constellation: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

@@ -1,0 +1,239 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:micromod-data-logging-carrier",
+  "manufacturer": "SparkFun Electronics",
+  "family": "MicroMod",
+  "board": "SparkFun MicroMod Data Logging Carrier",
+  "part_number": "DEV-16829",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Data_Logging_Carrier/6fe06a666a75f88c87da4ac8711085090e21e1c0/Hardware/MicroMod-Datalogging-CarrierBoard.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:46Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "91bf29ea9d50c1c6a86481d6d8e330e44ddb083942131a44f49896ee648c37bb",
+        "size_bytes": 477012,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Data_Logging_Carrier/6fe06a666a75f88c87da4ac8711085090e21e1c0/Hardware/MicroMod-Datalogging-CarrierBoard.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7586585c1e58adecb1efaf2023c1083b32722c8fdab93ef7e36a2cf4f6933320",
+        "size_bytes": 1203934,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Data_Logging_Carrier/6fe06a666a75f88c87da4ac8711085090e21e1c0/Hardware/Production/MicroMod-Datalogging-CarrierBoard-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3f75b8aa375f5c1ea3a847affeed11d19d9021f1ec7ef44a12a15ac944256cc0",
+        "size_bytes": 1498119,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Data_Logging_Carrier/6fe06a666a75f88c87da4ac8711085090e21e1c0/Hardware/MicroMod-Datalogging-CarrierBoard.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "91bf29ea9d50c1c6a86481d6d8e330e44ddb083942131a44f49896ee648c37bb",
+        "size_bytes": 477012,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Data_Logging_Carrier/6fe06a666a75f88c87da4ac8711085090e21e1c0/Hardware/MicroMod-Datalogging-CarrierBoard.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "72542d23a6bdb7f62cab3c3a15d2b6137e7a5013337e964aac501d7ad185c6f1",
+        "size_bytes": 1317560,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:14Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Data_Logging_Carrier@6fe06a666a75f88c87da4ac8711085090e21e1c0"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Data_Logging_Carrier/6fe06a666a75f88c87da4ac8711085090e21e1c0/Hardware/MicroMod-Datalogging-CarrierBoard.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7586585c1e58adecb1efaf2023c1083b32722c8fdab93ef7e36a2cf4f6933320",
+        "size_bytes": 1203934,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-16829",
+    "official_cad_repository": "https://github.com/sparkfun/MicroMod_Data_Logging_Carrier",
+    "official_github_repository": "https://github.com/sparkfun/MicroMod_Data_Logging_Carrier",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/MicroMod_Data_Logging_Carrier pinned at 6fe06a666a75. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

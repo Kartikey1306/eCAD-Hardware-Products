@@ -1,0 +1,224 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:micromod-processor-board-samd51",
+  "manufacturer": "SparkFun Electronics",
+  "family": "MicroMod",
+  "board": "SparkFun MicroMod Processor Board SAMD51",
+  "part_number": "DEV-16791",
+  "revision": "not-stated",
+  "mcu_soc": "SAMD51",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Processor_Board-SAMD51/7c85c41de81b93d6da49c199ea8284b18e1392d6/Documentation/SAMD51_datasheet.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:10Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "eeced79b4727a40b5336c437a0f9c4dd29342e3b31fb83dbde1e88141815b29b",
+        "size_bytes": 14495276,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Processor_Board-SAMD51/7c85c41de81b93d6da49c199ea8284b18e1392d6/Hardware/MicroMod_SAMD51.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9990eb7d600c645674b9019cd5b5c8b92864e20b324f8902ad22142844e840c8",
+        "size_bytes": 219446,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Processor_Board-SAMD51/7c85c41de81b93d6da49c199ea8284b18e1392d6/Production/MicroMod_SAMD51-Panel_v13.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "97a849bc279c30ac062abc70e601d095679419d7474470c9b3b4d26a705a7a05",
+        "size_bytes": 2157356,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Processor_Board-SAMD51/7c85c41de81b93d6da49c199ea8284b18e1392d6/Hardware/MicroMod_SAMD51.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9990eb7d600c645674b9019cd5b5c8b92864e20b324f8902ad22142844e840c8",
+        "size_bytes": 219446,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/MicroMod_Processor_Board-SAMD51/7c85c41de81b93d6da49c199ea8284b18e1392d6/Hardware/MicroMod_SAMD51.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:03Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "4bdb9eea6be8f993b1f4bef9d3601bd022664256e9d0c8299f297db5b578852e",
+        "size_bytes": 797607,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:10Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/MicroMod_Processor_Board-SAMD51@7c85c41de81b93d6da49c199ea8284b18e1392d6"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/MicroMod_Processor_Board-SAMD51/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-16791",
+    "official_cad_repository": "https://github.com/sparkfun/MicroMod_Processor_Board-SAMD51",
+    "official_github_repository": "https://github.com/sparkfun/MicroMod_Processor_Board-SAMD51",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/MicroMod_Processor_Board-SAMD51 pinned at 7c85c41de81b. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/MicroMod_Processor_Board-SAMD51: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

@@ -1,0 +1,254 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:thing-plus-esp32-c6",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Thing Plus",
+  "board": "SparkFun Thing Plus ESP32 C6",
+  "part_number": "DEV-22924",
+  "revision": "not-stated",
+  "mcu_soc": "ESP32-C6",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "RISC-V RV32IMC",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6/fb7352f770b885fa9d5767bd25a168b90a11d4e5/Documents/ESP32-C6-Datasheet.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "133848168667295113b1ab336ba33a0ab9b0d512bedf668fcc0d372f185ed301",
+        "size_bytes": 997828,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6/fb7352f770b885fa9d5767bd25a168b90a11d4e5/Hardware/ESP32-C6-WROOM-1.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5609e211240ff64ea0d56b18db0f2c2baaf41a4a81d68fbf3966076a73091d35",
+        "size_bytes": 28464,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6/fb7352f770b885fa9d5767bd25a168b90a11d4e5/Hardware/ESP32-C6-WROOM-1.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5609e211240ff64ea0d56b18db0f2c2baaf41a4a81d68fbf3966076a73091d35",
+        "size_bytes": 28464,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6/fb7352f770b885fa9d5767bd25a168b90a11d4e5/Production/Thing_Plus_ESP32_C6-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3b498f2278883ec311ad394514410278aff3cde10fa3f0512a776cdf922247d0",
+        "size_bytes": 2827422,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6/fb7352f770b885fa9d5767bd25a168b90a11d4e5/Hardware/Thing_Plus_ESP32_C6.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "24b289329c3f9c98afd6552a954e16e636e489836ae42ce911a1773e31729666",
+        "size_bytes": 565257,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6/fb7352f770b885fa9d5767bd25a168b90a11d4e5/Hardware/Thing_Plus_ESP32_C6.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "aa89ff067b61ef02d747a9ca88cff40cca7d47c4d90ea35ce394b2ce9b2184c6",
+        "size_bytes": 1242417,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Thing_Plus_ESP32_C6@fb7352f770b885fa9d5767bd25a168b90a11d4e5"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6/fb7352f770b885fa9d5767bd25a168b90a11d4e5/Hardware/ESP32-C6-WROOM-1.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5609e211240ff64ea0d56b18db0f2c2baaf41a4a81d68fbf3966076a73091d35",
+        "size_bytes": 28464,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-22924",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Thing_Plus_ESP32_C6",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Thing_Plus_ESP32_C6 pinned at fb7352f770b8. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

@@ -1,0 +1,267 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:smd-led-light-pipe",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Edge",
+  "board": "SparkFun SMD LED Light Pipe",
+  "part_number": "COM-25893",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:49Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_SMD_LED_Light_Pipe@ba9a58ae0f4c132c9c9b7c4b20135b6009b66536"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:49Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_SMD_LED_Light_Pipe@ba9a58ae0f4c132c9c9b7c4b20135b6009b66536"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/SparkFun%20SMD%20LED%20Light%20Pipe%20Datasheet.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "46a22573500bd0f70ebb183d0ce92040a32e96dc5e4e24590dbadb44a97d9136",
+        "size_bytes": 233646,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:49Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_SMD_LED_Light_Pipe@ba9a58ae0f4c132c9c9b7c4b20135b6009b66536"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:49Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_SMD_LED_Light_Pipe@ba9a58ae0f4c132c9c9b7c4b20135b6009b66536"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/KiCad%20Footprint/SparkFun%20SMD%20LED%20Light%20Pipe.pretty/SparkFun_SMD_LED_Light_Pipe-5mm.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "62d16fd3b84ffa515cfe879a6db64a383612c5a59f789ceffa45e8a070d32239",
+        "size_bytes": 4640,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "fusion360": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/Mechanical/Assembly%20Fusion%20Archive.f3z",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6999aa477795d6745361b6a2fc6b266bfaf2a05dd083fe414f29304de73ca7f4",
+        "size_bytes": 2118846,
+        "media_type": "application/octet-stream",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "25ff398c-324a-432d-960f-8eb29609f2d0.zip.f3d"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:49Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_SMD_LED_Light_Pipe@ba9a58ae0f4c132c9c9b7c4b20135b6009b66536"
+      }
+    },
+    "iges": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/Mechanical/Solids/SparkFun_SMD_LED_Light_Pipe.iges",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/Footprint%20Test/SparkFun_SMD_LED_Light_Pipe_Footprint_Test.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "666f6828df7753f320e7f8f9760a16000d1398367acd407061c699222e9680cc",
+        "size_bytes": 286779,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/Mechanical/Mechanical%20Drawing.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "fd92c3a6a3a6fb5e22dffc07dabb5bcf57fa94b26f2e27b0dc158a919089efbd",
+        "size_bytes": 246410,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:49Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_SMD_LED_Light_Pipe@ba9a58ae0f4c132c9c9b7c4b20135b6009b66536"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/Footprint%20Test/SparkFun_SMD_LED_Light_Pipe_Footprint_Test.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "666f6828df7753f320e7f8f9760a16000d1398367acd407061c699222e9680cc",
+        "size_bytes": 286779,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:49Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_SMD_LED_Light_Pipe@ba9a58ae0f4c132c9c9b7c4b20135b6009b66536"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/Footprint%20Test/SparkFun_SMD_LED_Light_Pipe_Footprint_Test.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "45d9474f24e9d8de7a011f7f077593c9733ab8ff3fcaccd4f61ac8a165e105dc",
+        "size_bytes": 75207,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/Mechanical/Solids/SparkFun_SMD_LED_Light_Pipe.step",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "401ff2637e77ea6ad0a2ea7110bedecbd30cf2abe7e74f05159aa530a438264a",
+        "size_bytes": 79422,
+        "media_type": "text/plain",
+        "detected_format": "step:AUTOMOTIVE_DESIGN { 1 0 10303 214 3 1 1 }",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_SMD_LED_Light_Pipe/ba9a58ae0f4c132c9c9b7c4b20135b6009b66536/Mechanical/STL/Body.stl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "70bc7d8429c5feb01e1f0e3d1d51134890d794069458bbcdde0649810a3ae0e8",
+        "size_bytes": 57484,
+        "media_type": "application/octet-stream",
+        "detected_format": "stl",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/COM-25893",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_SMD_LED_Light_Pipe",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_SMD_LED_Light_Pipe",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_SMD_LED_Light_Pipe pinned at ba9a58ae0f4c. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

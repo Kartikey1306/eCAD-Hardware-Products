@@ -1,0 +1,203 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:qwiic-gnss-sam-m8q",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "SparkFun Qwiic GNSS SAM M8Q",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q@4c45d55c12864c7c771554039bac3d1ebb3cde6d"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q@4c45d55c12864c7c771554039bac3d1ebb3cde6d"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q@4c45d55c12864c7c771554039bac3d1ebb3cde6d"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q@4c45d55c12864c7c771554039bac3d1ebb3cde6d"
+      }
+    },
+    "gerbers": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q/4c45d55c12864c7c771554039bac3d1ebb3cde6d/Hardware/Production/SparkFun_Qwiic_GNSS_SAM-M8Q_panelized.GBL",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q/4c45d55c12864c7c771554039bac3d1ebb3cde6d/Hardware/SparkFun_Qwiic_GNSS_SAM-M8Q.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c508899e89e6d0fe294efd88861b84381446c811c85438cc8047f86cab935b6e",
+        "size_bytes": 867355,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q@4c45d55c12864c7c771554039bac3d1ebb3cde6d"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q/4c45d55c12864c7c771554039bac3d1ebb3cde6d/Hardware/Production/SparkFun_Qwiic_GNSS_SAM-M8Q_panelized.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:53Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5519b1d9f5758d3e2726f231f4af9e43683d1595c67da5932f2fdadbbdbf3b83",
+        "size_bytes": 23193,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q/4c45d55c12864c7c771554039bac3d1ebb3cde6d/Hardware/SparkFun_Qwiic_GNSS_SAM-M8Q.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c508899e89e6d0fe294efd88861b84381446c811c85438cc8047f86cab935b6e",
+        "size_bytes": 867355,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q@4c45d55c12864c7c771554039bac3d1ebb3cde6d"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q/4c45d55c12864c7c771554039bac3d1ebb3cde6d/Hardware/SparkFun_Qwiic_GNSS_SAM-M8Q.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:53Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6f8cdc606dca42326da8d75280b799aa5d73789294088557e365a4e8094a113a",
+        "size_bytes": 310265,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q@4c45d55c12864c7c771554039bac3d1ebb3cde6d"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:07Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q@4c45d55c12864c7c771554039bac3d1ebb3cde6d"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q pinned at 4c45d55c1286. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Qwiic_GNSS_SAM-M8Q: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

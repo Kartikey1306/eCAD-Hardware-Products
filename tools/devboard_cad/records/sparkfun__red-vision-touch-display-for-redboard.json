@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:red-vision-touch-display-for-redboard",
+  "manufacturer": "SparkFun Electronics",
+  "family": "RedBoard",
+  "board": "SparkFun Red Vision Touch Display for RedBoard",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard/55d207429ee28a6960ceab4883a13edf81adeecc/Hardware/SparkFun_Red_Vision_Touch_Display_for_RedBoard.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a60926b98ecb6ab99955a2c8c138993ad06b8c40b16421912cde3ed8034fc0fb",
+        "size_bytes": 1407374,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard/55d207429ee28a6960ceab4883a13edf81adeecc/Hardware/SparkFun_Red_Vision_Touch_Display_for_RedBoard.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a60926b98ecb6ab99955a2c8c138993ad06b8c40b16421912cde3ed8034fc0fb",
+        "size_bytes": 1407374,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard/55d207429ee28a6960ceab4883a13edf81adeecc/Hardware/SparkFun_Red_Vision_Touch_Display_for_RedBoard.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2436ca339f4114ac54644371c3d48cedab1f98c908eef99ecd2600828a9a6d15",
+        "size_bytes": 308383,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard@55d207429ee28a6960ceab4883a13edf81adeecc"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Red_Vision_Touch_Display_for_RedBoard pinned at 55d207429ee2. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

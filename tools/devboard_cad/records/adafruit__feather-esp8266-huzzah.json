@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:feather-esp8266-huzzah",
+  "manufacturer": "Adafruit Industries",
+  "family": "Feather",
+  "board": "Adafruit Feather ESP8266 HUZZAH",
+  "part_number": "2821",
+  "revision": "G",
+  "mcu_soc": "ESP8266",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Xtensa L106",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB/957300988eee7d15d71649fd4e2cb023a6584acb/Adafruit%20ESP8266%20Feather.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:41Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "051ca11ee23fb5e8a63bf92081fc437306541a5ad1d463c25a99c6095cd51cef",
+        "size_bytes": 893843,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB/957300988eee7d15d71649fd4e2cb023a6584acb/Adafruit%20ESP8266%20Feather.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:41Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "051ca11ee23fb5e8a63bf92081fc437306541a5ad1d463c25a99c6095cd51cef",
+        "size_bytes": 893843,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB/957300988eee7d15d71649fd4e2cb023a6584acb/Adafruit%20ESP8266%20Feather.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:41Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "cdb70e2963d81cbafb903d56a3b81c7b724104f4a0a4419fbad43043a49954ff",
+        "size_bytes": 280305,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:02:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB@957300988eee7d15d71649fd4e2cb023a6584acb"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/2821",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB pinned at 957300988eee. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-Feather-ESP8266-HUZZAH-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution. See license.txt for additional details.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

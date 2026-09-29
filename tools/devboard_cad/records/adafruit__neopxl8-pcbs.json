@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:neopxl8-pcbs",
+  "manufacturer": "Adafruit Industries",
+  "family": "FeatherWing",
+  "board": "Adafruit NeoPXL8 PCBs",
+  "part_number": "3249",
+  "revision": "not-stated",
+  "mcu_soc": "ESP32",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Xtensa LX6",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-NeoPXL8-PCBs/1aa9e3e82c5872db786e047b8eb1b8fadaa7e802/Adafruit%20NeoPXL8%20Friend.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:34Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "04eb074a03debf1c74a3a2764eed5c19ef73fb47a5321bac547772fecb2e4d31",
+        "size_bytes": 156434,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-NeoPXL8-PCBs/1aa9e3e82c5872db786e047b8eb1b8fadaa7e802/Adafruit%20NeoPXL8%20Friend.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:34Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "04eb074a03debf1c74a3a2764eed5c19ef73fb47a5321bac547772fecb2e4d31",
+        "size_bytes": 156434,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-NeoPXL8-PCBs/1aa9e3e82c5872db786e047b8eb1b8fadaa7e802/Adafruit%20NeoPXL8%20Friend.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:34Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e3e7bfe22738e6f5836714686973f867be248a4995da49df16cd1d020c9aaf9a",
+        "size_bytes": 361683,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:44Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoPXL8-PCBs@1aa9e3e82c5872db786e047b8eb1b8fadaa7e802"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-NeoPXL8-PCBs"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/3249",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-NeoPXL8-PCBs",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-NeoPXL8-PCBs",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-NeoPXL8-PCBs pinned at 1aa9e3e82c58. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-NeoPXL8-PCBs: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

@@ -1,0 +1,221 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:neotrellis-m4-pcb-and-enclosure",
+  "manufacturer": "Adafruit Industries",
+  "family": "NeoTrellis",
+  "board": "CAD files for the Adafruit NeoTrellis M4 PCB and Enclosure",
+  "part_number": "4020",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure/3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db/Adafruit%20NeoTrellis%20M4.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:35Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "063eefcbaaa86d607f1889d3b28ba570958f7e0ad5b2e69306fd61108d403692",
+        "size_bytes": 736235,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure/3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db/Adafruit%20NeoTrellis%20M4.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:35Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "063eefcbaaa86d607f1889d3b28ba570958f7e0ad5b2e69306fd61108d403692",
+        "size_bytes": 736235,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure/3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db/Adafruit%20NeoTrellis%20M4%20Pinout.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:36Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3d5d759fcfe490ad105172520260f887948b3a9f0afb2faf9ece9e52bfd00695",
+        "size_bytes": 93656,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure/3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db/Adafruit%20NeoTrellis%20M4.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:14:36Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7e9754723bc4feb8913a910cf185a739ee693d2ceaa845c28283eb523b889a8e",
+        "size_bytes": 880923,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:57Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure@3e6e7d4f37c7df0f40a096f67ab64dfadd4c15db"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA (version not stated by the manufacturer)",
+    "cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "schematic_license": "CC BY-SA (version not stated by the manufacturer)",
+    "pcb_license": "CC BY-SA (version not stated by the manufacturer)",
+    "mechanical_cad_license": "CC BY-SA (version not stated by the manufacturer)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/4020",
+    "official_cad_repository": "https://github.com/adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure",
+    "official_github_repository": "https://github.com/adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure pinned at 3e6e7d4f37c7. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-NeoTrellis-M4-PCB-and-Enclosure: \"Creative Commons Attribution, Share-Alike license, check license.txt for more information\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
+}

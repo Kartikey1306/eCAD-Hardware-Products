@@ -1,0 +1,254 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:qwiic-co2-sensor-xensiv-pas",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "Qwiic Breakout Board for the Infineon XENSIV PAS CO2 Sensor",
+  "part_number": "SEN-22956",
+  "revision": "not-stated",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS/08a65f08c40e3a63d90a3495de2a7a21fed05588/Documentation/Infineon-PASCO2V01-DataSheet-v01_03-DataSheet-v01_03-EN.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a2eabdf4cae2722e5e78681dddfe7a76c8610aa15141edfe5ab7a25d8e7ee556",
+        "size_bytes": 1121220,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS/08a65f08c40e3a63d90a3495de2a7a21fed05588/Hardware/xensiv_pas.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6de45b510b4c44fbdba4330e06be0b3de39a5f2879d939698d3932f45a8db353",
+        "size_bytes": 42920,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS/08a65f08c40e3a63d90a3495de2a7a21fed05588/Hardware/xensiv_pas.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6de45b510b4c44fbdba4330e06be0b3de39a5f2879d939698d3932f45a8db353",
+        "size_bytes": 42920,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS/08a65f08c40e3a63d90a3495de2a7a21fed05588/Production/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "637389354cd01aa3d998ff23048332ab9895c2cf018bde3043059c605dbbae41",
+        "size_bytes": 905530,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS/08a65f08c40e3a63d90a3495de2a7a21fed05588/Hardware/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "84b7bba3e73bd49dc230a1172755afcd8cfcd87447dc67125c396179bc21200c",
+        "size_bytes": 308105,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS/08a65f08c40e3a63d90a3495de2a7a21fed05588/Hardware/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:51Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "07f6c12449c0a3e0e783cfdf4d7b322b2eae8b156d101bdc5c9523a0ad59d13b",
+        "size_bytes": 1187846,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:29Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS@08a65f08c40e3a63d90a3495de2a7a21fed05588"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS/08a65f08c40e3a63d90a3495de2a7a21fed05588/Hardware/xensiv_pas.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6de45b510b4c44fbdba4330e06be0b3de39a5f2879d939698d3932f45a8db353",
+        "size_bytes": 42920,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/SEN-22956",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS pinned at 08a65f08c40e. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Qwiic_CO2_Sensor_XENSIV_PAS: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

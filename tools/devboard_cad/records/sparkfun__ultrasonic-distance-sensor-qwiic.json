@@ -1,0 +1,233 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:ultrasonic-distance-sensor-qwiic",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "Documentation and Hardware for the SparkFun Ultrasonic Distance Sensor -Qwiic",
+  "part_number": "SEN-24805",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:43Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic@05adcfd6fd2df8c31e4cee1ac57febd16a0ee829"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:43Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic@05adcfd6fd2df8c31e4cee1ac57febd16a0ee829"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:43Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic@05adcfd6fd2df8c31e4cee1ac57febd16a0ee829"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic/05adcfd6fd2df8c31e4cee1ac57febd16a0ee829/Hardware/new_parts.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:57Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "cfb7f2d68810e589b3d6e1f1e159436f9bce10d0b64cd912574f1050a6e9b06d",
+        "size_bytes": 30828,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic/05adcfd6fd2df8c31e4cee1ac57febd16a0ee829/Hardware/new_parts.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:57Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "cfb7f2d68810e589b3d6e1f1e159436f9bce10d0b64cd912574f1050a6e9b06d",
+        "size_bytes": 30828,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic/05adcfd6fd2df8c31e4cee1ac57febd16a0ee829/Production/SparkFun_Ultrasonic_Sensor-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:57Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "901a90bc0993d1e418088a22824f64ae3e428a6afd6e10d3323627ace68125e0",
+        "size_bytes": 1038879,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:43Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic@05adcfd6fd2df8c31e4cee1ac57febd16a0ee829"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:43Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic@05adcfd6fd2df8c31e4cee1ac57febd16a0ee829"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:43Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic@05adcfd6fd2df8c31e4cee1ac57febd16a0ee829"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic/05adcfd6fd2df8c31e4cee1ac57febd16a0ee829/Hardware/SparkFun_Ultrasonic_Sensor.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:57Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "52f5e1e92b8293ff1d6c5f93dbe74a16b91eac8ec5a7a27ff568be3810111dd3",
+        "size_bytes": 261788,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:43Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic@05adcfd6fd2df8c31e4cee1ac57febd16a0ee829"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic/05adcfd6fd2df8c31e4cee1ac57febd16a0ee829/docs/assets/board_files/SparkFun_Ultrasonic_Sensor_Schematic.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:57Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0a41e6fca3bc95d3723fb3fddeb943ffd760fc0b214042e8c60b9c3f2aeb0a05",
+        "size_bytes": 117830,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic/05adcfd6fd2df8c31e4cee1ac57febd16a0ee829/Firmware/firmware_v01.stp",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:43Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic@05adcfd6fd2df8c31e4cee1ac57febd16a0ee829"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic/05adcfd6fd2df8c31e4cee1ac57febd16a0ee829/Hardware/new_parts.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:57Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "cfb7f2d68810e589b3d6e1f1e159436f9bce10d0b64cd912574f1050a6e9b06d",
+        "size_bytes": 30828,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/SEN-24805",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic pinned at 05adcfd6fd2d. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_Ultrasonic_Distance_Sensor-Qwiic: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

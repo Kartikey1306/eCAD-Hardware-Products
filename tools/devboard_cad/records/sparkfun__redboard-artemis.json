@@ -1,0 +1,209 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:redboard-artemis",
+  "manufacturer": "SparkFun Electronics",
+  "family": "RedBoard",
+  "board": "SparkFun RedBoard Artemis",
+  "part_number": "DEV-15444",
+  "revision": "not-stated",
+  "mcu_soc": "APOLLO3",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/RedBoard_Artemis/355f65af4583694bf7c2f49c74a0c9f74d5974dd/Hardware/RedBoard-Artemis.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:31Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7bcbb1f91af87af6673a4bc075d563948a276a22d18257d813a581eedab041e8",
+        "size_bytes": 2647774,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/RedBoard_Artemis/355f65af4583694bf7c2f49c74a0c9f74d5974dd/Hardware/Production/RedBoard-Artemis-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:30Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "609a3cd62c0a35e080cbae6d65ba88507e510ab0dd2c9ad6eff8aeac8ad20d6e",
+        "size_bytes": 1778507,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/RedBoard_Artemis/355f65af4583694bf7c2f49c74a0c9f74d5974dd/Hardware/RedBoard-Artemis.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:32Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7bcbb1f91af87af6673a4bc075d563948a276a22d18257d813a581eedab041e8",
+        "size_bytes": 2647774,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/RedBoard_Artemis/355f65af4583694bf7c2f49c74a0c9f74d5974dd/Hardware/RedBoard-Artemis.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:31Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "47a0e4c841feba3f6254dee4d623e4ea44c5c1cc65b0b85e55f72be89b354d9f",
+        "size_bytes": 1581605,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:40Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/RedBoard_Artemis@355f65af4583694bf7c2f49c74a0c9f74d5974dd"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/RedBoard_Artemis/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-15444",
+    "official_cad_repository": "https://github.com/sparkfun/RedBoard_Artemis",
+    "official_github_repository": "https://github.com/sparkfun/RedBoard_Artemis",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/RedBoard_Artemis pinned at 355f65af4583. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/RedBoard_Artemis: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

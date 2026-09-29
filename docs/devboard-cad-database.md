@@ -66,11 +66,33 @@ why `harvest_github.py` exists.
 `record_status` is **derived** from the record by `verify.derive_status()` and
 checked in CI, so it cannot drift out of step with the data it summarises.
 
+## Identity: findings and gaps are different facts
+
+Three reserved values keep "nobody has looked" separate from "we looked and there is none".
+Only the first blocks a record from reaching `verified`:
+
+| Field | Gap | Finding |
+|---|---|---|
+| `revision` | `unverified` | `not-stated` — an exhaustive official index names no revision |
+| `mcu_soc` | `UNVERIFIED` | `not-applicable` — a passive add-on board (FeatherWing, shield, HAT, cape) |
+| `part_number` | `UNVERIFIED` | the manufacturer's own part number |
+
+Collapsing the two would make an unfinished record look identical to a complete one about
+a board that genuinely has no revision.
+
 ## Tools
 
+The pipeline is: **propose candidates → verify from bytes → read licences → gate**.
+No step ever asserts that a file exists; only `verify.py` decides that, and only from
+content it retrieved.
+
 ```bash
-# 1. Propose candidates from a manufacturer's official repository, pinned to a commit.
-#    Presence is only ever proposed here; absence is proven from the tree.
+# 1a. Enumerate manufacturer repositories and turn them into records.
+#     Coverage grows by editing vendors.json, not by editing code.
+python3 tools/devboard_cad/discover_github.py discover --out candidates.json
+python3 tools/devboard_cad/discover_github.py emit --manifest candidates.json
+
+# 1b. One repository at a time, when you already know it.
 python3 tools/devboard_cad/harvest_github.py harvest \
     --repo adafruit/Adafruit-Feather-RP2040-PCB \
     --board-id adafruit:feather-rp2040 \
@@ -79,15 +101,39 @@ python3 tools/devboard_cad/harvest_github.py harvest \
     --mcu "Raspberry Pi RP2040" \
     --product-page https://www.adafruit.com/product/4884
 
-# 2. Decide availability by retrieving and content-checking each candidate.
-python3 tools/devboard_cad/verify.py verify adafruit__feather-rp2040 --apply
+# 1c. Manufacturers that do not publish on GitHub, from direct_sources.json.
+python3 tools/devboard_cad/seed_direct.py
 
-# 3. Gate: schema, uniqueness, filename agreement, derived status. Offline.
+# 2. Decide availability by retrieving and content-checking each candidate.
+python3 tools/devboard_cad/verify.py verify --apply --jobs 8 --quiet
+
+# 3. Read the hardware licence from the manufacturer's own LICENSE or README.
+python3 tools/devboard_cad/read_licenses.py
+
+# 4. Gate: schema, uniqueness, filename agreement, derived status, licence citations.
 python3 tools/devboard_cad/validate_records.py
 
-# 4. Drift: re-fetch every claimed file and compare digests. Networked, advisory.
+# 5. Drift: re-fetch every claimed file and compare digests. Networked, advisory.
 python3 tools/devboard_cad/validate_records.py --revalidate
 ```
+
+### Manufacturers that cannot be enumerated
+
+Issue #28 section 10 ranks the official product page and documentation above a repository,
+but neither is machine-enumerable, and two failure modes are permanent rather than
+incidental:
+
+* `raspberrypi.com` answers an automated client with a Cloudflare interstitial, and its
+  document portal is JavaScript-rendered. Its URLs were recovered instead from
+  `raspberrypi/documentation`, the manufacturer's own public documentation source, which
+  cites official `pip.raspberrypi.com` document IDs.
+* `st.com` does not answer an automated client at all. Boards whose files live only there
+  cannot be verified by this pipeline, and no record claims otherwise.
+
+Those manufacturers are served by `direct_sources.json`: a human supplies candidate URLs
+from the official source and `verify.py` decides. Because a curated list is not
+exhaustive, `seed_direct.py` never records `available: false` — absence is only provable
+against an index that enumerates everything.
 
 `verify.py` caches responses outside the repository (`~/.cache/devboard-cad`, or
 `DEVBOARD_CAD_CACHE`) and rate-limits per host. **Vendor files are never
@@ -102,6 +148,20 @@ File availability is mechanical; reading a vendor's terms is not, and
 `commercial_use_allowed` is the field with real downstream consequences. It is
 left `null` unless the licence has been read, and CI requires that any non-null
 permission is accompanied by a named `hardware_license` and a `license_url`.
+
+`read_licenses.py` reads the manufacturer's own LICENSE or README and matches it against a
+table of licences whose terms are already settled. It never interprets novel prose: an
+unrecognised statement leaves the record `UNVERIFIED`, which the gate then requires. The
+distinction is between reading and inferring — quoting "SparkFun hardware is released
+under Creative Commons Share-alike 4.0 International" from `LICENSE.md` is a reading;
+concluding a board is probably CC-licensed because its vendor usually is would not be.
+
+One case recurs and is recorded rather than smoothed over: Adafruit's READMEs name
+"Creative Commons Attribution/Share-Alike" with no version, and the `license.txt` they
+point at is usually absent from the repository. Every CC BY-SA version permits commercial
+use and modification under attribution and share-alike — the non-commercial variants are
+separately named BY-NC-SA — so the permissions are determinable while the version is not.
+Both facts go in the record.
 
 ## Schema
 
