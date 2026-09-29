@@ -230,6 +230,12 @@ class TestRealIcarus(unittest.TestCase):
                 {**passed, "v3.REF-DIG-006": GOLDEN_FAILED, "v3.REF-DIG-007": GOLDEN_FAILED,
                  "v3.REF-DIG-008": GOLDEN_INCONCLUSIVE, "v4.REQ-DIG-003": CORNER_FAILED,
                  "v4.REQ-DIG-004": CORNER_FAILED, "v4.REQ-DIG-005": CORNER_INCONCLUSIVE}),
+            # Review HT-4: 0xCA's bit 0 is 0 and 0x35's is 1, so a receiver whose bit 0 sticks at 1 misreads the
+            # second byte by one bit. Two odd bytes would hide it; the sample's bytes must keep a 0 in bit 0.
+            "the receiver's bit 0 stuck at 1": (
+                {RX: ("shift_reg[bit_idx] <= rx_sync;", "shift_reg[bit_idx] <= (bit_idx == 0) ? 1'b1 : rx_sync;")},
+                [RX], {"rx_bytes_received": 2.0, "rx_bit_errors": 1.0},
+                {**passed, "v3.REF-DIG-007": GOLDEN_FAILED, "v4.REQ-DIG-004": CORNER_FAILED}),
             "the transmitter's divider off by one": (
                 {TX: [("if (baud_cnt == BAUD_DIV - 1) begin\n                        baud_cnt <= 0;\n"
                        "                        bit_idx  <= 0;",

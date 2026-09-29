@@ -594,6 +594,39 @@ class TestRunProcessCollection(unittest.TestCase):
                     self.skipTest("this platform cannot create symbolic links")
                 self.assertEqual(result.collect_problems["link.txt"], "a symbolic link; not copied")
 
+    def test_a_file_swapped_for_a_link_after_its_check_is_copied_as_the_link(self):
+        """Review HT-3: a name is checked with lstat, then copied with follow_symlinks=False, so a file replaced
+        by a symbolic link between the two is copied as that link, never as the file it points at, and
+        run_process refuses the copy as an input. The swap is simulated by letting the lstat check see a
+        regular file where the workspace holds a link to a file outside it."""
+        from types import SimpleNamespace
+
+        from ecad_validation.adapters.process import ProcessRequest, run_process
+
+        if not self._symlinks():
+            self.skipTest("this platform cannot create symbolic links")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tool.py").write_text("import os, sys\nos.symlink(sys.argv[1], 'out.txt')\n", encoding="utf-8")
+            outside = root / "outside.txt"
+            outside.write_text("outside the workspace", encoding="utf-8")
+            kept = root / "kept"
+            kept.mkdir()
+            regular = SimpleNamespace(S_ISLNK=lambda mode: False, S_ISREG=lambda mode: True)
+            with mock.patch("ecad_validation.adapters.process.stat", regular):
+                result = run_process(ProcessRequest(argv=[sys.executable, "tool.py", str(outside)], input_root=root,
+                                                    input_files=[root / "tool.py"], collect=("out.txt",),
+                                                    collect_into=kept))
+            self.assertEqual((result.execution_status.value, result.collected, result.collect_problems),
+                             ("completed", [kept / "out.txt"], {}))
+            self.assertTrue((kept / "out.txt").is_symlink(), "the file the link points at was copied")
+            self.assertEqual(os.readlink(kept / "out.txt"), str(outside))
+            # The link leads out of the directory it was copied to, so run_process refuses it before its own
+            # symbolic-link check.
+            with self.assertRaisesRegex(ValueError, "adapter input escapes product root: .*out.txt"):
+                run_process(ProcessRequest(argv=[sys.executable, "-c", "pass"], input_root=kept,
+                                           input_files=[kept / "out.txt"]))
+
     def test_nothing_is_collected_from_a_run_that_timed_out_or_crashed(self):
         from ecad_validation.adapters.process import ProcessRequest, run_process
 

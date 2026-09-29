@@ -491,6 +491,7 @@ U_RX = ("    uart_rx #(.CLK_FREQ(CLK_FREQ), .BAUD_RATE(BAUD_RATE)) u_rx (\n"
 HEADER_PARAMETERS = "    parameter BAUD_RATE = 115_200\n) ("
 EXTRA_PARAMETER = "    parameter BAUD_RATE = 115_200,\n    parameter STOP_BITS = 1\n) ("
 REJECTED = "not the UART 8N1 loopback the digital domain validates: rule"
+BYTE_1 = "    localparam [7:0] TX_BYTE_1    = 8'hCA;\n"  # the top's last byte line
 
 
 class TestClassAndSanity(unittest.TestCase):
@@ -550,6 +551,18 @@ class TestClassAndSanity(unittest.TestCase):
             "C6: no reset": (
                 {TB: ("RESET_CYCLES       = 4;", "RESET_CYCLES       = 0;")},
                 "rule C6: the top states no localparam RESET_CYCLES = <decimal literal of at least 1>"),
+            # Review HT-3: the byte limit, a byte's width and a component id's first character, each untested.
+            "C6: seventeen bytes": (
+                {TB: (BYTE_1, BYTE_1 + "".join(f"    localparam [7:0] TX_BYTE_{n} = 8'h5A;\n" for n in range(2, 17)))},
+                "rule C6: the top states 17 localparams named TX_BYTE_*; the bytes sent are TX_BYTE_0 .. "
+                "TX_BYTE_{N-1}, consecutive, with 1 <= N <= 16"),
+            "C6: a byte sent that is not 8 bits wide": (
+                {TB: ("    localparam [7:0] TX_BYTE_1    = 8'hCA;", "    localparam TX_BYTE_1          = 202;")},
+                "rule C6: localparam TX_BYTE_1: a byte sent is localparam [7:0] TX_BYTE_1 = <8-bit sized literal>"),
+            "an instance name starting with _": (
+                {TB: ("uart_tx #(.CLK_FREQ(CLK_FREQ), .BAUD_RATE(BAUD_RATE)) u_tx (",
+                      "uart_tx #(.CLK_FREQ(CLK_FREQ), .BAUD_RATE(BAUD_RATE)) _u_tx (")},
+                f"{{here}}/{TB}:43: _u_tx: a name starting with _ cannot be a component id of the engineering model"),
             "a width mismatch": ({TB: ("    reg  [7:0] tx_data;", "    reg  [6:0] tx_data;")},
                                  f"{{here}}/{TB}:43: u_tx.tx_data is 8 bits wide and tx_data is 7"),
             "two drivers": ({TB: (".rx_valid(rx_valid)", ".rx_valid(tx_ready)")},
@@ -683,6 +696,88 @@ class TestClassAndSanity(unittest.TestCase):
                               f"{number} is above 2147483647", str(caught.exception))
                 self.assertFalse((item / SIM).read_bytes().count(number.encode()), "nothing was written")
 
+    def test_the_top_may_state_sixteen_bytes(self):
+        """Review HT-3: MAX_BYTES is the last count accepted (the seventeenth byte is refused above).
+        END = 4 + (16 + 2) * 12 * 434 = 93 748."""
+        with _scratch() as directory:
+            item = _copy(directory, {TB: (BYTE_1, BYTE_1 + "".join(f"    localparam [7:0] TX_BYTE_{n} = 8'h5A;\n"
+                                                                   for n in range(2, 16)))})
+            harness = (item / SIM).read_text()
+        self.assertIn("    reg  [7:0] ecad_expected [0:15];\n", harness)
+        self.assertIn("        ecad_expected[15] = 8'd90;\n", harness)
+        self.assertIn("        if (ecad_cycle == 93748) begin\n", harness)
+
+    def test_a_model_is_held_to_the_rules_its_sources_were(self):
+        """Review HT-3: loopback_roles and end_cycle, which the writer, V1, V2 and the references share, refuse a
+        hand-edited model that breaks rule C3, C4 or C7; and the run length has its floor, MIN_BIT_CYCLES."""
+        from ecad_model.domains.digital import end_cycle, loopback_roles
+        from ecad_model.importers import ExtractionError
+
+        model = _model()
+        where = f"{TB_REF}: {REJECTED}"
+
+        def without(component_id: str, facet: str) -> Dict[str, Any]:
+            changed = copy.deepcopy(model)
+            del _component(changed, component_id)["domains"]["digital"][facet]
+            return changed
+
+        crossed = copy.deepcopy(model)
+        _component(crossed, "u_tx")["hdl"]["parameters"] = {"BAUD_RATE": "baud_rate", "CLK_FREQ": "baud_rate"}
+        held = "{'BAUD_RATE': 'baud_rate', 'CLK_FREQ': 'clk_freq'}"
+        for label, changed, expected in (
+            ("C4: a parameter held by another parameter's facet", crossed,
+             "C4: u_tx holds its parameters as {'BAUD_RATE': 'baud_rate', 'CLK_FREQ': 'baud_rate'} with facets "
+             f"['baud_rate', 'clk_freq']; the class holds them as {held}"),
+            ("C4: a parameter without its facet", without("u_tx", "baud_rate"),
+             f"C4: u_tx holds its parameters as {held} with facets ['clk_freq']; the class holds them as {held}"),
+            ("C3: a receiver without its oversample", without("u_rx", "oversample"),
+             "C3: u_rx carries no oversample, its module's OVERSAMPLE"),
+        ):
+            with self.subTest(label):
+                with self.assertRaises(ExtractionError) as caught:
+                    loopback_roles(changed)
+                self.assertEqual((caught.exception.kind, str(caught.exception)), ("rejected", f"{where} {expected}"))
+        # END = RESET + (N + 2) * 12 * max(D_t, D_r, 16): 4 + 4 * 12 * 434 committed; at 5 MBd D = 10, so 16 counts.
+        self.assertEqual(end_cycle(model), 20836)
+        self.assertEqual(end_cycle(_set(model, ("u_tx", "baud_rate", 5000000), ("u_rx", "baud_rate", 5000000))), 772)
+        for component_id, facet, value in (("u_tx", "clk_freq", 0), ("u_rx", "baud_rate", 1.5),
+                                           ("u_tx", "baud_rate", True), ("u_rx", "clk_freq", -50000000)):
+            with self.subTest(component_id=component_id, facet=facet, value=value):
+                with self.assertRaises(ExtractionError) as caught:
+                    end_cycle(_set(model, (component_id, facet, value)))
+                self.assertEqual(str(caught.exception), f"{where} C7: {component_id} {facet} {value!r} is not a positive "
+                                                        "integer, so the run has no length")
+
+    def test_extract_refuses_another_format_and_a_seventeenth_source_before_reading_any(self):
+        """Review HT-3: a source that is not Verilog and more than verilog.MAX_MODULES sources are ValueError
+        (DATASET_INPUT_INVALID) before any file is read; sixteen are read, and refused on their content."""
+        from tests.unit.test_verilog_source import small_leaves
+
+        from ecad_model.domains.base import SourceArtifact
+        from ecad_model.importers import ExtractionError
+
+        adapter = _adapter()
+        annotations = json.loads((ITEM / "design" / "annotations.json").read_bytes())
+        refs = {"sample": SAMPLE, "annotations": ANNOTATIONS_REF, "annotations_sha256": "0" * 64}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "source").mkdir()
+            for relative in (TB, TX, RX):
+                (root / relative).write_bytes((ITEM / relative).read_bytes())
+            leaves = small_leaves(14)
+            for relative, data in leaves:
+                (root / relative).write_bytes(data)
+            sources = [SourceArtifact(path, "verilog") for path in (TB, TX, RX, *(path for path, _ in leaves))]
+            with self.assertRaisesRegex(ValueError, "^the digital domain reads at most 16 verilog sources, found 17$"):
+                adapter.extract(root, sources, annotations, refs)
+            with self.assertRaises(ExtractionError) as caught:
+                adapter.extract(root, sources[:16], annotations, refs)
+            self.assertTrue(str(caught.exception).startswith(f"{SAMPLE}/source/l0.v: module l0 is never instantiated"),
+                            str(caught.exception))
+            with self.assertRaisesRegex(ValueError, r"^the digital domain reads verilog sources only, not "
+                                                    r"source/part\.step \(step\)$"):
+                adapter.extract(root, [*sources[:3], SourceArtifact("source/part.step", "step")], annotations, refs)
+
     def test_the_resource_guard_refuses_a_run_longer_than_max_cycles(self):
         """END = 4 + 4 * 12 * T: 50e6 // 1200 = 41666 gives 1 999 972 cycles; 50e6 // 1199 = 41701 gives 2 001 652."""
         from ecad_model.dataset import build
@@ -764,8 +859,10 @@ class TestSimulationFile(unittest.TestCase):
                 "if (ecad_received < 1) ecad_missing = 1 - ecad_received;", "the harness's bytes awaited 1 != the model's 2"),
             "a dropped $display": (display, "", "declares the metrics ['clock_period_s'"),
             "a duplicated $display": (display, display + display, "and ['rx_framing_errors'] more than once"),
+            # Review HT-3: the reader's refusal names the simulation file's line, 353, not the harness's 112.
             "an inserted $fopen": ("            $finish;\n", '            $fopen("x");\n            $finish;\n',
-                                   "the harness is not one this adapter writes"),
+                                   f"{SIM}: the harness is not one this adapter writes: {SIM}:353: $fopen: opens, reads "
+                                   "or writes files; the harness uses only $display, $finish and $realtime"),
             "a swapped connection": ("u_rx (.clk(clk), .rst_n(rst_n), .rx(line)", "u_rx (.clk(clk), .rst_n(rst_n), .rx(tx_valid)",
                                      "'rx': 'tx_valid'"),
             # Only the writer's own text says where the harness samples: nothing the reader reads changes.
@@ -807,6 +904,11 @@ class TestSimulationFile(unittest.TestCase):
         _component(changed, "u_tx")["hdl"]["text"] += "\n"
         problems = adapter.invariant_problems(changed, {}, {SIM: data})
         self.assertIn(f"u_tx: hdl.text is not the bytes of {TX_REF} that design.sources records", problems)
+        # Review HT-3: a component's hdl source is one of the design's sources; the top carries no text to hash.
+        changed = copy.deepcopy(model)
+        _component(changed, "tb_uart_loopback")["hdl"]["source"] = f"{SAMPLE}/source/other.v"
+        self.assertIn(f"tb_uart_loopback: its source {SAMPLE}/source/other.v is not one of design.sources",
+                      adapter.invariant_problems(changed, {}, {SIM: data}))
 
 
 class TestReferences(unittest.TestCase):
