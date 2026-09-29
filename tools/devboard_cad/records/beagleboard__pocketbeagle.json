@@ -1,0 +1,230 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "beagleboard:pocketbeagle",
+  "manufacturer": "BeagleBoard.org Foundation",
+  "family": "PocketBeagle",
+  "board": "PocketBeagle",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "Octavo Systems OSD3358-SM",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A8",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T05:53:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/pocketbeagle@d793a63f48dd3041e333362d5ec870377d255f89"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/PocketBeagle_BOM.csv",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:10:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "fcc56db5b7c4949bf1d3d2cfaef1b94fd8aa5871aa10f0e712546bca5e11956b",
+        "size_bytes": 1789,
+        "media_type": "text/plain",
+        "detected_format": "csv",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T05:53:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/pocketbeagle@d793a63f48dd3041e333362d5ec870377d255f89"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/EAGLE/PocketBeagle.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:20:45Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "150ef4d53c7c073c29ff0b84b5f8b5c7238c7eabc57580bb7cf4ff14202cc874",
+        "size_bytes": 5922181,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/KiCAD/pocketbeagle.pretty/0402.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:10:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "01829680fae0b6742a786e2bd248916508ffea5a396a26b3a8df27aa13d6f108",
+        "size_bytes": 1413,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/KiCAD/plots/PocketBeagle-Top.gbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:10:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c37dcd8962a721da19aa35aaba6c825f3002542c02aaa62ebd4ca4eda3a3ddfc",
+        "size_bytes": 189784,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/KiCAD/PocketBeagle.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:10:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3208e126a89e999404de619b72e22453a6f87b3621808b505c58708654cccb30",
+        "size_bytes": 941269,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/KiCAD/plots/PocketBeagle-PTH.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:10:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "76be6ad8a48d16265a3840697f41a783a092085b4faf61d12fad3a1ec36cc901",
+        "size_bytes": 3868,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/EAGLE/PocketBeagle.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:20:45Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "150ef4d53c7c073c29ff0b84b5f8b5c7238c7eabc57580bb7cf4ff14202cc874",
+        "size_bytes": 5922181,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T05:53:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/pocketbeagle@d793a63f48dd3041e333362d5ec870377d255f89"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/PocketBeagle_sch.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:10:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6e22acbecc08122f7f6a7b9fdcdd5f2962b7fd3dc7cdc264e2e24d62c99e3948",
+        "size_bytes": 880188,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/pocketbeagle/d793a63f48dd3041e333362d5ec870377d255f89/models/PocketBeagle.step",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:10:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ef4e6f9f7f39dd53cc4f5ed19ebbb4e90bfd456a1bab63789d2a473f84dca6bc",
+        "size_bytes": 732012,
+        "media_type": "text/plain",
+        "detected_format": "step:AUTOMOTIVE_DESIGN { 1 0 10303 214 3 1 1 }",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T05:53:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/pocketbeagle@d793a63f48dd3041e333362d5ec870377d255f89"
+      }
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": null,
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.beagleboard.org/boards/pocketbeagle",
+    "official_cad_repository": "https://github.com/beagleboard/pocketbeagle",
+    "official_github_repository": "https://github.com/beagleboard/pocketbeagle",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository beagleboard/pocketbeagle pinned at d793a63f48dd. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the LICENSE file in the manufacturer's repository, which opens \"CC-BY-4.0\". Note the README additionally restricts use of the BeagleBoard.org trademarks and logo, which is a trademark matter separate from the copyright licence on the design materials."
+}

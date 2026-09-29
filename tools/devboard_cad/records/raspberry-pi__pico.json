@@ -1,26 +1,133 @@
 {
   "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "board_id": "raspberry-pi:pico",
   "manufacturer": "Raspberry Pi",
   "family": "Raspberry Pi Pico",
   "board": "Raspberry Pi Pico",
-  "part_number": "UNVERIFIED",
-  "revision": "unverified",
-  "mcu_soc": "UNVERIFIED",
+  "part_number": "SC0915",
+  "revision": "Pico-R3",
+  "mcu_soc": "Raspberry Pi RP2040",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Dual Arm Cortex-M0+",
+  "product_status": "active",
   "files": {
-    "schematic": {"available": null, "url": null, "verified_revision": null},
-    "pcb_source": {"available": null, "url": null, "verified_revision": null},
-    "gerbers": {"available": null, "url": null, "verified_revision": null},
-    "bom": {"available": null, "url": null, "verified_revision": null},
-    "pick_and_place": {"available": null, "url": null, "verified_revision": null},
-    "step": {"available": null, "url": null, "verified_revision": null},
-    "dxf": {"available": null, "url": null, "verified_revision": null},
-    "stl": {"available": null, "url": null, "verified_revision": null},
-    "kicad": {"available": null, "url": null, "verified_revision": null},
-    "eagle": {"available": null, "url": null, "verified_revision": null},
-    "altium": {"available": null, "url": null, "verified_revision": null},
-    "mechanical": {"available": null, "url": null, "verified_revision": null}
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pick_and_place": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "step": {
+      "available": true,
+      "url": "https://datasheets.raspberrypi.com/pico/Pico-R3-step.zip",
+      "verified_revision": "Pico-R3",
+      "evidence": {
+        "captured_at": "2026-09-29T06:03:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008311-DS-1-Pico-R3-step.zip",
+        "sha256": "4008e557bd80d75119872d10460d9f30f2e0faf210606d058bbe78cd6598c931",
+        "size_bytes": 266009,
+        "media_type": "application/zip",
+        "detected_format": "step:CONFIG_CONTROL_DESIGN",
+        "verification_method": "http_get_step_header",
+        "contained_member": "Pico-R3.step"
+      }
+    },
+    "dxf": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "stl": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "kicad": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "eagle": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "altium": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:03:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008307-DS-2-pico-datasheet.pdf",
+        "sha256": "757ff485227493b9fcc0c2c96c4dea9de020e1d8b2b11e2aa4f9ee8b25aa89eb",
+        "size_bytes": 18176869,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pinout": {
+      "available": true,
+      "url": "https://datasheets.raspberrypi.com/pico/Pico-R3-A4-Pinout.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T06:03:44Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008309-DS-1-Pico-R3-A4-Pinout.pdf",
+        "sha256": "e3166af0b2ec19aeb7c961a94ecc3766d88ddb247576d45e1e37f444d7e4c0ce",
+        "size_bytes": 386050,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    }
   },
   "licenses": {
     "hardware_license": "UNVERIFIED",
@@ -35,15 +142,15 @@
     "license_url": null
   },
   "sources": {
-    "source_tier": "community",
-    "official_product_page": "https://www.raspberrypi.com/",
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.raspberrypi.com/products/raspberry-pi-pico/",
     "official_cad_repository": null,
     "official_github_repository": null,
-    "official_documentation": null,
-    "direct_cad_download": null,
+    "official_documentation": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+    "direct_cad_download": "https://datasheets.raspberrypi.com/pico/Pico-R3-step.zip",
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "incomplete",
-  "notes": "Identity stub only. Per issue #28 section 10, part number, MCU, revision, per-format availability, and licensing must each be checked against official Raspberry Pi sources before being recorded. No availability claim is made by this record."
+  "record_status": "partial",
+  "notes": "Order code SC0915 and EAN 5056561801445 read from the official datasheet, Appendix A.2, Table 6. Availability is decided by verify.py from retrieved bytes. Licensing is left unverified: Raspberry Pi publishes the Pico CAD and schematic but the terms governing reuse of the design were not located on an official page, and issue #28 section 12 requires licensing to be tracked separately from file availability."
 }
