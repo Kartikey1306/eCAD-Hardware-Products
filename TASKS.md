@@ -146,7 +146,7 @@ Risks
 
 Owner: unassigned
 Mode: build
-Status: review (local branch `wip/stack`; not pushed)
+Status: review (PR #36, from the fork's `feat/cad-mechanical-domain`, which is the local `wip/stack`)
 Depends on: `fix/adapter-timeout-decode` and `fix/producer-cross-reference-checks` (cherry-picked as `3639778`, patch-identical); both are in the stack below this work
 
 Goal
@@ -202,7 +202,7 @@ Verification (code at `bd999d5`, 2026-09-26)
 
 Owner: unassigned
 Mode: build
-Status: review (local branch `feat/multi-domain-foundation`; not pushed)
+Status: review (PR #37, from the fork's `feat/multi-domain-foundation`, stacked on #36)
 Depends on: T-010 (`wip/stack`, which this branch builds on)
 
 Goal
@@ -262,7 +262,7 @@ Verification (2026-09-26/27; code at `000309b` unless a row names another commit
 
 Owner: unassigned
 Mode: build
-Status: review (local branch `feat/domain-electrical`; not pushed; two independent reviews at `bf04f1b`, whose findings are fixed at `11b19b1`, `555bfd7`, `ec37115` and `49887ac` (plan §7.6); the fixes have had no review of their own)
+Status: review (PR #38, from the fork's `feat/domain-electrical`, stacked on #37; two independent reviews at `bf04f1b`, whose findings are fixed at `11b19b1`, `555bfd7`, `ec37115` and `49887ac` (plan §7.6); the fixes have had no review of their own)
 Depends on: T-011 (`feat/multi-domain-foundation` at `042f934`, which this branch builds on)
 
 Goal
@@ -388,7 +388,7 @@ Verification of the branch review (2026-09-28/29, macOS arm64, Python 3.14.4, ng
 
 Owner: unassigned
 Mode: build
-Status: review (local branch `feat/domain-digital`; not pushed; two independent reviews at `905294f` (`6fbae29` on this branch), whose 12 distinct findings are fixed at `2b2d1d0` to `0a5ff00` (plan §7.7); the fixes have had no review of their own)
+Status: review (the fork's `feat/domain-digital`, stacked on PR #38; two independent reviews at `905294f` (`6fbae29` on this branch), whose 12 distinct findings are fixed at `2b2d1d0` to `0a5ff00` (plan §7.7); the fixes have had no review of their own)
 Depends on: T-012 (`feat/domain-electrical` at `7368641`, which this branch builds on)
 
 Goal
@@ -468,8 +468,10 @@ Verification (2026-09-29, macOS 26.6.2 arm64, Python 3.14.4, Icarus Verilog 13.0
   | Test discrimination, the re-anchored mutant | `python3 tests/mutation/run_mutations.py --workers 1 --only electrical-unregistered` on a clean clone of `0a5ff00` | `PASS` -- "baseline green; running 1 mutants", killed by `test_engineering_model.py::TestDocumentationExamples::test_examples_in_modules_that_need_no_cad_kernel [domains]`, "1 of 1 mutants killed", exit 0 (3 min 57 s). It is the only one of the 322 older mutants whose definition the digital branch changed |
   | Test discrimination, the other 321 | `run_mutations.py` | `NOT RUN` here -- last run at `ec37115` or `57f4fee` (T-012) |
   | The `hdl` job's steps on Linux, Icarus 11.0 | an ubuntu:22.04 arm64 container, a clean copy of `11e8c09`: apt `iverilog` (`Icarus Verilog version 11.0 (stable) ()`), Python 3.12.14 (uv's standalone build, where CI uses actions/setup-python), `pip install -r tools/requirements.txt pytest`, then with `ECAD_REQUIRE_HDL_TOOLS=1` the job's `run_all_tests.py --tb=short`, `check` and `validate` | `PASS` -- 428 passed, 61 skipped (the CAD and ngspice tests the job does not install for), 0 failed; `check` exit 0; `validate` exit 0: V0-V3 `PASS`, V4 `BLOCKED` (6 `WARNING`, REQ-DIG-007 `BLOCKED`), source not dirty. Run by the coordinator of the digital branch, not by this session |
+  | The `spice` and `hdl` jobs' steps on Linux at `0a5ff00` (this branch rebased onto PR #38's head) | the same ubuntu:22.04 arm64 containers, run by the coordinator: apt ngspice-36 for `spice`, apt Icarus 11.0 for `hdl`, Python 3.12.14, `ECAD_REQUIRE_SPICE_TOOLS=1` or `ECAD_REQUIRE_HDL_TOOLS=1`, the complete suite, `check` and `validate` of the job's sample | `PASS` -- each 428 passed, 61 skipped (the other tools' and the CAD tests), 0 failed; `check` exit 0; `validate`: `servo_supply_001` V0-V3 `PASS`, V4 `BLOCKED` (5 `WARNING`, 3 `BLOCKED`), `uart_loopback_001` V0-V3 `PASS`, V4 `BLOCKED` (6 `WARNING`, REQ-DIG-007 `BLOCKED`) |
+  | The `cad-dataset` job's steps on Linux at `0a5ff00` | a python:3.12-slim (Debian 13) arm64 container, run by the coordinator: apt `git libgl1`, `pip install -r tools/requirements.txt -r tools/requirements-cad.txt -c tools/constraints-cad.txt pytest` (cadquery-ocp 8.0.1, mujoco 3.14.0, numpy 2.5.3), `ECAD_REQUIRE_CAD_TOOLS=1`, `check`, the complete suite, `validate datasets/cad/robotic_joint_001` | `PASS` -- `check` exit 0; 469 passed, 20 skipped (the ngspice and Icarus tests), 0 failed; `validate` V0-V3 `PASS`, V4 `BLOCKED` (5 `WARNING`, REQ-XD-001 `BLOCKED`) |
   | Independent review | CLAUDE.md rule 4: two reviewers, correctness and security (CS) and honesty and tests (HT), at `905294f` | `PASS` -- 12 distinct findings (14 IDs, two found by both), all fixed (plan §7.7). The fixes themselves have had no review of their own |
-  | CI `hdl` job, Linux x86_64 | the job itself | `NOT RUN` -- the branch is not pushed and push access is read-only; the container above is arm64 |
+  | CI `hdl` job, Linux x86_64 | the job itself | `NOT RUN` -- push access is read-only, and the fork's workflows wait for a maintainer's approval (`action_required` on #36-#38); the container above is arm64 |
   | Verilator | a run of the harness under Verilator | `NOT RUN` -- Verilator is PLANNED, not an adapter (plan §20 Q9) |
   | Coverage of new and changed code | a coverage tool | `NOT RUN` -- none is installed (no `coverage`, no `pytest-cov`) |
 

@@ -2,13 +2,14 @@
 
 ## [Unreleased]
 
-Local branch `feat/domain-electrical`, not pushed and not released. It had
+`feat/domain-electrical`, published as PR #38 (stacked on #37 and #36), not released. It had
 two independent reviews at `bf04f1b` (2026-09-28), whose findings are fixed
 below (plan §7.6); the fixes have had no review of their own, and the CI
 `spice` job has never run.
 
-On it, the local branch `feat/domain-digital`, not pushed and not released.
-It had two independent reviews at `905294f`, whose findings are fixed below
+On it, `feat/domain-digital`, stacked on PR #38, not released.
+It had two independent reviews at `905294f` (`6fbae29` after its rebase onto
+PR #38's head), whose findings are fixed below
 (plan §7.7); the fixes have had no review of their own, and the CI `hdl` job
 has never run.
 
