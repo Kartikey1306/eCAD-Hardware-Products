@@ -4,7 +4,7 @@
   "board_id": "adafruit:terminal-block-bff",
   "manufacturer": "Adafruit Industries",
   "family": "QT Py",
-  "board": "Adafruit Terminal Block BFF",
+  "board": "Adafruit Terminal Block BFF Add-On for QT Py and Xiao",
   "part_number": "6495",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",

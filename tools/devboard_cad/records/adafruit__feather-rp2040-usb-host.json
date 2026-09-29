@@ -4,7 +4,7 @@
   "board_id": "adafruit:feather-rp2040-usb-host",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "Adafruit Feather RP2040 USB Host",
+  "board": "USB Host Feather",
   "part_number": "5723",
   "revision": "not-stated",
   "mcu_soc": "RP2040",

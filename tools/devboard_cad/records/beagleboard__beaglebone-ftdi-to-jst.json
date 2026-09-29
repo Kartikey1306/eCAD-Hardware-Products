@@ -4,7 +4,7 @@
   "board_id": "beagleboard:beaglebone-ftdi-to-jst",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "BeagleBone",
-  "board": "BeagleBoard.org beaglebone ftdi to jst",
+  "board": "BeagleBoard.org BeagleBone Ftdi to Jst",
   "part_number": "UNVERIFIED",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

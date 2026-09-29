@@ -4,7 +4,7 @@
   "board_id": "adafruit:esp32-s2-reverse-tft-feather",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "EagleCAD PCB files for Adafruit ESP32-S2 Reverse TFT Feather",
+  "board": "Adafruit ESP32-S2 Reverse TFT Feather",
   "part_number": "5345",
   "revision": "not-stated",
   "mcu_soc": "ESP32-S2",

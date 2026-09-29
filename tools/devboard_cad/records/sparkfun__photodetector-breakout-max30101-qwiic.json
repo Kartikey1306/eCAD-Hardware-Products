@@ -4,7 +4,7 @@
   "board_id": "sparkfun:photodetector-breakout-max30101-qwiic",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Breakout board for the MAX30101 Particle Sensor (Qwiic)",
+  "board": "SparkFun Photodetector Breakout MAX30101 Qwiic",
   "part_number": "SEN-16474",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",

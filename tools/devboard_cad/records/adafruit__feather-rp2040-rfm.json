@@ -4,7 +4,7 @@
   "board_id": "adafruit:feather-rp2040-rfm",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "EagleCAD PCB files for the Adafruit Feather RP2040 RFM69 and RFM9x boards",
+  "board": "Adafruit Feather RP2040 RFM69 and RFM9x boards",
   "part_number": "5712",
   "revision": "not-stated",
   "mcu_soc": "RP2040",

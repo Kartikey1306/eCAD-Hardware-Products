@@ -4,7 +4,7 @@
   "board_id": "sparkfun:high-precision-temperature-sensor-tmp117-qwiic",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Breakout board for the TMP117 High Precision Temperature Sensor (Qwiic)",
+  "board": "SparkFun High Precision Temperature Sensor TMP117 Qwiic",
   "part_number": "SEN-15805",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",

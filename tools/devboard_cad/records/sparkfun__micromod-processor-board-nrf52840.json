@@ -4,7 +4,7 @@
   "board_id": "sparkfun:micromod-processor-board-nrf52840",
   "manufacturer": "SparkFun Electronics",
   "family": "MicroMod",
-  "board": "SparkFun MicroMod Processor Board nRF52840",
+  "board": "SparkFun MicroMod Processor Board NRF52840",
   "part_number": "DEV-16984",
   "revision": "not-stated",
   "mcu_soc": "NRF52840",

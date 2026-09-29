@@ -4,7 +4,7 @@
   "board_id": "adafruit:slider-trinkey",
   "manufacturer": "Adafruit Industries",
   "family": "Trinkey",
-  "board": "EagleCAD PCB files for Adafruit Slider Trinkey",
+  "board": "Adafruit Slider Trinkey",
   "part_number": "5021",
   "revision": "not-stated",
   "mcu_soc": "SAMD21",

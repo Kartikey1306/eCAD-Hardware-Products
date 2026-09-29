@@ -4,7 +4,7 @@
   "board_id": "sparkfun:micromod-gnss-function-board-zed-f9p",
   "manufacturer": "SparkFun Electronics",
   "family": "MicroMod",
-  "board": "MicroMod Function Board for the u-blox ZED-F9P High Precision GNSS module",
+  "board": "SparkFun MicroMod GNSS Function Board ZED F9P",
   "part_number": "19663",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

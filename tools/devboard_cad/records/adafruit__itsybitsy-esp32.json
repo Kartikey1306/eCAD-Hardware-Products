@@ -4,7 +4,7 @@
   "board_id": "adafruit:itsybitsy-esp32",
   "manufacturer": "Adafruit Industries",
   "family": "ItsyBitsy",
-  "board": "Adafruit ItsyBitsy ESP32",
+  "board": "ItsyBitsy ESP32",
   "part_number": "5889",
   "revision": "not-stated",
   "mcu_soc": "ESP32",

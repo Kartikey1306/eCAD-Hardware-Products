@@ -4,7 +4,7 @@
   "board_id": "adafruit:ds3231-precision-rtc-featherwing",
   "manufacturer": "Adafruit Industries",
   "family": "FeatherWing",
-  "board": "Adafruit DS3231 Precision RTC FeatherWing",
+  "board": "DS3231 Precision RTC FeatherWing",
   "part_number": "3028",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",

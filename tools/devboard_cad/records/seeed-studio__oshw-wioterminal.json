@@ -4,7 +4,7 @@
   "board_id": "seeed-studio:oshw-wioterminal",
   "manufacturer": "Seeed Studio",
   "family": "Wio",
-  "board": "Presented by Seeed Studio, we offer our Wio Terminal open source hardware",
+  "board": "Seeed WioTerminal",
   "part_number": "4509",
   "revision": "3.0",
   "mcu_soc": "UNVERIFIED",

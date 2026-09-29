@@ -4,7 +4,7 @@
   "board_id": "adafruit:feather-esp32-s2",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "EagleCAD PCB files for Adafruit ESP32-S2 Feather",
+  "board": "Adafruit ESP32-S2 Feather",
   "part_number": "5000",
   "revision": "C",
   "mcu_soc": "ESP32-S2",

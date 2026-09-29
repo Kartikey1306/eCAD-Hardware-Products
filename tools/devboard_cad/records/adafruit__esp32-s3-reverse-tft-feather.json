@@ -4,7 +4,7 @@
   "board_id": "adafruit:esp32-s3-reverse-tft-feather",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "Adafruit ESP32 S3 Reverse TFT Feather",
+  "board": "ESP32-S3 Reverse TFT Feather",
   "part_number": "5691",
   "revision": "not-stated",
   "mcu_soc": "ESP32-S3",

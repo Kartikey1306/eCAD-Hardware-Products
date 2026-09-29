@@ -4,7 +4,7 @@
   "board_id": "adafruit:clue",
   "manufacturer": "Adafruit Industries",
   "family": "CLUE",
-  "board": "Adafruit CLUE",
+  "board": "Adafruit CLUE nRF52840 Express",
   "part_number": "4500",
   "revision": "not-stated",
   "mcu_soc": "NRF52840",

@@ -4,7 +4,7 @@
   "board_id": "beagleboard:beaglebone-ai-64",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "BeagleBone",
-  "board": "Mirror of https://git",
+  "board": "BeagleBoard.org BeagleBone AI 64",
   "part_number": "UNVERIFIED",
   "revision": "B1",
   "mcu_soc": "UNVERIFIED",

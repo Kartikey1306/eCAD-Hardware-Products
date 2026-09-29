@@ -4,7 +4,7 @@
   "board_id": "beagleboard:beaglev-fire",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "BeagleV",
-  "board": "Mirror of https://git",
+  "board": "BeagleBoard.org BeagleV Fire",
   "part_number": "UNVERIFIED",
   "revision": "A",
   "mcu_soc": "UNVERIFIED",

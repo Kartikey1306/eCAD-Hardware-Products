@@ -4,7 +4,7 @@
   "board_id": "adafruit:sht4x-trinkey",
   "manufacturer": "Adafruit Industries",
   "family": "Trinkey",
-  "board": "Adafruit SHT4x Trinkey",
+  "board": "SHT45 and SHT41 Trinkeys",
   "part_number": "5896",
   "revision": "not-stated",
   "mcu_soc": "SAMD21",

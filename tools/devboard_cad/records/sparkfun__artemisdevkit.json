@@ -4,7 +4,7 @@
   "board_id": "sparkfun:artemisdevkit",
   "manufacturer": "SparkFun Electronics",
   "family": "Artemis",
-  "board": "An mbed os enabled board based on the Artemis module",
+  "board": "SparkFun ArtemisDevKit",
   "part_number": "DEV-16828",
   "revision": "not-stated",
   "mcu_soc": "APOLLO3",

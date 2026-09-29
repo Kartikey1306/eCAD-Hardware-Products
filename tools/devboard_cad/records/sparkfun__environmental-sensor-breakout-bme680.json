@@ -4,7 +4,7 @@
   "board_id": "sparkfun:environmental-sensor-breakout-bme680",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Hardware Repository for the Enviromental Sensor Breakout",
+  "board": "Enviromental Sensor Breakout",
   "part_number": "SEN-16466",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",

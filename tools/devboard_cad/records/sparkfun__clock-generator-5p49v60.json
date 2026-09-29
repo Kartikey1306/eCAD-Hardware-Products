@@ -4,7 +4,7 @@
   "board_id": "sparkfun:clock-generator-5p49v60",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Hardware repo for the SparkFun Clock Generator 5P49V60 (Qwiic) breakout board",
+  "board": "SparkFun Clock Generator 5P49V60 (Qwiic) breakout board",
   "part_number": "BOB-15734",
   "revision": "not-stated",
   "mcu_soc": "not-applicable",

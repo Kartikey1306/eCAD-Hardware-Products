@@ -4,7 +4,7 @@
   "board_id": "beagleboard:capes",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "Capes",
-  "board": "Official BeagleBoard",
+  "board": "Official BeagleBoard.org capes",
   "part_number": "UNVERIFIED",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

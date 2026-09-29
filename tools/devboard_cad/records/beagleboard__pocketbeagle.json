@@ -4,7 +4,7 @@
   "board_id": "beagleboard:pocketbeagle",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "PocketBeagle",
-  "board": "BeagleBoard",
+  "board": "BeagleBoard.org PocketBeagle",
   "part_number": "UNVERIFIED",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

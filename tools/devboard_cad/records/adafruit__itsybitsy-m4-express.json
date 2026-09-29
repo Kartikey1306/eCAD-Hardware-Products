@@ -4,7 +4,7 @@
   "board_id": "adafruit:itsybitsy-m4-express",
   "manufacturer": "Adafruit Industries",
   "family": "ItsyBitsy",
-  "board": "Adafruit ItsyBitsy M4 Express",
+  "board": "Adafruit ItsyBitsy M4",
   "part_number": "3800",
   "revision": "not-stated",
   "mcu_soc": "SAMD51",

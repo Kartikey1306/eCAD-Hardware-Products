@@ -4,7 +4,7 @@
   "board_id": "sparkfun:humidity-sensor-shtc3",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Hardware repository for the SparkFun Humidity Sensor",
+  "board": "SparkFun Humidity Sensor",
   "part_number": "SEN-16467",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

@@ -4,7 +4,7 @@
   "board_id": "beagleboard:beagleplay",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "BeaglePlay",
-  "board": "Mirror of https://openbeagle",
+  "board": "BeagleBoard.org BeaglePlay",
   "part_number": "UNVERIFIED",
   "revision": "not-stated",
   "mcu_soc": "AM625",

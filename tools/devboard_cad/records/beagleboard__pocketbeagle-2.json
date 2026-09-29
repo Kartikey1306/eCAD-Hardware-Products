@@ -4,7 +4,7 @@
   "board_id": "beagleboard:pocketbeagle-2",
   "manufacturer": "BeagleBoard.org Foundation",
   "family": "PocketBeagle",
-  "board": "Mirror of https://openbeagle",
+  "board": "BeagleBoard.org PocketBeagle 2",
   "part_number": "UNVERIFIED",
   "revision": "A",
   "mcu_soc": "AM3358",

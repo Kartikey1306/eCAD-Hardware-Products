@@ -4,7 +4,7 @@
   "board_id": "sparkfun:qwiic-micro-samd21e",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Hardware repo for the Qwiic Micro SAMD21E development board",
+  "board": "Qwiic Micro SAMD21E development board",
   "part_number": "DEV-15423",
   "revision": "not-stated",
   "mcu_soc": "SAMD21",

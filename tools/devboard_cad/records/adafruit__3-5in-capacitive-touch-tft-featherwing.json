@@ -4,7 +4,7 @@
   "board_id": "adafruit:3-5in-capacitive-touch-tft-featherwing",
   "manufacturer": "Adafruit Industries",
   "family": "FeatherWing",
-  "board": "Adafruit 3.5in Capacitive Touch TFT FeatherWing",
+  "board": "Adafruit 3.5\" Capacitive Touch TFT FeatherWing",
   "part_number": "5872",
   "revision": "not-stated",
   "mcu_soc": "RP2040",

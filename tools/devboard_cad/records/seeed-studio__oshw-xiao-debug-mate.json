@@ -4,7 +4,7 @@
   "board_id": "seeed-studio:oshw-xiao-debug-mate",
   "manufacturer": "Seeed Studio",
   "family": "XIAO",
-  "board": "Seeed Studio XIAO Debug Mate: The all-in-one ESP32-S3 debugging solution",
+  "board": "Seeed Studio XIAO Debug Mate",
   "part_number": "6588",
   "revision": "1.0",
   "mcu_soc": "ESP32-S3",

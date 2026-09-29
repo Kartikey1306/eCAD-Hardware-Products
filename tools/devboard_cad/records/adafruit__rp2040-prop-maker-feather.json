@@ -4,7 +4,7 @@
   "board_id": "adafruit:rp2040-prop-maker-feather",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "Adafruit RP2040 Prop Maker Feather",
+  "board": "Adafruit Feather RP2040 Prop-Maker",
   "part_number": "5768",
   "revision": "not-stated",
   "mcu_soc": "RP2040",

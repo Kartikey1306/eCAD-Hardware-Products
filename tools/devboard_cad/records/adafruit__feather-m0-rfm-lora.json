@@ -4,7 +4,7 @@
   "board_id": "adafruit:feather-m0-rfm-lora",
   "manufacturer": "Adafruit Industries",
   "family": "Feather",
-  "board": "Adafruit Feather M0 RFM LoRa",
+  "board": "Adafruit Feather M0 RFM69 / RFM9X LoRa",
   "part_number": "3178",
   "revision": "not-stated",
   "mcu_soc": "SAMD21",

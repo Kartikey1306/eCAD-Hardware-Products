@@ -4,7 +4,7 @@
   "board_id": "sparkfun:real-time-clock-module-rv-8803",
   "manufacturer": "SparkFun Electronics",
   "family": "Qwiic",
-  "board": "Hardware repository for the SparkFun Real Time Clock Module",
+  "board": "SparkFun Real Time Clock Module",
   "part_number": "BOB-16281",
   "revision": "not-stated",
   "mcu_soc": "UNVERIFIED",

@@ -425,6 +425,59 @@ class TestDiscovery(unittest.TestCase):
             self.assertTrue(discover.ADDON.search(name), name)
         self.assertFalse(discover.ADDON.search("Adafruit-Feather-RP2040-PCB"))
 
+    def test_a_repository_description_is_not_always_a_product_name(self) -> None:
+        """"Mirror of https://openbeagle" names no product; fall back to the repo name."""
+        cases = [
+            ("beaglebone-ai-64", "Mirror of https://git.beagleboard.org/x",
+             "BeagleBoard.org Foundation", "BeagleBoard.org BeagleBone AI 64"),
+            ("OSHW-WioTerminal", "Presented by Seeed Studio, we offer our Wio Terminal",
+             "Seeed Studio", "Seeed WioTerminal"),
+            ("SparkFun_RedBoard_Artemis_Nano",
+             "Tiny Arduino compatible carrier board for SparkFun's Artemis module",
+             "SparkFun Electronics", "SparkFun RedBoard Artemis Nano"),
+        ]
+        for repo, desc, mfr, expected in cases:
+            self.assertEqual(discover.board_name(repo, desc, mfr), expected, repo)
+
+    def test_boilerplate_wrapping_a_product_name_is_stripped(self) -> None:
+        self.assertEqual(
+            discover.board_name("Adafruit-Feather-ESP32-S3-PCB",
+                                "EagleCAD PCB files for the Adafruit Feather ESP32-S3",
+                                "Adafruit Industries"),
+            "Adafruit Feather ESP32-S3")
+        self.assertEqual(
+            discover.board_name("X", "Open source PCB files for Feather RP2040",
+                                "Adafruit Industries"),
+            "Feather RP2040")
+
+    def test_a_description_is_cut_where_it_stops_naming(self) -> None:
+        self.assertEqual(
+            discover.board_name("x", "Qwiic Power Switch, which is a power switch for "
+                                     "the Qwiic system", "SparkFun Electronics"),
+            "Qwiic Power Switch")
+        self.assertEqual(
+            discover.board_name("x", "SparkFun Qwiic 6DoF BMI270 and the SparkFun Micro "
+                                     "Qwiic 6DoF BMI270", "SparkFun Electronics"),
+            "SparkFun Qwiic 6DoF BMI270")
+
+    def test_the_manufacturer_is_not_prepended_twice(self) -> None:
+        self.assertEqual(
+            discover.board_name("x", "Adafruit Circuit Playground Bluefruit",
+                                "Adafruit Industries"),
+            "Adafruit Circuit Playground Bluefruit")
+
+    def test_slug_fallback_restores_conventional_casing(self) -> None:
+        """A lowercase repo slug reads as prose unless acronyms and brands are recased."""
+        self.assertEqual(discover.board_name("SparkFun_IoT_RedBoard_ESP32", "",
+                                             "SparkFun Electronics"),
+                         "SparkFun IoT RedBoard ESP32")
+        self.assertEqual(discover.board_name("SparkFun_Qwiic_HAT_for_Raspberry_Pi", "",
+                                             "SparkFun Electronics"),
+                         "SparkFun Qwiic HAT for Raspberry Pi")
+        self.assertEqual(discover.board_name("beaglev-fire", "Mirror of https://x",
+                                             "BeagleBoard.org Foundation"),
+                         "BeagleBoard.org BeagleV Fire")
+
     def test_board_id_is_stable_and_filename_safe(self) -> None:
         """The org is already the namespace, so a repeated vendor prefix is dropped."""
         self.assertEqual(

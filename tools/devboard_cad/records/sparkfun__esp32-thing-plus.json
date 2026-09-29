@@ -4,7 +4,7 @@
   "board_id": "sparkfun:esp32-thing-plus",
   "manufacturer": "SparkFun Electronics",
   "family": "Thing Plus",
-  "board": "ESP32 Thing-compatible board using the WROOM module and a QWIIC connector",
+  "board": "SparkFun ESP32 Thing Plus",
   "part_number": "WRL-15663",
   "revision": "not-stated",
   "mcu_soc": "ESP32",
