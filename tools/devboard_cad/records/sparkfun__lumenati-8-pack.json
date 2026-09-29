@@ -7,7 +7,7 @@
   "board": "SparkFun Lumenati 8 Pack",
   "part_number": "COM-14357",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "not-applicable",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": null,

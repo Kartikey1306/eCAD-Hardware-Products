@@ -7,7 +7,7 @@
   "board": "he SparkFun GNSS-RTK L1/L5 Breakout",
   "part_number": "23288",
   "revision": "not-stated",
-  "mcu_soc": "not-applicable",
+  "mcu_soc": "UNVERIFIED",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": null,
@@ -219,6 +219,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "verified",
+  "record_status": "partial",
   "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_u-blox_NEO-F9P pinned at 90b8425e15b9. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_u-blox_NEO-F9P: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
 }

@@ -7,7 +7,7 @@
   "board": "SparkFun Qwiic HAT for Raspberry Pi",
   "part_number": "14459",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "not-applicable",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": null,
@@ -204,6 +204,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
+  "record_status": "verified",
   "notes": "File candidates harvested from the manufacturer's official repository sparkfun/Qwiic_Hat_for_Raspberry_Pi pinned at 398c9a964268. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/Qwiic_Hat_for_Raspberry_Pi: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
 }

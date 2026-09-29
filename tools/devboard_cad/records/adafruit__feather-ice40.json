@@ -7,10 +7,10 @@
   "board": "Feather with ICE40 FPGA",
   "part_number": "UNVERIFIED",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "ICE40",
   "hardware_revision": null,
   "fpga": null,
-  "cpu_architecture": null,
+  "cpu_architecture": "FPGA (no CPU core)",
   "product_status": "unknown",
   "files": {
     "altium": {

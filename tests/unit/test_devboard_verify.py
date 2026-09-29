@@ -421,9 +421,49 @@ class TestDiscovery(unittest.TestCase):
     def test_add_on_boards_are_recognised(self) -> None:
         """Issue #28 section 2.20 includes FeatherWings; most carry no MCU at all."""
         for name in ("Adafruit-OLED-FeatherWing-PCB", "Motor-Shield-PCB",
-                     "Sensor-Breakout-PCB", "BeagleBone-Proto-Cape"):
-            self.assertTrue(discover.ADDON.search(name), name)
-        self.assertFalse(discover.ADDON.search("Adafruit-Feather-RP2040-PCB"))
+                     "Adafruit_TFT_Gizmo", "Adafruit_Charger_BFF",
+                     "SparkFun_MicroMod_ATP_Carrier", "beagleboard-capes",
+                     "SparkFun_Lumenati_4_Pack", "Teensy_3.x_Feather_Adapter"):
+            self.assertTrue(discover.is_addon(name), name)
+
+    def test_an_underscore_does_not_hide_an_add_on(self) -> None:
+        """\\bgizmo\\b does not fire between "_" and "G"; separators are normalised first."""
+        self.assertTrue(discover.is_addon("Adafruit_TFT_Gizmo"))
+        self.assertTrue(discover.is_addon("Adafruit-TFT-Gizmo"))
+
+    def test_a_description_mentioning_a_part_does_not_make_a_board_passive(self) -> None:
+        """This put 'not-applicable' on 22 real MCU boards.
+
+        "an Arduino Uno compatible board with a USB-C connector" mentions a connector
+        without being one, so generic words are matched against the product NAME only.
+        """
+        self.assertFalse(discover.is_addon(
+            "SparkFun_RedBoard",
+            "An Arduino Uno compatible board with a USB-C connector"))
+        self.assertFalse(discover.is_addon(
+            "RedBoard_Edge",
+            "The RedBoard Edge is a RedBoard rebuilt around the idea that projects are "
+            "eventually put into an enclosure"))
+        self.assertFalse(discover.is_addon(
+            "Adafruit-Feather-RP2040-PCB", "Open source PCB files for Feather RP2040"))
+
+    def test_a_description_that_classifies_the_product_is_trusted(self) -> None:
+        """"breakout board" is the vendor classifying it, not an incidental mention."""
+        self.assertTrue(discover.is_addon(
+            "SparkFun_Qwiic_ADXL313", "Qwiic-enabled breakout board for the ADXL313"))
+        self.assertTrue(discover.is_addon(
+            "SparkFun_Qwiic_GPS_RTK", "Breakout board for the u-blox ZED-F9P"))
+
+    def test_a_wifi_module_is_not_the_boards_processor(self) -> None:
+        """WINC1500 matched before SAMD21 and hid the real MCU."""
+        self.assertEqual(
+            discover.extract_mcu("Feather M0 WiFi with ATSAMD21 and WINC1500"), "ATSAMD21")
+
+    def test_part_numbers_keep_their_own_spelling(self) -> None:
+        self.assertEqual(discover.extract_mcu("SiFive Freedom E310"), "SiFive FE310")
+        self.assertEqual(discover.extract_mcu("built on the i.MX RT1011"), "i.MX RT1011")
+        self.assertEqual(discover.arch_for("ICE40"), "FPGA (no CPU core)")
+        self.assertEqual(discover.arch_for("TH1520"), "RISC-V RV64GC")
 
     def test_a_repository_description_is_not_always_a_product_name(self) -> None:
         """"Mirror of https://openbeagle" names no product; fall back to the repo name."""

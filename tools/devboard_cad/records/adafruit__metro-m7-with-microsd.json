@@ -7,10 +7,10 @@
   "board": "Adafruit Metro M7 with microSD",
   "part_number": "5600",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "i.MX RT1011",
   "hardware_revision": null,
   "fpga": null,
-  "cpu_architecture": null,
+  "cpu_architecture": "Arm Cortex-M7",
   "product_status": "unknown",
   "files": {
     "altium": {
@@ -216,6 +216,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
+  "record_status": "verified",
   "notes": "File candidates harvested from the manufacturer's official repository adafruit/Adafruit-Metro-M7-with-microSD-PCB pinned at d7e0bc2ff4d5. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from adafruit/Adafruit-Metro-M7-with-microSD-PCB: \"Creative Commons Attribution/Share-Alike, all text above must be included in any redistribution.\". No version is given and the license file the README points at is not present, so the version is unverified; every CC BY-SA version permits commercial use and modification under attribution and share-alike, so the permissions are recorded and the version is not."
 }

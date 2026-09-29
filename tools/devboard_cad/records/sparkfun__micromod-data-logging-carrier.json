@@ -7,7 +7,7 @@
   "board": "SparkFun MicroMod Data Logging Carrier",
   "part_number": "DEV-16829",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "not-applicable",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": null,
@@ -234,6 +234,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
+  "record_status": "verified",
   "notes": "File candidates harvested from the manufacturer's official repository sparkfun/MicroMod_Data_Logging_Carrier pinned at 6fe06a666a75. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
 }

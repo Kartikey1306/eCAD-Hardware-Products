@@ -7,7 +7,7 @@
   "board": "MicroMod Asset Tracking Carrier Board based around the u-blox SARA-R5",
   "part_number": "DEV-17272",
   "revision": "R5",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "not-applicable",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": null,
@@ -249,6 +249,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
+  "record_status": "verified",
   "notes": "File candidates harvested from the manufacturer's official repository sparkfun/MicroMod_Asset_Tracker pinned at d0f4731a7c3d. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/MicroMod_Asset_Tracker: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
 }

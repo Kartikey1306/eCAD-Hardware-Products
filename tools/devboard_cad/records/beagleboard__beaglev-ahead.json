@@ -7,10 +7,10 @@
   "board": "BeagleBoard.org BeagleV Ahead",
   "part_number": "UNVERIFIED",
   "revision": "1.0",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "TH1520",
   "hardware_revision": null,
   "fpga": null,
-  "cpu_architecture": null,
+  "cpu_architecture": "RISC-V RV64GC",
   "product_status": "unknown",
   "files": {
     "altium": {

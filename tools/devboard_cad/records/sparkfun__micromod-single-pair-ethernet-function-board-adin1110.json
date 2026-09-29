@@ -7,7 +7,7 @@
   "board": "SparkFun MicroMod Single Pair Ethernet Function Board ADIN1110",
   "part_number": "COM-19038",
   "revision": "not-stated",
-  "mcu_soc": "UNVERIFIED",
+  "mcu_soc": "not-applicable",
   "hardware_revision": null,
   "fpga": null,
   "cpu_architecture": null,
@@ -234,6 +234,6 @@
     "direct_schematic_download": null,
     "direct_gerber_download": null
   },
-  "record_status": "partial",
+  "record_status": "verified",
   "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_MicroMod_Single_Pair_Ethernet_Function_Board_ADIN1110 pinned at 6ea9191b95b5. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
 }
