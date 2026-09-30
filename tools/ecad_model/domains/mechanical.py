@@ -21,7 +21,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from ..builder import build_engineering_model, resolve
+from ..builder import VERSION as BUILDER_VERSION, build_engineering_model, resolve
 from ..importers import importer_for
 from ..mjcf import build_mjcf, rigid_groups
 from ..quantity import is_null
@@ -297,6 +297,7 @@ class MechanicalAdapter:
         kernel = extraction["importer"]
         return Extraction(
             model=model,
+            producer=("ecad_model.builder", BUILDER_VERSION),
             files=[DerivedFile(
                 path=EXTRACTION, data=json_bytes(extraction), role="extraction", media_type="application/json",
                 producer="ecad_model.importers.step_ocp", version=f"{kernel['version']} ({kernel['kernel_version']})",

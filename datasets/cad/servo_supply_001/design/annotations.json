@@ -1,0 +1,219 @@
+{
+  "$schema": "https://embeddedos.org/schemas/engineering-model/v1/design-annotations.schema.json",
+  "annotations_version": "1.1.0",
+  "design_id": "servo_supply_001",
+  "materials": {},
+  "parts": {},
+  "joints": [],
+  "attachments": [],
+  "circuit_elements": {
+    "V_IN": {
+      "name": "hot-plug supply: 0 to 48 V in 100 us (testbench stimulus)",
+      "kind": "voltage_source"
+    },
+    "R_F1": {
+      "name": "F1 input fuse, modelled by its cold resistance only (no fuse is selected; it never opens)",
+      "kind": "fuse",
+      "domains": {
+        "electrical": {
+          "current_rating": {
+            "value": null,
+            "unit": "A",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "note": "no fuse is selected, so no current rating exists to check against"
+          },
+          "melting_i2t": {
+            "value": null,
+            "unit": "A^2*s",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "note": "no fuse is selected, so no melting I2t exists to check against"
+          },
+          "breaking_capacity": {
+            "value": null,
+            "unit": "A",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "note": "no fuse is selected, so no breaking capacity exists to check against"
+          }
+        }
+      }
+    },
+    "R_PRE": {
+      "name": "R1 precharge resistor (no resistor is selected)",
+      "kind": "resistor",
+      "domains": {
+        "electrical": {
+          "power_rating": {
+            "value": null,
+            "unit": "W",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "note": "no resistor is selected"
+          },
+          "pulse_energy_rating": {
+            "value": null,
+            "unit": "J",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "note": "no resistor is selected"
+          }
+        }
+      }
+    },
+    "S_BYP": {
+      "name": "Q1 precharge bypass, an ideal voltage-controlled switch (no relay or MOSFET is selected)",
+      "kind": "switch",
+      "domains": {
+        "electrical": {
+          "current_rating": {
+            "value": null,
+            "unit": "A",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "note": "no bypass device is selected"
+          }
+        }
+      }
+    },
+    "V_BYP": {
+      "name": "precharge controller's bypass command, 0 to 5 V at 30 ms (testbench stimulus)",
+      "kind": "voltage_source"
+    },
+    "C_BULK": {
+      "name": "C1 bulk capacitor, ideal apart from R_ESR (no capacitor is selected)",
+      "kind": "capacitor",
+      "domains": {
+        "electrical": {
+          "voltage_rating": {
+            "value": null,
+            "unit": "V",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "note": "no capacitor is selected, so no voltage rating exists to check against"
+          },
+          "ripple_current_rating": {
+            "value": null,
+            "unit": "A",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/servo_supply_001/design/annotations.json"
+            },
+            "note": "no capacitor is selected"
+          }
+        }
+      }
+    },
+    "R_ESR": {
+      "name": "C1 series resistance: a design value, not a datasheet ESR",
+      "kind": "resistor"
+    },
+    "I_LOAD": {
+      "name": "constant-current stand-in for the eServo-200 drive input, 200 W / 48 V from 40 ms (testbench stimulus)",
+      "kind": "current_source"
+    },
+    "S_FLT": {
+      "name": "fault injector: shorts the bus through 100 mohm at 100 ms (testbench only)",
+      "kind": "switch"
+    },
+    "V_FLT": {
+      "name": "fault injector command (testbench only)",
+      "kind": "voltage_source"
+    }
+  },
+  "components_without_cad": [
+    {
+      "component_id": "drive",
+      "name": "eServo-200 EtherCAT servo drive",
+      "kind": "motor_driver",
+      "domains": {
+        "electrical": {
+          "supply_voltage": {
+            "value": 48.0,
+            "unit": "V",
+            "status": "SPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            }
+          },
+          "rated_current": {
+            "value": 5.0,
+            "unit": "A",
+            "status": "SPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "note": "the sheet gives 5 A in its summary and on its power stage (3-phase MOSFET bridge, 48V/5A), without saying whether it is continuous or peak or whether the supply delivers it; REQ-EL-003 assumes it bounds the drive's input current"
+          },
+          "rated_power": {
+            "value": 200.0,
+            "unit": "W",
+            "status": "SPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "note": "the sheet does not say whether 200 W is input or output power; the netlist's I_LOAD assumes it is the drive's input, 200 W / 48 V"
+          },
+          "input_ripple_current": {
+            "value": null,
+            "unit": "A",
+            "status": "UNSPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "note": "the sheet does not state the drive's input ripple current"
+          },
+          "switching_frequency": {
+            "value": null,
+            "unit": "Hz",
+            "status": "UNSPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "note": "the sheet gives a 20 kHz current-loop bandwidth, which is not a switching frequency"
+          }
+        }
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "relation": "powered_by",
+      "from": "drive",
+      "to": "v_in"
+    }
+  ]
+}

@@ -1214,12 +1214,34 @@ class TestDocumentationExamples(unittest.TestCase):
         import importlib
 
         for name in ("quantity", "schemas", "importers.base", "importers", "builder", "mjcf", "requirements",
-                     "domains", "domains.mechanical", "results"):
+                     "domains", "domains.mechanical", "results", "spice", "domains.electrical"):
             with self.subTest(name):
                 module = importlib.import_module(f"ecad_model.{name}")
                 result = doctest.testmod(module, optionflags=doctest.ELLIPSIS)
                 self.assertGreater(result.attempted, 0, f"{name} has no runnable examples")
                 self.assertEqual(result.failed, 0)
+
+    def test_every_public_function_of_the_electrical_modules_has_an_example(self):
+        # attempted > 0 holds while most of a module's functions have none, and
+        # it did for the electrical adapter's methods. These two modules came
+        # with the electrical domain, so every public function and method in
+        # them is held to QUALITY.md; the older modules, some of whose
+        # functions still have none, are not held here.
+        import doctest
+        import importlib
+        import inspect
+
+        for name, known in (("spice", "parse_netlist"), ("domains.electrical", "ElectricalAdapter.extract")):
+            module = importlib.import_module(f"ecad_model.{name}")
+            examples = {test.name: len(test.examples) for test in doctest.DocTestFinder().find(module)}
+            defined = {f"{module.__name__}.{attr}": value for attr, value in vars(module).items()
+                       if not attr.startswith("_") and getattr(value, "__module__", None) == module.__name__}
+            public = [qualified for qualified, value in defined.items() if inspect.isfunction(value)]
+            public += [f"{qualified}.{attr}" for qualified, value in defined.items() if inspect.isclass(value)
+                       for attr, method in vars(value).items() if not attr.startswith("_") and inspect.isfunction(method)]
+            with self.subTest(name):
+                self.assertIn(f"{module.__name__}.{known}", public)  # the walk finds functions and methods
+                self.assertEqual([qualified for qualified in public if not examples.get(qualified)], [])
 
 if __name__ == "__main__":
     unittest.main()

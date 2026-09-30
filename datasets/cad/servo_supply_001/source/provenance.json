@@ -1,0 +1,28 @@
+{
+  "$schema": "https://embeddedos.org/schemas/cad-dataset/v1/source-provenance.schema.json",
+  "provenance_version": "1.0.0",
+  "domain": "electrical",
+  "artifacts": [
+    {"path": "source/servo_supply_001.cir", "format": "spice"}
+  ],
+  "description": "48 V servo-drive supply input testbench: hot-plug supply, fuse F1 as its cold resistance, precharge resistor with an ideal bypass switch, bulk capacitor with series resistance, a constant-current stand-in for the eServo-200 drive, and a fault switch that shorts the bus. No element is a real part. Authored for the eCAD multi-domain validation pipeline (issue #27).",
+  "artifact_type": "spice_netlist",
+  "artifact_version": "1.0",
+  "units": "SI (V, A, ohm, F, s) with lowercase SPICE scale suffixes t g meg k m u n p",
+  "coordinate_system": "none (a netlist has no geometry)",
+  "created_at": "2026-09-27",
+  "collected_at": "2026-09-27",
+  "origin": {
+    "kind": "self_authored",
+    "author": "EmbeddedOS (EoS) Research Foundation"
+  },
+  "license": {
+    "spdx": "MIT",
+    "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation",
+    "license_verified": true,
+    "license_text": {"path": "LICENSE", "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"},
+    "redistribution_permitted": true,
+    "training_use_permitted": true,
+    "basis": "hand-written in this repository as source/servo_supply_001.cir and committed under the repository's MIT LICENSE; contains no third-party model, library or part data"
+  }
+}

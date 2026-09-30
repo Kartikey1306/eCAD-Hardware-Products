@@ -14,9 +14,10 @@ file format or domain model. A domain adapter supplies all of it:
 Running cases and deciding verdicts stay with the existing case engine and its
 deterministic comparators, so no adapter can decide whether 4.8 <= 5.0.
 
-This protocol is provisional (ECAD_MULTI_DOMAIN_DATASET_PLAN.md §11): one
-domain uses it in production. A test-only adapter for an artefact-first
-domain exercises it, and the first real second domain may still change it.
+Stable since the electrical domain: two production domains use it, one
+CAD-first (mechanical) and one artefact-first (electrical). Changes since the
+foundation: `Extraction.producer`. A further change lists its reason and the
+matching change to every registered adapter and to the test fixture.
 """
 
 from __future__ import annotations
@@ -78,9 +79,15 @@ class Metric:
 
 @dataclass
 class Extraction:
-    """What a domain reads from a sample: its raw extraction files and the model."""
+    """What a domain reads from a sample: its raw extraction files and the model.
+
+    producer is the (tool, version) that wrote the model, recorded as the
+    model's producer and as the manifest's versions.engineering_model. It
+    has no default, so no adapter inherits another domain's producer.
+    """
 
     model: Dict[str, Any]
+    producer: Tuple[str, str]
     files: List[DerivedFile] = field(default_factory=list)
     tools: List[Dict[str, Any]] = field(default_factory=list)  # receipt tool records of what shaped it
 

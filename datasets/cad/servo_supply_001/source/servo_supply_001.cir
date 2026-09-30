@@ -1,0 +1,25 @@
+servo_supply_001: 48 V servo-drive supply input -- fuse, precharge limiter with bypass, bulk capacitor, drive load
+* Self-authored for the eCAD multi-domain validation pipeline (issue #27).
+* No element is a real part: every value below is a design choice of this
+* testbench, not a rating, measurement or datasheet value of any component.
+* The 48 V supply and the 200 W load come from the eServo-200 product sheet
+* (eRobotics_CAD_Design/robot_components/product_datasheet.md). I_LOAD is
+* 200 W / 48 V written to six significant figures: a constant-current
+* stand-in for the drive's input, ASSUMING the 200 W is input power (the
+* sheet does not say input or output). R_F1 is a fuse's cold resistance
+* only; it never opens. S_BYP is an ideal switch for the precharge bypass.
+* S_FLT, a testbench fault injector, shorts the bus through 100 mohm. Hot
+* plug 0 -> 48 V in 100 us; bypass at 30 ms; load at 40 ms; short at 100 ms.
+V_IN n_in 0 PWL(0 0 100u 48)
+R_F1 n_in n_f 20m
+R_PRE n_f n_bus 10
+S_BYP n_f n_bus n_byp 0 SW_BYP
+V_BYP n_byp 0 PWL(0 0 30m 0 30.001m 5)
+C_BULK n_bus n_esr 470u
+R_ESR n_esr 0 50m
+I_LOAD n_bus 0 PWL(0 0 40m 0 40.1m 4.16667)
+S_FLT n_bus 0 n_fc 0 SW_FLT
+V_FLT n_fc 0 PWL(0 0 100m 0 100.001m 5)
+.model SW_BYP SW(RON=10m ROFF=1g VT=2.5 VH=0)
+.model SW_FLT SW(RON=100m ROFF=1g VT=2.5 VH=0)
+.end

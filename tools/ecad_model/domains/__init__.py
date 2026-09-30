@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from .base import CaseTarget, DerivedFile, DomainAdapter, Extraction, Metric, SourceArtifact
+from .electrical import ElectricalAdapter
 from .mechanical import MechanicalAdapter
 
 DOMAINS = (
@@ -25,7 +26,7 @@ DOMAINS = (
     "full_system",
 )
 
-REGISTRY: Dict[str, DomainAdapter] = {"mechanical": MechanicalAdapter()}
+REGISTRY: Dict[str, DomainAdapter] = {"mechanical": MechanicalAdapter(), "electrical": ElectricalAdapter()}
 
 
 class DomainNotImplemented(ValueError):
@@ -71,7 +72,7 @@ def domain_status(primary: str, sources: Sequence[SourceArtifact], unknowns: Seq
 
     Example:
         >>> [s["status"] for s in domain_status("mechanical", [SourceArtifact("a.step", "step")], [])][:2]
-        ['AVAILABLE', 'NOT_IMPLEMENTED']
+        ['AVAILABLE', 'NOT_APPLICABLE']
     """
     adapters = REGISTRY if registry is None else registry
     formats = {source.format for source in sources}

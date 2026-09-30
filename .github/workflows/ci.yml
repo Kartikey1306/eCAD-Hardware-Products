@@ -84,6 +84,53 @@ jobs:
           path: validation-output/
           if-no-files-found: error
 
+  spice:
+    name: Electrical dataset (ngspice) and V0-V4
+    runs-on: ubuntu-22.04
+    env:
+      # The electrical simulation tests skip without ngspice; here a skip is a failure.
+      ECAD_REQUIRE_SPICE_TOOLS: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
+
+      - name: Install ngspice
+        # A system package, installed rather than assumed, and not pinned: which
+        # version apt gives this runner is unknown until the job runs, so the
+        # package version and the banner every receipt takes its version from
+        # are both printed here.
+        run: sudo apt-get update && sudo apt-get install -y ngspice && dpkg-query -W ngspice && ngspice --version
+
+      - name: Install validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r tools/requirements.txt pytest
+
+      - name: Complete test suite, electrical simulation tests mandatory
+        run: python run_all_tests.py --tb=short
+
+      - name: Committed derivation reproduces from the netlist
+        run: python tools/cad_dataset.py check datasets/cad/servo_supply_001
+
+      - name: V0-V4 receipt
+        run: >-
+          python tools/cad_dataset.py validate datasets/cad/servo_supply_001
+          --output electrical-validation
+
+      - name: Upload electrical evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: electrical-dataset-${{ github.sha }}
+          path: electrical-validation/
+          if-no-files-found: error
+
   cad-dataset:
     name: CAD dataset extraction and V0-V4
     runs-on: ubuntu-22.04

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://embeddedos.org/schemas/hardware-validation/v1/validation-cases.schema.json",
+  "cases": [
+    {
+      "adapter": "ngspice",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-EL-001",
+      "inputs": [
+        "derived/electrical/servo_supply_001.cir"
+      ],
+      "metric_limits": {
+        "inrush_peak_current_a": {
+          "maximum": 10.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "ngspice",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-EL-002",
+      "inputs": [
+        "derived/electrical/servo_supply_001.cir"
+      ],
+      "metric_limits": {
+        "bus_voltage_at_bypass_v": {
+          "minimum": 45.6
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "ngspice",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-EL-003",
+      "inputs": [
+        "derived/electrical/servo_supply_001.cir"
+      ],
+      "metric_limits": {
+        "steady_input_current_a": {
+          "maximum": 5.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "ngspice",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-EL-004",
+      "inputs": [
+        "derived/electrical/servo_supply_001.cir"
+      ],
+      "metric_limits": {
+        "steady_bus_voltage_v": {
+          "minimum": 47.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "adapter": "ngspice",
+      "arguments": [],
+      "domain": "eda_circuit",
+      "id": "REQ-EL-008",
+      "inputs": [
+        "derived/electrical/servo_supply_001.cir"
+      ],
+      "metric_limits": {
+        "startup_peak_current_a": {
+          "maximum": 10.0
+        }
+      },
+      "requirement_ids": [
+        "POLICY:V4-CORNER"
+      ],
+      "seed": 0,
+      "timeout_seconds": 300
+    }
+  ],
+  "contract_version": "1.0.0",
+  "gate": "V4"
+}

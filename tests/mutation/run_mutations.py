@@ -3,16 +3,19 @@
 
 Each mutant is one targeted edit that makes a behaviour the tests claim to
 protect wrong. For every mutant this copies the repository, applies the edit,
-runs the fast engineering-model and domain-adapter tests and, only if they
-stay green, the slower CAD-kernel tests. A mutant of a dataset item's own
-file (its simulation script) is followed by a rebuild of that item, so the
+runs the fast engineering-model, domain-adapter, netlist, ngspice-adapter
+and electrical tests, then the electrical tests that run ngspice and, only if
+they all stay green, the slower CAD-kernel tests. A mutant of a dataset
+item's own file (a simulation script, a netlist, its annotations,
+requirements or provenance) is followed by a rebuild of that item, so the
 manifest's hashes cannot kill it: a behavioural test must. A mutant the
-suite does not kill is a test gap, and the script exits 1. The unmutated copy
-runs first and must be green: against a failing baseline every mutant would
-look killed.
+suite does not kill is a test gap, and the script exits 1. The
+unmutated copy runs first and must be green: against a failing baseline every
+mutant would look killed.
 
 Needs the CAD kernel and MuJoCo (tools/requirements-cad.txt), with `python3`
-on PATH able to import mujoco. Not collected by pytest.
+on PATH able to import mujoco, and ngspice whose `--version` names its
+version (brew install ngspice; apt install ngspice). Not collected by pytest.
 
 Usage:
     python3 tests/mutation/run_mutations.py [--workers N] [--only NAME ...]
@@ -42,8 +45,21 @@ MA = "tools/ecad_model/domains/mechanical.py"
 RS = "tools/ecad_model/results.py"
 DR = "tools/ecad_model/domains/__init__.py"
 J = "datasets/cad/robotic_joint_001/simulation/joint_dynamics.py"
+NG = "tools/ecad_validation/adapters/ngspice.py"
+CP = "tools/ecad_validation/adapters/capabilities.py"
+SP = "tools/ecad_model/spice.py"
+EL = "tools/ecad_model/domains/electrical.py"
+EN = "datasets/cad/servo_supply_001/source/servo_supply_001.cir"
+EA = "datasets/cad/servo_supply_001/design/annotations.json"
+ER = "datasets/cad/servo_supply_001/requirements/requirements.json"
+EP = "datasets/cad/servo_supply_001/source/provenance.json"
+MS = "schemas/engineering-model/v1/engineering-model.schema.json"
 FAST = "tests/unit/test_engineering_model.py"
 ADAPTER = "tests/unit/test_domain_adapter.py"
+NETLIST = "tests/unit/test_spice_netlist.py"
+NGSPICE = "tests/unit/test_ngspice_adapter.py"
+ELECTRICAL = "tests/unit/test_electrical_domain.py"
+SPICE = "tests/unit/test_electrical_spice.py"
 SLOW = "tests/unit/test_cad_dataset.py"
 
 # (name, file, text to replace, replacement). The replaced text must occur
@@ -229,7 +245,7 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
      'foreign = sorted({entry["domain"] for entry in (*requirements["reference_values"], *requirements["requirements"])}',
      'foreign = sorted({entry["domain"] for entry in requirements["requirements"]}'),
     # Foundation review: a receipt is always written, and says what ran
-    ("item-error-crashes-validate", D, '        except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:',
+    ("item-error-crashes-validate", D, '        except (OSError, ValueError, KeyError, IndexError, TypeError, ArithmeticError) as exc:',
      '        except (OSError, ValueError) as exc:'),
     ("requirements-unreadable-crash", D, '    except (OSError, ValueError) as exc:\n        requirements_problem = f"{REQUIREMENTS}: {exc}"',
      '    except ZeroDivisionError as exc:\n        requirements_problem = f"{REQUIREMENTS}: {exc}"'),
@@ -411,6 +427,184 @@ MUTANTS: List[Tuple[str, str, str, str]] = [
     ("manifest-verified-at-optional", "schemas/cad-dataset/v1/dataset-item.schema.json",
      '"then": {"properties": {"license": {"required": ["license_text", "verified_by", "verified_at"]}}}',
      '"then": {"properties": {"license": {"required": ["license_text", "verified_by"]}}}'),
+    # spice: the netlist grammar refuses what ngspice would reinterpret
+    ("spice-control-accepted", SP, '            if keyword != ".model":\n',
+     '            if keyword in (".control", ".endc"):\n                continue\n            if keyword != ".model":\n'),
+    ("spice-include-accepted", SP, '            if keyword != ".model":\n',
+     '            if keyword in (".include", ".lib"):\n                continue\n            if keyword != ".model":\n'),
+    ("spice-milli-read-as-micro", SP, '"m": -3,', '"m": -6,'),
+    ("spice-number-case-folded", SP, "    match = _NUMBER.fullmatch(token)\n", "    match = _NUMBER.fullmatch(token.lower())\n"),
+    ("spice-unit-letters-ignored", SP, '+ "))?")', '+ "))?[A-Za-z]*")'),
+    ("spice-femto-accepted", SP, '"n": -9, "p": -12}', '"n": -9, "p": -12, "f": -15}'),
+    ("spice-gnd-accepted", SP, '    if node == "gnd":\n', "    if False:\n"),
+    ("spice-par-node-accepted", SP, "    if _PAR_NODE.fullmatch(node):\n", "    if False:\n"),
+    ("spice-after-end-ignored", SP, '            if text:\n                raise NetlistRefused(f"{where}: text after .end',
+     '            if False:\n                raise NetlistRefused(f"{where}: text after .end'),
+    ("spice-end-optional", SP, '    if not ended:\n        raise NetlistRefused(f"{path}: no .end line',
+     '    if False:\n        raise NetlistRefused(f"{path}: no .end line'),
+    ("spice-title-card-accepted", SP, "    problem = _title_problem(lines[0])\n", "    problem = None\n"),
+    ("spice-continuation-accepted", SP,
+     '        if text.startswith("+"):\n            raise NetlistRefused(f"{where}: a \'+\' continuation, which joins this line to the one before it")\n',
+     '        if text.startswith("+"):\n            continue\n'),
+    ("spice-dangling-node-allowed", SP, '        if node != "0" and len(terminals) < 2:\n', "        if False:\n"),
+    ("spice-dc-path-unchecked", SP, "    unreached = [node for node in first_line if node not in reached]\n",
+     "    unreached = []\n"),
+    ("spice-duplicate-designator-accepted", SP, "        if designator in designators:\n", "        if False:\n"),
+    ("spice-switch-defaults-allowed", SP, "    missing = [key for key in _SWITCH_KEYS if key not in params]\n",
+     '    missing = [key for key in ("RON", "ROFF") if key not in params]\n'),
+    ("spice-pwl-order-unchecked", SP, "    if any(later <= earlier for earlier, later in zip(times, times[1:])):\n",
+     "    if False:\n"),
+    ("spice-writer-rounds-values", SP, "    return repr(float(value))\n", '    return f"{value:.6g}"\n'),
+    # electrical: the network class, the closed forms, the deck, V1 and V2
+    ("el-extra-element-accepted", EL, '    if extra:\n        raise refuse("C8"', '    if False:\n        raise refuse("C8"'),
+    ("el-capacitor-anywhere", EL, 'capacitors = [c for c in of("capacitor") if rail in _main(c)]', 'capacitors = of("capacitor")'),
+    ("el-esr-left-out-of-references", EL, "tau1 = (alpha * r_s + r_e) * c", "tau1 = alpha * r_s * c"),
+    ("el-ramp-read-as-step", EL, "peak = g * supply_voltage + b", "peak = supply_voltage / (r_s + r_e)"),
+    ("el-charge-level-changed", EL, "CHARGED_FRACTION = 0.9  #", "CHARGED_FRACTION = 1 - 1 / math.e  #"),
+    ("el-supply-current-sign-flipped", EL, "current = f\"par('-i({supply})')\"", "current = f\"par('i({supply})')\""),
+    ("el-fault-measured-at-the-fault", EL, '"fault_input_current_a": f"FIND {current} AT={_n(t_end)}",',
+     '"fault_input_current_a": f"FIND {current} AT={_n(t_flt)}",'),
+    ("el-steady-sampled-after-the-fault", EL, '"steady_bus_voltage_v": f"FIND {rail} AT={_n(t_flt)}",',
+     '"steady_bus_voltage_v": f"FIND {rail} AT={_n(t_end)}",'),
+    ("el-settling-unchecked", EL, "    return span >= SETTLE_TIME_CONSTANTS * tau\n", "    return True\n"),
+    ("el-scenario-pairing-unchecked", EL, 'if window is not None and entry["scenario"]["name"] != window:', "if False:"),
+    ("el-derivation-pairing-unchecked", EL, 'if DERIVATION_METRIC[reference["derivation"]] != reference["metric"]:', "if False:"),
+    ("el-metric-unit-wrong", EL, '"inrush_peak_current_a": Metric("A", ', '"inrush_peak_current_a": Metric("mA", '),
+    ("el-facet-unit-unchecked", EL, '                elif facet["unit"] != unit:\n', "                elif False:\n"),
+    ("el-supply-sheet-invariant-off", EL, '            if final != stated["value"]:\n', "            if False:\n"),
+    ("el-netlist-hash-not-bound", EL, 'netlist_source = source("design_annotation", netlist_ref, netlist_sha256)',
+     'netlist_source = source("design_annotation", netlist_ref)'),
+    ("el-annotation-overrides-netlist", EL, "        if twice:\n            raise ValueError(", "        if False:\n            raise ValueError("),
+    ("el-ratings-dropped", EL, 'domains["electrical"] = {**stated, **added}', 'domains["electrical"] = dict(stated)'),
+    # electrical: the branches a line-coverage run found no test going through
+    ("el-capacitor-to-ground-refused", EL, '    if far != "0":\n', "    if True:\n"),
+    ("el-no-esr-read-as-50-milliohm", EL, 'r_e = values.get(("esr", "resistance"), 0.0)',
+     'r_e = values.get(("esr", "resistance"), 0.05)'),
+    ("el-absent-esr-dereferenced", EL, "        if component is None:\n            continue\n", ""),
+    ("el-spice-source-count-unchecked", EL, "        if len(netlists) != 1:\n", "        if False:\n"),
+    ("el-null-supply-voltage-compared", EL, 'if (stated is None or is_null(stated["status"]) or supply is None',
+     "if (stated is None or supply is None"),
+    ("spice-source-fields-unchecked", SP, "        if len(parts) != 4:\n", "        if False:\n"),
+    ("spice-model-card-name-unchecked", SP, "    if not _MODEL_NAME.fullmatch(name):\n", "    if False:\n"),
+    # electrical: the sample's own files (each rebuilt, so a behavioural test must kill it)
+    ("el-precharge-resistor-changed", EN, "R_PRE n_f n_bus 10\n", "R_PRE n_f n_bus 1\n"),
+    ("el-capacitance-plus-one-percent", EN, "C_BULK n_bus n_esr 470u", "C_BULK n_bus n_esr 474.7u"),
+    # REQ-EL-001's limit; REQ-EL-008 states 10 A too
+    ("el-inrush-limit-changed", ER, '"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n      "operator": "<=",\n'
+     '      "limit": {\n        "value": 10.0',
+     '"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n      "operator": "<=",\n'
+     '      "limit": {\n        "value": 4.0'),
+    ("el-illustrative-flag-cleared", ER,
+     '"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n      "operator": "<=",\n'
+     '      "limit": {\n        "value": 10.0\n      },\n      "unit": "A",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement '
+     'for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"\n'
+     '      },\n      "illustrative": true',
+     '"metric": "inrush_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n      "operator": "<=",\n'
+     '      "limit": {\n        "value": 10.0\n      },\n      "unit": "A",\n      "source": {\n        "kind": "requirement",\n        "ref": "example requirement '
+     'for the servo_supply_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"\n'
+     '      },\n      "illustrative": false'),
+    ("el-operator-flipped", ER, '"operator": ">=",\n      "limit": {\n        "value": 47.0',
+     '"operator": "<=",\n      "limit": {\n        "value": 47.0'),
+    ("el-rating-invented", EA, '"value": null,\n            "unit": "V",\n            "status": "UNKNOWN"',
+     '"value": 63.0,\n            "unit": "V",\n            "status": "SPECIFIED"'),
+    ("el-sheet-digest-changed", EA,
+     '"value": 5.0,\n            "unit": "A",\n            "status": "SPECIFIED",\n            "source": {\n'
+     '              "kind": "product_specification",\n              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",\n'
+     '              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"',
+     '"value": 5.0,\n            "unit": "A",\n            "status": "SPECIFIED",\n            "source": {\n'
+     '              "kind": "product_specification",\n              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",\n'
+     '              "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"'),
+    ("el-artifact-type-changed", EP, '"artifact_type": "spice_netlist"', '"artifact_type": "other"'),
+    # electrical: the format rule and the registry
+    ("circuit-format-rule-dropped", MS, '"then": {"properties": {"model_version": {"const": "1.1.0"}}}', '"then": {}'),
+    ("electrical-unregistered", DR, '{"mechanical": MechanicalAdapter(), "electrical": ElectricalAdapter()}',
+     '{"mechanical": MechanicalAdapter()}'),
+    # ngspice: batch invocation, .meas capture from stdout, version banner, receipt-safe probe reasons
+    ("ngspice-rawfile-requested", NG, 'argv=[capability.executable or "ngspice", "-b", relative],',
+     'argv=[capability.executable or "ngspice", "-b", "-r", "ngspice.raw", relative],'),
+    ("ngspice-log-requested", NG, 'argv=[capability.executable or "ngspice", "-b", relative],',
+     'argv=[capability.executable or "ngspice", "-b", "-o", "ngspice.log", relative],'),
+    ("ngspice-arguments-passed", NG, 'argv=[capability.executable or "ngspice", "-b", relative],',
+     'argv=[capability.executable or "ngspice", "-b", relative, *request.arguments],'),
+    ("ngspice-suffix-refused", NG, r'(\S+)(?:[ \t]+(?:at|from|to)=[ \t]*\S+)*[ \t]*$")', r'(\S+)[ \t]*$")'),
+    ("ngspice-duplicate-kept", NG, "reported.setdefault(found.group(1), []).append(found.group(2))",
+     "reported[found.group(1)] = [found.group(2)]"),
+    ("ngspice-non-finite-kept", NG, "        elif not math.isfinite(float(values[0])):\n", "        elif False:\n"),
+    ("ngspice-python-number-spellings", NG, "        elif not NUMBER.match(values[0]):\n", "        elif False:\n"),
+    ("ngspice-failed-read-as-zero", NG, '            problems[name] = f"failed: {failed[name]}"', "            metrics[name] = 0.0"),
+    ("ngspice-undeclared-names-read", NG, "    for name in declared:\n", "    for name in [*declared, *reported]:\n"),
+    ("ngspice-truncation-ignored", NG, "            if process.stdout.endswith(TRUNCATED):", "            if False:"),
+    ("ngspice-parsed-on-failure", NG, "        if verdict is Verdict.PASS:\n",
+     "        if process.execution_status is ExecutionStatus.COMPLETED:\n"),
+    ("ngspice-oversize-deck-read", NG, "        if netlist.stat().st_size > MAX_DECK_BYTES:", "        if False:"),
+    ("ngspice-reason-unsanitised", NG, "    if RECEIPT_CODE.match(reason):\n", "    if True:\n"),
+    ("ngspice-version-first-line", CP, r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)")}', "= {}"),
+    ("ngspice-version-invented", CP, "    return match.group(1) if match else None\n",
+     '    return match.group(1) if match else "unknown"\n'),
+    ("ngspice-version-minor-dropped", CP, r'= {"ngspice": re.compile(r"\bngspice-([0-9][0-9A-Za-z.+~-]*)")}',
+     r'= {"ngspice": re.compile(r"\bngspice-([0-9]+)")}'),
+    ("probe-pattern-for-every-tool", CP, "    pattern = VERSION_PATTERNS.get(adapter)\n",
+     '    pattern = VERSION_PATTERNS.get("ngspice")\n'),
+    # the domain adapter names its model's producer
+    ("model-producer-hard-coded", D, "producer=extraction.producer[0], version=extraction.producer[1],",
+     'producer="ecad_model.builder", version="1.0.0",'),
+    # the review of the electrical branch: names ngspice reads as its own (CS-1)
+    ("spice-node-prefix-dropped", SP, '_NODE = re.compile(r"0|n_[a-z0-9_]{1,30}")',
+     '_NODE = re.compile(r"0|[a-z][a-z0-9_]{0,31}")'),
+    ("spice-model-prefix-dropped", SP, '_MODEL_NAME = re.compile(r"SW_[A-Z0-9_]{1,29}")',
+     '_MODEL_NAME = re.compile(r"[A-Z][A-Z0-9_]{0,31}")'),
+    ("schema-node-prefix-dropped", MS, '"pattern": "^(0|n_[a-z0-9_]{1,30})$"',
+     '"pattern": "^(0|(?!gnd$)(?!pa_[0-9]+$)[a-z][a-z0-9_]{0,31})$"'),
+    ("schema-model-prefix-dropped", MS, '"pattern": "^SW_[A-Z0-9_]{1,29}$"', '"pattern": "^[A-Z][A-Z0-9_]{0,31}$"'),
+    # the review of the electrical branch: a fault the window cannot measure (CS-2)
+    ("el-fault-window-unchecked", EL, "    if not _settled(t_end - closes, tau_f):\n", "    if False:\n"),
+    ("el-fault-that-never-closes-accepted", EL, "    if not levels[2] > threshold + hysteresis:\n        return",
+     "    if False:\n        return"),
+    ("el-fault-hysteresis-ignored-at-extraction", EL, "    closes = _closing_time(times, levels, threshold, hysteresis)\n",
+     "    closes = _closing_time(times, levels, threshold, 0.0)\n"),
+    # values the closed forms divide by, and errors that cost a receipt (CS-3)
+    ("el-nonpositive-value-accepted", EL, "            if value is not None and not value > 0:\n", "            if False:\n"),
+    ("el-ramp-after-bypass-accepted", EL, "    if not t_r < t_b:\n        return", "    if False:\n        return"),
+    ("el-arithmetic-error-raised", EL, "    except ArithmeticError as exc:\n", "    except LookupError as exc:\n"),
+    ("el-non-finite-reference-kept", EL, "    if not math.isfinite(value):\n        raise ReferenceBlocked",
+     "    if False:\n        raise ReferenceBlocked"),
+    ("runner-arithmetic-error-crashes", D,
+     '        except (OSError, ValueError, KeyError, IndexError, TypeError, ArithmeticError) as exc:',
+     '        except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:'),
+    # the open fault switch in the precharge forms (CS-4)
+    ("el-precharge-fault-divider-ignored", EL, "alpha = r_off_f / (r_s + r_off_f)", "alpha = 1.0"),
+    ("el-precharge-fault-current-ignored", EL, "g = 1 / (r_s + r_off_f)  #", "g = 0.0  #"),
+    # the startup peak and its closed form (CS-5)
+    ("el-startup-window-ends-at-bypass", EL, '"startup_peak_current_a": f"MAX {current} FROM=0.0 TO={_n(t_flt)}",',
+     '"startup_peak_current_a": f"MAX {current} FROM=0.0 TO={_n(t_byp)}",'),
+    ("el-startup-surge-ignored", EL, "            if surge >= max(peak, i_ss):\n", "            if False:\n"),
+    ("el-startup-load-ignored", EL, "            return max(peak, i_ss)\n", "            return peak\n"),
+    ("el-startup-surge-without-esr", EL, "            rail = (supply_voltage * r_e * r_off_f + v_c * r_c * r_off_f)",
+     "            rail = v_c + 0 * (supply_voltage * r_e * r_off_f + v_c * r_c * r_off_f)"),
+    ("el-startup-limit-changed", ER, '"metric": "startup_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n'
+     '      "operator": "<=",\n      "limit": {\n        "value": 10.0',
+     '"metric": "startup_peak_current_a",\n      "scenario": {\n        "name": "startup"\n      },\n'
+     '      "operator": "<=",\n      "limit": {\n        "value": 100.0'),
+    # conditions of rules C1, C3, C4 and C7 no test reached (HT-3)
+    ("el-ramp-zero-level", EL, "and points[1][0] > 0 and points[1][1] > 0", "and points[1][0] > 0 and points[1][1] >= 0"),
+    ("el-command-node-shared", EL, ' or len(at[control["cp"]]) != 2', ""),
+    ("el-command-cn-ground", EL, 'if (control["cn"] != "0" or control["cp"] == "0"', 'if (control["cp"] == "0"'),
+    ("el-bypass-other-end", EL, " or _other(bypasses[0], junction) != _other(limiters[0], junction)", ""),
+    # branches no test reached (HT-5)
+    ("ng-summary-cap", NG, "list(problems.items())[:MAX_SUMMARY_PROBLEMS])", "list(problems.items()))"),
+    ("el-invariant-ref-unchecked", EL, ' or facet["source"]["ref"] != netlist["path"])', ")"),
+    ("el-powered-by-any-element", EL, '\n                    or supply.get("circuit", {}).get("element") != "voltage_source"):', "):"),
+    ("el-closes-hysteresis-bypass", EL,
+     'values[("bypass_command", "waveform_voltage")],\n                               values[("bypass", "threshold_voltage")], '
+     'values[("bypass", "hysteresis_voltage")])',
+     'values[("bypass_command", "waveform_voltage")],\n                               values[("bypass", "threshold_voltage")], 0.0)'),
+    ("el-closes-hysteresis-startup", EL,
+     '\n                                   values[("bypass", "threshold_voltage")], values[("bypass", "hysteresis_voltage")])',
+     '\n                                   values[("bypass", "threshold_voltage")], 0.0)'),
+    ("el-closes-hysteresis-fault", EL, 'values[("fault", "threshold_voltage")], values[("fault", "hysteresis_voltage")])',
+     'values[("fault", "threshold_voltage")], 0.0)'),
+    ("el-closing-time-ignores-hysteresis", EL, "(times[2] - times[1]) * (threshold + hysteresis) / levels[2]",
+     "(times[2] - times[1]) * threshold / levels[2]"),
 ]
 
 
@@ -459,8 +653,9 @@ def run(name: str, relative: Optional[str], old: str, new: str) -> Tuple[str, st
                 for command in (["git", "add", "-A"], ["git", "-c", "user.name=mutation", "-c",
                                 "user.email=mutation@localhost", "commit", "-q", "-m", "mutant"]):
                     subprocess.run(command, cwd=copy, check=True, capture_output=True, timeout=300)
-        environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", PYTHONDONTWRITEBYTECODE="1")
-        for suite in (FAST, ADAPTER, SLOW):
+        environment = dict(os.environ, ECAD_REQUIRE_CAD_TOOLS="1", ECAD_REQUIRE_SPICE_TOOLS="1",
+                           PYTHONDONTWRITEBYTECODE="1")
+        for suite in (FAST, ADAPTER, NETLIST, NGSPICE, ELECTRICAL, SPICE, SLOW):
             result = subprocess.run(
                 [sys.executable, "-m", "pytest", suite, "-q", "-x", "-p", "no:cacheprovider"],
                 cwd=copy, env=environment, capture_output=True, text=True, timeout=1800,

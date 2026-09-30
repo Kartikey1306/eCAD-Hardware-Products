@@ -21,7 +21,11 @@
       "const": "https://embeddedos.org/schemas/engineering-model/v1/design-annotations.schema.json"
     },
     "annotations_version": {
-      "const": "1.0.0"
+      "description": "The format version. Every minor version of v1 is accepted; annotations that use circuit_elements declare 1.1.0, which introduced it.",
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
     },
     "design_id": {
       "$ref": "common.schema.json#/definitions/identifier"
@@ -214,6 +218,52 @@
         }
       }
     },
+    "circuit_elements": {
+      "description": "Keyed by the designator of a netlist element: its name, its kind and the ratings of the part it stands for (format 1.1.0). Never a value the netlist states: a facet the netlist sets is refused as declared twice.",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[RCVIS][A-Z0-9_]{1,31}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "kind"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "common.schema.json#/definitions/nonEmptyString"
+          },
+          "kind": {
+            "enum": [
+              "fuse",
+              "resistor",
+              "capacitor",
+              "switch",
+              "voltage_source",
+              "current_source",
+              "other"
+            ]
+          },
+          "note": {
+            "$ref": "common.schema.json#/definitions/nonEmptyString"
+          },
+          "domains": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "electrical": {
+                "$ref": "#/definitions/facet"
+              },
+              "thermal": {
+                "$ref": "#/definitions/facet"
+              }
+            }
+          }
+        }
+      }
+    },
     "relationships": {
       "type": "array",
       "items": {
@@ -247,6 +297,23 @@
       }
     }
   },
+  "allOf": [
+    {
+      "description": "circuit_elements is an addition of format 1.1.0.",
+      "if": {
+        "required": [
+          "circuit_elements"
+        ]
+      },
+      "then": {
+        "properties": {
+          "annotations_version": {
+            "const": "1.1.0"
+          }
+        }
+      }
+    }
+  ],
   "definitions": {
     "facet": {
       "type": "object",
