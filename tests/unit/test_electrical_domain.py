@@ -1130,8 +1130,12 @@ class TestSample(unittest.TestCase):
         self.assertIn("requirements resting on components/c_bulk/domains/electrical/ripple_current_rating (UNKNOWN)",
                       status["electrical"]["reason"])
         self.assertEqual(status["mechanical"]["status"], "NOT_APPLICABLE")
+        # The one entry the digital adapter changes in this manifest (digital design §8.2).
+        self.assertEqual(status.pop("digital"), {"domain": "digital", "status": "NOT_APPLICABLE",
+                                                 "reason": "the digital adapter reads verilog, which this sample does "
+                                                           "not have"})
         self.assertEqual({d: s["status"] for d, s in status.items() if d not in ("electrical", "mechanical")},
-                         dict.fromkeys(("digital", "pcb", "power_electronics", "control", "electromagnetic", "thermal",
+                         dict.fromkeys(("pcb", "power_electronics", "control", "electromagnetic", "thermal",
                                         "full_system"), "NOT_IMPLEMENTED"))
         lineage = {d["artifact"]["path"]: d["derived_from"] for d in manifest["derived"]}
         self.assertEqual(lineage["derived/engineering_model.json"], [NETLIST, "design/annotations.json"])

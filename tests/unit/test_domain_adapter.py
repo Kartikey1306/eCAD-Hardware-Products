@@ -1,11 +1,13 @@
 """The domain adapter protocol, exercised by an artefact-first domain.
 
-The only production adapter is mechanical, whose engineering model is built
-from a STEP assembly. The protocol claims more: that a domain whose artefact
-*is* its structure -- HDL, a netlist -- plugs into the same runner without
-the runner knowing it. This test-only adapter reads a Verilog file, so it
-needs no CAD kernel and no simulator, and proves the claim on a sample with
-no STEP file:
+The production adapters are mechanical, whose engineering model is built
+from a STEP assembly, electrical (a SPICE netlist) and digital (Verilog, the
+UART 8N1 loopback only). The protocol claims more than the three show: that
+any domain whose artefact *is* its structure plugs into the same runner
+without the runner knowing it. This test-only adapter reads a Verilog file,
+so it needs no CAD kernel and no simulator, and proves the claim on a sample
+with no STEP file. Its tests pass it as the registry's digital adapter in
+place of the production one, which would refuse the fixture's blinker:
 
 - the base types carry a non-CAD source, and build writes a schema-valid
   model and manifest, which names the fixture as the model's producer;
@@ -17,7 +19,8 @@ no STEP file:
   the existing engine runs with the Icarus adapter (reported not installed,
   so the outcome does not depend on the machine), and the per-requirement
   result is generated from it;
-- without the adapter registered, build refuses and validate is BLOCKED.
+- without a digital adapter registered, build refuses and validate is
+  BLOCKED; so is a domain the platform's own registry has no adapter for.
 
 It is a fixture, not a digital domain: it validates nothing about the HDL.
 The same fast fixture also carries the runner's untrusted-input and
@@ -225,7 +228,7 @@ def _no_icarus():
     """The Icarus adapter, reporting itself not installed wherever the test runs."""
     from ecad_validation.adapters.base import Capability
 
-    return mock.patch("ecad_validation.adapters.hdl.probe_executable",
+    return mock.patch("ecad_validation.adapters.hdl.probe_iverilog",
                       return_value=Capability(adapter="iverilog", available=False, reason="IVERILOG_NOT_INSTALLED"))
 
 
@@ -361,14 +364,16 @@ class TestArtefactFirstDomain(unittest.TestCase):
     def test_without_its_adapter_the_domain_is_not_implemented_and_nothing_runs(self):
         from ecad_model.dataset import build, validate
 
+        # The platform's registry has a production digital adapter: this one has no digital adapter at all.
+        without = {domain: adapter for domain, adapter in REGISTRY.items() if domain != "digital"}
         with _scratch() as directory:
             item = _digital_sample(directory, [REQUIREMENT])
             build(item, self.registry)  # the committed case documents exist
             with self.assertRaisesRegex(ValueError, "digital is NOT_IMPLEMENTED"):
-                build(item)
+                build(item, without)
             with tempfile.TemporaryDirectory() as output, \
                     mock.patch("ecad_validation.adapters.hdl.HDLAdapter.run", side_effect=AssertionError("ran")):
-                receipt = validate(item, Path(output) / "run")
+                receipt = validate(item, Path(output) / "run", without)
                 report = (Path(output) / "run" / "report.md").read_text()
                 self.assertFalse((Path(output) / "run" / "results.json").exists())
             checks = _checks(receipt)
@@ -379,6 +384,28 @@ class TestArtefactFirstDomain(unittest.TestCase):
             self.assertEqual((checks["v4.REQ-DIG-001"]["verdict"], checks["v4.REQ-DIG-001"]["reason_code"]),
                              ("BLOCKED", "DERIVATION_NOT_AVAILABLE"))
             self.assertIn("No per-requirement results were written: no digital adapter is registered", report)
+
+    def test_a_domain_with_no_production_adapter_is_not_implemented(self):
+        """The platform's own registry, with nothing passed in its place: no pcb adapter exists."""
+        from ecad_model.dataset import build, validate
+
+        with _scratch() as directory:
+            item = _digital_sample(directory, [REQUIREMENT])
+            provenance = json.loads((item / "source" / "provenance.json").read_text())
+            provenance.update(domain="pcb", artifact_type="kicad_project",
+                              description="Test fixture: a sample whose primary domain has no adapter.")
+            (item / "source" / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+            with self.assertRaisesRegex(ValueError, "no pcb adapter is registered in this platform: pcb is NOT_IMPLEMENTED"):
+                build(item)
+            with tempfile.TemporaryDirectory() as output, \
+                    mock.patch("ecad_validation.adapters.hdl.HDLAdapter.run", side_effect=AssertionError("ran")):
+                receipt = validate(item, Path(output) / "run")
+                report = (Path(output) / "run" / "report.md").read_text()
+                self.assertFalse((Path(output) / "run" / "results.json").exists())
+        v1 = _checks(receipt)["v1.pcb.extraction-and-sanity"]
+        self.assertEqual((v1["verdict"], v1["reason_code"]), ("BLOCKED", "DOMAIN_NOT_IMPLEMENTED"))
+        self.assertEqual(v1["findings"], ["no pcb adapter is registered in this platform"])
+        self.assertIn("No per-requirement results were written: no pcb adapter is registered", report)
 
     def test_only_the_sample_s_primary_domain_is_available(self):
         """A second artefact another adapter could read does not make its domain

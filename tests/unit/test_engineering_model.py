@@ -1214,7 +1214,8 @@ class TestDocumentationExamples(unittest.TestCase):
         import importlib
 
         for name in ("quantity", "schemas", "importers.base", "importers", "builder", "mjcf", "requirements",
-                     "domains", "domains.mechanical", "results", "spice", "domains.electrical"):
+                     "domains", "domains.mechanical", "results", "spice", "domains.electrical", "verilog",
+                     "domains.digital"):
             with self.subTest(name):
                 module = importlib.import_module(f"ecad_model.{name}")
                 result = doctest.testmod(module, optionflags=doctest.ELLIPSIS)

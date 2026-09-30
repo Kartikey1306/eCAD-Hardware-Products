@@ -1,0 +1,277 @@
+{
+  "$schema": "https://embeddedos.org/schemas/engineering-model/v1/engineering-requirements.schema.json",
+  "requirements_version": "1.0.0",
+  "design_id": "uart_loopback_001",
+  "reference_values": [
+    {
+      "reference_id": "REF-DIG-001",
+      "title": "The harness clock runs at twice its half period",
+      "domain": "digital",
+      "metric": "clock_period_s",
+      "scenario": {
+        "name": "loopback"
+      },
+      "unit": "s",
+      "absolute_tolerance": 1e-15,
+      "derivation": "clock_period",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-DIG-002",
+      "title": "The line and tx_ready are high after reset",
+      "domain": "digital",
+      "metric": "tx_idle_after_reset",
+      "scenario": {
+        "name": "loopback"
+      },
+      "unit": "1",
+      "absolute_tolerance": 0,
+      "derivation": "idle_high_after_reset",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-DIG-003",
+      "title": "A start bit lasts CLK_FREQ // BAUD_RATE cycles",
+      "domain": "digital",
+      "metric": "tx_bit_cycles",
+      "scenario": {
+        "name": "loopback"
+      },
+      "unit": "cycles",
+      "absolute_tolerance": 0,
+      "derivation": "bit_period_cycles",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-DIG-004",
+      "title": "The bit rate is the clock divided by the transmitter's divider",
+      "domain": "digital",
+      "metric": "tx_bit_rate_bd",
+      "scenario": {
+        "name": "loopback"
+      },
+      "unit": "Bd",
+      "absolute_tolerance": 0.001,
+      "derivation": "bit_rate",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-DIG-005",
+      "title": "A frame keeps the transmitter busy for ten bit periods",
+      "domain": "digital",
+      "metric": "tx_frame_cycles",
+      "scenario": {
+        "name": "loopback"
+      },
+      "unit": "cycles",
+      "absolute_tolerance": 0,
+      "derivation": "frame_cycles",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-DIG-006",
+      "title": "Every byte sent is received",
+      "domain": "digital",
+      "metric": "rx_bytes_received",
+      "scenario": {
+        "name": "loopback"
+      },
+      "unit": "1",
+      "absolute_tolerance": 0,
+      "derivation": "bytes_sent",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-DIG-007",
+      "title": "The loopback recovers every bit",
+      "domain": "digital",
+      "metric": "rx_bit_errors",
+      "scenario": {
+        "name": "loopback"
+      },
+      "unit": "bits",
+      "absolute_tolerance": 0,
+      "derivation": "lossless_loopback",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-DIG-008",
+      "title": "The receiver reports no framing error",
+      "domain": "digital",
+      "metric": "rx_framing_errors",
+      "scenario": {
+        "name": "loopback"
+      },
+      "unit": "1",
+      "absolute_tolerance": 0,
+      "derivation": "no_framing_errors",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "REQ-DIG-001",
+      "title": "The line runs no slower than 115200 Bd less 2 %",
+      "domain": "digital",
+      "component": "u_tx",
+      "metric": "tx_bit_rate_bd",
+      "scenario": {
+        "name": "loopback"
+      },
+      "operator": ">=",
+      "limit": {
+        "value": 112896.0
+      },
+      "unit": "Bd",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-DIG-002",
+      "title": "The line runs no faster than 115200 Bd plus 2 %",
+      "domain": "digital",
+      "component": "u_tx",
+      "metric": "tx_bit_rate_bd",
+      "scenario": {
+        "name": "loopback"
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 117504.0
+      },
+      "unit": "Bd",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-DIG-003",
+      "title": "Every byte the testbench offers arrives",
+      "domain": "digital",
+      "component": "u_rx",
+      "metric": "rx_bytes_received",
+      "scenario": {
+        "name": "loopback"
+      },
+      "operator": ">=",
+      "limit": {
+        "quantity": "components/tb_uart_loopback/domains/digital/byte_count"
+      },
+      "unit": "1",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-DIG-004",
+      "title": "No bit is lost or received wrong",
+      "domain": "digital",
+      "component": "u_rx",
+      "metric": "rx_bit_errors",
+      "scenario": {
+        "name": "loopback"
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 0
+      },
+      "unit": "bits",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-DIG-005",
+      "title": "No framing error is reported",
+      "domain": "digital",
+      "component": "u_rx",
+      "metric": "rx_framing_errors",
+      "scenario": {
+        "name": "loopback"
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 0
+      },
+      "unit": "1",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-DIG-006",
+      "title": "No output is unknown at the first falling clock edge after reset is released",
+      "domain": "digital",
+      "component": "tb_uart_loopback",
+      "metric": "outputs_unknown_after_reset",
+      "scenario": {
+        "name": "loopback"
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 0
+      },
+      "unit": "1",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-DIG-007",
+      "title": "The clock period is no shorter than the target device can meet",
+      "domain": "digital",
+      "component": "tb_uart_loopback",
+      "metric": "clock_period_s",
+      "scenario": {
+        "name": "loopback"
+      },
+      "operator": ">=",
+      "limit": {
+        "quantity": "components/target_device/domains/digital/min_clock_period"
+      },
+      "unit": "s",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the uart_loopback_001 MVP, chosen to exercise the pipeline; not a customer, interface or certification requirement; no standard or peer device was consulted"
+      },
+      "illustrative": true
+    }
+  ]
+}

@@ -41,3 +41,7 @@
 datasets/cad/** -text
 LICENSE -text
 eRobotics_CAD_Design/robot_components/product_datasheet.md -text
+
+# Origins that dataset items copy and bind by hash (REUSE-1).
+rtl/uart_tx.v -text
+rtl/uart_rx.v -text

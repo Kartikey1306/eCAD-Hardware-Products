@@ -108,7 +108,9 @@ class TestCIWorkflow(unittest.TestCase):
         Each of these read as green with the simulation tests skipped, and
         the substring checks of the tests below let every one through: an
         `if:` on the job, `|| true` after the suite, `--ignore`, `--deselect`
-        or `-k` on it, and the variable set to 0 in a step's own env.
+        or `-k` on it, and the variable set to 0 in a step's own env. So did
+        `if: false` on the check or the validate step (review HT-8): no step
+        runs conditionally except the evidence upload, and that one always.
         """
         job = _job(self.workflow, name)
         self.assertEqual(set(job["keys"]), {"name", "runs-on", "env", "steps"}, "no if:, continue-on-error or matrix")
@@ -119,6 +121,9 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertEqual(set(suite[0]), {"name", "run"}, "the suite step has no if:, env or continue-on-error")
         self.assertEqual(suite[0]["run"], "python run_all_tests.py --tb=short")
         for step in job["steps"]:
+            if "if" in step:
+                self.assertEqual((step["if"], step.get("uses", "").partition("@")[0]),
+                                 ("always()", "actions/upload-artifact"), f"only the upload runs conditionally: {step}")
             self.assertNotIn("continue-on-error", step)
             self.assertNotIn(variable, step.get("env", ""))
             for flag in ("||", "--ignore", "--deselect", " -k ", " -k="):
@@ -169,6 +174,28 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertIn("if-no-files-found: error", job)
         self.assertNotIn("continue-on-error", job)
 
+
+    def test_hdl_job_cannot_skip_silently(self):
+        """The HDL simulation tests skip without Icarus Verilog. The one job that
+        installs it must turn a skip into a failure, or a missing simulator reads as green."""
+        self.assert_the_suite_runs_whole_and_required("hdl", "ECAD_REQUIRE_HDL_TOOLS")
+        start = self.workflow.index("\n  hdl:\n")
+        # Before spice, so the spice job's slice below still ends at cad-dataset.
+        self.assertLess(self.workflow.index("\n  validation-evidence:\n"), start)
+        following = self.workflow.index("\n  spice:\n", start)
+        job = self.workflow[start:following]
+        self.assertIn('ECAD_REQUIRE_HDL_TOOLS: "1"', job)
+        self.assertIn("sudo apt-get install -y iverilog", job)  # a system package, not on PyPI
+        self.assertIn("iverilog -V", job)  # the version every receipt records, in the job's log
+        self.assertIn("python -m pip install -r tools/requirements.txt pytest", job)
+        self.assertIn("run: python run_all_tests.py --tb=short", job)  # the whole suite, not a subset
+        self.assertIn("python tools/cad_dataset.py check datasets/cad/uart_loopback_001", job)
+        self.assertIn("python tools/cad_dataset.py validate datasets/cad/uart_loopback_001", job)
+        self.assertIn("--output digital-validation", job)
+        self.assertIn("uses: actions/upload-artifact@v4", job)
+        self.assertIn("path: digital-validation/", job)
+        self.assertIn("if-no-files-found: error", job)
+        self.assertNotIn("continue-on-error", job)
 
 class TestTestRunner(unittest.TestCase):
     @mock.patch("run_all_tests.subprocess.run")

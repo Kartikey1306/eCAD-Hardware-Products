@@ -11,9 +11,12 @@ stack in §1.1. The first implementation stage (§21 item 3) is on the local
 branch `feat/multi-domain-foundation`, which forks from that commit, and
 §21 item 3 marks the state of each of its items there. The electrical domain
 (§21 item 4) is on the local branch `feat/domain-electrical`, which forks
-from the foundation's documentation commit `042f934`; this copy of the plan
-is that branch's, and §21 item 4 marks the state of each of its items there.
-Nothing here is pushed. Every statement about the
+from the foundation's documentation commit `042f934`, and §21 item 4 marks
+the state of each of its items there. The digital domain (§21 item 5) is on
+the local branch `feat/domain-digital`, which forks from the electrical
+branch's `7368641`; this copy of the plan is that branch's, and §21 item 5
+marks the state of each of its items there. The digital branch is not
+pushed. Every statement about the
 repository was checked against that state. Load-bearing claims carry an
 evidence label per `CLAUDE.md`: **Verified** (a command was run and its output
 read), **Observed** (visible in the code), **Inferred**, **Assumed**,
@@ -62,12 +65,12 @@ These are labels for this document only. Data uses the spec §34 vocabulary
 | Legacy validators | `tools/validate_products.py` | BOM arithmetic, datasheet contract, simulation execution, CAD invariants via `kiutils`/`ezdxf`/OpenSCAD. Tolerates findings listed in `tools/product_baseline.json`, where V0–V4 fails closed (§5) | IMPLEMENTED |
 | V0–V4 contract | `schemas/hardware-validation/v1/`, `contracts/hardware-validation/v1/` | Receipts, gates, verdicts, evidence index, bundles; 5 `POLICY:` requirements | IMPLEMENTED (merged, PR #30, 751616a) |
 | V0–V4 engine | `tools/ecad_validation/` | `engine.py` (V0–V2 via the legacy validators), `cases.py` (V3/V4 from `validation/*/cases.json`), `evidence.py`, `models.py` (typed results, fail-closed aggregation) | PARTIAL — defects open on master, fixed only on unpushed branches (§1.1); V3/V4 exercised by no product; RESULT-2 and STATE-2 (§7.2) open |
-| Tool adapters | `tools/ecad_validation/adapters/` | `python_control`, `mujoco`, `ngspice`, `kicad` (kicad-cli DRC), `iverilog`. Four run through the hardened `run_process`; **`iverilog` calls `subprocess.run` directly** with the inherited environment and no output cap (`hdl.py:51-100`, **Observed**). **Only `python_control` and `mujoco` emit metrics**; `ngspice`, `iverilog` and `kicad` decide from the exit code and return none, so their V3/V4 cases can only be `INCONCLUSIVE` (ARCH-2). On `feat/domain-electrical`, `ngspice` returns the `.meas` results its deck declares (§7.2 ARCH-2) | PARTIAL |
+| Tool adapters | `tools/ecad_validation/adapters/` | `python_control`, `mujoco`, `ngspice`, `kicad` (kicad-cli DRC), `iverilog`. Four run through the hardened `run_process`; **`iverilog` calls `subprocess.run` directly** with the inherited environment and no output cap (`hdl.py:51-100`, **Observed**). **Only `python_control` and `mujoco` emit metrics**; `ngspice`, `iverilog` and `kicad` decide from the exit code and return none, so their V3/V4 cases can only be `INCONCLUSIVE` (ARCH-2). On `feat/domain-electrical`, `ngspice` returns the `.meas` results its deck declares (§7.2 ARCH-2). On `feat/domain-digital`, `iverilog` runs both steps and its version probe through `run_process` (§7.2 ARCH-10) and returns the `ECAD_METRIC` lines its inputs declare, and `run_process` can copy declared outputs out of its workspace (§7.2 ARCH-2); `kicad` still returns no metric | PARTIAL |
 | CAD dataset + engineering model | `tools/ecad_model/`, `schemas/engineering-model/v1/`, `schemas/cad-dataset/v1/`, `datasets/cad/robotic_joint_001/` | STEP → isolated OpenCASCADE extraction → engineering model with provenance → MJCF → MuJoCo → V0–V4 receipt | PARTIAL — works end to end; the base types are STEP-bound (§7.3) |
-| RTL | `rtl/spi_master.v`, `uart_rx.v`, `uart_tx.v` | 352 lines of Verilog | PARTIAL — `tests/test_rtl_models.py` tests Python re-implementations; the HDL is never compiled (**Observed**) |
+| RTL | `rtl/spi_master.v`, `uart_rx.v`, `uart_tx.v` | 352 lines of Verilog | PARTIAL — `tests/test_rtl_models.py` tests Python re-implementations; the HDL is never compiled (**Observed**). On `feat/domain-digital`, byte-identical copies of `uart_tx.v` and `uart_rx.v` are compiled and simulated by Icarus Verilog as the digital sample (§10 row 3); `spi_master.v` is not (the grammar refuses its `$clog2`), and `tests/test_rtl_models.py` is unchanged |
 | PCB artefacts | 67 `.kicad_pcb`, 69 `.net`, 9 `.kicad_sch`, 67 `.dxf`, 67 `.scad` | Generated boards: placed footprints, no pads, no traces, no signal nets, by design (`MEMORY.md`) | PARTIAL — structural checks only |
 | Dev-board database | open PR #31 (`schemas/devboard-cad/v1/`, `tools/devboard_cad/`) | Board-record catalogue for issue #28 | PARTIAL — open PR, not merged; complementary (§20 Q6) |
-| CI | `.github/workflows/ci.yml` | Test matrix (3 OS × Py 3.10–3.12); `validation-evidence` job; `cad-dataset` job (on the stack only). **Gaps:** ruff and mypy are `continue-on-error` on master (mypy made blocking on unpushed `ci/enforce-type-check`); nothing compiles HDL, runs SPICE, or fetches LFS content. `feat/domain-electrical` adds a `spice` job, which has never run (§17) | PARTIAL |
+| CI | `.github/workflows/ci.yml` | Test matrix (3 OS × Py 3.10–3.12); `validation-evidence` job; `cad-dataset` job (on the stack only). **Gaps:** ruff and mypy are `continue-on-error` on master (mypy made blocking on unpushed `ci/enforce-type-check`); nothing compiles HDL, runs SPICE, or fetches LFS content. `feat/domain-electrical` adds a `spice` job and `feat/domain-digital` an `hdl` job; neither has run on a runner (§17) | PARTIAL |
 
 ### 1.1 Local branches (none pushed; push access is read-only for this account)
 
@@ -175,7 +178,8 @@ the complete suite (**Verified** at `bd999d5`: all pass on macOS arm64, Python
 3.14, CAD tools mandatory). Mutation suite: 68 mutants. Not present: training records, a second domain, a
 per-requirement result record, a domain adapter layer. The last three exist
 on the local branches of §21 items 3 and 4; the second sample,
-`datasets/cad/servo_supply_001`, is electrical (§10 row 2).
+`datasets/cad/servo_supply_001`, is electrical (§10 row 2), and the third,
+`datasets/cad/uart_loopback_001`, digital (§10 row 3, §21 item 5).
 
 ## 7. What is missing, partial, or unsafe
 
@@ -244,15 +248,18 @@ Nothing here has landed.
 | STATUS-3 | A missing physical input (a part with no material) gave V1 `FAIL DATASET_INPUT_INVALID`, against spec §34 | Fixed on the stack: `BLOCKED MISSING_REQUIRED_INPUT` · `test_a_missing_input_is_blocked_not_a_design_failure` · `missing-input-reported-fail` |
 | TRAIN-1 | The provenance schema accepted `license_verified: false` with training use permitted (spec §22) | Fixed on the stack: an unverified licence permits neither · `test_an_unverified_licence_permits_neither_redistribution_nor_training` · `unverified-licence-permits-use` |
 | HONESTY-1 | The receipt's `eligible_for_ebuild` is overall `PASS`, so a sample whose illustrative limits all pass would read as release-eligible (latent: `REQ-XD-001` keeps today's receipt `BLOCKED`) | Fixed on the stack: a met illustrative limit is `WARNING` `WITHIN_ILLUSTRATIVE_LIMIT`, which the contract treats as blocking · `test_only_a_real_requirement_can_pass`, `test_committed_item_meets_every_measurable_check` · `illustrative-limit-passes` |
-| STATE-2 | V3/V4 execution records and receipt `tools[]` embed the host interpreter's absolute path (`process.py` argv[0], `python_control.py:82`, `cases.py:401`), in 14 of 30 hash-bound evidence files of a dataset run; `fix/portable-evidence-paths` covers only `engine.py` (spec §24) | Open. Existing merged code; extends that fix branch |
+| STATE-2 | V3/V4 execution records and receipt `tools[]` embed the host interpreter's absolute path (`process.py` argv[0], `python_control.py:82`, `cases.py:401`), in 14 of 30 hash-bound evidence files of a dataset run; `fix/portable-evidence-paths` covers only `engine.py` (spec §24) | Open. Existing merged code; extends that fix branch. The digital domain's execution records carry `vvp`'s absolute path the same way (`/opt/homebrew/bin/vvp`, **Verified** in the receipt of `validate` at `0a5ff00`, 2026-09-29) |
 | FACT-3, -11, -12 | The first S6 fix guarded only the CAD file; `check` read inputs before refusing symlinks or unenumerable items; the post-transfer external-file refusal was untested | Fixed on the stack (rows S1, S3, S4, S6 above) |
 | ACC-9 | `validate` did not refuse a symlinked item (only `build` and `check` did) | Fixed on the stack · `test_check_refuses_a_symlinked_directory_before_reading_through_it` (now `check` and `validate`) · `validate-follows-symlinks` (on this branch folded into `check-follows-symlinks`: `Item` refuses before either reads) |
 | ACC-1 | The simulation-script mutants were killed only by the manifest's hash of the script, so no behavioural test was shown to catch wrong physics there | Fixed in the harness: the item is rebuilt after such a mutant; results in §16 |
-| RESULT-2 | On a failed version probe the adapters emit reason codes containing `:`, spaces or `-` (`capabilities.py:45/54/79`); the receipt then fails its own schema and none is written | Open. Existing merged code; fix branch `fix/version-probe-reason-codes`, §21 item 1. PARTIAL on `feat/domain-electrical`, the ngspice path only: the adapter maps `VERSION_PROBE_ERROR:<message>` and `VERSION_PROBE_EXIT_-<n>` to reason codes and puts the raw text in the summary, and the mapping is deleted when the general fix lands · `test_a_version_probe_failure_gives_a_reason_the_receipt_accepts` · `ngspice-reason-unsanitised` |
+| RESULT-2 | On a failed version probe the adapters emit reason codes containing `:`, spaces or `-` (`capabilities.py:45/54/79`); the receipt then fails its own schema and none is written | Open. Existing merged code; fix branch `fix/version-probe-reason-codes`, §21 item 1. PARTIAL on `feat/domain-electrical`, the ngspice path only: the adapter maps `VERSION_PROBE_ERROR:<message>` and `VERSION_PROBE_EXIT_-<n>` to reason codes and puts the raw text in the summary, and the mapping is deleted when the general fix lands · `test_a_version_probe_failure_gives_a_reason_the_receipt_accepts` · `ngspice-reason-unsanitised`. PARTIAL on `feat/domain-digital` for the iverilog path too, with a copy of the same mapping (`hdl._receipt_reason`) · `test_hdl_adapter.py::test_a_version_probe_failure_gives_a_reason_the_receipt_accepts` · `hdl-reason-unsanitised` |
 | ARCH-7 | `python_control` reports the validator's interpreter version, not the model's packages, and may run a different interpreter; receipt tool records were last-writer-wins per `tool_id` | Tool records fixed on the stack: one record per tool keeps only what all its checks share · `test_committed_item_meets_every_measurable_check` · `tool-record-last-writer-wins`. The `python_control` half is open: a prerequisite of the first Python-model domain (§21 item 7) |
 | RESULT-8 | Version probes take the first output line; ngspice's is a banner: ngspice-47's `--version` prints `******` first and names itself on the second line, `** ngspice-47 : Circuit level simulation program` (**Verified**, 2026-09-27) | Fixed on `feat/domain-electrical`: an ngspice-only `VERSION_PATTERNS` entry reads `47` (and `36`, `44.2` from their recorded banners); no match is version `None`, which the existing policy turns from `PASS` into `BLOCKED TOOL_VERSION_UNAVAILABLE`; every other tool keeps the first-line rule · `test_the_ngspice_version_comes_from_its_banner`, `test_probes_of_other_tools_still_take_their_first_line` · `ngspice-version-first-line`, `ngspice-version-invented`, `ngspice-version-minor-dropped`, `probe-pattern-for-every-tool` |
-| ARCH-2 | Only `python_control` and `mujoco` return metrics. ngspice ran with `-o ngspice.log -r ngspice.raw`: with `-r` batch mode makes no `.meas` ("No .measure possible in batch mode (-b) with -r rawfile set!", exit 0), and with `-o` the results go to a log inside the workspace `run_process` deletes (**Verified**, ngspice-47, 2026-09-27) | ngspice half fixed on `feat/domain-electrical`: `ngspice -b <deck>` and nothing else; the metrics are the `.meas` results the deck declares, read from stdout only when exactly one line reports the name with a finite plain-decimal value; truncated output is `INCONCLUSIVE OUTPUT_TRUNCATED` with no metrics; exit != 0 stays `FAIL` · the 14 tests of `test_ngspice_adapter.py` · `ngspice-rawfile-requested` … `ngspice-oversize-deck-read`. Open: `run_process` copying declared outputs out of the workspace, and the iverilog and kicad parsers (§21 items 5 and 6) |
-| SEC-2 | The dataset runner executes a committed case document (`dataset.py`, before the stale-case filter) before it decides which of its cases count. A hand-edited committed ngspice deck, or a forged committed case whose inputs include a `.spiceinit`, would run before it is marked stale, and ngspice runs `.control` `shell` blocks under `-b` and a working-directory `.spiceinit` (**Verified**, ngspice-47, 2026-09-27) | Open. `feat/domain-electrical` narrows the source path: the netlist parser refuses `.control`, `*#` and every other directive, so the deck `build` writes from the model carries none. It does not close it: ngspice runs the committed deck, which equals the regenerated one only while V2's reproduction check passes, and a hand-edited committed deck's `.control` `shell` block ran during `validate` before V2 and the stale-case filter flagged it (**Verified** by the review of the branch, 2026-09-28; the first version of this row said ngspice only ran the regenerated deck, which was false). The same holds for the Python case scripts. V2 and `check` report an edited deck, after it has run; no guard stops the run. Proposed for its own foundation change: run a committed document only if every case equals a fresh one and every derived input reproduces, else run nothing and report `CASE_DOCUMENT_NOT_RUN`. It narrows the decision recorded in `MEMORY.md` (committed case documents run), so it needs the maintainer's acceptance |
+| ARCH-2 | Only `python_control` and `mujoco` return metrics. ngspice ran with `-o ngspice.log -r ngspice.raw`: with `-r` batch mode makes no `.meas` ("No .measure possible in batch mode (-b) with -r rawfile set!", exit 0), and with `-o` the results go to a log inside the workspace `run_process` deletes (**Verified**, ngspice-47, 2026-09-27) | ngspice half fixed on `feat/domain-electrical`: `ngspice -b <deck>` and nothing else; the metrics are the `.meas` results the deck declares, read from stdout only when exactly one line reports the name with a finite plain-decimal value; truncated output is `INCONCLUSIVE OUTPUT_TRUNCATED` with no metrics; exit != 0 stays `FAIL` · the 14 tests of `test_ngspice_adapter.py` · `ngspice-rawfile-requested` … `ngspice-oversize-deck-read`. Output half and iverilog half fixed on `feat/domain-digital`: `run_process` copies the names a request declares (`collect`, `collect_into`) out of its workspace after a completed run of any exit status, only regular files of at most 64 MiB checked with `lstat` and copied with `follow_symlinks=False`, every other name in `collect_problems`, nothing after a timeout or crash, and nothing for a request that declares none, so every other caller is unchanged; the iverilog adapter reads the `ECAD_METRIC <name> <value>` lines its inputs declare from vvp's stdout, truncated output is `INCONCLUSIVE OUTPUT_TRUNCATED` with no metrics, exit != 0 `FAIL` with none, and case arguments are refused (`BLOCKED RTL_ARGUMENTS_REFUSED`) · `test_run_process_collects_only_declared_regular_files`, `test_nothing_is_collected_from_a_run_that_timed_out_or_crashed`, `test_a_request_that_collects_nothing_behaves_as_before`, `test_declared_metrics_are_read_once_each_and_nothing_else`, `test_case_arguments_never_reach_a_command_line` · `process-collect-*`, `hdl-truncation-ignored`, `hdl-undeclared-metrics-read`, `hdl-arguments-passed` … (§7.7, §16). Open: the kicad parser (§21 item 6) |
+| ARCH-10 | `iverilog` ran both of its steps with `subprocess.run` directly, with the caller's environment and no output cap (`hdl.py:51-100` before the digital branch, **Observed**), where every other adapter runs through `run_process`; its version probe, `capabilities.probe_executable`, also passed the caller's environment, and `iverilog -V` then wrote the file `IVERILOG_ICONFIG` names (**Verified**, Icarus 13.0, the digital review CS-6) | Fixed on `feat/domain-digital`: `iverilog -g2012 -o simulation.vvp <inputs>` and `vvp simulation.vvp` each run through `run_process` in a workspace of their own, the program carried between them by the output copy (ARCH-2), with the scrubbed environment, the 4 MiB output cap, the case's timeout and an empty stdin (`ProcessRequest.stdin_devnull`, opt-in, so no other caller changes); the version probe runs through `run_process` too (`hdl.probe_iverilog`) · `test_both_icarus_steps_run_through_run_process_with_the_scrubbed_environment`, `test_both_steps_are_capped_at_the_process_output_limit`, `test_the_compiler_sees_only_the_scrubbed_environment` (real Icarus) · `hdl-compile-bypasses-run-process`, `hdl-run-bypasses-run-process`, `hdl-compile-inherits-environment`, `hdl-run-inherits-environment`, `hdl-probe-bypasses-run-process`, `hdl-probe-inherits-environment`. Open: `capabilities.detect_capabilities` (only the `ecad_validation` CLI's capability listing) still probes `iverilog -V` with the caller's environment; changing it changes every tool's probe, so it is its own change (`MEMORY.md`) |
+| SEC-2 | The dataset runner executes a committed case document (`dataset.py`, before the stale-case filter) before it decides which of its cases count. A hand-edited committed ngspice deck, or a forged committed case whose inputs include a `.spiceinit`, would run before it is marked stale, and ngspice runs `.control` `shell` blocks under `-b` and a working-directory `.spiceinit` (**Verified**, ngspice-47, 2026-09-27) | Open. `feat/domain-electrical` narrows the source path: the netlist parser refuses `.control`, `*#` and every other directive, so the deck `build` writes from the model carries none. It does not close it: ngspice runs the committed deck, which equals the regenerated one only while V2's reproduction check passes, and a hand-edited committed deck's `.control` `shell` block ran during `validate` before V2 and the stale-case filter flagged it (**Verified** by the review of the branch, 2026-09-28; the first version of this row said ngspice only ran the regenerated deck, which was false). The same holds for the Python case scripts. V2 and `check` report an edited deck, after it has run; no guard stops the run. Proposed for its own foundation change: run a committed document only if every case equals a fresh one and every derived input reproduces, else run nothing and report `CASE_DOCUMENT_NOT_RUN`. It narrows the decision recorded in `MEMORY.md` (committed case documents run), so it needs the maintainer's acceptance. `feat/domain-digital` narrows the Verilog path the same way and leaves it open the same way: the grammar refuses every `$` name, directive, string and hierarchical reference in the sources, so the RTL in the simulation file `build` writes carries none, and its harness uses no `$` name but `$display`, `$finish` and `$realtime`; but Icarus runs the committed file, and a `$fopen` added by hand to its harness wrote a file outside the item 14 times during `validate`, once per compiled case, before V0 and V2 failed and every case was marked stale (**Verified** at `0a5ff00`, Icarus 13.0, 2026-09-29, a scratch clone) |
+| REUSE-1 | An artefact copied from elsewhere in the repository (`rtl/*.v`, a board) must stay bound to its origin, or the sample's copy and the repository's file drift apart unseen (§18) | Implemented on `feat/domain-digital`: an artefact of the source provenance may carry `copied_from {path, sha256}` (provenance format 1.1.0, required for it); `cited_source_problems`, so `check` and V0, re-hashes the origin like any cited file (outside the repository, missing, not a regular file, changed), requires the copy's bytes to have the origin's digest, and refuses an origin inside the item, compared by file identity (`os.path.samefile`, review CS-3), not by spelling; `VALIDATOR_VERSION` is 1.1.0; `.gitattributes` keeps `rtl/uart_tx.v` and `rtl/uart_rx.v` byte-exact on checkout · `test_a_copied_source_is_bound_to_its_origin`, `test_an_rtl_copy_edited_without_a_rebuild_is_caught_at_v0_and_v2_and_not_counted`, `test_hash_cited_rtl_is_never_converted_on_checkout` · `reuse-origin-unchecked`, `reuse-copy-unchecked`, `reuse-origin-inside-item-allowed`, `reuse-origin-inside-compared-by-spelling`, `item-origin-digest-changed`, `provenance-copy-version-rule-dropped`, `rtl-origin-converted-on-checkout`. Open: the capital-letters case of the test, and so the kill of `reuse-origin-inside-compared-by-spelling`, exists only on a filesystem that folds letter case (macOS by default, not the Linux runner); `copied_from` is not restated in the manifest (design Q-D5) |
+| SEC-3 | The digital grammar reads only the sources; the compiled program and the committed simulation file are not screened, and `vvp` runs without `-N` | PLANNED, its own change (design §13.1): a screen of every quoted `$name` and `:vpi_module` in the compiled program, and `vvp -N`. Until then plan R5 holds |
 | MAP-1 | A `BLOCKED` V3 reference falls back to contract domain `integrated_physics` because only `requirements[]` is searched | Fixed on `feat/multi-domain-foundation` (the lookup covers references); no observable effect for mechanical |
 | ENGINE-1 | The case engine does not survive every case document: it reports one it cannot parse as `FAIL` with no evidence (`cases.py:157-170`), which the receipt contract forbids, so the receipt fails its own schema; it reads the document as UTF-8 and catches only `OSError` and `JSONDecodeError`, so a document in UTF-16 raises out of it; a document nested deeply enough raises `RecursionError` from its parse or its schema check; and a metric that is not a finite number makes `canonical_json_bytes` raise (`cases.py:410`). In each case no receipt is written, and an exception loses the verdicts of every case in the document (**Verified** through the dataset runner, 2026-09-26/27) | Open in merged code. The dataset runner on `feat/multi-domain-foundation` cites the document as the evidence, and turns an engine exception into a gate-level `INCONCLUSIVE` `CASE_ENGINE_ERROR` with each entry `INCONCLUSIVE` (crashed); the product pipeline still has the defect. Fix belongs with §21 item 1 |
 
@@ -261,6 +268,8 @@ Nothing here has landed.
 With no code anywhere: training records; electrical, digital, PCB, power,
 control, EM, thermal and full-system domains; cross-domain rules beyond a
 model-quantity limit (`from_result`, `depends_on`); non-STEP importers.
+(The electrical and digital domains have since been written, on the local
+branches of §21 items 4 and 5.)
 
 On `feat/multi-domain-foundation` only, not on the stack (§21 item 3 marks each): the
 `UNSPECIFIED` and `NOT_AVAILABLE` statuses with one null predicate; the
@@ -418,7 +427,7 @@ that killed it. The fixes have had no review of their own.
 | HT-1 | The documentation said V2's electrical invariants read the committed deck; the runner hands them the freshly regenerated deck | Fixed in the documentation (the runner is unchanged; `MEMORY.md` says why): the invariants check the writer against the reader and the model, and only `v2.dataset-reproduction` reads the committed deck | `test_a_deck_edited_without_a_rebuild_is_divergent_and_not_counted` (the invariants `PASS` on an edited committed deck) · *doc change* |
 | HT-2 | Three places said ngspice only ever runs the regenerated deck; a committed deck's `.control shell` ran during `validate` | Fixed in `docs/cad-dataset-engineering-model-v1.md`, `MEMORY.md` and §7.2 SEC-2: ngspice runs the committed deck, equal to the regenerated one only while reproduction passes; the residual risk is a hand-edited committed file running a command before it is flagged stale, as for the Python case scripts. SEC-2 itself stays open, a maintainer's decision | *doc change* |
 | HT-3 | Conditions of rules C1, C3, C4 and C7 had no test (V > 0; the bypass ending on the rail; the command node carrying only the command; cn on ground), and a mutant of each survived every suite | Fixed: a netlist for each | `test_only_the_series_precharge_supply_network_is_accepted` · `el-ramp-zero-level`, `el-bypass-other-end`, `el-command-node-shared`, `el-command-cn-ground` |
-| HT-4 | `test_spice_job_cannot_skip_silently` passed with the job under `if: false`, `|| true` after the suite, `--ignore` of the electrical tests, or a step-level `ECAD_REQUIRE_SPICE_TOOLS: "0"` | Fixed: a strict reader of the workflow's layout (no YAML parser is installed) asserts the job's keys, its one env entry, the exact suite step, and no `||`, `--ignore`, `--deselect` or `-k`; the cad-dataset test the same way. Each edit fails the new tests and passed the old | `test_spice_job_cannot_skip_silently`, `test_cad_dataset_job_cannot_skip_silently`, `test_the_job_reader_refuses_a_line_it_cannot_place` · *none: the mutation harness does not run `test_ci_and_runner.py`* |
+| HT-4 | `test_spice_job_cannot_skip_silently` passed with the job under `if: false`, `\|\| true` after the suite, `--ignore` of the electrical tests, or a step-level `ECAD_REQUIRE_SPICE_TOOLS: "0"` | Fixed: a strict reader of the workflow's layout (no YAML parser is installed) asserts the job's keys, its one env entry, the exact suite step, and no `||`, `--ignore`, `--deselect` or `-k`; the cad-dataset test the same way. Each edit fails the new tests and passed the old | `test_spice_job_cannot_skip_silently`, `test_cad_dataset_job_cannot_skip_silently`, `test_the_job_reader_refuses_a_line_it_cannot_place` · *none: the mutation harness does not run `test_ci_and_runner.py`* |
 | HT-5 | No test reached the summary's `[:MAX_SUMMARY_PROBLEMS]` cap (and `run`'s docstring said every unread name is named), the path half of "cites the netlist by path and hash", the `powered_by` guard, or the hysteresis in the closing times | Fixed: a test each; the docstring states the cap | `test_the_summary_names_at_most_ten_unread_measurements`, `test_v2_names_every_way_a_deck_can_disagree_with_its_model`, `test_a_reference_does_not_apply_where_its_assumptions_fail`, `test_a_fault_the_transient_cannot_measure_is_refused` · `ng-summary-cap`, `el-invariant-ref-unchecked`, `el-powered-by-any-element`, `el-closes-hysteresis-bypass`, `el-closes-hysteresis-startup`, `el-closes-hysteresis-fault`, `el-closing-time-ignores-hysteresis` |
 | HT-6 | Numbers in the documentation: "at least 21 times" (the fault current's ratio is 20.94), 714287 (714286 from the stored golden), 285 mutants (292 at `bf04f1b`) | Fixed: recomputed after the changes (the table of `docs/electrical-domain-v1.md`, §16, `TASKS.md` T-012) | *doc change* |
 | HT-7 | Q4 was half dropped: whether the sheet's 5 A is continuous or peak and 200 W input or output power; the netlist and REQ-EL-003 read 200 W / 48 V as the drive's input and compare the input current with 5 A, which the sheet gives for the power stage | Fixed: both labelled assumptions in §20 Q4, the annotations' notes, REQ-EL-003's title and the netlist's comment; the sample rebuilt | *data and doc change* (the rebuilt sample is checked by `test_the_committed_sample_checks_and_rebuilds_to_the_same_bytes`) |
@@ -429,6 +438,63 @@ commit is not amended: it says 16 new mutants (it adds 15), and that the
 stored goldens moved "in the ninth to twelfth figure" (the eighth to
 twelfth: `precharge_bus_voltage` moved from 47.9147188794 to
 47.9147184047).
+
+### 7.7 Defects found by independent review of the digital branch, and their state
+
+`feat/domain-digital` at `905294f` had two independent reviews, correctness
+and security (CS) and honesty and tests (HT): 14 findings, of which two were
+found by both (CS-3 = HT-5, CS-5 = HT-2), so 12 distinct, and ruff's F841
+besides. All are fixed, in two sessions; the rows below are as the fixing
+sessions recorded them (their scratch evidence is local to the authoring
+session), and the fixes have had no review of their own. The fifteen digital
+commits were then applied again on the electrical branch's `7368641` (which
+adds only the electrical design document to `38680e0`), each with the same
+patch (`git patch-id` equal, **Verified**), so each has a second name; this
+table uses this branch's:
+
+| Reviewed or fixed as | On this branch |
+|---|---|
+| `905294f` (the domain, reviewed) | `6fbae29` |
+| `1cb1615` (CS-2) | `2b2d1d0` |
+| `46c0b1f` (CS-1) | `adb556d` |
+| `11b027d` (HT-6) | `65eba08` |
+| `faf72f3` (HT-1) | `11e1a89` |
+| `085a52d` (CS-4) | `f944414` |
+| `e244cc6` (CS-3 = HT-5) | `0bdd55e` |
+| `9ca5e03` (CS-6) | `ea81cff` |
+| `f723d68` (ruff F841) | `2f379c2` |
+| `427686d` (HT-3, HT-4) | `70433d7` |
+| `20d9a63` (HT-7 tests, HT-8, CS-5 test) | `5d5ee97` |
+| `6c9599a` (`MEMORY.md`: CS-5, HT-7 and eight decisions) | `9fb7fed` |
+| `11e8c09` (a mutant renamed, HT-3) | `0a5ff00` |
+
+`git diff 11e8c09 0a5ff00` is exactly the electrical design-document commit
+`7368641`, so the code at `0a5ff00` is the code the review's fixes and the
+mutation run were verified on (**Verified**, 2026-09-29). Each named mutant
+is in `tests/mutation/run_mutations.py`, and §16 records the run that killed
+it.
+
+| ID | Finding (as confirmed) | State | Test · mutant |
+|---|---|---|---|
+| CS-1 | The harness counted bit errors only in bytes that arrived and always printed the framing count: a receiver that never set `rx_valid` passed REF-DIG-007/008 and REQ-DIG-004/005 | Fixed (`adb556d`): `rx_bit_errors` adds 8 for each byte sent that never arrived (a lost bit is a bit not received as sent, so a lost byte stays a `FAIL`); `rx_framing_errors` is not printed when it is 0 and a byte is missing (no stop bit to judge, so the comparator says `INCONCLUSIVE`), and is printed when above 0. The count a missing byte is taken against is one harness line, which `read_harness` reads back as `awaited` and V2 compares. REQ-DIG-004 is "No bit is lost or received wrong"; the sample rebuilt (the simulation file 13 240 B, `597eebf2…fd83`; model and case documents unchanged). Icarus 13.0 and 11.0 (apt 11.0-1.1, ubuntu:22.04 arm64) printed identical metric lines for the sample and five copies. The 20 MHz copy now reads 15 bit errors (7 + 8), the receiver at 57 600 Bd 12 (4 + 8) with no framing count | `test_rtl_defects_fail_their_references` ("the receiver never sets rx_valid", which fails against the old writer), V2's awaited-count case, `read_harness` refusals of a mismatched and a repeated awaited line · `dg-missing-bytes-not-counted`, `dg-framing-reported-while-bytes-missing`, `dg-awaited-count-hard-coded`, `dg-v2-awaited-not-compared`, `vg-harness-awaited-count-unbound`; `dg-marker-dropped` re-anchored |
+| CS-2 | Icarus reserves `bool`, `wone` and `wreal`, and refuses a unary operator applied to a unary operator; the grammar accepted them | Fixed (`2b2d1d0`, the first fixing session); its tests re-run and its three mutants re-run by the second | `test_verilog_source.py` (keyword classes, unary forms), `test_the_grammar_refuses_what_icarus_cannot_compile_and_keeps_what_it_can` (real Icarus) · `vg-icarus-extended-types-accepted`, `vg-wone-accepted`, `vg-unary-after-unary-accepted` |
+| CS-3 = HT-5 | REUSE-1's "origin inside the item" compared paths as text, so letter case bypassed it on a case-insensitive filesystem | Fixed (`0bdd55e`): `dataset._lies_within` compares the resolved origin and each existing ancestor with the item's directory by `os.path.samefile` | `test_a_copied_source_is_bound_to_its_origin`, case "an origin inside the item, spelled in capitals", added only where the filesystem folds case (it fails against the textual check on macOS) · `reuse-origin-inside-compared-by-spelling`; `reuse-origin-inside-item-allowed` re-anchored. The case, and so that mutant's kill, exists only on a case-insensitive filesystem |
+| CS-4 | A sized top localparam (`64'd5000000000`) passed extraction, and build wrote an unsized decimal the harness reader refuses | Fixed (`f944414`): extraction refuses an override above `verilog.MAX_DECIMAL` under rule C4 (before the fix build accepted and V2 failed; after, build refuses) | `test_a_parameter_is_at_most_what_an_unsized_decimal_holds` (2^31 - 1 written, 2^31 and 5e9 refused); the class-rule case "C4: a parameter above 2^31 - 1" through `validate` · `dg-parameter-above-max-decimal-accepted`, `dg-parameter-bound-off-by-one` |
+| CS-5 = HT-2 | `MEMORY.md` said the digital invariants check the committed simulation file; the runner hands them the regenerated one | Fixed in `MEMORY.md` (`9fb7fed`), as electrical HT-1 was; the runner is unchanged (the electrical row's rejected alternative applies) | `test_a_simulation_file_edited_without_a_rebuild_is_divergent_and_not_counted` now asserts `v2.digital.model-invariants` `PASS DOMAIN_MODEL_CONSISTENT` (`5d5ee97`) · none: a documentation finding, and the assertion pins the runner's behaviour |
+| CS-6 | The iverilog version probe ran with the caller's environment, so `IVERILOG_ICONFIG` wrote a file | Fixed (`ea81cff`): `hdl.probe_iverilog` runs `iverilog -V` through `run_process` and maps its outcome to `probe_executable`'s reasons; no other adapter changes. Open: `capabilities.detect_capabilities` still probes with the caller's environment (§7.2 ARCH-10) | `test_both_icarus_steps_run_through_run_process_with_the_scrubbed_environment` (the probe's environment, directory, stdin and timeout), `test_the_compiler_sees_only_the_scrubbed_environment` (`capability()` and a run write no file; `iverilog -V` with the caller's environment does); both fail against the old adapter · `hdl-probe-bypasses-run-process`, `hdl-probe-inherits-environment` |
+| HT-1 | V1's `abs(2*half*clock - 1) > 1e-9` refused every half period that does not divide one second into whole Hz | Fixed (`11e1a89`): `CLK_FREQ` is accepted within 1 Hz of 10^9 / (2 N), compared in integers, \|2 N f - 10^9\| < 2 N; the review's example, `clock != round(1/(2*half))`, would refuse 166 666 666, which integer division gives (`MEMORY.md`) | `test_v1_refuses_impossible_values_units_and_clocks` (166 666 667 and 166 666 666 at 6 ns pass, 166 666 668 and 166 666 665 fail, 50 000 001 at 20 ns fails; with real Icarus V1 and every V3 check `PASS` at 6 ns) · `dg-clock-tolerance-inclusive`, `dg-clock-compared-in-seconds`; `dg-clock-consistency-unchecked` re-anchored |
+| HT-3 | Twelve rules and guards survived every digital suite | Fixed (`70433d7`, tests only) | one case each: 17 bytes refused (C6) and 16 built (END 93 748); a byte that is not `[7:0]` (C6); an instance named `_u_tx`; C4 on a model (a crossed facet map; a missing facet); C3 on a model (no oversample); C7 in `end_cycle` (0, 1.5, `True`, negative); `MIN_BIT_CYCLES` (END 772 at 5 MBd); `extract` refusing a `step` source and a 17th source before reading (16 are read); V2 naming an hdl source not in `design.sources`; the harness refusal naming file line 353; `_collect` copying a link swapped in as the link · `dg-byte-count-unbounded`, `dg-byte-width-unchecked`, `dg-underscore-name-accepted`, `dg-c4-facets-unchecked`, `dg-c4-facet-map-unchecked`, `dg-model-oversample-unchecked`, `dg-c7-non-integer-accepted`, `dg-min-bit-cycles-dropped`, `dg-foreign-source-read`, `dg-too-many-sources-read`, `dg-v2-hdl-source-unchecked`, `dg-v2-harness-offset-dropped`, `process-collect-copies-link-target` |
+| HT-4 | No RTL-defect copy detected a stuck data bit; `item-byte-changed` was killed only by byte-pinning tests | Fixed (`70433d7`) | `test_rtl_defects_fail_their_references` row "the receiver's bit 0 stuck at 1": 0x35/0xCA gives 1 bit error, REF-DIG-007 and REQ-DIG-004 `FAIL`. With the item's 0xCA edited to 0xC5 and rebuilt, that row fails (checked by hand), a behavioural kill of `item-byte-changed`; the harness still reports its first killer, a byte-pinning test |
+| HT-6 | REQ-DIG-006's title overstated a metric sampled at one instant | Fixed (`65eba08`): "No output is unknown at the first falling clock edge after reset is released"; measuring over the whole run was rejected (`MEMORY.md`) | `test_the_unknown_outputs_requirement_names_the_one_instant_it_is_measured_at` · `item-unknown-outputs-title-overstated` |
+| HT-7 | `MEMORY.md` claimed 5000-level depth tests for if, case and bit selects, and miscounted the RTL copies' non-ASCII | Fixed: the tests added (`5d5ee97`); the rows corrected (`9fb7fed`): 4 em dashes, 2 en dashes, 1 multiplication sign | `test_rtl_bodies_are_clocked_nonblocking_and_single_driven` (5000 ifs and cases refused at line 36, 5000 selects at line 37) · the existing `vg-depth-unbounded`, `vg-expression-depth-unbounded` |
+| HT-8 | `assert_the_suite_runs_whole_and_required` missed an `if: false` on a check or validate step | Fixed (`5d5ee97`): no step may carry `if:` but an upload's `if: always()` | nine variants (a check, validate or upload step under `if: false`, in each of hdl, spice and cad-dataset) fail the new assertion and passed the old · none: the mutation harness does not run `test_ci_and_runner.py` |
+| ruff F841 | An unused `root` in `process.py` | Fixed (`2f379c2`): the line removed; its one effect was a `RuntimeError` on a symbolic-link-loop root on Python before 3.13, for a root nothing reads when there are no inputs | none: no behaviour depends on it, and restoring the line is an equivalent mutant |
+
+Also open after the review, and not a finding of it: the recorded
+`RECORDED_STDOUT` and `HARNESS_REPORT` of `tests/unit/test_hdl_adapter.py`
+still describe the simulation file as it stood at `905294f` (sha256
+`191bd8f1…3e84`), which its docstring names; they test the adapter's
+parser, not the sample.
 
 ---
 
@@ -530,6 +596,19 @@ Unchanged from the stack, with these changes:
   `circuit` with nets, ports and rails (two sources of truth for
   connectivity). Stored nets, and pins beyond an element's terminals, still
   wait for a cross-domain rule. Maintainer acceptance is open (§20).
+- **ARCH-1 as amended by the digital domain** (`feat/domain-digital`,
+  format 1.2.0). Icarus compiles one file written from the model, so the
+  model carries what the adapter does not model: each module instance's
+  component has an `hdl` member with its module, source file, ports,
+  parameter facets and the module's source text verbatim, bound to
+  `design.sources` by hash; the top's lists its signals. Why: `write_models`
+  receives only the model, and re-reading the sources there would be a
+  hidden input; verbatim text means the bytes Icarus compiles are the
+  committed RTL. Rejected: a protocol change passing the model and the RTL
+  copies to the case target (not forced, and a copy edited without a rebuild
+  would still run); a canonical reprint of the RTL (Icarus would compile
+  text the sample does not contain). Maintainer acceptance is open (design
+  Q-D1).
 
 Spec entity names map as follows. Mechanical: Part → component with
 `cad_ref`; Link → rigid group root; Joint → joint; Material → `material`;
@@ -538,8 +617,12 @@ the MJCF proxies (domain model). Electrical: Circuit → the model of a
 sample whose primary domain is electrical; Component → a component with a
 `circuit` member; Node → its terminals; Net → derived from the terminals;
 PowerRail, Input and Output → roles of the validated network class, not
-stored; ComponentRating → rating facets. Module/Signal/Clock,
-Layer/Trace/Via, PowerStage, Plant/Controller, Coil/Excitation and
+stored; ComponentRating → rating facets. Digital: DigitalSystem → the
+model of a sample whose primary domain is digital; Module → a component
+with an `hdl` member; Signal → the top's `hdl.signals` and each port's
+`signal`; Clock and Reset → the top's facets and the signals rule C5 names;
+Behaviour → `hdl.text`; StateMachine is not extracted. Layer/Trace/Via,
+PowerStage, Plant/Controller, Coil/Excitation and
 HeatSource/ThermalInterface are domain-model concepts owned by their adapters,
 with the parameters other domains consume published as facets.
 
@@ -616,15 +699,21 @@ cross-domain and full system).
   Mechanical models stay 1.0.0 (`MODEL_VERSION`); the electrical adapter
   writes 1.1.0 (`CIRCUIT_MODEL_VERSION`). Rejected: keeping 1.0.0 for
   documents that use the additions, which would hand a 1.0.0 reader members
-  its closed schema refuses. Maintainer acceptance is open (§20).
+  its closed schema refuses. Maintainer acceptance is open (§20). On
+  `feat/domain-digital` both also accept 1.2.0, required for an `hdl`
+  member and for a `digital` facet on a component without CAD; the digital
+  adapter writes 1.2.0 (`HDL_MODEL_VERSION`). Each rule names its own
+  version, so no document can use both the 1.1.0 and the 1.2.0 additions
+  (design Q-D6). The source provenance accepts 1.0.0 and 1.1.0, and 1.1.0 is
+  required for `copied_from` (REUSE-1).
 
 ## 10. Domain-by-domain plan
 
 | # | Domain | Current | MVP sample | Open-source backend | Blockers and prerequisites |
 |---|---|---|---|---|---|
-| 1 | Mechanical | PARTIAL | `robotic_joint_001` (exists) | MuJoCo | Fixes in §7 are local and unpushed; Linux reproduction (§20 R1) |
-| 2 | Electrical | PARTIAL (local branch `feat/domain-electrical`; §21 item 4 marks each part) | `servo_supply_001`: 48 V servo supply input: fuse, precharge resistor with bypass switch, bulk capacitor with series resistance, constant-current drive load, fault switch. | Inrush peak and I²t, precharge, the startup peak with the bypass surge, steady bus voltage and input current, fuse dissipation, prospective short-circuit current; component ratings `BLOCKED` on data | ngspice batch: the deck's `.meas` results read from stdout (ARCH-2, ngspice half) and the version from the banner (RESULT-8) | ngspice-47 is installed here (Homebrew); which ngspice apt installs on the CI runner is Unknown, and it is not pinned. **Data:** the eServo-200 sheet gives only 48 V, 5 A, 200 W; fuse, limiter and capacitor values are design choices of a self-authored circuit (`SPECIFIED` by the netlist, source `design_annotation`, noted as no part's rating) and every part rating is `UNKNOWN`, so no check on a real part's rating can `PASS`; steady ripple is `BLOCKED`: the sheet states neither the drive's input ripple current nor its switching frequency (`UNSPECIFIED`); overlaps PR #31's eServo-200 power-budget cases (Q6) |
-| 3 | Digital | PLANNED | `rtl/uart_tx.v` + `uart_rx.v` loopback with a Verilog testbench: compile, frame timing at 115200 baud, byte recovery | Icarus Verilog; Verilator later | `iverilog` moved onto `run_process` first (ARCH-10); copied artefacts bound to their origin by hash (REUSE-1); Verilator needs a cases-contract amendment (Q9) |
+| 1 | Mechanical | PARTIAL | `robotic_joint_001` (exists) | MuJoCo | In PR #36, with the fixes of §7; Linux reproduction (§20 R1) |
+| 2 | Electrical | PARTIAL (PR #38; §21 item 4 marks each part) | `servo_supply_001`: 48 V servo supply input: fuse, precharge resistor with bypass switch, bulk capacitor with series resistance, constant-current drive load, fault switch. Checks: inrush peak and I²t, precharge, the startup peak with the bypass surge, steady bus voltage and input current, fuse dissipation, prospective short-circuit current; component ratings `BLOCKED` on data | ngspice batch: the deck's `.meas` results read from stdout (ARCH-2, ngspice half) and the version from the banner (RESULT-8) | ngspice-47 is installed here (Homebrew); ubuntu-22.04's apt gives ngspice-36 (Verified in an arm64 container, where the `spice` job's steps pass), and it is not pinned. **Data:** the eServo-200 sheet gives only 48 V, 5 A, 200 W; fuse, limiter and capacitor values are design choices of a self-authored circuit (`SPECIFIED` by the netlist, source `design_annotation`, noted as no part's rating) and every part rating is `UNKNOWN`, so no check on a real part's rating can `PASS`; steady ripple is `BLOCKED`: the sheet states neither the drive's input ripple current nor its switching frequency (`UNSPECIFIED`); overlaps PR #31's eServo-200 power-budget cases (Q6) |
+| 3 | Digital | PARTIAL (fork branch `feat/domain-digital`, stacked on PR #38; §21 item 5 marks each part) | `uart_loopback_001`: `rtl/uart_tx.v` + `uart_rx.v`, copied byte for byte and bound to their origins by hash (REUSE-1), in a loopback by a declarative top: compilation, reset idle and unknown outputs, the clock period, bit period, bit rate and frame length at 115 200 Bd, byte recovery, bit and framing errors; the UART 8N1 loopback class only, every metric `SIMPLIFIED` | Icarus Verilog, the primary and only simulator: `iverilog -g2012` and `vvp` through `run_process` (ARCH-10), the declared `ECAD_METRIC` lines read from stdout (ARCH-2). Verilator PLANNED: the merged cases contract's adapter enum has no `verilator` (Q9), CI's apt Verilator 4.038 cannot build the harness, its report lines carry wall time, and it is 2-state. ModelSim/Questa PLANNED: licensed, no adapter and no stub | Icarus comes from apt, unpinned (11.0 in an ubuntu:22.04 arm64 container; 13.0 on the Mac every local run used). **Data:** no target device is selected, so its `min_clock_period` is `UNKNOWN` and REQ-DIG-007 is `BLOCKED`; every limit is illustrative. The committed simulation file runs before V2 calls it stale (§7.2 SEC-2) |
 | 4 | PCB | PLANNED | An existing generated board: outline, layers, placement within outline, netlist ↔ board ↔ BOM reconciliation | kiutils; kicad-cli DRC later | Boards have no pads, traces or signal nets, so DRC, clearance and trace-width checks are `BLOCKED` on the data |
 | 5 | Power electronics | PLANNED | Synchronous buck 48 V → 12 V: output ripple, inductor current ripple, switch RMS current | ngspice switching model, or an averaged Python model | Loss parameters from real datasheets, or labelled example design values |
 | 6 | Control | PLANNED | PID position loop on `robotic_joint_001`'s CAD-derived plant: overshoot, settling, steady-state error, saturation | Python + scipy | Actuator torque limit, gear ratio, rotor inertia and friction are unknown (the last two not yet even recorded as unknowns): they are declared required inputs, so every loop check on the committed sample is `BLOCKED` until a motor is selected, rather than passing on a plant that silently omits the actuator (INVENT-2). The met and `FAIL` cases come from a test-built copy with actuator values `SPECIFIED` as design annotations, noted as no real motor. PID gains are design annotations; limits are illustrative. Plant inertia published as a `DERIVED` facet (ARCH-3); per-package tool versions (ARCH-7) |
@@ -652,8 +741,10 @@ workspace before deleting it, and each adapter gets a metric parser (ngspice
 `.meas`/raw file, `vvp` `$display` markers, KiCad DRC report) that turns tool
 output into metrics and evidence (ARCH-2). For ngspice the parser exists on
 `feat/domain-electrical` and needs no output copy: the `.meas` results are
-read from stdout (§7.2 ARCH-2). The output copy and the other parsers wait
-for their domains.
+read from stdout (§7.2 ARCH-2). On `feat/domain-digital` the output copy
+exists (`ProcessRequest.collect`), and the `vvp` parser reads the
+`ECAD_METRIC` lines the harness declares; the KiCad parser waits for its
+domain.
 
 **Domain adapter** (`ecad_model/domains/base.py`; stable since the electrical
 domain, as the end of this section records). The spec's
@@ -736,9 +827,14 @@ PLANNED as an additive `CaseTarget.scenario_inputs` when a domain needs
 them; `publish` and `depends_on`, which still wait for cross-domain rules.
 Registry side effects, not protocol changes: `REGISTRY` gains
 `ElectricalAdapter`, and the robotic joint's manifest regenerates one entry,
-electrical `NOT_IMPLEMENTED` → `NOT_APPLICABLE`. A further protocol change
-lists its reason and the matching change to every registered adapter and to
-the test fixture.
+electrical `NOT_IMPLEMENTED` → `NOT_APPLICABLE`. The digital domain
+(`feat/domain-digital`) changed no protocol method or type: the RTL text is
+carried in the model (§8.2), so `write_models` and `case_target` suffice as
+they are. Its registry side effects: `REGISTRY` gains `DigitalAdapter`, and
+the manifests of the robotic joint and the servo supply regenerate one entry
+each, digital `NOT_IMPLEMENTED` → `NOT_APPLICABLE`. A further protocol
+change lists its reason and the matching change to every registered adapter
+and to the test fixture.
 
 ### 11.1 Simulator and importer roadmap (COVER-1)
 
@@ -751,7 +847,7 @@ required by CI.
 |---|---|---|---|
 | Mechanical | MuJoCo | Gazebo, Isaac Sim | STL (mesh-only, no assembly), IGES, URDF, MJCF, USD; each refuses what it cannot represent |
 | Electrical | ngspice | LTspice, PSpice | KiCad schematic → netlist |
-| Digital | Icarus Verilog | Verilator, then ModelSim/Questa | — |
+| Digital | Icarus Verilog (on `feat/domain-digital`) | Verilator — PLANNED: a case needs the cases contract amended (Q9), and CI a Verilator of 5 or later, since apt's 4.038 cannot build the harness; ModelSim/Questa — PLANNED, licensed, with no adapter and no stub | — |
 | PCB | kiutils; kicad-cli DRC | — | — |
 | Power electronics | ngspice / averaged Python | PLECS, Simulink/Simscape | — |
 | Control | Python + scipy | Simulink, FMI/FMU | — |
@@ -980,7 +1076,33 @@ From `TESTING.md` and from both reviews:
   `test_spice_netlist.py`, 3 by `test_domain_adapter.py` (**Verified**,
   2026-09-28). The other 221 were last run at `57f4fee`; their target lines
   and the tests that killed them are unchanged since, so those kills stand
-  (Inferred, not re-run).
+  (Inferred, not re-run). On `feat/domain-digital`, 451 mutants
+  (**Verified**: the harness's `MUTANTS` list at `0a5ff00`, 451 names, each
+  once): the 322 of the electrical branch and 129 new ones -- 50 of the
+  digital adapter, 30 of the Verilog grammar, 21 of the hdl adapter, 8 of
+  `run_process`'s output copy and stdin, 4 of REUSE-1 in `dataset.py`, 2 of
+  the version probe (`capabilities.py`), 9 of the sample's top, requirements,
+  annotations and provenance (each followed by a rebuild), 3 of the model,
+  annotation and provenance format rules, 1 of the registry and 1 of
+  `.gitattributes`. All 129 were killed at `11e8c09`, the code of
+  `0a5ff00` (§7.7), in 23 `--only` batches with `--workers 4`, each after
+  its own green baseline: 129 of 129, none surviving and no `ANCHOR` or
+  `HARNESS` outcome, the first killers 57 in `test_digital_domain.py`, 29 in
+  `test_hdl_adapter.py`, 27 in `test_verilog_source.py`, 14 in
+  `test_engineering_model.py` (the modules' doctests), 1 in
+  `test_domain_adapter.py` and 1 in `test_ngspice_adapter.py` (the review's
+  fixer, 2026-09-29; five batches ran longer than 8 minutes). The harness
+  names only the first killer: a mutant killed first by a doctest or a
+  byte-pinning test may also be killed by a behavioural one, which the fixer
+  checked by hand for `dg-missing-bytes-not-counted` and `item-byte-changed`.
+  One of the 322, `electrical-unregistered`, was re-anchored by the digital
+  branch (the registry line it anchored on moved); it is the only one of
+  them whose definition changed (**Verified**: the 322 compared between
+  `7368641` and `0a5ff00`), and at `0a5ff00`, on a clean clone, after
+  "baseline green", it was killed by
+  `test_engineering_model.py::TestDocumentationExamples::test_examples_in_modules_that_need_no_cad_kernel`
+  (**Verified**, 2026-09-29, 4 minutes). The other 321 were last run at
+  `ec37115` or `57f4fee`; their kills stand as above (Inferred, not re-run).
 - Property tests: rigid transforms of a whole design leave every physical
   metric unchanged.
 - Reference values for every simulated metric with a closed form.
@@ -998,12 +1120,20 @@ From `TESTING.md` and from both reviews:
   tests skip with a reason.
 - One job per domain toolchain (`cad-dataset` exists; `spice` exists on
   `feat/domain-electrical`, placed between `validation-evidence` and
-  `cad-dataset` so the existing slice test of `cad-dataset` stays exact, and
-  has never run; `hdl`, `kicad` to come), each setting
+  `cad-dataset` so the existing slice test of `cad-dataset` stays exact;
+  `hdl` exists on `feat/domain-digital`, placed between
+  `validation-evidence` and `spice` for the same reason; neither has run on
+  a runner; `kicad` to come), each setting
   `ECAD_REQUIRE_<DOMAIN>_TOOLS=1` so a skip is a failure, and running the
   complete suite through `run_all_tests.py`. In the `spice` job the CAD
   tests skip with their reason (`cad-dataset` runs them), and the real-ngspice
-  tests are mandatory.
+  tests are mandatory; in the `hdl` job the CAD and ngspice tests skip with
+  their reason, and the real-Icarus tests are mandatory. The `hdl` job's
+  steps passed at `11e8c09` in an ubuntu:22.04 arm64 container (apt Icarus
+  11.0, Python 3.12.14 from uv where CI uses actions/setup-python): 428
+  passed, 61 skipped, 0 failed; `check` exit 0; `validate` V0-V3 `PASS`, V4
+  `BLOCKED` with 6 `WARNING` and REQ-DIG-007 `BLOCKED` (run by the
+  coordinator of the digital branch, 2026-09-29; `TASKS.md` T-013).
 - System libraries are installed explicitly: OpenCASCADE's wheel fails to
   import on a bare Debian image without `libGL.so.1` (**Verified**,
   `python:3.12-slim`, both architectures). Whether the `ubuntu-22.04` runner
@@ -1012,7 +1142,8 @@ From `TESTING.md` and from both reviews:
   (`tools/constraints-cad.txt`). Exception, BLOCKED: the `spice` job installs
   ngspice from apt unpinned, because which version the runner gets is Unknown
   until the job runs; it prints the package version and the banner for the
-  pinning decision (§20 Q16).
+  pinning decision (§20 Q16). So does the `hdl` job for Icarus Verilog,
+  printing the first lines of `iverilog -V` and `vvp -V`.
 - Derived files are reproduced on Linux before a PR merges (§20 R1).
 - LFS: see §18.
 
@@ -1043,7 +1174,8 @@ From `TESTING.md` and from both reviews:
   added in any domain (Q1).
 - Artefacts reused from elsewhere in the repository (`rtl/*.v`, boards) are
   copied into the sample with their origin path and SHA-256 recorded and
-  checked by `check` and V0 (REUSE-1).
+  checked by `check` and V0 (REUSE-1). Implemented on `feat/domain-digital`
+  for the two RTL copies of `uart_loopback_001` (§7.2 REUSE-1).
 
 ## 19. Recommended MVP examples
 
@@ -1083,16 +1215,16 @@ An MVP with no real part can therefore never `PASS` on a part rating.
 | Q6 | Relation to open PR #31 (dev-board database). Its board records are a component catalogue that samples should reference rather than duplicate. It also adds eServo-200 V3/V4 `python_control` cases (a 48 V bus-current and power-budget model), which overlap the electrical MVP and, once merged, make §5's "V3/V4 never execute on master" false (RISK-1) | Coordination with its author |
 | Q7 | `AI_ASSUMPTION` inputs: `INCONCLUSIVE` (implemented as the default) or excluded entirely? | Maintainer decision |
 | Q8 | Dataset layout: by primary domain (spec §3) or one directory per sample with domains in metadata? The first non-mechanical sample, `servo_supply_001` (`feat/domain-electrical`), stays at `datasets/cad/servo_supply_001/`: the brief for that change kept the layout, against §21's rule that the move goes with that sample (an explicit instruction wins, `CLAUDE.md` precedence 1). The layout question itself is still open | Maintainer decision, now before the move rather than before the first non-mechanical sample |
-| Q9 | New simulators (Verilator, Elmer, FMI) need the merged cases contract's adapter enum amended, or an open adapter ID checked against the registry | Maintainer decision |
+| Q9 | New simulators (Verilator, Elmer, FMI) need the merged cases contract's adapter enum amended, or an open adapter ID checked against the registry. For Verilator, CI also needs version 5 or later: apt's 4.038 on ubuntu:22.04 rejects `--binary` and `--timing` and the digital harness's timing controls (the digital design's container run, 2026-09-27) | Maintainer decision |
 | Q10 | The spec orders mechanical after the foundation; this plan lands the existing mechanical work first, because spec §35 asks to preserve it and the review evidence is tied to it | Confirm |
 | Q11 | Add `.options norefvalue` to the electrical deck? On ngspice-47 it removes the progress report (` Reference value : <t>`) that a slowed run writes to stdout, so two runs of one deck would print identical stdout (Verified, 28 parallel runs, 2026-09-27). ngspice-36 (what apt installs on ubuntu:22.04, the CI runner's release) and 44.2 (python:3.12-slim) accept it: under load, without it 36 wrote two or three progress reports per run to stderr and 44.2 two to stdout, with it neither wrote any, and the nine measurement lines were identical across three runs of each deck (Observed, arm64 containers, 2026-09-27; `TASKS.md`). It changes the committed deck's bytes, `spice.read_deck`'s section marker and the recorded-deck test fixtures | Maintainer decision; the runs on ngspice-36 and 44.2 it waited for are made |
 | Q12 | Accept ARCH-1 as amended by the electrical domain (§8.2): a component's `circuit` member, nets derived and never stored? | Maintainer decision |
 | Q13 | Accept the in-document minor-version rule (§9.3): format 1.1.0 required for a document that uses an addition of 1.1.0? | Maintainer decision |
 | Q14 | Land the SEC-2 guard (§7.2) as its own foundation change, before `validate` runs on anything unreviewed? It narrows the recorded decision that committed case documents run | Maintainer decision |
 | Q15 | Harden the ngspice tool adapter beyond ARCH-2: `-n` (skip `.spiceinit`) and a deck screen in `NgspiceAdapter` (SEC-1, engine code no named defect covers); and should an ngspice exit status other than 0 become `INCONCLUSIVE` rather than `FAIL` (`python_control` maps it to `FAIL` too)? | Maintainer decision |
-| Q16 | Pin ngspice in CI after the `spice` job's first run, or pin a runner image or a container? The banner names only the release (`36`), so the job also prints the package version | Maintainer decision, after the first run |
+| Q16 | Pin ngspice in CI after the `spice` job's first run, or pin a runner image or a container? The banner names only the release (`36`), so the job also prints the package version. The same for Icarus Verilog in the `hdl` job (`feat/domain-digital`), which prints the first lines of `iverilog -V` and `vvp -V` and no package version; an ubuntu:22.04 arm64 container got 11.0 | Maintainer decision, after the first run |
 | Q17 | Commit invalid and boundary electrical samples as dataset items with expected receipts, or keep them test-built copies (today)? | Maintainer decision |
-| R1 | Cross-platform reproduction. **Verified** at `bd999d5`: Linux aarch64 (`python:3.12-slim`, pinned wheels, only `git` and `libgl1` added) passes `check`, the complete suite (245) and gives the same `validate` verdicts as macOS; and again on the foundation at `bb43124` (322 tests) and at `000309b` (332 tests). **Verified** at `c9be0b6`: Linux x86_64 under emulation passes `check`. **Not run**: MuJoCo stages on native x86_64, because the emulated CPU has no AVX; any of `feat/domain-electrical` on Linux (its `spice` job would be the first) | A native x86_64 run, which the `cad-dataset` CI job provides on its first execution |
+| R1 | Cross-platform reproduction. **Verified** at `bd999d5`: Linux aarch64 (`python:3.12-slim`, pinned wheels, only `git` and `libgl1` added) passes `check`, the complete suite (245) and gives the same `validate` verdicts as macOS; and again on the foundation at `bb43124` (322 tests) and at `000309b` (332 tests). **Verified** at `c9be0b6`: Linux x86_64 under emulation passes `check`. **Not run**: MuJoCo stages on native x86_64, because the emulated CPU has no AVX; any of `feat/domain-electrical` or `feat/domain-digital` on x86_64: their `spice` and `hdl` jobs' steps ran on Linux only in arm64 containers (`TASKS.md` T-012, T-013) | A native x86_64 run, which the `cad-dataset` CI job provides on its first execution |
 | R2 | Several domains need system tools CI must install; install time and flakiness are unknown | CI trial |
 | R3 | Push access is read-only for this account; nothing can land without a fork or restored access | Access decision |
 | R4 | PR 3 regenerates mutation and reproduction evidence and re-anchors the mutation suite | Budgeted in §21 |
@@ -1264,6 +1396,65 @@ An MVP with no real part can therefore never `PASS` on a part rating.
    `run_process`, with a test and a mutant that both the compile and the run
    step get the scrubbed environment and the output cap (ARCH-10); `hdl` CI
    job; `tests/test_rtl_models.py` unchanged.
+   Each item is marked with its state on `feat/domain-digital` at
+   `0a5ff00`, whose code is that of `11e8c09`, where the fixes of two
+   independent reviews were verified (§7.7; the fixes have had no review of
+   their own, `CLAUDE.md` rule 4), as run on macOS arm64 with Icarus Verilog
+   13.0 unless it says otherwise:
+   - `rtl/` UART loopback on Icarus, `datasets/cad/uart_loopback_001` --
+     IMPLEMENTED for the UART 8N1 loopback class only: `build`, `check` and
+     `validate` on a clean clone give V0–V3 `PASS` and V4 `BLOCKED` as
+     designed (`docs/digital-domain-v1.md`, Example); so do the `hdl` job's
+     steps in an ubuntu:22.04 arm64 container on Icarus 11.0 (§17); the run on
+     the x86_64 runner is NOT RUN;
+   - `iverilog` onto `run_process`, with a test and a mutant that both steps
+     get the scrubbed environment and the output cap (ARCH-10) --
+     IMPLEMENTED: `test_both_icarus_steps_run_through_run_process_with_the_scrubbed_environment`,
+     `test_both_steps_are_capped_at_the_process_output_limit`,
+     `test_the_compiler_sees_only_the_scrubbed_environment` (real Icarus);
+     `hdl-compile-bypasses-run-process`, `hdl-run-bypasses-run-process`,
+     `hdl-compile-inherits-environment`, `hdl-run-inherits-environment`
+     killed (§16); the version probe too (review CS-6), though
+     `detect_capabilities` still probes with the caller's environment
+     (§7.2 ARCH-10);
+   - output capture and metric parsing (ARCH-2, the `run_process` output copy
+     and the iverilog half) -- IMPLEMENTED; the KiCad parser stays PLANNED
+     for item 6; case arguments on the iverilog path -- refused
+     (IMPLEMENTED); RESULT-2 -- PARTIAL, the ngspice and iverilog paths only
+     (the general fix is item 1);
+   - copied artefacts bound to their origin by hash (REUSE-1, §10 row 3) --
+     IMPLEMENTED (§7.2 REUSE-1), with `VALIDATOR_VERSION` 1.1.0;
+   - `hdl` CI job -- PARTIAL: written, placed and tested
+     (`test_hdl_job_cannot_skip_silently`, strict enough that an `if:` on any
+     step but an upload's fails it, review HT-8), never run on a runner; its
+     steps passed in the arm64 container above (run by the coordinator);
+     pinning Icarus -- BLOCKED on the runner's unknown version (§20 Q16);
+   - `tests/test_rtl_models.py` unchanged -- IMPLEMENTED (**Verified**: its
+     last change is `f15a4aa`, and its sha256 is `7a9ced8e…2866` at
+     `0a5ff00`);
+   - the §10 list: a sample -- IMPLEMENTED; a met limit -- IMPLEMENTED as
+     `WARNING` against illustrative limits, and as `PASS` against a real
+     requirement only on a test-built copy with a fixture device limit, since
+     no device is selected; a `FAIL` from a mutated input -- IMPLEMENTED
+     (test-built copies, real Icarus: a 230 400 Bd top fails REQ-DIG-002, RTL
+     defect copies fail their references); a `BLOCKED` from a missing input --
+     IMPLEMENTED (REQ-DIG-007 on the committed sample); an invalid-input and a
+     boundary sample -- PARTIAL: test-built copies, not committed items (as
+     §20 Q17); negative tests -- IMPLEMENTED; mutants -- IMPLEMENTED: 451 at
+     `0a5ff00`, the 129 of the digital branch killed at `11e8c09` after green
+     baselines and the re-anchored `electrical-unregistered` at `0a5ff00`, the
+     other 321 last run at `ec37115` or `57f4fee` (§16); per-domain
+     documentation (spec §28) -- IMPLEMENTED (`docs/digital-domain-v1.md`); a
+     CI job that makes a skip a failure -- PARTIAL, as above;
+   - timing against a real device -- BLOCKED on data: no target device is
+     selected, so `min_clock_period` is `UNKNOWN` and REQ-DIG-007 `BLOCKED`;
+   - Verilator -- PLANNED (§20 Q9; a CI Verilator of 5 or later);
+     ModelSim/Questa -- PLANNED, licensed, no adapter and no stub;
+   - the SEC-2 runner guard -- PLANNED, its own foundation change (§7.2);
+     the program screen and `vvp -N` (SEC-3) -- PLANNED;
+   - a framing-fault scenario, FSM extraction, other RTL forms, a second
+     sample (`rtl/spi_master.v`, refused at its `$clog2`) -- PLANNED;
+   - the dataset move (Q8) -- not done: the brief kept the layout.
 6. **PCB**: generated boards through kiutils; DRC `BLOCKED` on data until
    routed boards exist.
 7. **Power electronics**. First, the `python_control` fix of ARCH-7 (report
@@ -1282,5 +1473,5 @@ An MVP with no real part can therefore never `PASS` on a part rating.
 The dataset move (Q8) goes in the first PR with a non-mechanical primary
 sample, as a pure move commit whose only diffs are paths and regenerated
 hashes, followed by a Linux reproduction run. The electrical change (item 4)
-did not make it: its brief kept the layout, and the move waits for the
-maintainer's Q8 decision.
+did not make it, and neither did the digital change (item 5): their briefs
+kept the layout, and the move waits for the maintainer's Q8 decision.

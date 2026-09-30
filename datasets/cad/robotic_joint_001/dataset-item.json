@@ -108,8 +108,8 @@
     },
     {
       "domain": "digital",
-      "reason": "no digital validator exists in this platform yet",
-      "status": "NOT_IMPLEMENTED"
+      "reason": "the digital adapter reads verilog, which this sample does not have",
+      "status": "NOT_APPLICABLE"
     },
     {
       "domain": "pcb",

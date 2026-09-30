@@ -16,3 +16,5 @@ MODEL_VERSION = "1.0.0"
 # The model format with a component's circuit member (engineering-model.schema.json);
 # the builder writes no member of it, so its models stay 1.0.0.
 CIRCUIT_MODEL_VERSION = "1.1.0"
+# The model format with a component's hdl member (format 1.2.0), which the digital domain writes.
+HDL_MODEL_VERSION = "1.2.0"

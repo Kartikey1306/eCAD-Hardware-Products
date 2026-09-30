@@ -21,10 +21,11 @@
       "const": "https://embeddedos.org/schemas/engineering-model/v1/design-annotations.schema.json"
     },
     "annotations_version": {
-      "description": "The format version. Every minor version of v1 is accepted; annotations that use circuit_elements declare 1.1.0, which introduced it.",
+      "description": "The format version. Every minor version of v1 is accepted; annotations that use circuit_elements declare 1.1.0, which introduced it, and annotations that give a component without CAD a digital facet declare 1.2.0.",
       "enum": [
         "1.0.0",
-        "1.1.0"
+        "1.1.0",
+        "1.2.0"
       ]
     },
     "design_id": {
@@ -207,6 +208,10 @@
               "electrical": {
                 "$ref": "#/definitions/facet"
               },
+              "digital": {
+                "description": "Format 1.2.0.",
+                "$ref": "#/definitions/facet"
+              },
               "control": {
                 "$ref": "#/definitions/facet"
               },
@@ -309,6 +314,37 @@
         "properties": {
           "annotations_version": {
             "const": "1.1.0"
+          }
+        }
+      }
+    },
+    {
+      "description": "A digital facet on a component without CAD is an addition of format 1.2.0.",
+      "if": {
+        "required": [
+          "components_without_cad"
+        ],
+        "properties": {
+          "components_without_cad": {
+            "contains": {
+              "required": [
+                "domains"
+              ],
+              "properties": {
+                "domains": {
+                  "required": [
+                    "digital"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "annotations_version": {
+            "const": "1.2.0"
           }
         }
       }

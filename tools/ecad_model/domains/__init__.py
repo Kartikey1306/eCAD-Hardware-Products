@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from .base import CaseTarget, DerivedFile, DomainAdapter, Extraction, Metric, SourceArtifact
+from .digital import DigitalAdapter
 from .electrical import ElectricalAdapter
 from .mechanical import MechanicalAdapter
 
@@ -26,7 +27,8 @@ DOMAINS = (
     "full_system",
 )
 
-REGISTRY: Dict[str, DomainAdapter] = {"mechanical": MechanicalAdapter(), "electrical": ElectricalAdapter()}
+REGISTRY: Dict[str, DomainAdapter] = {"mechanical": MechanicalAdapter(), "electrical": ElectricalAdapter(),
+                                      "digital": DigitalAdapter()}
 
 
 class DomainNotImplemented(ValueError):
@@ -41,8 +43,8 @@ def adapter_for(domain: str, registry: Optional[Mapping[str, DomainAdapter]] = N
             nothing here can build a model from the sample's artefacts.
 
     Example:
-        >>> adapter_for("mechanical").formats
-        frozenset({'step'})
+        >>> adapter_for("mechanical").formats, adapter_for("digital").formats
+        (frozenset({'step'}), frozenset({'verilog'}))
     """
     adapters = REGISTRY if registry is None else registry
     if domain not in adapters:

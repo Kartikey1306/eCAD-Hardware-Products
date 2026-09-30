@@ -104,8 +104,11 @@ class TestHDLAdapterTimeout(unittest.TestCase):
             root = Path(directory)
             source = root / "tb.v"
             source.write_text("module tb; endmodule\n", encoding="utf-8")
+            # Both Icarus steps run through run_process, so the boundary is its
+            # subprocess.run, and its shutil.which must find the compiler.
             with mock.patch.object(hdl.HDLAdapter, "capability", return_value=capability), \
-                 mock.patch.object(hdl.subprocess, "run", side_effect=expired):
+                 mock.patch("ecad_validation.adapters.process.shutil.which", return_value="/fake/iverilog"), \
+                 mock.patch("ecad_validation.adapters.process.subprocess.run", side_effect=expired):
                 result = hdl.HDLAdapter().run(
                     AdapterRequest(
                         case_id="hanging-testbench",
