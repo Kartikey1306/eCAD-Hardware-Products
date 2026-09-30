@@ -1,0 +1,206 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "adafruit:feather-ice40",
+  "manufacturer": "Adafruit Industries",
+  "family": "Feather",
+  "board": "Feather with ICE40 FPGA",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "ICE40",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "FPGA (no CPU core)",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:32Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-ICE40-PCB@d2a4cf7ad1d9c1139535624bacd64d180dd3e111"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:32Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-ICE40-PCB@d2a4cf7ad1d9c1139535624bacd64d180dd3e111"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:32Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-ICE40-PCB@d2a4cf7ad1d9c1139535624bacd64d180dd3e111"
+      }
+    },
+    "eagle": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-ICE40-PCB/d2a4cf7ad1d9c1139535624bacd64d180dd3e111/fpga.sch",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-ICE40-PCB/d2a4cf7ad1d9c1139535624bacd64d180dd3e111/gerber/feather_ice40-B.Cu.gbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:41Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "47e650dda8efaa728a455c8628585526d3f07c0607b2a3ae6bb5daa9c8d414c1",
+        "size_bytes": 62347,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-ICE40-PCB/d2a4cf7ad1d9c1139535624bacd64d180dd3e111/feather_ice40.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:42Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "40994505a0a5daa8034593cc3dc1f24785a674ab516030b0bba5be5bf8c35f1a",
+        "size_bytes": 263977,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:32Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-ICE40-PCB@d2a4cf7ad1d9c1139535624bacd64d180dd3e111"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-ICE40-PCB/d2a4cf7ad1d9c1139535624bacd64d180dd3e111/gerber/feather_ice40-PTH.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:42Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "311571a1b469d94077e6db53b03916447a65bbcbbc395eca33cb630372a95385",
+        "size_bytes": 1513,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-ICE40-PCB/d2a4cf7ad1d9c1139535624bacd64d180dd3e111/feather_ice40.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:42Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "40994505a0a5daa8034593cc3dc1f24785a674ab516030b0bba5be5bf8c35f1a",
+        "size_bytes": 263977,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:32Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-ICE40-PCB@d2a4cf7ad1d9c1139535624bacd64d180dd3e111"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/adafruit/Feather-ICE40-PCB/d2a4cf7ad1d9c1139535624bacd64d180dd3e111/fpga.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:12:41Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2221ea326e3d7ac2179ac8e1a43e284393df46f8aaa288479c789c1541aa19e6",
+        "size_bytes": 6489,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:32Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-ICE40-PCB@d2a4cf7ad1d9c1139535624bacd64d180dd3e111"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:03:32Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "adafruit/Feather-ICE40-PCB@d2a4cf7ad1d9c1139535624bacd64d180dd3e111"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/adafruit/Feather-ICE40-PCB/blob/master/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.adafruit.com/product/",
+    "official_cad_repository": "https://github.com/adafruit/Feather-ICE40-PCB",
+    "official_github_repository": "https://github.com/adafruit/Feather-ICE40-PCB",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository adafruit/Feather-ICE40-PCB pinned at d2a4cf7ad1d9. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for adafruit/Feather-ICE40-PCB."
+}

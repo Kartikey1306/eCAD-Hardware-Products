@@ -1,0 +1,225 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:pro-micro-esp32c3",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Pro Micro",
+  "board": "SparkFun Pro Micro ESP32-C3",
+  "part_number": "DEV-23484",
+  "revision": "not-stated",
+  "mcu_soc": "ESP32-C3",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "RISC-V RV32IMC",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro-ESP32C3/b302fbc429a90b87865145877b96f189ad4d5460/Documents/esp32-c3-mini-1_datasheet_en.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:29Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2c7ec81e3a4d189e85e25a9f02365d9272de6bcd0609f20ab378f3e0c392caff",
+        "size_bytes": 911284,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro-ESP32C3/b302fbc429a90b87865145877b96f189ad4d5460/Hardware/SparkFun_Dev_ESP32_C3_MINI.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:28Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9ad29e5ba0ca6d1682945363a1a6b3fdc48a9268da2c97fe07ede68a26c8b562",
+        "size_bytes": 336944,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro-ESP32C3/b302fbc429a90b87865145877b96f189ad4d5460/Production/SparkFun_Dev_ESP32_C3_MINI-Panel_v11.zip",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:30Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "899d14d3cb7433f7d61529a37be68fc4eb60e23dd289e49789c974591d2ef7ed",
+        "size_bytes": 6877404,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "SparkFun_Dev_ESP32_C3_MINI-Panel_v11/ordering_instructions.txt"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro-ESP32C3/b302fbc429a90b87865145877b96f189ad4d5460/Hardware/SparkFun_Dev_ESP32_C3_MINI.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:28Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "9ad29e5ba0ca6d1682945363a1a6b3fdc48a9268da2c97fe07ede68a26c8b562",
+        "size_bytes": 336944,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_Pro_Micro-ESP32C3/b302fbc429a90b87865145877b96f189ad4d5460/docs/assets/board_files/SparkFun_ESP32_C3_Pro_Micro_Schematic.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:28Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3bdee2f268feb00c13bc0e8262c8148a06f9adb1ad260138729d2a5759bedcba",
+        "size_bytes": 166214,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:36Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_Pro_Micro-ESP32C3@b302fbc429a90b87865145877b96f189ad4d5460"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/DEV-23484",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_Pro_Micro-ESP32C3",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_Pro_Micro-ESP32C3",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_Pro_Micro-ESP32C3 pinned at b302fbc429a9. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

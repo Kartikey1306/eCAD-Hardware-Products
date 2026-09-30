@@ -1,0 +1,567 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "title": "eCAD Development Board CAD Record v1.1",
+  "description": "Board-by-board master record for third-party development-board CAD availability, per eCAD-Hardware-Products issue #28. Records exact board identity, official-source hierarchy, per-format CAD availability, licensing, and commercial-reuse status. Family-level claims are not permitted: every record binds one exact board and revision. Contract 1.1.0 additionally requires machine-checkable evidence behind every availability claim: a positive claim must carry the SHA-256 of a file that was actually retrieved, and an unknown claim must carry no evidence at all. Availability is therefore no longer assertable by hand.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "contract_version",
+    "board_id",
+    "manufacturer",
+    "family",
+    "board",
+    "part_number",
+    "revision",
+    "mcu_soc",
+    "files",
+    "licenses",
+    "sources",
+    "record_status"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json"
+    },
+    "contract_version": {
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
+    },
+    "board_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]*$"
+    },
+    "manufacturer": {
+      "$ref": "#/definitions/nonEmptyString"
+    },
+    "family": {
+      "$ref": "#/definitions/nonEmptyString"
+    },
+    "board": {
+      "$ref": "#/definitions/nonEmptyString"
+    },
+    "part_number": {
+      "$ref": "#/definitions/nonEmptyString"
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exact hardware revision this record was verified against. Three reserved values distinguish outcomes that must not be conflated: 'unverified' means nobody has looked; 'not-stated' means an exhaustive official index was consulted and the manufacturer publishes no revision; anything else is the revision itself. Only 'unverified' blocks record_status from reaching 'verified'."
+    },
+    "mcu_soc": {
+      "$ref": "#/definitions/nonEmptyString",
+      "description": "The board's MCU or SoC. Reserved value 'not-applicable' for passive add-on boards (FeatherWings, shields, HATs, capes, breakouts), which issue #28 section 2.20 includes in scope and which carry no processor. 'UNVERIFIED' means not yet determined and blocks 'verified'."
+    },
+    "hardware_revision": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Vendor hardware revision when it is tracked separately from the board revision."
+    },
+    "fpga": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "FPGA part, for boards whose primary programmable device is not an MCU/SoC."
+    },
+    "cpu_architecture": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "e.g. Arm Cortex-M0+, Arm Cortex-A76, RISC-V RV32IMC, Xtensa LX7."
+    },
+    "product_status": {
+      "enum": [
+        "active",
+        "not_recommended",
+        "discontinued",
+        "unknown",
+        null
+      ],
+      "description": "Issue #28 section 8: current / discontinued."
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schematic",
+        "pcb_source",
+        "gerbers",
+        "bom",
+        "mechanical"
+      ],
+      "properties": {
+        "schematic": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "pcb_source": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "gerbers": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "bom": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "pick_and_place": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "step": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "dxf": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "stl": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "kicad": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "eagle": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "altium": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "mechanical": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "nc_drill": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "ipc2581": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "odb": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "iges": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "fusion360": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "solidworks": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "orcad": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "allegro": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "symbol_library": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "footprint_library": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "datasheet": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "user_manual": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "hardware_design_guide": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "assembly_drawing": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "pinout": {
+          "$ref": "#/definitions/fileAvailability"
+        },
+        "reference_design": {
+          "$ref": "#/definitions/fileAvailability"
+        }
+      }
+    },
+    "licenses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hardware_license",
+        "redistribution_allowed",
+        "modification_allowed",
+        "commercial_use_allowed"
+      ],
+      "properties": {
+        "hardware_license": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "cad_license": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "schematic_license": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pcb_license": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mechanical_cad_license": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "redistribution_allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "modification_allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "commercial_use_allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "attribution_required": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "license_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_tier",
+        "official_product_page"
+      ],
+      "properties": {
+        "source_tier": {
+          "enum": [
+            "manufacturer_official",
+            "authorized_distributor",
+            "community"
+          ]
+        },
+        "official_product_page": {
+          "type": "string",
+          "format": "uri"
+        },
+        "official_cad_repository": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "official_github_repository": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "official_documentation": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "direct_cad_download": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "direct_schematic_download": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "direct_gerber_download": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
+      }
+    },
+    "record_status": {
+      "enum": [
+        "verified",
+        "partial",
+        "incomplete"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": ".*\\S.*"
+    },
+    "fileAvailability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available"
+      ],
+      "properties": {
+        "available": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "verified_revision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/fileEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "available"
+            ],
+            "properties": {
+              "available": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "url",
+              "evidence"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence": {
+                "type": "object",
+                "required": [
+                  "sha256"
+                ],
+                "properties": {
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          },
+          "description": "A positive claim must name a URL and carry a digest of retrieved bytes."
+        },
+        {
+          "if": {
+            "required": [
+              "available"
+            ],
+            "properties": {
+              "available": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "evidence"
+            ],
+            "properties": {
+              "evidence": {
+                "type": "object",
+                "anyOf": [
+                  {
+                    "properties": {
+                      "verification_method": {
+                        "const": "http_get_absent"
+                      }
+                    },
+                    "required": [
+                      "verification_method",
+                      "http_status"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "verification_method": {
+                        "const": "official_index_absent"
+                      }
+                    },
+                    "required": [
+                      "verification_method",
+                      "index_ref"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "description": "'Verified absent' is itself a claim and must record how absence was established."
+        },
+        {
+          "if": {
+            "required": [
+              "available"
+            ],
+            "properties": {
+              "available": {
+                "const": null
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidence": {
+                "type": "null"
+              }
+            }
+          },
+          "description": "Unknown must not carry evidence; that is what keeps unknown distinct from absent."
+        }
+      ]
+    },
+    "fileEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verification_method",
+        "captured_at",
+        "producer_tool_id"
+      ],
+      "description": "Provenance for one availability determination. Mirrors the field vocabulary of schemas/hardware-validation/v1/evidence-index.schema.json so this repository has a single provenance model.",
+      "properties": {
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Digest of the bytes actually retrieved. Required when available is true."
+        },
+        "media_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_bytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "http_status": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "producer_tool_id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "verification_method": {
+          "enum": [
+            "http_get_magic",
+            "http_get_archive_member",
+            "http_get_step_header",
+            "http_get_absent",
+            "official_index",
+            "official_index_absent",
+            "manual_official_source"
+          ]
+        },
+        "detected_format": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Format inferred from content, not from the URL suffix."
+        },
+        "contained_member": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Member path, when the payload is an archive."
+        },
+        "source_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri",
+          "description": "URL after redirects, when it differs from files.*.url."
+        },
+        "index_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The authoritative file index consulted, pinned to an immutable revision (e.g. 'adafruit/Adafruit-Feather-RP2040-PCB@<commit sha>'). Required to justify available=false: absence is only provable against an index that enumerates everything the vendor publishes."
+        }
+      }
+    }
+  }
+}

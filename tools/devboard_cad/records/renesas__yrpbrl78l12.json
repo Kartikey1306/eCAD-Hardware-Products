@@ -1,0 +1,95 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "renesas:yrpbrl78l12",
+  "manufacturer": "Renesas Electronics",
+  "family": "RL78 / RL78-L12",
+  "board": "YRPBRL78L12 Evaluation Board for RL78/L12 (Renesas Promotion Board)",
+  "part_number": "YRPBRL78L12",
+  "revision": "1.00",
+  "mcu_soc": "Renesas R5F10RLCAFB (RL78/L12)",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Renesas RL78 (S2 core, 16-bit CISC)",
+  "product_status": "active",
+  "files": {
+    "schematic": {
+      "available": true,
+      "url": "https://www.renesas.com/en/document/sch/rpbrl78l12-renesas-promotion-board-schematics-rev100",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:56Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "373a8d5a0e699df18bfa4b0e4d3eaff2a823d9b7d50229ad4251ae388b20cf57",
+        "size_bytes": 629600,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://www.renesas.com/en/document/mat/yrpbrl78l12-users-manual-rev100",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "12fe091375de0f5f443bb9ede95f59fbadfd8f17fbd90ef70492d0fc899a5b07",
+        "size_bytes": 15021800,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/yrpbrl78l12",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.renesas.com/en/document/mat/yrpbrl78l12-users-manual-rev100",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://www.renesas.com/en/document/sch/rpbrl78l12-renesas-promotion-board-schematics-rev100",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

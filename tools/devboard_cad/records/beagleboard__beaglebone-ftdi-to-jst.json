@@ -1,0 +1,236 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "beagleboard:beaglebone-ftdi-to-jst",
+  "manufacturer": "BeagleBoard.org Foundation",
+  "family": "BeagleBone",
+  "board": "BeagleBoard.org BeagleBone Ftdi to Jst",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ftdi-to-jst/f5118d9c14871e92a1ff6186fdc710c654eee371/footprints.pretty/CONN_SM03B-SRSS-TB_JST.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8ea9bf4ef579891014db9858b4e00d5b22ed09c240f7d150d31f59263a19f9ba",
+        "size_bytes": 4563,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ftdi-to-jst/f5118d9c14871e92a1ff6186fdc710c654eee371/local.kicad_sym",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e2321e6fd6d8d052662963959356e98c07b055e86ebca371c432dea0c9034003",
+        "size_bytes": 6875,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ftdi-to-jst/f5118d9c14871e92a1ff6186fdc710c654eee371/beaglebone-ftdi-to-jst.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c89a9b90503d84ddcf1fc6b5e43d49015d07e0774f2098726a7c36009f8d875b",
+        "size_bytes": 16770,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ftdi-to-jst/f5118d9c14871e92a1ff6186fdc710c654eee371/beaglebone-ftdi-to-jst.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "91ec97cc069ccfc3f2482e513958a73333174a369a24575b1d1ea9fb0fc45136",
+        "size_bytes": 17060,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ftdi-to-jst@f5118d9c14871e92a1ff6186fdc710c654eee371"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ftdi-to-jst/f5118d9c14871e92a1ff6186fdc710c654eee371/local.kicad_sym",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:50Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e2321e6fd6d8d052662963959356e98c07b055e86ebca371c432dea0c9034003",
+        "size_bytes": 6875,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/beagleboard/beaglebone-ftdi-to-jst/blob/main/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.beagleboard.org/boards",
+    "official_cad_repository": "https://github.com/beagleboard/beaglebone-ftdi-to-jst",
+    "official_github_repository": "https://github.com/beagleboard/beaglebone-ftdi-to-jst",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository beagleboard/beaglebone-ftdi-to-jst pinned at f5118d9c1487. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for beagleboard/beaglebone-ftdi-to-jst."
+}

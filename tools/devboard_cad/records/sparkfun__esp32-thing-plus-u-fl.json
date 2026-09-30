@@ -1,0 +1,255 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:esp32-thing-plus-u-fl",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Thing Plus",
+  "board": "SparkFun ESP32 Thing Plus U.FL",
+  "part_number": "WRL-17381",
+  "revision": "not-stated",
+  "mcu_soc": "ESP32",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Xtensa LX6",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/ESP32_Thing_Plus_U.FL/cc74046280c1cc5f410adf89ca029a7923f55154/Documents/esp32-wroom-32e_esp32-wroom-32ue_datasheet_en.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "b59d3737a9471a8684fcca693573e6019848b16d59df517f02a48025abcaa2f8",
+        "size_bytes": 1043311,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/ESP32_Thing_Plus_U.FL/cc74046280c1cc5f410adf89ca029a7923f55154/Hardware/esp-wroom-32u.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0e4f72de6262b9e94d1bb7293518c01d02f6c1345abe52079dea48461befab75",
+        "size_bytes": 86438,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/ESP32_Thing_Plus_U.FL/cc74046280c1cc5f410adf89ca029a7923f55154/Hardware/esp-wroom-32u.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0e4f72de6262b9e94d1bb7293518c01d02f6c1345abe52079dea48461befab75",
+        "size_bytes": 86438,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/ESP32_Thing_Plus_U.FL/cc74046280c1cc5f410adf89ca029a7923f55154/Hardware/Production/ESP32_Thing_Plus_UFL-Panel_v10.zip",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:26Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "51759f2ab63de5406701babec466c238495af730711e540f0ac8802d51ecc6f8",
+        "size_bytes": 3385149,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "ESP32_Thing_Plus_UFL-Panel.GBL"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/ESP32_Thing_Plus_U.FL/cc74046280c1cc5f410adf89ca029a7923f55154/Hardware/ESP32_Thing_Plus_UFL.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "20807fc1370b46dac3823a1fc094b0464870e3e859449207b90b25c509fa73bc",
+        "size_bytes": 477129,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/ESP32_Thing_Plus_U.FL/cc74046280c1cc5f410adf89ca029a7923f55154/Hardware/ESP32_Thing_Plus_UFL.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "cc4056c18fe8957bfb743b54a7170b749a6afcea74feff10e4d22ed9c7a90fe4",
+        "size_bytes": 1209125,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:07:25Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/ESP32_Thing_Plus_U.FL@cc74046280c1cc5f410adf89ca029a7923f55154"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/ESP32_Thing_Plus_U.FL/cc74046280c1cc5f410adf89ca029a7923f55154/Hardware/esp-wroom-32u.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:25Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0e4f72de6262b9e94d1bb7293518c01d02f6c1345abe52079dea48461befab75",
+        "size_bytes": 86438,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/ESP32_Thing_Plus_U.FL/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/WRL-17381",
+    "official_cad_repository": "https://github.com/sparkfun/ESP32_Thing_Plus_U.FL",
+    "official_github_repository": "https://github.com/sparkfun/ESP32_Thing_Plus_U.FL",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/ESP32_Thing_Plus_U.FL pinned at cc74046280c1. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/ESP32_Thing_Plus_U.FL: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

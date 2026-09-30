@@ -1,0 +1,254 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:micromod-gnss-function-board-zed-f9p",
+  "manufacturer": "SparkFun Electronics",
+  "family": "MicroMod",
+  "board": "SparkFun MicroMod GNSS Function Board ZED F9P",
+  "part_number": "19663",
+  "revision": "not-stated",
+  "mcu_soc": "not-applicable",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P/94a722c73ff60fc51fbbeb90fb310be2ef446c7c/Documentation/ZED-F9P-02B_DataSheet_UBX-21023276.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:53Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3729bd81334a66f550cb5d09614d775fdb497f621c5a3e2862495bcb3bcb59b8",
+        "size_bytes": 1141066,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P/94a722c73ff60fc51fbbeb90fb310be2ef446c7c/Libraries/output.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:53Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ea57d5eab42b6e708773d72087672b78e39efff422d1ff2fd58575be6338f73b",
+        "size_bytes": 37750,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P/94a722c73ff60fc51fbbeb90fb310be2ef446c7c/Libraries/output.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:53Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ea57d5eab42b6e708773d72087672b78e39efff422d1ff2fd58575be6338f73b",
+        "size_bytes": 37750,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P/94a722c73ff60fc51fbbeb90fb310be2ef446c7c/Production/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:53Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "09b9bbd78ac77f0c1963cda4c4544d92cb3b95ec3365ae8990da23abc55cb806",
+        "size_bytes": 1756545,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P/94a722c73ff60fc51fbbeb90fb310be2ef446c7c/Hardware/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:54Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c98d0649f40359e2d0888b9cd2e56b1738edaef37d4ecb7e7373d822eecd14a4",
+        "size_bytes": 576518,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P/94a722c73ff60fc51fbbeb90fb310be2ef446c7c/Hardware/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:55Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "944c50c37d13d3c423c7cbce965da809215fc5582928f143fd49bc08823b343c",
+        "size_bytes": 1364642,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:08:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P@94a722c73ff60fc51fbbeb90fb310be2ef446c7c"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P/94a722c73ff60fc51fbbeb90fb310be2ef446c7c/Libraries/output.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:53Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "ea57d5eab42b6e708773d72087672b78e39efff422d1ff2fd58575be6338f73b",
+        "size_bytes": 37750,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/19663",
+    "official_cad_repository": "https://github.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P",
+    "official_github_repository": "https://github.com/sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P pinned at 94a722c73ff6. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/SparkFun_MicroMod_GNSS_Function_Board_ZED-F9P: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

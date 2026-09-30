@@ -1,0 +1,81 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "raspberry-pi:2-model-b",
+  "manufacturer": "Raspberry Pi",
+  "family": "Raspberry Pi 2",
+  "board": "Raspberry Pi 2 Model B",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "Broadcom BCM2836",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A7",
+  "product_status": "unknown",
+  "files": {
+    "schematic": {
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008327-DS",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:04Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/506-raspberry-pi-2-model-b/documents/RP-008327-DS-1-raspberry-pi-2-b-reduced-schematics.pdf",
+        "sha256": "9ca4a13767e42f5ab697a06219c66fc4fda5c30405d6e915f9e752334325fc8d",
+        "size_bytes": 143139,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.raspberrypi.com/products/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://pip.raspberrypi.com/documents/RP-008327-DS",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from raspberrypi/documentation@b47f68f."
+}

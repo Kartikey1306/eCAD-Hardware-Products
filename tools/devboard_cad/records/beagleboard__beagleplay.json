@@ -1,0 +1,203 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "beagleboard:beagleplay",
+  "manufacturer": "BeagleBoard.org Foundation",
+  "family": "BeaglePlay",
+  "board": "BeagleBoard.org BeaglePlay",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "AM625",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A53",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleplay/7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea/Design/Altium%20Export/BEAGLEPLAYV020_220915.PrjPcb/019_CC1352P.SchDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e90c8ab78a25985ea98d7fe3415286b16bffb9a13bd6d2fc61fa33124189fea7",
+        "size_bytes": 526848,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleplay/7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea/BeaglePlay_bom.csv",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "d56ede54e1ff1dbf78933c9b378c161acb69c399ea848b4c65520947e3ebe63c",
+        "size_bytes": 15287,
+        "media_type": "text/plain",
+        "detected_format": "csv",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagleplay@7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea"
+      }
+    },
+    "eagle": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleplay/7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea/Design/20230215_beagleplayv022_10.brd",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagleplay@7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagleplay@7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagleplay@7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleplay/7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea/MFG/gerber_beagleplayv022_230215/beagleplayv022_10-1-8.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:11Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c7bf067ca6b0801d8227ef0997444873673cdba3206dd36ffc455551752aeb41",
+        "size_bytes": 45908,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleplay/7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea/Design/20230215_beagleplayv022_10.brd",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:06Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagleplay@7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleplay/7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea/BeaglePlay_sch.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:12Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "02dadb53639d008ffa6fbda4eba59a82a8134cd77696697a81b5afcbe426f556",
+        "size_bytes": 1333365,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleplay/7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea/Enclosure/shield.step",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:17:10Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "5605f56abd54f0a5a309e91cadf169c4af27bcb684ed4636437ac294174746b2",
+        "size_bytes": 59408532,
+        "media_type": "text/plain",
+        "detected_format": "step:AUTOMOTIVE_DESIGN { 1 0 10303 214 3 1 1 }",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleplay/7a59a98ae27dc4fd9e2bd8975ff90cdb44a366ea/Enclosure/bot.stl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:13Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "77919ff489a6637ea019348b859eb35f090d0450a8d70907a4fb2eb13035e90b",
+        "size_bytes": 970784,
+        "media_type": "application/octet-stream",
+        "detected_format": "stl",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/beagleboard/beagleplay/blob/main/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.beagleboard.org/boards",
+    "official_cad_repository": "https://github.com/beagleboard/beagleplay",
+    "official_github_repository": "https://github.com/beagleboard/beagleplay",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository beagleboard/beagleplay pinned at 7a59a98ae27d. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for beagleboard/beagleplay."
+}

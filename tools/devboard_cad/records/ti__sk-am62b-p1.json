@@ -1,0 +1,98 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "ti:sk-am62b-p1",
+  "manufacturer": "Texas Instruments",
+  "family": "Sitara AM62x Starter Kit",
+  "board": "AM62x Starter Kit Evaluation Module with PMIC",
+  "part_number": "SK-AM62B-P1",
+  "revision": "PROC142B (package also contains PROC142A",
+  "mcu_soc": "AM6254 (Sitara AM62x)",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A53 (quad) + Cortex-M4F + Cortex-R5F",
+  "product_status": "active",
+  "files": {
+    "schematic": {
+      "available": true,
+      "url": "https://www.ti.com/lit/zip/SPRM860",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:34:17Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/sprm860a/sprm860a.zip?ts=1790593132470",
+        "sha256": "cf15e6fdcf075f166aa53dad87fb8c0fe0a4298e7021cf214deda312a253687f",
+        "size_bytes": 179001141,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "1_PROC142B/1_SCHEMATIC/2_PDF_Standard/PROC142B(002)_SCH_With_Design_Updates..Notes_V1.0.pdf"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://www.ti.com/lit/pdf/SPRUJ40",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:42Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/ug/spruj40f/spruj40f.pdf?ts=1790669478152",
+        "sha256": "8362e3228442543e16f62e10b31a4d1a14be3c0d735f45516cc00436987f793f",
+        "size_bytes": 11625298,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.ti.com/tool/SK-AM62B-P1",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.ti.com/lit/pdf/SPRUJ40",
+    "direct_cad_download": null,
+    "direct_schematic_download": "https://www.ti.com/lit/zip/SPRM860",
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

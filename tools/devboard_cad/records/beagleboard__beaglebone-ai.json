@@ -1,0 +1,230 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "beagleboard:beaglebone-ai",
+  "manufacturer": "BeagleBoard.org Foundation",
+  "family": "BeagleBone",
+  "board": "BeagleBone AI",
+  "part_number": "UNVERIFIED",
+  "revision": "A2",
+  "mcu_soc": "AM5729",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A15",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ai@819b6268c33ed85f1030205eea24a68261d30681"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/BeagleBone-AI_bom.csv",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:23Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3808aeef50359f2ebf00a47989d2fff55092cb5c0d30866bab18285d7e3d6aca",
+        "size_bytes": 15635,
+        "media_type": "text/plain",
+        "detected_format": "csv",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ai@819b6268c33ed85f1030205eea24a68261d30681"
+      }
+    },
+    "eagle": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/HW/BeagleBone-AI.brd",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/kicad/beaglebone-ai-rev-a1/beaglebone-ai.pretty/FD40.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:23Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "34f9f525216bb6ad54f91a7a4214d43b5313b27da74780c0665e38577c83ed3a",
+        "size_bytes": 574,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ai@819b6268c33ed85f1030205eea24a68261d30681"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/kicad/beaglebone-ai-rev-a1/adc.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:23Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a798b178983fa7251100b48c25ce0ab4f467b3fa3f75c5a19ae41d93a1093a32",
+        "size_bytes": 144216,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ai@819b6268c33ed85f1030205eea24a68261d30681"
+      }
+    },
+    "nc_drill": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/MFG/BeagleBone-AI-1-12.drl",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/kicad/beaglebone-ai-rev-a1/beaglebone-ai.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:47Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "16f102f404c86bc9026e75f4269ad2bac50b9f6cb57f3052e9d75d4c2ae0d1a9",
+        "size_bytes": 27222726,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ai@819b6268c33ed85f1030205eea24a68261d30681"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/kicad/beaglebone-ai-rev-a1/adc.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:23Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a798b178983fa7251100b48c25ce0ab4f467b3fa3f75c5a19ae41d93a1093a32",
+        "size_bytes": 144216,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/Mechanical/PCBA_BeagleBone_AI_Rev_A1.stp",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:33Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a2fa9b13114e0d0eb431fe4e1c8749327bda7bd12eea0fe5ad53d95934a87e5e",
+        "size_bytes": 8951269,
+        "media_type": "text/plain",
+        "detected_format": "step:AP203_CONFIGURATION_CONTROLLED_3D_DESIGN_OF_MECHANICAL_PARTS_AND_ASSEMBLIES_MIM_LF { 1 0 10303 403 2 1 2}",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:45Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-ai@819b6268c33ed85f1030205eea24a68261d30681"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-ai/819b6268c33ed85f1030205eea24a68261d30681/kicad/beaglebone-ai-rev-a1/beaglebone-ai.kicad_sym",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:24Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "940ef1e7901478d235efc7b223b3b02a1d577c6dd05d13d69bfeb9f5e806687e",
+        "size_bytes": 475248,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/beagleboard/beaglebone-ai/blob/master/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.beagleboard.org/boards",
+    "official_cad_repository": "https://github.com/beagleboard/beaglebone-ai",
+    "official_github_repository": "https://github.com/beagleboard/beaglebone-ai",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository beagleboard/beaglebone-ai pinned at 819b6268c33e. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for beagleboard/beaglebone-ai."
+}

@@ -1,0 +1,260 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "beagleboard:beagleconnect-freedom",
+  "manufacturer": "BeagleBoard.org Foundation",
+  "family": "BeagleConnect",
+  "board": "BeagleBoard.org BeagleConnect Freedom",
+  "part_number": "UNVERIFIED",
+  "revision": "2.0",
+  "mcu_soc": "CC1352P7",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M4F",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagleconnect-freedom@3f99c08de7d81991f95eb2c23f30798a129ffdcf"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/hw/BOM/BeagleConnect%20Freedom%20C7.csv",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:58Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "97429d28d46637b3eea49dc8f9ecff0d2921fff08a64b03da03f7ce8062dfd2a",
+        "size_bytes": 3955,
+        "media_type": "text/plain",
+        "detected_format": "csv",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "datasheet": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/docs/datasheets/hdc2010.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f97bcd5a53b44bb18df1dd57754b82583e2dbd2342b6d037b71733882bff862c",
+        "size_bytes": 1904065,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/case/mechanical%20design/BeagleConnect_B_PCB_Placement_v2.0.dxf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "cb42cd048f67f342453edb547e7a9f3ca386a6d4175fbedf3aaadc39c04dfb98",
+        "size_bytes": 2623692,
+        "media_type": "application/octet-stream",
+        "detected_format": "dxf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/docs/MSP-EXP430F5529LP_Hardware_Design_Files/Hardware/MSP-EXP430F5529LP.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:01Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "dc0ee6874e04c5cbc44aa0eb3e628ca30cf892f4b501e64336bb9e2639dc129f",
+        "size_bytes": 1708081,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/hw/KICAD/leash.pretty/A-1JB.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:58Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f8a372ff19c900b0888b99d31bd8ff0fc8477ee3c35808f093db1a81b4b8d899",
+        "size_bytes": 1791,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/hw/Gerber/BeagleConnect%20Freedom%20C7-B_Cu.gbl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "bbed1d8660abfb00824360e58f6df689977d2d0401af066bedb0bad2dd1d8b41",
+        "size_bytes": 689063,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/hw/KICAD/RF.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:59Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "87bebd94ab5632cf20e53567f50d209eaebdd4a562a2651ff4ef91e544d24c47",
+        "size_bytes": 329665,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/case/mechanical%20design/BeagleConnect_B_PCB_Placement_v2.0.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "15b6d584064a380c3973c2d5efe41fb9787af99978e30f99a82db74bf818f2a1",
+        "size_bytes": 380126,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/hw/Gerber/BeagleConnect%20Freedom%20C7-PTH.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:59Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "31a41e8588e1ca1c13338db8fd22c8b6de60c31282ac36921b07de68746f49a6",
+        "size_bytes": 8268,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/hw/KICAD/BeagleConnect%20Freedom%20C7.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:10Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "2783997982826648c60f83042c0dde423db467ff65175b0203505af31c2689a9",
+        "size_bytes": 6134059,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/case/mechanical%20design/BeagleConnect_B_PCB_Placement_v2.0.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "15b6d584064a380c3973c2d5efe41fb9787af99978e30f99a82db74bf818f2a1",
+        "size_bytes": 380126,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/hw/KICAD/RF.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:59Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "87bebd94ab5632cf20e53567f50d209eaebdd4a562a2651ff4ef91e544d24c47",
+        "size_bytes": 329665,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagleconnect-freedom/3f99c08de7d81991f95eb2c23f30798a129ffdcf/hw/3D_files/beagleconnect_%E5%A4%96%E5%A3%B3-20230208.stp",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:16:06Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a11ecfc434926a7de266b4565d824b4dce58b04507cf55449169d574eb34d315",
+        "size_bytes": 3206684,
+        "media_type": "text/plain",
+        "detected_format": "step:AP203_CONFIGURATION_CONTROLLED_3D_DESIGN_OF_MECHANICAL_PARTS_AND_ASSEMBLIES_MIM_LF { 1 0 10303 403 2 1 2}",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:04Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagleconnect-freedom@3f99c08de7d81991f95eb2c23f30798a129ffdcf"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/beagleboard/beagleconnect-freedom/blob/master/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.beagleboard.org/boards",
+    "official_cad_repository": "https://github.com/beagleboard/beagleconnect-freedom",
+    "official_github_repository": "https://github.com/beagleboard/beagleconnect-freedom",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository beagleboard/beagleconnect-freedom pinned at 3f99c08de7d8. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for beagleboard/beagleconnect-freedom."
+}

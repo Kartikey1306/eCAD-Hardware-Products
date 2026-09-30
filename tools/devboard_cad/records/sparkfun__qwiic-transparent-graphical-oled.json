@@ -1,0 +1,242 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "sparkfun:qwiic-transparent-graphical-oled",
+  "manufacturer": "SparkFun Electronics",
+  "family": "Qwiic",
+  "board": "Transparent Graphical OLED",
+  "part_number": "15173",
+  "revision": "not-stated",
+  "mcu_soc": "ATMEGA328",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "AVR",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:24Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_Transparent_Graphical_OLED@bd3d83e027a54ab27c442cdbed2abbb434173052"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:24Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_Transparent_Graphical_OLED@bd3d83e027a54ab27c442cdbed2abbb434173052"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:24Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_Transparent_Graphical_OLED@bd3d83e027a54ab27c442cdbed2abbb434173052"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_Transparent_Graphical_OLED/bd3d83e027a54ab27c442cdbed2abbb434173052/Hardware/SparkFun_Transparent_Graphical_OLED_Breakout.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:16Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "bb8302c8468a6d6a7a7baaf0ecd3aa1d5eecfe2e6f7f42c64be01333d73d2506",
+        "size_bytes": 384748,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_Transparent_Graphical_OLED/bd3d83e027a54ab27c442cdbed2abbb434173052/Hardware/lib/TGO.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:16Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a8eeefb79d72e134ad52e3c52d22567c1f8fc9169608cb2cdfdb3edefac6dd61",
+        "size_bytes": 19632,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_Transparent_Graphical_OLED/bd3d83e027a54ab27c442cdbed2abbb434173052/Hardware/Production/TGO-Panel.GBL",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:17Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "dfb93acf1dd36496e9fa40f08e83370bf6f8c93b69d2162909f1c3e6a3c7d97e",
+        "size_bytes": 512151,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:24Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_Transparent_Graphical_OLED@bd3d83e027a54ab27c442cdbed2abbb434173052"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_Transparent_Graphical_OLED/bd3d83e027a54ab27c442cdbed2abbb434173052/Documentation/UG-2864KLBMG01%20%2828641195E%29/UG-2864KLBMG01%20Drawing%20-%20110601A.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:17Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6cd5c37b9b0e379c9e997410f417c883d745bd4625800ae9a897290a8011ac20",
+        "size_bytes": 46539,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:24Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_Transparent_Graphical_OLED@bd3d83e027a54ab27c442cdbed2abbb434173052"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_Transparent_Graphical_OLED/bd3d83e027a54ab27c442cdbed2abbb434173052/Hardware/SparkFun_Transparent_Graphical_OLED_Breakout.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:16Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "bb8302c8468a6d6a7a7baaf0ecd3aa1d5eecfe2e6f7f42c64be01333d73d2506",
+        "size_bytes": 384748,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:24Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_Transparent_Graphical_OLED@bd3d83e027a54ab27c442cdbed2abbb434173052"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_Transparent_Graphical_OLED/bd3d83e027a54ab27c442cdbed2abbb434173052/Hardware/SparkFun_Transparent_Graphical_OLED_Breakout.sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:17Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "587f4291c7aa954178274159e8095d1256c6cec08bcf4c83e6f89c94fd5a9f90",
+        "size_bytes": 871228,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:24Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_Transparent_Graphical_OLED@bd3d83e027a54ab27c442cdbed2abbb434173052"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:06:24Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "sparkfun/Qwiic_Transparent_Graphical_OLED@bd3d83e027a54ab27c442cdbed2abbb434173052"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/sparkfun/Qwiic_Transparent_Graphical_OLED/bd3d83e027a54ab27c442cdbed2abbb434173052/Hardware/lib/TGO.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:22:17Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a8eeefb79d72e134ad52e3c52d22567c1f8fc9169608cb2cdfdb3edefac6dd61",
+        "size_bytes": 19632,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/sparkfun/Qwiic_Transparent_Graphical_OLED/blob/HEAD/LICENSE.md"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.sparkfun.com/products/15173",
+    "official_cad_repository": "https://github.com/sparkfun/Qwiic_Transparent_Graphical_OLED",
+    "official_github_repository": "https://github.com/sparkfun/Qwiic_Transparent_Graphical_OLED",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository sparkfun/Qwiic_Transparent_Graphical_OLED pinned at bd3d83e027a5. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from sparkfun/Qwiic_Transparent_Graphical_OLED: \"SparkFun hardware is released under [Creative Commons Share-alike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/).\"."
+}

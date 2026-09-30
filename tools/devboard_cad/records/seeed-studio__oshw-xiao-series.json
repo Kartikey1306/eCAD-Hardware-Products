@@ -1,0 +1,233 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "seeed-studio:oshw-xiao-series",
+  "manufacturer": "Seeed Studio",
+  "family": "XIAO",
+  "board": "Seeed XIAO Series",
+  "part_number": "5627",
+  "revision": "R4",
+  "mcu_soc": "ESP32-C6",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "RISC-V RV32IMC",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Series/cc7f3bbfc69f20061e533304b160bedcf377844a/Seeed%20Studio%20XIAO%20Series%20Library/XIAO-Add-On.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "65be9234e6024f3d9dedfa8f03daefab258d300f0d29821727712d407464ad97",
+        "size_bytes": 21737,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Series/cc7f3bbfc69f20061e533304b160bedcf377844a/Seeed%20Studio%20XIAO%20Series%20Library/XIAO-Add-On.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "65be9234e6024f3d9dedfa8f03daefab258d300f0d29821727712d407464ad97",
+        "size_bytes": 21737,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "pcb_source": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "schematic": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:20Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "Seeed-Studio/OSHW-XIAO-Series@cc7f3bbfc69f20061e533304b160bedcf377844a"
+      }
+    },
+    "stl": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Series/cc7f3bbfc69f20061e533304b160bedcf377844a/projects/community-diy-projects/XIAO_ESP32_NTP_Clock/3d_models/1.%20Cases%20-%20choose%20one/CASE_14deg.stl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "664782dd3e4d050274147d5c8feb9838d5d753c3b1aa11037604d9db36041a21",
+        "size_bytes": 985884,
+        "media_type": "application/octet-stream",
+        "detected_format": "stl",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Series/cc7f3bbfc69f20061e533304b160bedcf377844a/Seeed%20Studio%20XIAO%20Series%20Library/Seeed_Studio_XIAO_Series.kicad_sym",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:20:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "c203a046580c33efdfb771e76c4c1eb10138c6d2d368f9517c4c4503b7d0bb71",
+        "size_bytes": 173901,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "MIT",
+    "cad_license": "MIT",
+    "schematic_license": "MIT",
+    "pcb_license": "MIT",
+    "mechanical_cad_license": "MIT",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/Seeed-Studio/OSHW-XIAO-Series/blob/main/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.seeedstudio.com/",
+    "official_cad_repository": "https://github.com/Seeed-Studio/OSHW-XIAO-Series",
+    "official_github_repository": "https://github.com/Seeed-Studio/OSHW-XIAO-Series",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "verified",
+  "notes": "File candidates harvested from the manufacturer's official repository Seeed-Studio/OSHW-XIAO-Series pinned at cc7f3bbfc69f. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for Seeed-Studio/OSHW-XIAO-Series."
+}

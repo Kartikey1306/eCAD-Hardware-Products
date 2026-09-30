@@ -1,0 +1,216 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "robotis-git:opencr",
+  "manufacturer": "ROBOTIS",
+  "family": "OpenCR",
+  "board": "BOM, Circuit and PCB Gerber of OpenCR",
+  "part_number": "UNVERIFIED",
+  "revision": "H",
+  "mcu_soc": "STM32F7",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/OpenCR-Hardware@4c56093c5aaedbcb98b374f94a8046187834022c"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/OpenCR-Hardware/4c56093c5aaedbcb98b374f94a8046187834022c/BOM/OpenCR_REVH_BOM.xls",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "d2f2dc8011238de8638abb5852448a2d6fd9f37f105fbfe774b85ea8c38bd0ce",
+        "size_bytes": 37888,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/OpenCR-Hardware/4c56093c5aaedbcb98b374f94a8046187834022c/CAD/OpenCR_REVH_DXF_Top.dxf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:06Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "731087c1c9939f662f70ebe418ebbb918fb9f1a03216da31e9607d3c102fcde1",
+        "size_bytes": 6384607,
+        "media_type": "text/plain",
+        "detected_format": "dxf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/OpenCR-Hardware@4c56093c5aaedbcb98b374f94a8046187834022c"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/OpenCR-Hardware/4c56093c5aaedbcb98b374f94a8046187834022c/Gerber/OpenCR_REVH_Gerber.zip",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e3a6a51bda9f8b875ebd4bf0bbdd6bfef01d5fbaac226991ea4c30cd8e67590a",
+        "size_bytes": 763711,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "drill.drl"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/OpenCR-Hardware@4c56093c5aaedbcb98b374f94a8046187834022c"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/OpenCR-Hardware@4c56093c5aaedbcb98b374f94a8046187834022c"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/OpenCR-Hardware@4c56093c5aaedbcb98b374f94a8046187834022c"
+      }
+    },
+    "pcb_source": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/OpenCR-Hardware@4c56093c5aaedbcb98b374f94a8046187834022c"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:26Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "ROBOTIS-GIT/OpenCR-Hardware@4c56093c5aaedbcb98b374f94a8046187834022c"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/OpenCR-Hardware/4c56093c5aaedbcb98b374f94a8046187834022c/Schematic/OpenCR_REVH.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:04Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "66f6a3febd85873572c416de1c98ae7447b8bc6a725ecdd200881feed83729ca",
+        "size_bytes": 474654,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/OpenCR-Hardware/4c56093c5aaedbcb98b374f94a8046187834022c/Layout/OpenCR_REVH.step",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:12Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "1fdbbb882216cc011a3cd038fc56abe5525135bec9c77a5e5ff5066c85e7b484",
+        "size_bytes": 20261152,
+        "media_type": "text/plain",
+        "detected_format": "step:AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/ROBOTIS-GIT/OpenCR-Hardware/4c56093c5aaedbcb98b374f94a8046187834022c/Layout/OpenCR_REVH.stl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:08Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "87c13e6e00d93b385c5620cd185887b67bb27c3cb5e579bb34c9aee5b6a0a5ed",
+        "size_bytes": 4142184,
+        "media_type": "application/octet-stream",
+        "detected_format": "stl",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.robotis.us/",
+    "official_cad_repository": "https://github.com/ROBOTIS-GIT/OpenCR-Hardware",
+    "official_github_repository": "https://github.com/ROBOTIS-GIT/OpenCR-Hardware",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository ROBOTIS-GIT/OpenCR-Hardware pinned at 4c56093c5aae. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware."
+}

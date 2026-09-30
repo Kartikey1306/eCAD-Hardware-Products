@@ -1,0 +1,203 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "beagleboard:beagley-ai",
+  "manufacturer": "BeagleBoard.org Foundation",
+  "family": "BeagleY",
+  "board": "BeagleBoard.org BeagleY-AI",
+  "part_number": "UNVERIFIED",
+  "revision": "A",
+  "mcu_soc": "AM67",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A53",
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagley-ai@d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e"
+      }
+    },
+    "assembly_drawing": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagley-ai/d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e/design/assembly/BeagleY-AI_Rev%20A_Assembly_240426.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:19:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "444db48194376c3cd6931f06b72f6c69cbff079f6a5d8475ef071263cbce3536",
+        "size_bytes": 845279,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "bom": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagley-ai/d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e/design/BeagleY-AI_Rev%20A_BOM_240426.xlsx",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagley-ai@d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e"
+      }
+    },
+    "eagle": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagley-ai/d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e/design/BeagleY-AI_PCB_Rev%20A_240426.brd",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagley-ai@d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagley-ai@d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e"
+      }
+    },
+    "mechanical": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagley-ai/d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e/design/BeagleY-AI_mechanical_drawing.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:19:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "47fd02e7632c392e6930b5654e95b9d1b3318d001e61565021fbaf30b676672a",
+        "size_bytes": 122454,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "nc_drill": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagley-ai/d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e/design/BeagleY-AI_Rev%20A_Gerber_240426/BeagleY-AI_PCB_Rev%20A_240426-1-2.drl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:19:00Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "6ed9b8892e65cfe388aadf9e410c93603b47acc6fe2058e5057cd5264f5db42b",
+        "size_bytes": 7952,
+        "media_type": "text/plain",
+        "detected_format": "excellon",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pcb_source": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagley-ai/d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e/design/BeagleY-AI_PCB_Rev%20A_240426.brd",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagley-ai@d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beagley-ai/d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e/BeagleY-AI_SCH.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:19:01Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e29a87d522c1590fec070645d4ad8a77351e6e7d0e1b3336bc9a2fd304bc2278",
+        "size_bytes": 1913358,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagley-ai@d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:10:08Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beagley-ai@d1c9f8b76c17c0b629341b79bd4286dbeebb1e3e"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/beagleboard/beagley-ai/blob/main/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.beagleboard.org/boards",
+    "official_cad_repository": "https://github.com/beagleboard/beagley-ai",
+    "official_github_repository": "https://github.com/beagleboard/beagley-ai",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository beagleboard/beagley-ai pinned at d1c9f8b76c17. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for beagleboard/beagley-ai."
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "renesas:ek-ra4m2",
+  "manufacturer": "Renesas Electronics",
+  "family": "RA / RA4 Series",
+  "board": "EK-RA4M2 - Evaluation Kit for RA4M2 MCU Group",
+  "part_number": "RTK7EKA4M2S00001BE",
+  "revision": "v1",
+  "mcu_soc": "Renesas R7FA4M2AD3CFP (RA4M2 Group)",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-M33",
+  "product_status": "active",
+  "files": {
+    "user_manual": {
+      "available": true,
+      "url": "https://www.renesas.com/en/document/man/ek-ra4m2-v1-users-manual",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:31:42Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0468bd1068a8ea7fdf0df6be9e29d30e5942176bb940e40e3c5a5f25c8c25162",
+        "size_bytes": 4090307,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.renesas.com/en/design-resources/boards-kits/ek-ra4m2",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.renesas.com/en/document/man/ek-ra4m2-v1-users-manual",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

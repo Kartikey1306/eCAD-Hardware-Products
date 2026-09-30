@@ -1,0 +1,104 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "ti:msp-exp430g2et",
+  "manufacturer": "Texas Instruments",
+  "family": "MSP430 LaunchPad (MSP430G2xx value line)",
+  "board": "MSP430G2553 LaunchPad Development Kit",
+  "part_number": "MSP-EXP430G2ET",
+  "revision": "1.0 (design package MCU021_V1.0)",
+  "mcu_soc": "MSP430G2553IN20",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "TI MSP430 16-bit RISC",
+  "product_status": "active",
+  "files": {
+    "altium": {
+      "available": true,
+      "url": "https://www.ti.com/lit/zip/SLAR153",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:20Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/df/slar153/slar153.zip?ts=1790661449684",
+        "sha256": "fc6764cb380ebd19759daee70711dcec77569da22a8b383be90ccc10619f526c",
+        "size_bytes": 5127737,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "MSP-EXP430G2ET_Hardware_Design_Files/Hardware/Cad Source Files/MCU021_V1.0.PrjPcb"
+      }
+    },
+    "user_manual": {
+      "available": true,
+      "url": "https://www.ti.com/lit/pdf/SLAU772",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:32:20Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://www.ti.com/lit/ug/slau772a/slau772a.pdf?ts=1790669469016",
+        "sha256": "b278ab034136a4336dd397b5a6a3a221f867b33c959feb8f466be388e61de29a",
+        "size_bytes": 3791885,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "mechanical": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.ti.com/tool/MSP-EXP430G2ET",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.ti.com/lit/pdf/SLAU772",
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+}

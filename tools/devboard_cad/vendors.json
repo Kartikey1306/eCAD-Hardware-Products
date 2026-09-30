@@ -1,0 +1,228 @@
+{
+  "$comment": "Manufacturer GitHub organisations that publish board design files, mapped to the families issue #28 section 2 names. Source tier 3 in section 10. Editing this file is how coverage grows: add an org and its families, then run discover_github.py.",
+  "contract_version": "1.0.0",
+  "vendors": [
+    {
+      "org": "adafruit",
+      "manufacturer": "Adafruit Industries",
+      "product_page": "https://www.adafruit.com/product/{part_number}",
+      "families": [
+        "Feather",
+        "FeatherWing",
+        "ItsyBitsy",
+        "QT Py",
+        "Metro",
+        "Trinkey",
+        "CLUE",
+        "PyPortal",
+        "MatrixPortal",
+        "Circuit Playground",
+        "FunHouse",
+        "MacroPad",
+        "NeoTrellis",
+        "Grand Central",
+        "PyBadge"
+      ]
+    },
+    {
+      "org": "sparkfun",
+      "manufacturer": "SparkFun Electronics",
+      "product_page": "https://www.sparkfun.com/products/{part_number}",
+      "families": [
+        "Thing Plus",
+        "Pro Micro",
+        "RedBoard",
+        "MicroMod",
+        "Artemis",
+        "Qwiic",
+        "Edge"
+      ]
+    },
+    {
+      "org": "Seeed-Studio",
+      "manufacturer": "Seeed Studio",
+      "product_page": "https://www.seeedstudio.com/",
+      "families": [
+        "XIAO",
+        "Wio",
+        "reComputer",
+        "reTerminal",
+        "ReSpeaker",
+        "Odyssey"
+      ]
+    },
+    {
+      "org": "espressif",
+      "manufacturer": "Espressif Systems",
+      "product_page": "https://www.espressif.com/en/products/devkits",
+      "families": [
+        "ESP-DevKit",
+        "ESP-BOX"
+      ]
+    },
+    {
+      "org": "beagleboard",
+      "manufacturer": "BeagleBoard.org Foundation",
+      "product_page": "https://www.beagleboard.org/boards",
+      "families": [
+        "BeagleBone",
+        "BeaglePlay",
+        "PocketBeagle",
+        "BeagleV",
+        "BeagleConnect",
+        "BeagleY",
+        "Capes"
+      ]
+    },
+    {
+      "org": "arduino",
+      "manufacturer": "Arduino",
+      "product_page": "https://store.arduino.cc/",
+      "families": [
+        "Uno",
+        "Nano",
+        "Mega",
+        "Leonardo",
+        "Micro",
+        "Due",
+        "Zero",
+        "MKR",
+        "Portenta",
+        "GIGA",
+        "Nicla",
+        "Alvik"
+      ]
+    },
+    {
+      "org": "m5stack",
+      "manufacturer": "M5Stack",
+      "product_page": "https://docs.m5stack.com/en/products",
+      "families": [
+        "Core",
+        "M5StickC",
+        "M5Stamp",
+        "Atom",
+        "Cardputer",
+        "Tough",
+        "Paper",
+        "Dial",
+        "M5 Hardware",
+        "M5Dial",
+        "M5Cardputer",
+        "UnitCam",
+        "M5Paper"
+      ]
+    },
+    {
+      "org": "Digilent",
+      "manufacturer": "Digilent",
+      "product_page": "https://digilent.com/reference/programmable-logic/start",
+      "families": [
+        "Arty",
+        "Basys",
+        "Cmod",
+        "Nexys",
+        "Zybo",
+        "ZedBoard",
+        "Eclypse",
+        "Genesys",
+        "Cora",
+        "Analog Discovery",
+        "OpenScope",
+        "PYNQ"
+      ]
+    },
+    {
+      "org": "pimoroni",
+      "manufacturer": "Pimoroni",
+      "product_page": "https://shop.pimoroni.com/",
+      "families": [
+        "Pico",
+        "Tiny2040",
+        "Plasma",
+        "Badger",
+        "Enviro",
+        "Inky",
+        "Keybow"
+      ]
+    },
+    {
+      "org": "sipeed",
+      "manufacturer": "Sipeed",
+      "product_page": "https://www.sipeed.com/",
+      "families": [
+        "Maix",
+        "Longan",
+        "Tang",
+        "Lichee",
+        "NanoKVM",
+        "NanoKVM",
+        "Sipeed"
+      ]
+    },
+    {
+      "org": "radxa",
+      "manufacturer": "Radxa",
+      "product_page": "https://radxa.com/products",
+      "families": [
+        "ROCK",
+        "Zero",
+        "CM3",
+        "X2",
+        "E25",
+        "NIO",
+        "OSHW",
+        "OSHW",
+        "HW Design",
+        "SoM",
+        "Radxa"
+      ]
+    },
+    {
+      "org": "microbit-foundation",
+      "manufacturer": "Micro:bit Educational Foundation",
+      "product_page": "https://microbit.org/buy/",
+      "families": [
+        "micro:bit",
+        "microbit",
+        "Reference Design"
+      ]
+    },
+    {
+      "org": "calliope-mini",
+      "manufacturer": "Calliope gGmbH",
+      "product_page": "https://calliope.cc/",
+      "families": [
+        "Calliope",
+        "mini"
+      ]
+    },
+    {
+      "org": "ROBOTIS-GIT",
+      "manufacturer": "ROBOTIS",
+      "product_page": "https://www.robotis.us/",
+      "families": [
+        "OpenCR",
+        "XelNetwork",
+        "TurtleBot",
+        "Dynamixel",
+        "OpenManipulator"
+      ]
+    },
+    {
+      "org": "Xilinx",
+      "manufacturer": "AMD (Xilinx)",
+      "product_page": "https://www.amd.com/en/products/system-on-modules/kria.html",
+      "families": [
+        "Kria",
+        "ZCU",
+        "VCK",
+        "Versal",
+        "BoardStore",
+        "Zynq",
+        "Artix",
+        "Kintex"
+      ]
+    }
+  ]
+}

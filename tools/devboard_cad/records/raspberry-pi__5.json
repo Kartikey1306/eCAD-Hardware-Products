@@ -1,0 +1,98 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "raspberry-pi:5",
+  "manufacturer": "Raspberry Pi",
+  "family": "Raspberry Pi 5",
+  "board": "Raspberry Pi 5",
+  "part_number": "UNVERIFIED",
+  "revision": "unverified",
+  "mcu_soc": "Broadcom BCM2712",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": "Arm Cortex-A76",
+  "product_status": "unknown",
+  "files": {
+    "mechanical": {
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008347-DS",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/892-raspberry-pi-5/documents/RP-008347-DS-1-raspberry-pi-5-mechanical-drawing.pdf",
+        "sha256": "5dd680d6c1f5e7aa9c7b020695e315d04aac862df82ff01d4e9041cd0668d7f2",
+        "size_bytes": 174949,
+        "media_type": "application/pdf",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-010083-CA",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:21:20Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/892-raspberry-pi-5/documents/RP-010083-CA-1-rpi-5%203D%20STEP%20-%20No%20Graphics%20small%20file.zip",
+        "sha256": "6841637b4cfa97637bf34b529bfe896f24d9634b2c40b57a156781f55d88f06f",
+        "size_bytes": 13270704,
+        "media_type": "application/zip",
+        "detected_format": "step:AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }",
+        "verification_method": "http_get_step_header",
+        "contained_member": "rpi-5b_no_graphics.step"
+      }
+    },
+    "schematic": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "gerbers": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    },
+    "bom": {
+      "available": null,
+      "url": null,
+      "verified_revision": null,
+      "evidence": null
+    }
+  },
+  "licenses": {
+    "hardware_license": "UNVERIFIED",
+    "cad_license": null,
+    "schematic_license": null,
+    "pcb_license": null,
+    "mechanical_cad_license": null,
+    "redistribution_allowed": null,
+    "modification_allowed": null,
+    "commercial_use_allowed": null,
+    "attribution_required": null,
+    "license_url": null
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.raspberrypi.com/products/",
+    "official_cad_repository": null,
+    "official_github_repository": null,
+    "official_documentation": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html",
+    "direct_cad_download": "https://pip.raspberrypi.com/documents/RP-010083-CA",
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from raspberrypi/documentation@b47f68f."
+}

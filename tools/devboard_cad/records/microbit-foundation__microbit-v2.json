@@ -1,0 +1,194 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "microbit-foundation:microbit-v2",
+  "manufacturer": "Micro:bit Educational Foundation",
+  "family": "micro:bit",
+  "board": "Micro:bit Microbit V2",
+  "part_number": "UNVERIFIED",
+  "revision": "2.2",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "bom": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/microbit-foundation/microbit-v2-hardware/17aae03003b4fd3686d18aca5ad175c420d29a20/V2.21/Bill%20of%20Materials%20MicroBit_V2.2.1.csv",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "pcb_source": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/microbit-foundation/microbit-v2-hardware/17aae03003b4fd3686d18aca5ad175c420d29a20/V2.00/MicroBit_V2.0.0_S_schematic.PDF",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:39:02Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "094e004ece2e2d6e12f77603a7365f4ab310a48a2ce359fb0de3000e497adad0",
+        "size_bytes": 1634222,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:38:16Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "microbit-foundation/microbit-v2-hardware@17aae03003b4fd3686d18aca5ad175c420d29a20"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://microbit.org/buy/",
+    "official_cad_repository": "https://github.com/microbit-foundation/microbit-v2-hardware",
+    "official_github_repository": "https://github.com/microbit-foundation/microbit-v2-hardware",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository microbit-foundation/microbit-v2-hardware pinned at 17aae03003b4. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for microbit-foundation/microbit-v2-hardware."
+}

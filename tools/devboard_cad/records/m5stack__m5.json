@@ -1,0 +1,248 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "m5stack:m5",
+  "manufacturer": "M5Stack",
+  "family": "M5 Hardware",
+  "board": "M5Stack hardware related documents, etc",
+  "part_number": "UNVERIFIED",
+  "revision": "2.7",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/Common/Unit_Type_A/Footprints/Unit_Type_A.PcbDoc",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "bb3a4008097936934527e00d2ff351d95a3d5ebffbc478f50a770159b4e84096",
+        "size_bytes": 2862080,
+        "media_type": "application/octet-stream",
+        "detected_format": "ole",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "bom": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:37:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "m5stack/M5_Hardware@a240115c94b19ecf647f229c47fa9a8ce46ccdc4"
+      }
+    },
+    "dxf": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/Common/Unit_Type_A/Structures/Unit_Type_A.dxf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:38Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7988e6f792f2878fb432d2605d89b3ce2fb86c10ad0e36183a3cfa7bf9c53b31",
+        "size_bytes": 17778,
+        "media_type": "text/plain",
+        "detected_format": "dxf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "eagle": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:37:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "m5stack/M5_Hardware@a240115c94b19ecf647f229c47fa9a8ce46ccdc4"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/KiCad/Footprints/M5Stack.pretty/Stamp-C3.kicad_mod",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "bfd4afca5507e42a091876cc2269b385be4429e3f9a6e6874644d8e239538731",
+        "size_bytes": 978839,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:37:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "m5stack/M5_Hardware@a240115c94b19ecf647f229c47fa9a8ce46ccdc4"
+      }
+    },
+    "kicad": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/KiCad/Symbols/Stamp_UWB.kicad_sym",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3aff76f5992cd67c274bb57e08eff30d38d8f0fdabbafd2e5844e6672119a591",
+        "size_bytes": 4965,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:37:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "m5stack/M5_Hardware@a240115c94b19ecf647f229c47fa9a8ce46ccdc4"
+      }
+    },
+    "nc_drill": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:37:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "m5stack/M5_Hardware@a240115c94b19ecf647f229c47fa9a8ce46ccdc4"
+      }
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/KiCad/Projects/Module_ExtPort_For_Core2/Module_ExtPort_For_Core2.kicad_pcb",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:39Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "0d7f5cb8b465d0b2fc19916761551807bee89be520b3d18c2da020d658020a69",
+        "size_bytes": 436903,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T08:37:55Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "m5stack/M5_Hardware@a240115c94b19ecf647f229c47fa9a8ce46ccdc4"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/KiCad/Projects/Module_ExtPort_For_Core2/Module_ExtPort_For_Core2.kicad_sch",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:38Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "a54c07def283dc09ca7b73960eb743e5073f212258896f86410ef7cbff88dfd5",
+        "size_bytes": 59647,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/KiCad/3D/M5Stack.3dshapes/Stamp-S3.step",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:42Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "7f29337cdac90c80400897f52795ed0709548d4e74dc4436efb3e4f3873d2ebf",
+        "size_bytes": 2904597,
+        "media_type": "text/plain",
+        "detected_format": "step:AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }",
+        "verification_method": "http_get_step_header"
+      }
+    },
+    "stl": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/Products/K001/Structures/Core1.stl",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:41Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "e1aa2d5a6640fe3123b1fbff8c648993d69c5414c69d73985b406f88a5cf8792",
+        "size_bytes": 781784,
+        "media_type": "application/octet-stream",
+        "detected_format": "stl",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/KiCad/Symbols/Stamp_UWB.kicad_sym",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T08:38:40Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3aff76f5992cd67c274bb57e08eff30d38d8f0fdabbafd2e5844e6672119a591",
+        "size_bytes": 4965,
+        "media_type": "text/plain",
+        "detected_format": "kicad",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "MIT",
+    "cad_license": "MIT",
+    "schematic_license": "MIT",
+    "pcb_license": "MIT",
+    "mechanical_cad_license": "MIT",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://opensource.org/license/mit"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://docs.m5stack.com/en/products",
+    "official_cad_repository": "https://github.com/m5stack/M5_Hardware",
+    "official_github_repository": "https://github.com/m5stack/M5_Hardware",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository m5stack/M5_Hardware pinned at a240115c94b1. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for m5stack/M5_Hardware."
+}

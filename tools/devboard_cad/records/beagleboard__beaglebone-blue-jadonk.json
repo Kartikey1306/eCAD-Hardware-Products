@@ -1,0 +1,236 @@
+{
+  "$schema": "https://embeddedos.org/schemas/devboard-cad/v1/board-record.schema.json",
+  "contract_version": "1.1.0",
+  "board_id": "beagleboard:beaglebone-blue-jadonk",
+  "manufacturer": "BeagleBoard.org Foundation",
+  "family": "BeagleBone",
+  "board": "BeagleBoard.org BeagleBone Blue Jadonk",
+  "part_number": "UNVERIFIED",
+  "revision": "not-stated",
+  "mcu_soc": "UNVERIFIED",
+  "hardware_revision": null,
+  "fpga": null,
+  "cpu_architecture": null,
+  "product_status": "unknown",
+  "files": {
+    "altium": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-blue-jadonk@adfac644088d6d321c32132e07b94a06b522573c"
+      }
+    },
+    "bom": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-blue-jadonk/adfac644088d6d321c32132e07b94a06b522573c/BeagleBone_Blue_BOM.csv",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f14b6480e1bdb181eaf718649fb6d72dabc9882e24c9892adf745e99666fe30d",
+        "size_bytes": 8075,
+        "media_type": "text/plain",
+        "detected_format": "csv",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "dxf": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-blue-jadonk@adfac644088d6d321c32132e07b94a06b522573c"
+      }
+    },
+    "eagle": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-blue-jadonk/adfac644088d6d321c32132e07b94a06b522573c/EAGLE/BeagleBone_Blue.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8bafa8df6204a23c308b6383528cfed85e5fb9836e59f1f57fd1cbb615425141",
+        "size_bytes": 762924,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "footprint_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-blue-jadonk/adfac644088d6d321c32132e07b94a06b522573c/EAGLE/BeagleBone_Blue.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3440d01e46f386d227cadf74023434157e5f5b2fe8162c4b8c8ffc653af2ee6e",
+        "size_bytes": 991936,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "gerbers": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-blue-jadonk/adfac644088d6d321c32132e07b94a06b522573c/MFG/BeagleBone_Blue.bcream.ger",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "63c9642bd030c74ec2b5042f15913a4f921f790ec43f473bd6c42630fed04305",
+        "size_bytes": 11997,
+        "media_type": "text/plain",
+        "detected_format": "gerber",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "kicad": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-blue-jadonk@adfac644088d6d321c32132e07b94a06b522573c"
+      }
+    },
+    "mechanical": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-blue-jadonk@adfac644088d6d321c32132e07b94a06b522573c"
+      }
+    },
+    "nc_drill": {
+      "available": null,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-blue-jadonk/adfac644088d6d321c32132e07b94a06b522573c/MFG/BeagleBone_Blue.drills.xln",
+      "verified_revision": null,
+      "evidence": null
+    },
+    "pcb_source": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-blue-jadonk/adfac644088d6d321c32132e07b94a06b522573c/EAGLE/BeagleBone_Blue.brd",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "8bafa8df6204a23c308b6383528cfed85e5fb9836e59f1f57fd1cbb615425141",
+        "size_bytes": 762924,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "pick_and_place": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-blue-jadonk@adfac644088d6d321c32132e07b94a06b522573c"
+      }
+    },
+    "schematic": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-blue-jadonk/adfac644088d6d321c32132e07b94a06b522573c/BeagleBone_Blue_sch.pdf",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:48Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "f6b18c2fc7499f05bac0f9b773adf29ea43429bc54d637d5f07b4315e38e80f6",
+        "size_bytes": 127044,
+        "media_type": "application/octet-stream",
+        "detected_format": "pdf",
+        "verification_method": "http_get_magic"
+      }
+    },
+    "step": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-blue-jadonk@adfac644088d6d321c32132e07b94a06b522573c"
+      }
+    },
+    "stl": {
+      "available": false,
+      "url": null,
+      "verified_revision": null,
+      "evidence": {
+        "sha256": null,
+        "captured_at": "2026-09-29T07:09:47Z",
+        "producer_tool_id": "devboard-cad-github-harvester@0.1.0",
+        "verification_method": "official_index_absent",
+        "index_ref": "beagleboard/beaglebone-blue-jadonk@adfac644088d6d321c32132e07b94a06b522573c"
+      }
+    },
+    "symbol_library": {
+      "available": true,
+      "url": "https://raw.githubusercontent.com/beagleboard/beaglebone-blue-jadonk/adfac644088d6d321c32132e07b94a06b522573c/EAGLE/BeagleBone_Blue.lbr",
+      "verified_revision": null,
+      "evidence": {
+        "captured_at": "2026-09-29T07:15:49Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "sha256": "3440d01e46f386d227cadf74023434157e5f5b2fe8162c4b8c8ffc653af2ee6e",
+        "size_bytes": 991936,
+        "media_type": "text/plain",
+        "detected_format": "eagle",
+        "verification_method": "http_get_magic"
+      }
+    }
+  },
+  "licenses": {
+    "hardware_license": "CC BY 4.0",
+    "cad_license": "CC BY 4.0",
+    "schematic_license": "CC BY 4.0",
+    "pcb_license": "CC BY 4.0",
+    "mechanical_cad_license": "CC BY 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://github.com/beagleboard/beaglebone-blue-jadonk/blob/master/LICENSE"
+  },
+  "sources": {
+    "source_tier": "manufacturer_official",
+    "official_product_page": "https://www.beagleboard.org/boards",
+    "official_cad_repository": "https://github.com/beagleboard/beaglebone-blue-jadonk",
+    "official_github_repository": "https://github.com/beagleboard/beaglebone-blue-jadonk",
+    "official_documentation": null,
+    "direct_cad_download": null,
+    "direct_schematic_download": null,
+    "direct_gerber_download": null
+  },
+  "record_status": "partial",
+  "notes": "File candidates harvested from the manufacturer's official repository beagleboard/beaglebone-blue-jadonk pinned at adfac644088d. Availability is decided by verify.py from retrieved bytes, never from this index. Licensing is left unverified until the vendor's terms have been read; a GitHub SPDX tag describes the repository, not necessarily the hardware. Hardware licence read from the SPDX licence GitHub detects for beagleboard/beaglebone-blue-jadonk."
+}
