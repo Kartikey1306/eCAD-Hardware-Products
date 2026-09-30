@@ -1,0 +1,220 @@
+{
+  "$schema": "https://embeddedos.org/schemas/cad-dataset/v1/dataset-item.schema.json",
+  "artifact_type": "step_assembly",
+  "artifact_version": "1.0",
+  "collected_at": "2026-09-24",
+  "coordinate_system": "right-handed; +Z up; joint axis along +Y through (0, *, 200) mm",
+  "created_at": "2026-09-24",
+  "dataset_item_version": "1.0.0",
+  "derived": [
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "derived/cad_extraction.json",
+        "sha256": "efcadbce8b75783a038374252a3e29b9e7ccd6e531df849841422353b87d2fda",
+        "size_bytes": 7181
+      },
+      "derived_from": [
+        "source/robotic_joint_001.step"
+      ],
+      "domain": "mechanical",
+      "producer": {
+        "tool": "ecad_model.importers.step_ocp",
+        "version": "1.0.0 (cadquery-ocp 8.0.1.0.0)"
+      },
+      "role": "extraction"
+    },
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "derived/engineering_model.json",
+        "sha256": "84bd8964159842b73f46db93d7de8e21912ff0588a69869659b639398db1fa38",
+        "size_bytes": 42232
+      },
+      "derived_from": [
+        "derived/cad_extraction.json",
+        "design/annotations.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.builder",
+        "version": "1.0.0"
+      },
+      "role": "engineering_model"
+    },
+    {
+      "artifact": {
+        "media_type": "application/xml",
+        "path": "derived/mechanical/robotic_joint_001.mjcf.xml",
+        "sha256": "cb39428319ded1c4b702e87c9dafe56c6b51bea3493428da3acd11336146f021",
+        "size_bytes": 2521
+      },
+      "derived_from": [
+        "derived/engineering_model.json"
+      ],
+      "domain": "mechanical",
+      "producer": {
+        "tool": "ecad_model.mjcf",
+        "version": "1.0.0"
+      },
+      "role": "domain_model"
+    },
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "validation/golden/cases.json",
+        "sha256": "891b495bb285ef4c6d55ba4d45a164f74bc9bb800683b87fa50bfe4224fa5398",
+        "size_bytes": 6447
+      },
+      "derived_from": [
+        "derived/engineering_model.json",
+        "requirements/requirements.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.requirements",
+        "version": "1.0.0"
+      },
+      "role": "golden_cases"
+    },
+    {
+      "artifact": {
+        "media_type": "application/json",
+        "path": "validation/corners/cases.json",
+        "sha256": "a4ce6a66ce82148127721a85547cd300b72ee6aeb72bdff9643549fe2078ec83",
+        "size_bytes": 3403
+      },
+      "derived_from": [
+        "derived/engineering_model.json",
+        "requirements/requirements.json"
+      ],
+      "producer": {
+        "tool": "ecad_model.requirements",
+        "version": "1.0.0"
+      },
+      "role": "corner_cases"
+    }
+  ],
+  "description": "Single-axis robotic joint: aluminium base plate and pillar, steel shaft in the pillar bore, aluminium link, steel payload block. Authored for the eCAD multi-domain validation pipeline (issue #27).",
+  "domain": "mechanical",
+  "domains": [
+    {
+      "domain": "mechanical",
+      "reason": "joint statics, rated-move dynamics, free oscillation and range-of-motion clearance, simulated with MuJoCo and compared with closed-form references; requirements resting on components/actuator/domains/mechanical/continuous_output_torque (UNKNOWN), components/actuator/domains/mechanical/gear_ratio (UNKNOWN) are BLOCKED",
+      "status": "AVAILABLE"
+    },
+    {
+      "domain": "electrical",
+      "reason": "no electrical validator exists in this platform yet; this sample also lacks components/actuator/domains/electrical/torque_constant (UNKNOWN), components/actuator/domains/electrical/winding_resistance (UNKNOWN)",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "digital",
+      "reason": "no digital validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "pcb",
+      "reason": "no pcb validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "power_electronics",
+      "reason": "no power_electronics validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "control",
+      "reason": "no control validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "electromagnetic",
+      "reason": "no electromagnetic validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "thermal",
+      "reason": "no thermal validator exists in this platform yet; this sample also lacks components/actuator/domains/thermal/maximum_winding_temperature (UNKNOWN)",
+      "status": "NOT_IMPLEMENTED"
+    },
+    {
+      "domain": "full_system",
+      "reason": "no full_system validator exists in this platform yet",
+      "status": "NOT_IMPLEMENTED"
+    }
+  ],
+  "hash": "sha256:47d654d14b587b48be85f160e5ec40d8fc6e6949e40b2ca4d9263b90570c6546",
+  "inputs": {
+    "annotations": {
+      "media_type": "application/json",
+      "path": "design/annotations.json",
+      "sha256": "8a3634b34bd70f55c2f3d94f1c4000a47ee97e539ccdad8cdcfa42713d5ddf45",
+      "size_bytes": 7217
+    },
+    "provenance": {
+      "media_type": "application/json",
+      "path": "source/provenance.json",
+      "sha256": "8c80213b9aaf0b38db99bab29a50e33bb61c8de48aeaad294868e9d7cd312909",
+      "size_bytes": 1298
+    },
+    "requirements": {
+      "media_type": "application/json",
+      "path": "requirements/requirements.json",
+      "sha256": "6156ea0e0643497cefba62114a3e6eb77fa90b3b11445bbd84fd8d4a062c1c82",
+      "size_bytes": 9531
+    },
+    "simulation": [
+      {
+        "media_type": "text/x-python",
+        "path": "simulation/joint_dynamics.py",
+        "sha256": "58698a3f9f98a2bb0390257e5397faf97e8c2afac9519d2bc598d368733931a1",
+        "size_bytes": 10027
+      }
+    ]
+  },
+  "item_id": "robotic_joint_001",
+  "source": {
+    "artifacts": [
+      {
+        "format": "step",
+        "media_type": "application/step",
+        "path": "source/robotic_joint_001.step",
+        "sha256": "1a806383a6e131b7a4f5d78ed52567c47fb6090b10da3042006bd635551635bc",
+        "size_bytes": 78250
+      }
+    ],
+    "license": {
+      "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation",
+      "basis": "authored in this repository by source/generate_step.py and committed under the repository's MIT LICENSE",
+      "license_text": {
+        "path": "LICENSE",
+        "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"
+      },
+      "license_verified": true,
+      "redistribution_permitted": true,
+      "spdx": "MIT",
+      "training_use_permitted": true
+    },
+    "origin": {
+      "author": "EmbeddedOS (EoS) Research Foundation",
+      "generator": {
+        "media_type": "text/x-python",
+        "path": "source/generate_step.py",
+        "sha256": "1acb933216930f35996a197854dc7aa05e2c88950b839da90c5696e7224418d6",
+        "size_bytes": 5516
+      },
+      "kind": "self_authored"
+    }
+  },
+  "source_url": null,
+  "title": "robotic joint 001",
+  "units": "mm",
+  "versions": {
+    "domain_models": {
+      "mechanical": "ecad_model.mjcf 1.0.0"
+    },
+    "engineering_model": "1.0.0",
+    "extraction": "ecad_model.importers.step_ocp 1.0.0 (cadquery-ocp 8.0.1.0.0)",
+    "simulation": "sha256:a9d171f871ce444c8ed2ddf93b96d0c6fd650dc574561a9a05a6e3eff17e5a03",
+    "validation_contract": "hardware-validation v1.0.0"
+  }
+}

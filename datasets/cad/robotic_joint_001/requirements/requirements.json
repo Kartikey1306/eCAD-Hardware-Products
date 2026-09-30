@@ -1,0 +1,298 @@
+{
+  "$schema": "https://embeddedos.org/schemas/engineering-model/v1/engineering-requirements.schema.json",
+  "requirements_version": "1.0.0",
+  "design_id": "robotic_joint_001",
+  "reference_values": [
+    {
+      "reference_id": "REF-MECH-001",
+      "title": "Holding torque in the as-modelled pose matches the lever-arm cross product",
+      "domain": "mechanical",
+      "metric": "static_torque_at_zero_nm",
+      "scenario": {
+        "name": "static_sweep"
+      },
+      "unit": "N*m",
+      "absolute_tolerance": 1e-06,
+      "derivation": "gravity_torque_as_modelled",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-MECH-002",
+      "title": "Small free oscillation period matches the linearised pendulum",
+      "domain": "mechanical",
+      "metric": "small_oscillation_period_s",
+      "scenario": {
+        "name": "free_swing",
+        "amplitude_rad": 0.01
+      },
+      "unit": "s",
+      "absolute_tolerance": 2e-05,
+      "derivation": "small_oscillation_period",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-MECH-003",
+      "title": "Simulated moving mass equals the CAD-derived moving mass",
+      "domain": "mechanical",
+      "metric": "moving_mass_kg",
+      "scenario": {
+        "name": "static_sweep"
+      },
+      "unit": "kg",
+      "absolute_tolerance": 1e-09,
+      "derivation": "moving_mass",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-MECH-004",
+      "title": "Moving mass under the 1.0 kg rated-payload override",
+      "domain": "mechanical",
+      "metric": "moving_mass_kg",
+      "scenario": {
+        "name": "static_sweep",
+        "payload_component": "payload",
+        "payload_mass_kg": 1.0
+      },
+      "unit": "kg",
+      "absolute_tolerance": 1e-09,
+      "derivation": "moving_mass",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-MECH-005",
+      "title": "Holding torque in the as-modelled pose under the rated-payload override",
+      "domain": "mechanical",
+      "metric": "static_torque_at_zero_nm",
+      "scenario": {
+        "name": "static_sweep",
+        "payload_component": "payload",
+        "payload_mass_kg": 1.0
+      },
+      "unit": "N*m",
+      "absolute_tolerance": 1e-06,
+      "derivation": "gravity_torque_as_modelled",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-MECH-006",
+      "title": "Hanging equilibrium angle matches the centre-of-mass geometry",
+      "domain": "mechanical",
+      "metric": "equilibrium_angle_rad",
+      "scenario": {
+        "name": "free_swing",
+        "amplitude_rad": 0.01
+      },
+      "unit": "rad",
+      "absolute_tolerance": 1e-06,
+      "derivation": "equilibrium_angle",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-MECH-007",
+      "title": "Peak speed of the rated move matches the minimum-jerk profile",
+      "domain": "mechanical",
+      "metric": "move_peak_speed_rad_s",
+      "scenario": {
+        "name": "rated_move",
+        "start_rad": 0.0,
+        "end_rad": -1.5707963267948966,
+        "duration_s": 0.8
+      },
+      "unit": "rad/s",
+      "absolute_tolerance": 1e-06,
+      "derivation": "min_jerk_peak_speed",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-MECH-008",
+      "title": "Peak acceleration of the rated move matches the minimum-jerk profile",
+      "domain": "mechanical",
+      "metric": "move_peak_accel_rad_s2",
+      "scenario": {
+        "name": "rated_move",
+        "start_rad": 0.0,
+        "end_rad": -1.5707963267948966,
+        "duration_s": 0.8
+      },
+      "unit": "rad/s^2",
+      "absolute_tolerance": 0.0001,
+      "derivation": "min_jerk_peak_accel",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    },
+    {
+      "reference_id": "REF-MECH-009",
+      "title": "Peak torque of the rated move matches inertia times acceleration less gravity",
+      "domain": "mechanical",
+      "metric": "move_peak_torque_abs_nm",
+      "scenario": {
+        "name": "rated_move",
+        "start_rad": 0.0,
+        "end_rad": -1.5707963267948966,
+        "duration_s": 0.8
+      },
+      "unit": "N*m",
+      "absolute_tolerance": 1e-06,
+      "derivation": "rated_move_peak_torque",
+      "source": {
+        "kind": "computation",
+        "ref": "model verification: an independent closed-form derivation, not a design requirement"
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "REQ-MECH-001",
+      "title": "Holding torque across the range of motion, nominal payload",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "static_torque_max_abs_nm",
+      "scenario": {
+        "name": "static_sweep"
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 2.5
+      },
+      "unit": "N*m",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-MECH-002",
+      "title": "Holding torque across the range of motion, 1.0 kg rated payload",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "static_torque_max_abs_nm",
+      "scenario": {
+        "name": "static_sweep",
+        "payload_component": "payload",
+        "payload_mass_kg": 1.0
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 4.0
+      },
+      "unit": "N*m",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-MECH-003",
+      "title": "Peak torque of the rated move (0 to -90 degrees in 0.8 s)",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "move_peak_torque_abs_nm",
+      "scenario": {
+        "name": "rated_move",
+        "start_rad": 0.0,
+        "end_rad": -1.5707963267948966,
+        "duration_s": 0.8
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 3.0
+      },
+      "unit": "N*m",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-MECH-004",
+      "title": "Peak joint speed of the rated move",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "move_peak_speed_rad_s",
+      "scenario": {
+        "name": "rated_move",
+        "start_rad": 0.0,
+        "end_rad": -1.5707963267948966,
+        "duration_s": 0.8
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 5.0
+      },
+      "unit": "rad/s",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-MECH-005",
+      "title": "No part comes within 5 mm of the fixed structure across the range of motion",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "rom_min_clearance_m",
+      "scenario": {
+        "name": "rom_sweep"
+      },
+      "operator": ">=",
+      "limit": {
+        "value": 0.005
+      },
+      "unit": "m",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-XD-001",
+      "title": "Rated-payload holding torque is within the actuator's continuous output torque",
+      "domain": "mechanical",
+      "component": "actuator",
+      "metric": "static_torque_max_abs_nm",
+      "scenario": {
+        "name": "static_sweep",
+        "payload_component": "payload",
+        "payload_mass_kg": 1.0
+      },
+      "operator": "<=",
+      "limit": {
+        "quantity": "components/actuator/domains/mechanical/continuous_output_torque"
+      },
+      "unit": "N*m",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP, chosen to exercise the pipeline; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    }
+  ]
+}

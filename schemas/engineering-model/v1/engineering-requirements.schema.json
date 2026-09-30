@@ -1,0 +1,191 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/engineering-requirements.schema.json",
+  "title": "eCAD Machine-Readable Engineering Requirements v1",
+  "description": "Numeric requirements evaluated deterministically. reference_values verify a domain model against an independent derivation (V3 golden); requirements bound a simulated metric under a scenario (V4 corner). A limit may be a number or a path to a model quantity; a limit with a null status (UNKNOWN, UNSPECIFIED, NOT_AVAILABLE) makes the requirement BLOCKED, never assumed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "requirements_version",
+    "design_id",
+    "reference_values",
+    "requirements"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://embeddedos.org/schemas/engineering-model/v1/engineering-requirements.schema.json"
+    },
+    "requirements_version": {
+      "const": "1.0.0"
+    },
+    "design_id": {
+      "$ref": "common.schema.json#/definitions/identifier"
+    },
+    "reference_values": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/referenceValue"
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/requirement"
+      }
+    }
+  },
+  "definitions": {
+    "metric": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "scenario": {
+      "description": "What the case runs. The name and its parameters belong to the domain: each domain adapter validates them against its own vocabulary (for the mechanical domain, mechanical-vocabulary.schema.json).",
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "common.schema.json#/definitions/identifier"
+        }
+      }
+    },
+    "referenceValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_id",
+        "title",
+        "domain",
+        "metric",
+        "scenario",
+        "unit",
+        "absolute_tolerance",
+        "derivation",
+        "source"
+      ],
+      "properties": {
+        "reference_id": {
+          "$ref": "common.schema.json#/definitions/identifier"
+        },
+        "title": {
+          "$ref": "common.schema.json#/definitions/nonEmptyString"
+        },
+        "domain": {
+          "$ref": "common.schema.json#/definitions/engineeringDomain"
+        },
+        "metric": {
+          "$ref": "#/definitions/metric"
+        },
+        "scenario": {
+          "$ref": "#/definitions/scenario"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "absolute_tolerance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "derivation": {
+          "description": "Name of the independent closed-form derivation, one the domain adapter implements, that computes the expected value from the engineering model. The value itself is computed, not typed.",
+          "$ref": "common.schema.json#/definitions/identifier"
+        },
+        "source": {
+          "$ref": "common.schema.json#/definitions/source"
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "title",
+        "domain",
+        "component",
+        "metric",
+        "scenario",
+        "operator",
+        "limit",
+        "unit",
+        "source",
+        "illustrative"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "common.schema.json#/definitions/identifier"
+        },
+        "title": {
+          "$ref": "common.schema.json#/definitions/nonEmptyString"
+        },
+        "domain": {
+          "$ref": "common.schema.json#/definitions/engineeringDomain"
+        },
+        "component": {
+          "description": "The component or joint the requirement constrains; must resolve in the engineering model.",
+          "$ref": "common.schema.json#/definitions/identifier"
+        },
+        "metric": {
+          "$ref": "#/definitions/metric"
+        },
+        "scenario": {
+          "$ref": "#/definitions/scenario"
+        },
+        "operator": {
+          "enum": [
+            "<=",
+            ">="
+          ]
+        },
+        "limit": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "quantity"
+              ],
+              "properties": {
+                "quantity": {
+                  "$ref": "common.schema.json#/definitions/nonEmptyString"
+                }
+              }
+            }
+          ]
+        },
+        "tolerance": {
+          "description": "How far the metric may pass the limit and still meet it, in the requirement's unit. Applied as maximum = limit + tolerance for <=, minimum = limit - tolerance for >=. Absent means 0.",
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "common.schema.json#/definitions/source"
+        },
+        "illustrative": {
+          "description": "True for an example limit chosen to exercise the pipeline rather than a real requirement. Carried into every result and report row.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

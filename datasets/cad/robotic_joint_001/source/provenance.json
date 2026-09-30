@@ -1,0 +1,29 @@
+{
+  "$schema": "https://embeddedos.org/schemas/cad-dataset/v1/source-provenance.schema.json",
+  "provenance_version": "1.0.0",
+  "domain": "mechanical",
+  "artifacts": [
+    {"path": "source/robotic_joint_001.step", "format": "step"}
+  ],
+  "generator": "source/generate_step.py",
+  "description": "Single-axis robotic joint: aluminium base plate and pillar, steel shaft in the pillar bore, aluminium link, steel payload block. Authored for the eCAD multi-domain validation pipeline (issue #27).",
+  "artifact_type": "step_assembly",
+  "artifact_version": "1.0",
+  "units": "mm",
+  "coordinate_system": "right-handed; +Z up; joint axis along +Y through (0, *, 200) mm",
+  "created_at": "2026-09-24",
+  "collected_at": "2026-09-24",
+  "origin": {
+    "kind": "self_authored",
+    "author": "EmbeddedOS (EoS) Research Foundation"
+  },
+  "license": {
+    "spdx": "MIT",
+    "attribution": "Copyright (c) 2024-2026 EmbeddedOS (EoS) Research Foundation",
+    "license_verified": true,
+    "license_text": {"path": "LICENSE", "sha256": "2779b5d4987171210e3c18f461e4ee832426c3c52ca3e53a7dce23af057c4c0a"},
+    "redistribution_permitted": true,
+    "training_use_permitted": true,
+    "basis": "authored in this repository by source/generate_step.py and committed under the repository's MIT LICENSE"
+  }
+}

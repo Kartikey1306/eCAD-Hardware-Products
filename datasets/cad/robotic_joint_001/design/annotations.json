@@ -1,0 +1,244 @@
+{
+  "$schema": "https://embeddedos.org/schemas/engineering-model/v1/design-annotations.schema.json",
+  "annotations_version": "1.0.0",
+  "design_id": "robotic_joint_001",
+  "materials": {
+    "aluminium_6061": {
+      "name": "aluminium alloy 6061",
+      "density": {
+        "value": 2700.0,
+        "unit": "kg/m^3",
+        "status": "ESTIMATED",
+        "source": {
+          "kind": "estimation",
+          "ref": "nominal density of aluminium alloy 6061, 2.70 g/cm^3, from general engineering knowledge"
+        },
+        "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses"
+      }
+    },
+    "steel_1045": {
+      "name": "AISI 1045 carbon steel",
+      "density": {
+        "value": 7850.0,
+        "unit": "kg/m^3",
+        "status": "ESTIMATED",
+        "source": {
+          "kind": "estimation",
+          "ref": "nominal density of AISI 1045 carbon steel, 7.85 g/cm^3, from general engineering knowledge"
+        },
+        "note": "no handbook, standard or supplier certificate was consulted; confirm against one before relying on derived masses"
+      }
+    }
+  },
+  "parts": {
+    "base_plate": {
+      "component_id": "base_plate",
+      "kind": "structure",
+      "material": "aluminium_6061"
+    },
+    "pillar": {
+      "component_id": "pillar",
+      "kind": "structure",
+      "material": "aluminium_6061"
+    },
+    "shaft": {
+      "component_id": "shaft",
+      "kind": "shaft",
+      "material": "steel_1045"
+    },
+    "link": {
+      "component_id": "link",
+      "kind": "structure",
+      "material": "aluminium_6061"
+    },
+    "payload": {
+      "component_id": "payload",
+      "kind": "payload",
+      "material": "steel_1045"
+    }
+  },
+  "joints": [
+    {
+      "joint_id": "j1",
+      "type": "revolute",
+      "parent": "pillar",
+      "child": "link",
+      "realized_by": "shaft",
+      "axis_sense": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "limits": {
+        "lower": {
+          "value": -2.0943951023931953,
+          "unit": "rad",
+          "status": "SPECIFIED",
+          "source": {
+            "kind": "design_annotation",
+            "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+          },
+          "note": "-120 degrees: the link lifted up and back over the pillar"
+        },
+        "upper": {
+          "value": 0.4363323129985824,
+          "unit": "rad",
+          "status": "SPECIFIED",
+          "source": {
+            "kind": "design_annotation",
+            "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+          },
+          "note": "+25 degrees: the link lowered toward the base plate; positive rotation about +Y lowers the tip"
+        }
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "component": "pillar",
+      "attached_to": "base_plate"
+    },
+    {
+      "component": "shaft",
+      "attached_to": "link"
+    },
+    {
+      "component": "payload",
+      "attached_to": "link"
+    }
+  ],
+  "components_without_cad": [
+    {
+      "component_id": "actuator",
+      "name": "joint actuator (motor and gearbox, not yet selected)",
+      "kind": "motor",
+      "domains": {
+        "mechanical": {
+          "continuous_output_torque": {
+            "value": null,
+            "unit": "N*m",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "note": "no motor or gearbox is selected: needs torque constant, continuous current and gear ratio"
+          },
+          "gear_ratio": {
+            "value": null,
+            "unit": "1",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "note": "no gearbox is selected"
+          }
+        },
+        "electrical": {
+          "torque_constant": {
+            "value": null,
+            "unit": "N*m/A",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "note": "no motor is selected"
+          },
+          "winding_resistance": {
+            "value": null,
+            "unit": "ohm",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "note": "no motor is selected"
+          }
+        },
+        "thermal": {
+          "maximum_winding_temperature": {
+            "value": null,
+            "unit": "degC",
+            "status": "UNKNOWN",
+            "source": {
+              "kind": "design_annotation",
+              "ref": "datasets/cad/robotic_joint_001/design/annotations.json"
+            },
+            "note": "no motor is selected"
+          }
+        }
+      }
+    },
+    {
+      "component_id": "drive",
+      "name": "eServo-200 EtherCAT servo drive",
+      "kind": "motor_driver",
+      "domains": {
+        "electrical": {
+          "supply_voltage": {
+            "value": 48.0,
+            "unit": "V",
+            "status": "SPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            }
+          },
+          "rated_current": {
+            "value": 5.0,
+            "unit": "A",
+            "status": "SPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            },
+            "note": "the datasheet states 5 A without saying whether it is continuous or peak"
+          },
+          "rated_power": {
+            "value": 200.0,
+            "unit": "W",
+            "status": "SPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            }
+          }
+        },
+        "control": {
+          "current_loop_bandwidth": {
+            "value": 20000.0,
+            "unit": "Hz",
+            "status": "SPECIFIED",
+            "source": {
+              "kind": "product_specification",
+              "ref": "eRobotics_CAD_Design/robot_components/product_datasheet.md",
+              "sha256": "f6e4502a3a93112aab7fcd91c9c9242c1227cde8d21c6614dabbab2291094f8c"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "relation": "powered_by",
+      "from": "actuator",
+      "to": "drive"
+    },
+    {
+      "relation": "controls",
+      "from": "drive",
+      "to": "actuator"
+    },
+    {
+      "relation": "drives",
+      "from": "actuator",
+      "to": "link"
+    }
+  ]
+}

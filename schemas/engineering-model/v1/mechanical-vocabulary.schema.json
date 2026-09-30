@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/mechanical-vocabulary.schema.json",
+  "title": "eCAD Mechanical Domain Vocabulary v1",
+  "description": "The scenarios and closed-form derivations the mechanical domain adapter implements. The generic requirements schema leaves both open; the mechanical adapter validates every mechanical requirement and reference against this document.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenarios",
+    "derivations"
+  ],
+  "properties": {
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/scenario"
+      }
+    },
+    "derivations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/derivation"
+      }
+    }
+  },
+  "definitions": {
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "static_sweep",
+            "rated_move",
+            "rom_sweep",
+            "free_swing"
+          ]
+        },
+        "payload_mass_kg": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "start_rad": {
+          "type": "number"
+        },
+        "end_rad": {
+          "type": "number"
+        },
+        "duration_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "amplitude_rad": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "payload_component": {
+          "$ref": "common.schema.json#/definitions/identifier"
+        }
+      },
+      "dependencies": {
+        "payload_mass_kg": [
+          "payload_component"
+        ],
+        "payload_component": [
+          "payload_mass_kg"
+        ]
+      },
+      "allOf": [
+        {
+          "description": "The rated move is a minimum-jerk profile from start_rad to end_rad over duration_s; the case script and the move derivations read all three.",
+          "if": {"properties": {"name": {"const": "rated_move"}}},
+          "then": {"required": ["start_rad", "end_rad", "duration_s"]}
+        },
+        {
+          "description": "The free swing starts amplitude_rad from equilibrium.",
+          "if": {"properties": {"name": {"const": "free_swing"}}},
+          "then": {"required": ["amplitude_rad"]}
+        }
+      ]
+    },
+    "derivation": {
+      "description": "Name of the independent closed-form derivation that computes the expected value from the engineering model. The value itself is computed, not typed.",
+      "enum": [
+        "moving_mass",
+        "gravity_torque_as_modelled",
+        "small_oscillation_period",
+        "equilibrium_angle",
+        "min_jerk_peak_speed",
+        "min_jerk_peak_accel",
+        "rated_move_peak_torque"
+      ]
+    }
+  }
+}

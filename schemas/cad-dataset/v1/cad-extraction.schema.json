@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/cad-dataset/v1/cad-extraction.schema.json",
+  "title": "eCAD Raw CAD Extraction v1",
+  "description": "What a CAD importer read from the file and nothing else, in the file's declared length unit. Mass properties are for unit density: density is design intent, not geometry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "extraction_version", "source", "importer", "length_unit", "parts"],
+  "properties": {
+    "$schema": {"const": "https://embeddedos.org/schemas/cad-dataset/v1/cad-extraction.schema.json"},
+    "extraction_version": {"const": "1.0.0"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "format"],
+      "properties": {
+        "path": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/relativePath"},
+        "sha256": {"$ref": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json#/definitions/sha256"},
+        "format": {"enum": ["step"]}
+      }
+    },
+    "importer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "kernel", "kernel_version"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "kernel": {"type": "string", "minLength": 1},
+        "kernel_version": {"type": "string", "minLength": 1}
+      }
+    },
+    "length_unit": {"enum": ["mm", "m", "inch"]},
+    "parts": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/part"}}
+  },
+  "definitions": {
+    "vector3": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}},
+    "matrix3": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/definitions/vector3"}},
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "occurrence",
+        "translation",
+        "rotation",
+        "solid_count",
+        "face_count",
+        "volume",
+        "surface_area",
+        "center_of_mass_local",
+        "inertia_about_com_unit_density_local",
+        "bounding_box_local",
+        "cylindrical_faces"
+      ],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "occurrence": {"type": "string", "minLength": 1},
+        "translation": {"$ref": "#/definitions/vector3"},
+        "rotation": {"$ref": "#/definitions/matrix3"},
+        "solid_count": {"type": "integer", "minimum": 0},
+        "face_count": {"type": "integer", "minimum": 0},
+        "volume": {"type": "number", "minimum": 0},
+        "surface_area": {"type": "number", "minimum": 0},
+        "center_of_mass_local": {"$ref": "#/definitions/vector3"},
+        "inertia_about_com_unit_density_local": {"$ref": "#/definitions/matrix3"},
+        "bounding_box_local": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": {"min": {"$ref": "#/definitions/vector3"}, "max": {"$ref": "#/definitions/vector3"}}
+        },
+        "cylindrical_faces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["axis_origin_local", "axis_direction_local", "radius"],
+            "properties": {
+              "axis_origin_local": {"$ref": "#/definitions/vector3"},
+              "axis_direction_local": {"$ref": "#/definitions/vector3"},
+              "radius": {"type": "number", "exclusiveMinimum": 0}
+            }
+          }
+        }
+      }
+    }
+  }
+}

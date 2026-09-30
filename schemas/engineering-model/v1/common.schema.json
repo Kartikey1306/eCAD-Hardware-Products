@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://embeddedos.org/schemas/engineering-model/v1/common.schema.json",
+  "title": "eCAD Engineering Model v1 Common Types",
+  "description": "Shared closed definitions. Every engineering value is a quantity that states where it came from; an unknown value is null and says so.",
+  "definitions": {
+    "identifier": {
+      "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/identifier"
+    },
+    "nonEmptyString": {
+      "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/nonEmptyString"
+    },
+    "relativePath": {
+      "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/relativePath"
+    },
+    "sha256": {
+      "$ref": "https://embeddedos.org/schemas/hardware-validation/v1/common.schema.json#/definitions/sha256"
+    },
+    "status": {
+      "description": "Epistemic status. DERIVED is a deterministic function of other recorded values and must name them in derived_from. AI_ASSUMPTION must never be presented as SPECIFIED or MEASURED. Three statuses have no value: UNKNOWN (nobody has established it, including not yet selected), UNSPECIFIED (the governing source was consulted and is silent) and NOT_AVAILABLE (it exists in a source this project cannot access or use).",
+      "enum": ["MEASURED", "SPECIFIED", "DERIVED", "SIMULATED", "ESTIMATED", "AI_ASSUMPTION", "UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE"]
+    },
+    "engineeringDomain": {
+      "enum": [
+        "mechanical",
+        "electrical",
+        "digital",
+        "pcb",
+        "power_electronics",
+        "control",
+        "electromagnetic",
+        "thermal",
+        "full_system"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "cad",
+            "datasheet",
+            "product_specification",
+            "design_annotation",
+            "requirement",
+            "handbook",
+            "measurement",
+            "simulation",
+            "estimation",
+            "computation",
+            "ai"
+          ]
+        },
+        "ref": {"$ref": "#/definitions/nonEmptyString"},
+        "sha256": {"$ref": "#/definitions/sha256"}
+      }
+    },
+    "numberOrMatrix": {
+      "oneOf": [
+        {"type": "number"},
+        {"type": "array", "minItems": 1, "items": {"type": "number"}},
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "array", "minItems": 1, "items": {"type": "number"}}
+        }
+      ]
+    },
+    "quantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "status", "source"],
+      "properties": {
+        "value": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/definitions/numberOrMatrix"}]
+        },
+        "unit": {"type": "string", "minLength": 1},
+        "status": {"$ref": "#/definitions/status"},
+        "source": {"$ref": "#/definitions/source"},
+        "derived_from": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/definitions/nonEmptyString"}
+        },
+        "note": {"$ref": "#/definitions/nonEmptyString"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"enum": ["UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE"]}}},
+          "then": {"properties": {"value": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"value": {"type": "null"}}},
+          "then": {"properties": {"status": {"enum": ["UNKNOWN", "UNSPECIFIED", "NOT_AVAILABLE"]}}}
+        },
+        {
+          "description": "Why there is no value, or what an estimate rests on, is always stated.",
+          "if": {"properties": {"status": {"enum": ["UNKNOWN", "NOT_AVAILABLE", "ESTIMATED"]}}},
+          "then": {"required": ["note"]}
+        },
+        {
+          "description": "UNSPECIFIED cites, by hash, the document that is silent on the value.",
+          "if": {"properties": {"status": {"const": "UNSPECIFIED"}}},
+          "then": {"properties": {"source": {"required": ["sha256"]}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "MEASURED"}}},
+          "then": {"properties": {"source": {"properties": {"kind": {"const": "measurement"}}}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "SIMULATED"}}},
+          "then": {"properties": {"source": {"properties": {"kind": {"const": "simulation"}}}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "AI_ASSUMPTION"}}},
+          "then": {"properties": {"source": {"properties": {"kind": {"const": "ai"}}}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "DERIVED"}}},
+          "then": {
+            "required": ["derived_from"],
+            "properties": {"derived_from": {"minItems": 1}}
+          }
+        }
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "size_bytes", "media_type"],
+      "properties": {
+        "path": {"$ref": "#/definitions/relativePath"},
+        "sha256": {"$ref": "#/definitions/sha256"},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "media_type": {"$ref": "#/definitions/nonEmptyString"}
+      }
+    }
+  }
+}

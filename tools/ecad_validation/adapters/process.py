@@ -8,7 +8,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional
+from typing import Dict, List, Mapping, Optional, Union
 
 from ..models import ExecutionStatus
 
@@ -34,6 +34,22 @@ class ProcessResult:
     stderr: str = ""
     workspace: Optional[Path] = None
     outputs: List[Path] = field(default_factory=list)
+
+
+def captured_text(value: Union[bytes, str, None]) -> str:
+    """Normalise captured subprocess output to text.
+
+    ``subprocess.TimeoutExpired`` carries the raw accumulated *bytes* even when
+    ``subprocess.run`` was given ``text=True``: the exception is raised from
+    ``Popen._communicate`` before newline translation runs. Passing those bytes
+    to :func:`_limited` raises ``AttributeError``, which no caller catches, so
+    the timeout path must decode before truncating.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    return value
 
 
 def _limited(text: str) -> str:
@@ -125,8 +141,8 @@ def run_process(request: ProcessRequest) -> ProcessResult:
                 execution_status=ExecutionStatus.TIMED_OUT,
                 reason_code="TOOL_TIMED_OUT",
                 argv=argv,
-                stdout=_limited(exc.stdout or ""),
-                stderr=_limited(exc.stderr or ""),
+                stdout=_limited(captured_text(exc.stdout)),
+                stderr=_limited(captured_text(exc.stderr)),
             )
         except OSError as exc:
             return ProcessResult(

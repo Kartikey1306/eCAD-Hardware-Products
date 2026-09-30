@@ -2,16 +2,23 @@
 
 from __future__ import annotations
 
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 from ecad_validation.adapters.base import AdapterRequest  # noqa: E402
-from ecad_validation.adapters.process import ProcessRequest, run_process  # noqa: E402
+from ecad_validation.adapters import hdl  # noqa: E402
+from ecad_validation.adapters.process import (  # noqa: E402
+    ProcessRequest,
+    captured_text,
+    run_process,
+)
 from ecad_validation.adapters.python_control import PythonControlAdapter  # noqa: E402
 from ecad_validation.models import ExecutionStatus, Verdict  # noqa: E402
 
@@ -46,6 +53,71 @@ class TestProcessRunner(unittest.TestCase):
             )
         self.assertEqual(result.execution_status, ExecutionStatus.TIMED_OUT)
         self.assertEqual(result.reason_code, "TOOL_TIMED_OUT")
+
+    def test_timeout_after_output_is_reported_not_raised(self):
+        """A tool that prints before hanging must still time out cleanly.
+
+        ``TimeoutExpired.stdout`` is bytes even under ``text=True``, so the
+        silent script in the test above never exercised the decode path. Every
+        real solver prints a banner before it hangs.
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            script = root / "noisy_slow.py"
+            script.write_text(
+                "import sys, time\n"
+                "print('transient analysis started')\n"
+                "sys.stdout.flush()\n"
+                "time.sleep(30)\n",
+                encoding="utf-8",
+            )
+            result = run_process(
+                ProcessRequest(
+                    argv=[sys.executable, "noisy_slow.py"],
+                    input_root=root,
+                    input_files=[script],
+                    timeout_seconds=1,
+                )
+            )
+        self.assertEqual(result.execution_status, ExecutionStatus.TIMED_OUT)
+        self.assertEqual(result.reason_code, "TOOL_TIMED_OUT")
+        self.assertIsInstance(result.stdout, str)
+        self.assertIn("transient analysis started", result.stdout)
+
+    def test_captured_text_decodes_bytes_and_none(self):
+        self.assertEqual(captured_text(b"banner\n"), "banner\n")
+        self.assertEqual(captured_text("banner\n"), "banner\n")
+        self.assertEqual(captured_text(None), "")
+        self.assertIsInstance(captured_text(b"\xff\xfe"), str)
+
+
+class TestHDLAdapterTimeout(unittest.TestCase):
+    def test_timeout_output_is_text_not_bytes(self):
+        """vvp prints a VCD banner before a testbench with no $finish hangs."""
+        capability = hdl.Capability(
+            adapter="iverilog", available=True, executable="iverilog", version="12.0"
+        )
+        expired = subprocess.TimeoutExpired(
+            cmd=["iverilog"], timeout=1, output=b"VCD info: dumpfile waves.vcd opened\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "tb.v"
+            source.write_text("module tb; endmodule\n", encoding="utf-8")
+            with mock.patch.object(hdl.HDLAdapter, "capability", return_value=capability), \
+                 mock.patch.object(hdl.subprocess, "run", side_effect=expired):
+                result = hdl.HDLAdapter().run(
+                    AdapterRequest(
+                        case_id="hanging-testbench",
+                        product_root=root,
+                        input_files=[source],
+                        timeout_seconds=1,
+                    )
+                )
+        self.assertEqual(result.execution_status, ExecutionStatus.TIMED_OUT)
+        self.assertEqual(result.reason_code, "RTL_EXECUTION_TIMED_OUT")
+        self.assertIsInstance(result.stdout, str)
+        self.assertIn("VCD info", result.stdout)
 
 
 class TestPythonControlAdapter(unittest.TestCase):

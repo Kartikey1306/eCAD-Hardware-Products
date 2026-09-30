@@ -10,7 +10,7 @@ from pathlib import Path
 from ..models import ExecutionStatus, Verdict
 from .base import Adapter, AdapterRequest, AdapterResult, Capability
 from .capabilities import probe_executable
-from .process import relative_input_path
+from .process import captured_text, relative_input_path
 
 
 class HDLAdapter(Adapter):
@@ -106,8 +106,8 @@ class HDLAdapter(Adapter):
                     reason_code="RTL_EXECUTION_TIMED_OUT",
                     summary="RTL compilation or execution timed out",
                     command=compile_command,
-                    stdout=exc.stdout or "",
-                    stderr=exc.stderr or "",
+                    stdout=captured_text(exc.stdout),
+                    stderr=captured_text(exc.stderr),
                 )
             except OSError as exc:
                 return AdapterResult(
