@@ -15,6 +15,16 @@ Scenarios (the --scenario JSON object's "name"):
                   the joint range, using the model's collision proxies.
     free_swing    Period of small free oscillation about the stable
                   equilibrium, integrated forward in time.
+    intent_tracking
+                  Closed loop: a sequence of decoded intents (eNI's
+                  move_left / move_right / select / ...) becomes joint
+                  setpoints. Each move follows a minimum-jerk reference, and
+                  computed torque (inverse dynamics of the reference) plus PD
+                  on the tracking error drives the joint under forward
+                  dynamics, saturated at the actuator limit. The run reports
+                  whether each setpoint was reached and what that cost in
+                  torque and speed. These are task metrics, not "the
+                  simulation ran".
 
 Every scenario except rom_sweep runs with contact disabled: the collision
 proxies are conservative boxes for clearance checking, and must never push on
@@ -213,11 +223,110 @@ def free_swing(model: mujoco.MjModel, scenario: Dict[str, Any]) -> Dict[str, flo
     }
 
 
+# Intent vocabulary of eNI's simulator provider, and the setpoint change each
+# one commands, in units of step_rad. "select"/"activate" hold the current
+# setpoint and "deactivate" returns to the as-modelled pose (0 rad). Anything
+# else is an error, so a renamed intent cannot silently become "do nothing".
+INTENT_STEPS = {
+    "move_left": -1.0,
+    "move_right": 1.0,
+    "scroll_up": 0.5,
+    "scroll_down": -0.5,
+    "select": 0.0,
+    "activate": 0.0,
+}
+TRACK_STEP_S = 5e-4
+# Peaks of a minimum-jerk move over distance d in time T:
+# speed 1.875 d / T, acceleration 10 / sqrt(3) d / T^2.
+MIN_JERK_PEAK_SPEED = 1.875
+MIN_JERK_PEAK_ACCEL = 10 / math.sqrt(3)
+
+
+def intent_tracking(model: mujoco.MjModel, scenario: Dict[str, Any]) -> Dict[str, float]:
+    model.opt.disableflags |= mujoco.mjtDisableBit.mjDSBL_CONTACT
+    model.opt.timestep = TRACK_STEP_S
+    address, _body, low, high = hinge(model)
+    intents = scenario["intents"]
+    if not intents:
+        raise ValueError("intent_tracking needs at least one intent")
+    step, dwell = scenario["step_rad"], scenario["dwell_s"]
+    kp, kd = scenario["kp"], scenario["kd"]
+    limit, tolerance = scenario["torque_limit_nm"], scenario["settle_tolerance_rad"]
+    speed_cap = scenario["max_reference_speed_rad_s"]
+    # Bounding speed alone is not enough. Short moves then finish so fast that
+    # their acceleration, and so their torque, hits the actuator limit.
+    accel_cap = scenario["max_reference_accel_rad_s2"]
+    margin = scenario.get("range_margin_rad", 0.05)
+
+    plant = mujoco.MjData(model)
+    reference = mujoco.MjData(model)  # scratch state for inverse dynamics of the reference
+    setpoint = 0.0
+    plant.qpos[address] = setpoint
+    mujoco.mj_forward(model, plant)
+    peak_torque = peak_speed = worst_error = 0.0
+    saturated = total = clamped = reached = range_violation = 0
+    dwell_steps = int(round(dwell / TRACK_STEP_S))
+    for intent in intents:
+        if intent == "deactivate":
+            commanded = 0.0
+        elif intent in INTENT_STEPS:
+            commanded = setpoint + INTENT_STEPS[intent] * step
+        else:
+            raise ValueError(f"unknown intent {intent!r}")
+        goal = min(max(commanded, low + margin), high - margin)
+        clamped += int(goal != commanded)
+        start, delta = setpoint, goal - setpoint
+        duration = max(MIN_JERK_PEAK_SPEED * abs(delta) / speed_cap,
+                       math.sqrt(MIN_JERK_PEAK_ACCEL * abs(delta) / accel_cap),
+                       TRACK_STEP_S)
+        if duration > dwell:
+            raise ValueError(f"a {abs(delta):.3f} rad move needs {duration:.3f} s within "
+                             f"{speed_cap} rad/s and {accel_cap} rad/s^2, "
+                             f"longer than dwell_s {dwell}")
+        for k in range(dwell_steps):
+            s_ = min(1.0, k * TRACK_STEP_S / duration)
+            q_r = start + delta * (10 * s_**3 - 15 * s_**4 + 6 * s_**5)
+            qd_r = delta * (30 * s_**2 - 60 * s_**3 + 30 * s_**4) / duration if s_ < 1 else 0.0
+            qdd_r = delta * (60 * s_ - 180 * s_**2 + 120 * s_**3) / duration**2 if s_ < 1 else 0.0
+            reference.qpos[address], reference.qvel[address], reference.qacc[address] = q_r, qd_r, qdd_r
+            mujoco.mj_inverse(model, reference)
+            q, qd = float(plant.qpos[address]), float(plant.qvel[address])
+            tau = float(reference.qfrc_inverse[address]) + kp * (q_r - q) + kd * (qd_r - qd)
+            if abs(tau) > limit:
+                saturated += 1
+                tau = math.copysign(limit, tau)
+            plant.qfrc_applied[address] = tau
+            mujoco.mj_step(model, plant)
+            total += 1
+            q, qd = float(plant.qpos[address]), float(plant.qvel[address])
+            if not (math.isfinite(q) and math.isfinite(qd)):
+                raise FloatingPointError("integration diverged")
+            peak_torque = max(peak_torque, abs(tau))
+            peak_speed = max(peak_speed, abs(qd))
+            range_violation |= int(not low - 1e-6 <= q <= high + 1e-6)
+        setpoint = goal
+        error = abs(goal - float(plant.qpos[address]))
+        worst_error = max(worst_error, error)
+        reached += int(error <= tolerance)
+    return {
+        "intents_applied": float(len(intents)),
+        "setpoints_reached_fraction": reached / len(intents),
+        "settle_error_max_rad": worst_error,
+        "track_peak_torque_abs_nm": peak_torque,
+        "track_peak_speed_rad_s": peak_speed,
+        "torque_saturated_fraction": saturated / total,
+        "setpoints_clamped": float(clamped),
+        "range_violation": float(range_violation),
+        "final_angle_rad": float(plant.qpos[address]),
+    }
+
+
 SCENARIOS = {
     "static_sweep": static_sweep,
     "rated_move": rated_move,
     "rom_sweep": rom_sweep,
     "free_swing": free_swing,
+    "intent_tracking": intent_tracking,
 }
 
 

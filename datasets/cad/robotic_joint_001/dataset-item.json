@@ -11,8 +11,8 @@
       "artifact": {
         "media_type": "application/json",
         "path": "derived/cad_extraction.json",
-        "sha256": "efcadbce8b75783a038374252a3e29b9e7ccd6e531df849841422353b87d2fda",
-        "size_bytes": 7181
+        "sha256": "2f1e8a93f0a1e0b2819ca7a54f4848311b563bca80e0ee8184bb6ac411466b59",
+        "size_bytes": 7175
       },
       "derived_from": [
         "source/robotic_joint_001.step"
@@ -28,8 +28,8 @@
       "artifact": {
         "media_type": "application/json",
         "path": "derived/engineering_model.json",
-        "sha256": "84bd8964159842b73f46db93d7de8e21912ff0588a69869659b639398db1fa38",
-        "size_bytes": 42232
+        "sha256": "0c05790555f394ec7fd72e966c43a491262d6d9061c27d47cd53e44093d81bbb",
+        "size_bytes": 42223
       },
       "derived_from": [
         "derived/cad_extraction.json",
@@ -45,8 +45,8 @@
       "artifact": {
         "media_type": "application/xml",
         "path": "derived/mechanical/robotic_joint_001.mjcf.xml",
-        "sha256": "cb39428319ded1c4b702e87c9dafe56c6b51bea3493428da3acd11336146f021",
-        "size_bytes": 2521
+        "sha256": "84d8c58e4c802195fed2c0858fe6f70167dccb8f79283837ed10ed3d8d2fe510",
+        "size_bytes": 2516
       },
       "derived_from": [
         "derived/engineering_model.json"
@@ -79,8 +79,8 @@
       "artifact": {
         "media_type": "application/json",
         "path": "validation/corners/cases.json",
-        "sha256": "a4ce6a66ce82148127721a85547cd300b72ee6aeb72bdff9643549fe2078ec83",
-        "size_bytes": 3403
+        "sha256": "091e21d38dbc8ad56cf5e37444c58fe68da2d97fe8beef3da1d6eeb0626cbe87",
+        "size_bytes": 8345
       },
       "derived_from": [
         "derived/engineering_model.json",
@@ -142,7 +142,7 @@
       "status": "NOT_IMPLEMENTED"
     }
   ],
-  "hash": "sha256:47d654d14b587b48be85f160e5ec40d8fc6e6949e40b2ca4d9263b90570c6546",
+  "hash": "sha256:e74e7c63a0a65023005c281cf8a4d7a28324cf7926889fb2b6b062a09558c053",
   "inputs": {
     "annotations": {
       "media_type": "application/json",
@@ -159,15 +159,15 @@
     "requirements": {
       "media_type": "application/json",
       "path": "requirements/requirements.json",
-      "sha256": "6156ea0e0643497cefba62114a3e6eb77fa90b3b11445bbd84fd8d4a062c1c82",
-      "size_bytes": 9531
+      "sha256": "d2843a1b5686a4ff90da362b5dbf7d08cb954df305a7414969cf281e703e3266",
+      "size_bytes": 15600
     },
     "simulation": [
       {
         "media_type": "text/x-python",
         "path": "simulation/joint_dynamics.py",
-        "sha256": "58698a3f9f98a2bb0390257e5397faf97e8c2afac9519d2bc598d368733931a1",
-        "size_bytes": 10027
+        "sha256": "fb94ab6798d53eaa65e2ddd8c80cf7529758cf5a77b4f271e05a8efe18647021",
+        "size_bytes": 15399
       }
     ]
   },
@@ -214,7 +214,7 @@
     },
     "engineering_model": "1.0.0",
     "extraction": "ecad_model.importers.step_ocp 1.0.0 (cadquery-ocp 8.0.1.0.0)",
-    "simulation": "sha256:a9d171f871ce444c8ed2ddf93b96d0c6fd650dc574561a9a05a6e3eff17e5a03",
+    "simulation": "sha256:f15ae86ca8d91b1ad660c7f592830f99e3d2809fbd13fb3e2ae023141b48cc55",
     "validation_contract": "hardware-validation v1.0.0"
   }
 }

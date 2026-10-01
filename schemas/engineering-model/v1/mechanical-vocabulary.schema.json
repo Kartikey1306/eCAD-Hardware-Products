@@ -36,7 +36,8 @@
             "static_sweep",
             "rated_move",
             "rom_sweep",
-            "free_swing"
+            "free_swing",
+            "intent_tracking"
           ]
         },
         "payload_mass_kg": {
@@ -59,7 +60,24 @@
         },
         "payload_component": {
           "$ref": "common.schema.json#/definitions/identifier"
-        }
+        },
+        "intents": {
+          "description": "Decoded intents, in order, as eNI's simulator provider names them.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["move_left", "move_right", "scroll_up", "scroll_down", "select", "activate", "deactivate"]
+          }
+        },
+        "step_rad": {"type": "number", "exclusiveMinimum": 0},
+        "dwell_s": {"type": "number", "exclusiveMinimum": 0},
+        "kp": {"type": "number", "minimum": 0},
+        "kd": {"type": "number", "minimum": 0},
+        "max_reference_speed_rad_s": {"type": "number", "exclusiveMinimum": 0},
+        "max_reference_accel_rad_s2": {"type": "number", "exclusiveMinimum": 0},
+        "torque_limit_nm": {"type": "number", "exclusiveMinimum": 0},
+        "settle_tolerance_rad": {"type": "number", "exclusiveMinimum": 0},
+        "range_margin_rad": {"type": "number", "minimum": 0}
       },
       "dependencies": {
         "payload_mass_kg": [
@@ -79,6 +97,14 @@
           "description": "The free swing starts amplitude_rad from equilibrium.",
           "if": {"properties": {"name": {"const": "free_swing"}}},
           "then": {"required": ["amplitude_rad"]}
+        },
+        {
+          "description": "Intent tracking turns each intent into a setpoint, moves there on a minimum-jerk reference bounded in speed and acceleration, and drives the joint with computed torque plus PD, saturated at torque_limit_nm.",
+          "if": {"properties": {"name": {"const": "intent_tracking"}}},
+          "then": {
+            "required": ["intents", "step_rad", "dwell_s", "kp", "kd", "max_reference_speed_rad_s",
+                         "max_reference_accel_rad_s2", "torque_limit_nm", "settle_tolerance_rad"]
+          }
         }
       ]
     },

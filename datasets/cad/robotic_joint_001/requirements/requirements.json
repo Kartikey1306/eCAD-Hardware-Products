@@ -273,6 +273,221 @@
       "illustrative": true
     },
     {
+      "requirement_id": "REQ-MECH-006",
+      "title": "Intent tracking stays within the actuator's 3.0 N*m",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "track_peak_torque_abs_nm",
+      "scenario": {
+        "name": "intent_tracking",
+        "intents": [
+          "move_left",
+          "move_left",
+          "move_left",
+          "select",
+          "move_right",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "deactivate"
+        ],
+        "step_rad": 0.25,
+        "dwell_s": 2.0,
+        "kp": 40.0,
+        "kd": 4.0,
+        "max_reference_speed_rad_s": 2.5,
+        "max_reference_accel_rad_s2": 10.0,
+        "torque_limit_nm": 3.0,
+        "settle_tolerance_rad": 0.02
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 3.0
+      },
+      "unit": "N*m",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP: an eNI-style intent trace drives the joint in closed loop; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-MECH-007",
+      "title": "Intent tracking stays under the 5.0 rad/s joint speed limit",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "track_peak_speed_rad_s",
+      "scenario": {
+        "name": "intent_tracking",
+        "intents": [
+          "move_left",
+          "move_left",
+          "move_left",
+          "select",
+          "move_right",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "deactivate"
+        ],
+        "step_rad": 0.25,
+        "dwell_s": 2.0,
+        "kp": 40.0,
+        "kd": 4.0,
+        "max_reference_speed_rad_s": 2.5,
+        "max_reference_accel_rad_s2": 10.0,
+        "torque_limit_nm": 3.0,
+        "settle_tolerance_rad": 0.02
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 5.0
+      },
+      "unit": "rad/s",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP: an eNI-style intent trace drives the joint in closed loop; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-MECH-008",
+      "title": "Every intent setpoint is reached within tolerance",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "setpoints_reached_fraction",
+      "scenario": {
+        "name": "intent_tracking",
+        "intents": [
+          "move_left",
+          "move_left",
+          "move_left",
+          "select",
+          "move_right",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "deactivate"
+        ],
+        "step_rad": 0.25,
+        "dwell_s": 2.0,
+        "kp": 40.0,
+        "kd": 4.0,
+        "max_reference_speed_rad_s": 2.5,
+        "max_reference_accel_rad_s2": 10.0,
+        "torque_limit_nm": 3.0,
+        "settle_tolerance_rad": 0.02
+      },
+      "operator": ">=",
+      "limit": {
+        "value": 1.0
+      },
+      "unit": "1",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP: an eNI-style intent trace drives the joint in closed loop; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-MECH-009",
+      "title": "The joint never leaves its range of motion while tracking",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "range_violation",
+      "scenario": {
+        "name": "intent_tracking",
+        "intents": [
+          "move_left",
+          "move_left",
+          "move_left",
+          "select",
+          "move_right",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "deactivate"
+        ],
+        "step_rad": 0.25,
+        "dwell_s": 2.0,
+        "kp": 40.0,
+        "kd": 4.0,
+        "max_reference_speed_rad_s": 2.5,
+        "max_reference_accel_rad_s2": 10.0,
+        "torque_limit_nm": 3.0,
+        "settle_tolerance_rad": 0.02
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 0.0
+      },
+      "unit": "1",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP: an eNI-style intent trace drives the joint in closed loop; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
+      "requirement_id": "REQ-MECH-010",
+      "title": "The controller never sits at the torque limit",
+      "domain": "mechanical",
+      "component": "j1",
+      "metric": "torque_saturated_fraction",
+      "scenario": {
+        "name": "intent_tracking",
+        "intents": [
+          "move_left",
+          "move_left",
+          "move_left",
+          "select",
+          "move_right",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "move_left",
+          "deactivate"
+        ],
+        "step_rad": 0.25,
+        "dwell_s": 2.0,
+        "kp": 40.0,
+        "kd": 4.0,
+        "max_reference_speed_rad_s": 2.5,
+        "max_reference_accel_rad_s2": 10.0,
+        "torque_limit_nm": 3.0,
+        "settle_tolerance_rad": 0.02
+      },
+      "operator": "<=",
+      "limit": {
+        "value": 0.0
+      },
+      "unit": "1",
+      "source": {
+        "kind": "requirement",
+        "ref": "example requirement for the robotic_joint_001 MVP: an eNI-style intent trace drives the joint in closed loop; not a customer, safety or certification requirement"
+      },
+      "illustrative": true
+    },
+    {
       "requirement_id": "REQ-XD-001",
       "title": "Rated-payload holding torque is within the actuator's continuous output torque",
       "domain": "mechanical",
