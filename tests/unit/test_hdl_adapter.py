@@ -620,7 +620,10 @@ class TestRunProcessCollection(unittest.TestCase):
             self.assertEqual((result.execution_status.value, result.collected, result.collect_problems),
                              ("completed", [kept / "out.txt"], {}))
             self.assertTrue((kept / "out.txt").is_symlink(), "the file the link points at was copied")
-            self.assertEqual(os.readlink(kept / "out.txt"), str(outside))
+            # realpath: on Windows the copied link target is the extended-length
+            # (\\?\) form, which names the same file as the plain path.
+            self.assertEqual(os.path.realpath(os.readlink(kept / "out.txt")),
+                             os.path.realpath(outside))
             # The link leads out of the directory it was copied to, so run_process refuses it before its own
             # symbolic-link check.
             with self.assertRaisesRegex(ValueError, "adapter input escapes product root: .*out.txt"):

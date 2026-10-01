@@ -175,9 +175,9 @@ def _digital_sample(directory: str, requirements: Sequence[Dict[str, Any]] = (),
     (item / "source").mkdir(parents=True)
     (item / "design").mkdir()
     (item / "requirements").mkdir()
-    (item / "source" / "blinker.v").write_text(VERILOG)
+    (item / "source" / "blinker.v").write_text(VERILOG, newline="\n")  # LF: the HDL linter flags CRLF
     for artefact in extra_artifacts:
-        (item / artefact["path"]).write_text("ISO-10303-21;\nEND-ISO-10303-21;\n")
+        (item / artefact["path"]).write_text("ISO-10303-21;\nEND-ISO-10303-21;\n", newline="\n")
     provenance = json.loads((MECHANICAL_ITEM / "source" / "provenance.json").read_text())
     provenance.pop("generator")  # the fixture has no authoring script
     provenance.update(domain="digital", artifacts=[{"path": "source/blinker.v", "format": "verilog"}, *extra_artifacts],
