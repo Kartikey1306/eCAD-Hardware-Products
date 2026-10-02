@@ -621,13 +621,16 @@ class TestRunProcessCollection(unittest.TestCase):
                              ("completed", [kept / "out.txt"], {}))
             self.assertTrue((kept / "out.txt").is_symlink(), "the file the link points at was copied")
             # realpath: on Windows the copied link target is the extended-length
-            # (\\?\\) form, which names the same file as the plain path.
+            # (\\?\) form, which names the same file as the plain path.
             # realpath() returns the prefix inconsistently, so strip it
-            # before comparing.
+            # before comparing. The prefix is four characters: in source it is
+            # "\\\\?\\", not "\\?\\" (which is the three characters \?\).
+            extended_prefix = "\\\\?\\"
+
             def _canon(p):
                 p = os.path.realpath(p)
-                if os.name == "nt" and p.startswith("\\?\\"):
-                    p = p[4:]
+                if os.name == "nt" and p.startswith(extended_prefix):
+                    p = p[len(extended_prefix):]
                 return p
             self.assertEqual(_canon(os.readlink(kept / "out.txt")),
                              _canon(outside))
