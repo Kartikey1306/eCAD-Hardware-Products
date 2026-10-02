@@ -55,13 +55,14 @@ def regular_file(path: Path, limit: Optional[int] = None) -> int:
         UnsupportedFormat: Not a regular file (or a symlink), or too large.
 
     Example:
-        >>> import tempfile, os
+        >>> import tempfile
         >>> with tempfile.TemporaryDirectory() as d:
-        ...     fifo = Path(d) / "part.step"; os.mkfifo(fifo)
-        ...     regular_file(fifo)
+        ...     regular_file(Path(d))  # a directory is not a regular file;
+        ...                            # os.mkfifo is Unix-only, so the portable
+        ...                            # non-regular file is used here
         Traceback (most recent call last):
         ...
-        ecad_model.importers.base.UnsupportedFormat: part.step: not a regular file
+        ecad_model.importers.base.UnsupportedFormat: ...: not a regular file
     """
     import stat
 

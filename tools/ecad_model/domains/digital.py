@@ -460,7 +460,7 @@ def loopback_roles(model: Dict[str, Any]) -> Roles:
     Example:
         >>> import json; from pathlib import Path
         >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/uart_loopback_001"
-        >>> roles = loopback_roles(json.loads((item / "derived/engineering_model.json").read_text()))
+        >>> roles = loopback_roles(json.loads((item / "derived/engineering_model.json").read_text(encoding="utf-8")))
         >>> roles.transmitter["component_id"], roles.receiver["component_id"], roles.line, roles.clock
         ('u_tx', 'u_rx', 'line', 'clk')
     """
@@ -523,7 +523,7 @@ def end_cycle(model: Dict[str, Any]) -> int:
     Example:
         >>> import json; from pathlib import Path
         >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/uart_loopback_001"
-        >>> end_cycle(json.loads((item / "derived/engineering_model.json").read_text()))
+        >>> end_cycle(json.loads((item / "derived/engineering_model.json").read_text(encoding="utf-8")))
         20836
     """
     roles = loopback_roles(model)
@@ -583,7 +583,7 @@ def write_harness(model: Dict[str, Any]) -> str:
     Example:
         >>> import json; from pathlib import Path
         >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/uart_loopback_001"
-        >>> harness = write_harness(json.loads((item / "derived/engineering_model.json").read_text()))
+        >>> harness = write_harness(json.loads((item / "derived/engineering_model.json").read_text(encoding="utf-8")))
         >>> harness.splitlines()[18], harness.splitlines()[21]
         ('    always #10 clk = ~clk;', '        repeat (4) @(posedge clk);')
     """
@@ -741,7 +741,7 @@ def write_simulation(model: Dict[str, Any]) -> bytes:
     Example:
         >>> import json; from pathlib import Path
         >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/uart_loopback_001"
-        >>> simulation = write_simulation(json.loads((item / "derived/engineering_model.json").read_text()))
+        >>> simulation = write_simulation(json.loads((item / "derived/engineering_model.json").read_text(encoding="utf-8")))
         >>> simulation.decode().splitlines()[241]
         '// ---- harness ----'
         >>> simulation == (item / "derived/digital/uart_loopback_001.v").read_bytes()
@@ -861,7 +861,7 @@ def reference_value(model: Dict[str, Any], derivation: str,
     Example:
         >>> import json; from pathlib import Path
         >>> item = Path(__file__).resolve().parents[3] / "datasets/cad/uart_loopback_001"
-        >>> model = json.loads((item / "derived/engineering_model.json").read_text())
+        >>> model = json.loads((item / "derived/engineering_model.json").read_text(encoding="utf-8"))
         >>> reference_value(model, "bit_period_cycles")[0], round(reference_value(model, "bit_rate")[0], 6)
         (434.0, 115207.373272)
     """
