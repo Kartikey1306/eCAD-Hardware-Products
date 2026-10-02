@@ -49,6 +49,18 @@ METRICS = {
     "rom_colliding_poses": Metric("1", "SIMPLIFIED", "poses with proxy contact"),
     "rom_checked_pairs": Metric("1", "SIMPLIFIED", "part pairs checked for clearance"),
     "rom_joint_pair_unchecked": Metric("1", "SIMPLIFIED", "1 when the joint's own pair could not be checked"),
+    # Closed-loop intent tracking. REDUCED_ORDER: the dynamics are the CAD-derived
+    # rigid bodies, but the actuator is an ideal torque source saturated at
+    # torque_limit_nm, with no motor, gearbox or sensor model.
+    "track_peak_torque_abs_nm": Metric("N*m", "REDUCED_ORDER", "peak commanded torque while tracking intents"),
+    "track_peak_speed_rad_s": Metric("rad/s", "REDUCED_ORDER", "peak joint speed while tracking intents"),
+    "setpoints_reached_fraction": Metric("1", "REDUCED_ORDER", "share of intent setpoints reached within tolerance"),
+    "settle_error_max_rad": Metric("rad", "REDUCED_ORDER", "worst tracking error at the end of a dwell"),
+    "torque_saturated_fraction": Metric("1", "REDUCED_ORDER", "share of control steps held at the torque limit"),
+    "range_violation": Metric("1", "REDUCED_ORDER", "1 if the joint ever left its range of motion"),
+    "intents_applied": Metric("1", "REDUCED_ORDER", "intents executed"),
+    "setpoints_clamped": Metric("1", "REDUCED_ORDER", "setpoints pulled back inside the range margin"),
+    "final_angle_rad": Metric("rad", "REDUCED_ORDER", "joint angle after the last intent"),
 }
 
 

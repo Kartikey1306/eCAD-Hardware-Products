@@ -51,6 +51,13 @@ def mujoco_on_path() -> None:
         raise unittest.SkipTest(message)
 
 
+# Metrics of the closed-loop intent_tracking scenario (REQ-MECH-006..010).
+INTENT_TRACKING_METRICS = frozenset({
+    "track_peak_torque_abs_nm", "track_peak_speed_rad_s", "setpoints_reached_fraction",
+    "range_violation", "torque_saturated_fraction",
+})
+
+
 class TestStepExtraction(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -787,8 +794,13 @@ class TestHonestOutcomes(unittest.TestCase):
                         self.assertEqual(hashlib.sha256(stored.read_bytes()).hexdigest(), evidence["sha256"])
                     if result["status"] == "PASS":
                         self.assertTrue(result["simulator_version"])
-                    self.assertEqual(result["model_fidelity"],
-                                     "SIMPLIFIED" if result["metric"].startswith("rom_") else "EXACT_GEOMETRY")
+                    # Clearance uses bounding-box proxies; intent tracking uses
+                    # an ideal saturated torque source in place of a motor model.
+                    expected_fidelity = (
+                        "SIMPLIFIED" if result["metric"].startswith("rom_")
+                        else "REDUCED_ORDER" if result["metric"] in INTENT_TRACKING_METRICS
+                        else "EXACT_GEOMETRY")
+                    self.assertEqual(result["model_fidelity"], expected_fidelity)
             # Each field is what the run compiled and recorded, not a default the schema would accept.
             corners = {c["id"]: c for c in json.loads((ITEM / "validation" / "corners" / "cases.json").read_text())["cases"]}
             golden = {c["id"]: c for c in json.loads((ITEM / "validation" / "golden" / "cases.json").read_text())["cases"]}
