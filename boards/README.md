@@ -50,6 +50,19 @@ MCU, memory map, and peripherals, and submit it against `eos`.
    open an issue here referencing the `eos` descriptor and attach the
    design files under the matching `*_CAD_Design/` domain directory.
 
+## Incoming (no EoS descriptor yet) — October 2026
+
+Boards on the #28 watchlist with no `eos/boards/` descriptor yet. Entries
+stay here (not in the table above) until a descriptor lands; specs are
+minimal until datasheet review.
+
+| Board | Vendor | Family | Notes |
+|---|---|---|---|
+| FRDM-IMXRT1186 | NXP | i.MX RT1186 | FRDM dev board for the RT1186 crossover MCU |
+| ESP32-C5 Pico | Espressif | ESP32-C5 | RISC-V + 802.15.4/Wi-Fi 6; Thread/Matter candidate |
+| ESP-Mosaico (S31) | — | — | Specs pending datasheet review |
+| VENTUNO Q | — | STM32H5 (STM32H5F5) | Cortex-M33 target; specs pending datasheet review |
+
 ## Roadmap (from #28)
 
 - Per-family pages (Arduino, Pi, ESP32, STM32, nRF, FPGA, robotics kits)
