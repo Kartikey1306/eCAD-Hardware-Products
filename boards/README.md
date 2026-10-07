@@ -62,6 +62,11 @@ minimal until datasheet review.
 | ESP32-C5 Pico | Espressif | ESP32-C5 | RISC-V + 802.15.4/Wi-Fi 6; Thread/Matter candidate |
 | ESP-Mosaico (S31) | — | — | Specs pending datasheet review |
 | VENTUNO Q | — | STM32H5 (STM32H5F5) | Cortex-M33 target; specs pending datasheet review |
+| Alif StartKit SK-E1C | Alif | Ensemble E1C | Cortex-M55 + Ethos-U55, 2MB SRAM, Arducam header, dual PDM mics, onboard J-Link — tinyML reference target |
+| Alif StartKit SK-B1 | Alif | Ensemble E1 | As E1C + BLE 5.3 + 802.15.4 |
+| NuMaker-IoT-MA35D0-A2 "Chili Pro" | Nuvoton | MA35D0 | Dual Cortex-A35 650MHz + Cortex-M4 180MHz; 45×45mm heterogeneous Linux+MCU eval board |
+| M5Stack Stamp LoRa-1262 / Module13.2 | M5Stack | ESP32-S3 | SX1262, 868–923MHz LoRa; pairs with the eNet LoRaWAN study |
+| 8devices 8Sight T100 | 8devices | STM32N657 | Cortex-M55 800MHz + 600-GOPS Neural-ART NPU + HW ISP; Lynred LWIR, 320×240@60fps fully offline — NPU-vision reference design |
 
 ## Roadmap (from #28)
 
@@ -70,3 +75,4 @@ minimal until datasheet review.
 - Mapping each catalog entry to its EoS support tier (descriptor,
   BSP, EoSim model).
 - Kit/cookbook entries: "what to buy to run EoS on <board>".
+
