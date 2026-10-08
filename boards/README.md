@@ -58,10 +58,12 @@ minimal until datasheet review.
 
 | Board | Vendor | Family | Notes |
 |---|---|---|---|
-| FRDM-IMXRT1186 | NXP | i.MX RT1186 | FRDM dev board for the RT1186 crossover MCU |
+| FRDM-IMXRT1186 | NXP | i.MX RT1186 | FRDM dev board: M7 @ 800MHz + M33 @ 300MHz, dual GbE TSN + 2× Fast Eth (EtherCAT/TSN), motor-control headers — the eNet deterministic-comms reference target |
 | ESP32-C5 Pico | Espressif | ESP32-C5 | RISC-V + 802.15.4/Wi-Fi 6; Thread/Matter candidate |
 | ESP-Mosaico (S31) | — | — | Specs pending datasheet review |
-| VENTUNO Q | — | STM32H5 (STM32H5F5) | Cortex-M33 target; specs pending datasheet review |
+| Arduino VENTUNO Q | Arduino | Dragonwing IQ-8275 + STM32H5F5 | Dual-brain: Qualcomm Dragonwing IQ-8275 + STM32H5F5, 16GB RAM, 3× MIPI-CSI, CAN FD, ROS 2 — the dual-brain pattern in hardware |
+| DEBIX M8391-01 | DEBIX | MediaTek Genio 720 | Octa-core A78/A55, 9-TOPS NPU850, industrial -40..85°C, Pi-sized — mid-tier NPU vision/robotics target |
+| Bluemag Pi | Upbeat | SiFive E3 + E2 | RISC-V flight controller (E3 flight-critical + E2 AI/system), onboard AI; CEATEC Oct 13–16 demo — aero dual-brain COTS reference |
 | Alif StartKit SK-E1C | Alif | Ensemble E1C | Cortex-M55 + Ethos-U55, 2MB SRAM, Arducam header, dual PDM mics, onboard J-Link — tinyML reference target |
 | Alif StartKit SK-B1 | Alif | Ensemble E1 | As E1C + BLE 5.3 + 802.15.4 |
 | NuMaker-IoT-MA35D0-A2 "Chili Pro" | Nuvoton | MA35D0 | Dual Cortex-A35 650MHz + Cortex-M4 180MHz; 45×45mm heterogeneous Linux+MCU eval board |
