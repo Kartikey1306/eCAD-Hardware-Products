@@ -1,0 +1,64 @@
+{
+  "purpose": "Licences a person read from a manufacturer's own package or page, for boards whose terms are not in a GitHub repository. read_licenses.py --statements applies one only when the source still has the reviewed SHA-256 and every quote is still in it. 'fields' and 'scope' limit a statement to the files it covers.",
+  "statements": [
+    {
+      "board_id": "arduino:uno-rev3",
+      "licence": "CC BY-SA 4.0",
+      "source": "https://docs.arduino.cc/static/6bb7a3ca51ebee82a252f60c0b418787/A000066-cad-files.zip",
+      "sha256": "532b306cb153846eafc0ca9fe991d7a4dfa0c52dcefafa2efeaebf4b845ec820",
+      "member": "A000066-cad-files/License.txt",
+      "url": "https://docs.arduino.cc/hardware/uno-rev3",
+      "quotes": [
+        "This project's hardware is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License."
+      ],
+      "covers": "The CAD package linked from the UNO R3 documentation page: UNO-TH_Rev3e.brd and UNO-TH_Rev3e.sch. The separate content.arduino.cc/assets/UNO-TH_Rev3e.zip marks its files 'CC-SA-BY-NC' and is not used.",
+      "read_at": "2026-10-09"
+    },
+    {
+      "board_id": "raspberry-pi:5",
+      "licence": "MIT",
+      "source": "https://pip.raspberrypi.com/documents/RP-010083-CA",
+      "sha256": "6841637b4cfa97637bf34b529bfe896f24d9634b2c40b57a156781f55d88f06f",
+      "member": "LICENSE.txt",
+      "quotes": [
+        "This 3D model is provided under the MIT license included at the end of this file.",
+        "Copyright (c) 2026 Raspberry Pi Ltd",
+        "Permission is hereby granted, free of charge, to any person obtaining a copy"
+      ],
+      "fields": [
+        "cad_license",
+        "mechanical_cad_license"
+      ],
+      "scope": "3D model only",
+      "covers": "The STEP model rpi-5b_no_graphics.step in the same package. The board's schematic and layout are not published under it.",
+      "read_at": "2026-10-09"
+    },
+    {
+      "board_id": "raspberry-pi:cmio",
+      "licence": "BSD-3-Clause",
+      "source": "https://pip.raspberrypi.com/documents/RP-008376-DS",
+      "sha256": "e33a46326831a20e189d3f7584b05ad5d9abff5b0cf4eed289019949a997f6ad",
+      "member": "README.txt",
+      "quotes": [
+        "Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:",
+        "Copyright (c) 2014 Raspberry Pi (Trading) Ltd.",
+        "Neither the name of the Raspberry Pi Foundation, nor Raspberry Pi (Trading) Ltd, nor the names of its contributors may be used to endorse or promote products derived from this product without specific prior written permission."
+      ],
+      "covers": "The whole package: Allegro board, OrCAD design, Gerbers, drill files, BOM and schematic. The README carries the three BSD clauses without naming the licence.",
+      "read_at": "2026-10-09"
+    },
+    {
+      "board_id": "raspberry-pi:pico",
+      "licence": "Permission grant in 0BSD wording (no licence named)",
+      "source": "https://raw.githubusercontent.com/raspberrypi/documentation/62ba0a0c2dd5030fe9b19458fa9bd174a451f79b/documentation/asciidoc/microcontrollers/pico-series/about_pico.adoc",
+      "sha256": "b8da220aa4e1cd0d23632ff07ec0a5138519c30c4e149e5da9491daff02af11f",
+      "url": "https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html",
+      "quotes": [
+        "Raspberry Pi grants permission to use, copy, modify, and distribute the following designs for any purpose, with or without fee.",
+        "Design files for Raspberry Pi Pico and Pico H are openly available with no limitations."
+      ],
+      "covers": "The designs listed above the grant: the Cadence Allegro design files (RP-008379-DS, which carries the same grant in its LICENSE.txt) and the STEP file (RP-008311-DS, byte-identical to Pico-R3-step.zip). Read from the source of the official documentation page, which answers automated clients with 403.",
+      "read_at": "2026-10-09"
+    }
+  ]
+}

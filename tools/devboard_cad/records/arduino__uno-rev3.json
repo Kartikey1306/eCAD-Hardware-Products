@@ -15,33 +15,34 @@
   "files": {
     "pcb_source": {
       "available": true,
-      "url": "https://content.arduino.cc/assets/UNO-TH_Rev3e.zip",
+      "url": "https://docs.arduino.cc/static/6bb7a3ca51ebee82a252f60c0b418787/A000066-cad-files.zip",
       "verified_revision": "Rev3e",
       "evidence": {
-        "captured_at": "2026-09-29T07:21:47Z",
+        "captured_at": "2026-10-09T10:18:13Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
-        "sha256": "680cba4a0e6fb3a42ebc0d7055a1c924baabc19ebfd328e8da4454fa8fed7145",
-        "size_bytes": 140885,
+        "sha256": "532b306cb153846eafc0ca9fe991d7a4dfa0c52dcefafa2efeaebf4b845ec820",
+        "size_bytes": 303265,
         "media_type": "application/zip",
         "detected_format": "zip",
         "verification_method": "http_get_archive_member",
-        "contained_member": "UNO-TH_Rev3e.brd"
+        "contained_member": "A000066-cad-files/UNO-TH_Rev3e.brd"
       }
     },
     "schematic": {
       "available": true,
-      "url": "https://content.arduino.cc/assets/UNO-TH_Rev3e_sch.pdf",
-      "verified_revision": null,
+      "url": "https://docs.arduino.cc/static/6bb7a3ca51ebee82a252f60c0b418787/A000066-cad-files.zip",
+      "verified_revision": "Rev3e",
       "evidence": {
-        "captured_at": "2026-09-29T07:21:48Z",
+        "captured_at": "2026-10-09T10:18:13Z",
         "producer_tool_id": "devboard-cad-verifier@0.1.0",
         "http_status": 200,
-        "sha256": "4f09f63b8ec0246cf54a99335673ccd9e8e7e62d4665d6b11f70534420b2952b",
-        "size_bytes": 71600,
-        "media_type": "application/pdf",
-        "detected_format": "pdf",
-        "verification_method": "http_get_magic"
+        "sha256": "532b306cb153846eafc0ca9fe991d7a4dfa0c52dcefafa2efeaebf4b845ec820",
+        "size_bytes": 303265,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "A000066-cad-files/UNO-TH_Rev3e.sch"
       }
     },
     "step": {
@@ -70,16 +71,16 @@
     }
   },
   "licenses": {
-    "hardware_license": "UNVERIFIED",
-    "cad_license": null,
-    "schematic_license": null,
-    "pcb_license": null,
-    "mechanical_cad_license": null,
-    "redistribution_allowed": null,
-    "modification_allowed": null,
-    "commercial_use_allowed": null,
-    "attribution_required": null,
-    "license_url": null
+    "hardware_license": "CC BY-SA 4.0",
+    "cad_license": "CC BY-SA 4.0",
+    "schematic_license": "CC BY-SA 4.0",
+    "pcb_license": "CC BY-SA 4.0",
+    "mechanical_cad_license": "CC BY-SA 4.0",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://docs.arduino.cc/hardware/uno-rev3"
   },
   "sources": {
     "source_tier": "manufacturer_official",
@@ -92,5 +93,5 @@
     "direct_gerber_download": null
   },
   "record_status": "partial",
-  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent."
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. Hardware licence read from A000066-cad-files/License.txt in https://docs.arduino.cc/static/6bb7a3ca51ebee82a252f60c0b418787/A000066-cad-files.zip: \"This project's hardware is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.\"."
 }

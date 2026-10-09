@@ -4464,6 +4464,24 @@
       "licence_url": "https://github.com/adafruit/Adafruit-WICED-WiFi-Feather-PCB"
     },
     {
+      "board_id": "arduino:uno-rev3",
+      "manufacturer": "Arduino",
+      "board": "Arduino UNO Rev3",
+      "path": "boards/cad/arduino/uno-rev3/cad/A000066-cad-files.zip",
+      "category": "cad",
+      "detected_format": "zip",
+      "formats": [
+        "pcb_source",
+        "schematic"
+      ],
+      "url": "https://docs.arduino.cc/static/6bb7a3ca51ebee82a252f60c0b418787/A000066-cad-files.zip",
+      "sha256": "532b306cb153846eafc0ca9fe991d7a4dfa0c52dcefafa2efeaebf4b845ec820",
+      "size_bytes": 303265,
+      "retrieved_at": "2026-10-09T10:18:13Z",
+      "licence": "CC BY-SA 4.0",
+      "licence_url": "https://docs.arduino.cc/hardware/uno-rev3"
+    },
+    {
       "board_id": "beagleboard:beaglebone-ai",
       "manufacturer": "BeagleBoard.org Foundation",
       "board": "BeagleBone AI",
@@ -5269,6 +5287,76 @@
       "retrieved_at": "2026-09-29T07:20:00Z",
       "licence": "CC BY 4.0",
       "licence_url": "https://github.com/radxa/oshw"
+    },
+    {
+      "board_id": "raspberry-pi:5",
+      "manufacturer": "Raspberry Pi",
+      "board": "Raspberry Pi 5",
+      "path": "boards/cad/raspberry-pi/5/cad/RP-010083-CA.zip",
+      "category": "cad",
+      "detected_format": "zip",
+      "formats": [
+        "step"
+      ],
+      "url": "https://pip.raspberrypi.com/documents/RP-010083-CA",
+      "sha256": "6841637b4cfa97637bf34b529bfe896f24d9634b2c40b57a156781f55d88f06f",
+      "size_bytes": 13270704,
+      "retrieved_at": "2026-09-29T07:21:20Z",
+      "licence": "MIT",
+      "licence_url": "https://pip.raspberrypi.com/documents/RP-010083-CA"
+    },
+    {
+      "board_id": "raspberry-pi:cmio",
+      "manufacturer": "Raspberry Pi",
+      "board": "Raspberry Pi Compute Module IO Board schematics",
+      "path": "boards/cad/raspberry-pi/cmio/cad/RP-008376-DS.zip",
+      "category": "cad",
+      "detected_format": "zip",
+      "formats": [
+        "pcb_source"
+      ],
+      "url": "https://pip.raspberrypi.com/documents/RP-008376-DS",
+      "sha256": "e33a46326831a20e189d3f7584b05ad5d9abff5b0cf4eed289019949a997f6ad",
+      "size_bytes": 1397182,
+      "retrieved_at": "2026-09-29T07:21:41Z",
+      "licence": "BSD-3-Clause",
+      "licence_url": "https://pip.raspberrypi.com/documents/RP-008376-DS"
+    },
+    {
+      "board_id": "raspberry-pi:pico",
+      "manufacturer": "Raspberry Pi",
+      "board": "Raspberry Pi Pico",
+      "path": "boards/cad/raspberry-pi/pico/cad/Pico-R3-step.zip",
+      "category": "cad",
+      "detected_format": "zip",
+      "formats": [
+        "step"
+      ],
+      "url": "https://datasheets.raspberrypi.com/pico/Pico-R3-step.zip",
+      "sha256": "4008e557bd80d75119872d10460d9f30f2e0faf210606d058bbe78cd6598c931",
+      "size_bytes": 266009,
+      "retrieved_at": "2026-09-29T06:03:44Z",
+      "licence": "Permission grant in 0BSD wording (no licence named)",
+      "licence_url": "https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html"
+    },
+    {
+      "board_id": "raspberry-pi:pico",
+      "manufacturer": "Raspberry Pi",
+      "board": "Raspberry Pi Pico",
+      "path": "boards/cad/raspberry-pi/pico/cad/RP-008379-DS.zip",
+      "category": "cad",
+      "detected_format": "zip",
+      "formats": [
+        "bom",
+        "pcb_source",
+        "schematic"
+      ],
+      "url": "https://pip.raspberrypi.com/documents/RP-008379-DS",
+      "sha256": "90d120b7664bb1b7a458c50ab65ed087e28116e849f627793dc1ecf1585d415a",
+      "size_bytes": 651151,
+      "retrieved_at": "2026-10-09T10:18:15Z",
+      "licence": "Permission grant in 0BSD wording (no licence named)",
+      "licence_url": "https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html"
     },
     {
       "board_id": "robotis-git:xelnetwork",

@@ -735,6 +735,19 @@ class TestLicenceStatements(unittest.TestCase):
         self.assertEqual(url, f"https://raw.githubusercontent.com/v/r/{commit}/LICENSE")
         self.assertEqual(calls, [f"repos/v/r/contents?ref={commit}"])
 
+    def test_committed_statements_name_settled_licences_and_existing_records(self) -> None:
+        body = json.loads((REPO_ROOT / licences.STATEMENTS_PATH).read_text(encoding="utf-8"))
+        for statement in body["statements"]:
+            with self.subTest(board=statement["board_id"]):
+                self.assertIn(statement["licence"], licences.KNOWN)
+                self.assertRegex(statement["sha256"], r"^[0-9a-f]{64}$")
+                self.assertTrue(statement["quotes"])
+                path = REPO_ROOT / "tools/devboard_cad/records" / (statement["board_id"].replace(":", "__") + ".json")
+                record = json.loads(path.read_text(encoding="utf-8"))
+                expected = statement["licence"] if not statement.get("scope") \
+                    else f"{statement['licence']} ({statement['scope']})"
+                self.assertEqual(record["licenses"]["hardware_license"], expected)
+
 
 if __name__ == "__main__":
     unittest.main()
