@@ -1,21 +1,54 @@
 # SparkFun Artemis
 
 Design files published by **SparkFun Electronics**, copied here without
-modification from the official sources listed below. Each file is byte-identical to
-the SHA-256 recorded for it in
-[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/).
+modification from the official sources listed below: the files named in
+[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/), each matching
+its recorded SHA-256, and every other CAD file in the manufacturer's repository at
+the commit the record pins, each matching its git blob ID there. Archives are
+unpacked and only their CAD members kept.
 
 - Board ID: `sparkfun:artemis`
 - Part number: WRL-15484
 - Licence: CC BY-SA 4.0 (https://github.com/sparkfun/SparkFun_Artemis/blob/HEAD/LICENSE.md)
 - Attribution: SparkFun Electronics
 - Changes: none
+- CAD files: 30
 
-| File | Kind | Format | Source | SHA-256 | Retrieved |
-|---|---|---|---|---|---|
-| [`cad/Artemis-Production-Model-V1.step`](cad/Artemis-Production-Model-V1.step) | cad | step | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Documents/Artemis%20Production%20Model%20V1.step) | `fe6e7ae4e358fa66…` | 2026-09-29T07:20:13Z |
-| [`cad/Artemis-Production-Model-V1.stl`](cad/Artemis-Production-Model-V1.stl) | cad | stl | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Documents/Artemis%20Production%20Model%20V1.stl) | `6bc57ead37b15c50…` | 2026-09-29T07:20:11Z |
-| [`cad/Module-Pads.lbr`](cad/Module-Pads.lbr) | cad | eagle, footprint_library, symbol_library | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Module-Pads.lbr) | `eb953eabd64cfe41…` | 2026-09-29T07:20:11Z |
-| [`cad/SparkFun_Artemis-Panel.GBL`](cad/SparkFun_Artemis-Panel.GBL) | cad | gerbers | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GBL) | `b0d043b0472518f4…` | 2026-09-29T07:20:11Z |
-| [`cad/SparkFun_Artemis.brd`](cad/SparkFun_Artemis.brd) | cad | pcb_source | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/SparkFun_Artemis.brd) | `877b565be79d75ba…` | 2026-09-29T07:20:11Z |
-| [`cad/SparkFun_Artemis.sch`](cad/SparkFun_Artemis.sch) | cad | schematic | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/SparkFun_Artemis.sch) | `69dbbd8de41de779…` | 2026-09-29T07:20:11Z |
+| File | Format | Source | SHA-256 |
+|---|---|---|---|
+| [`cad/Documents/Artemis-Production-Model-V1.step`](cad/Documents/Artemis-Production-Model-V1.step) | step | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Documents/Artemis%20Production%20Model%20V1.step) | `fe6e7ae4e358fa66…` |
+| [`cad/Documents/Artemis-Production-Model-V1.stl`](cad/Documents/Artemis-Production-Model-V1.stl) | stl | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Documents/Artemis%20Production%20Model%20V1.stl) | `6bc57ead37b15c50…` |
+| [`cad/Hardware/Module-Pads.lbr`](cad/Hardware/Module-Pads.lbr) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Module-Pads.lbr) | `eb953eabd64cfe41…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GBL`](cad/Hardware/Production/SparkFun_Artemis-Panel.GBL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GBL) | `b0d043b0472518f4…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GBO`](cad/Hardware/Production/SparkFun_Artemis-Panel.GBO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GBO) | `64ac9afadc9a4da2…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GBP`](cad/Hardware/Production/SparkFun_Artemis-Panel.GBP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GBP) | `c962b4f2be274798…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GBS`](cad/Hardware/Production/SparkFun_Artemis-Panel.GBS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GBS) | `3731fb5a600c6da7…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GKO`](cad/Hardware/Production/SparkFun_Artemis-Panel.GKO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GKO) | `689d40b412f81d08…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GL2`](cad/Hardware/Production/SparkFun_Artemis-Panel.GL2) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GL2) | `21cc8fffd7805cd0…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GL3`](cad/Hardware/Production/SparkFun_Artemis-Panel.GL3) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GL3) | `0d6a06b8bae71ef5…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GTL`](cad/Hardware/Production/SparkFun_Artemis-Panel.GTL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GTL) | `c8162084eb4ac53b…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GTO`](cad/Hardware/Production/SparkFun_Artemis-Panel.GTO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GTO) | `64f5f971ef34beb9…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GTP`](cad/Hardware/Production/SparkFun_Artemis-Panel.GTP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GTP) | `44b9e6bc9b43e809…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.GTS`](cad/Hardware/Production/SparkFun_Artemis-Panel.GTS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.GTS) | `9cd03c57a763dea7…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel.brd`](cad/Hardware/Production/SparkFun_Artemis-Panel.brd) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.brd) | `c352d1875d1be857…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GBL`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GBL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GBL` | `c7feabf75191d435…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GBO`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GBO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GBO` | `30921ee0b6740c79…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GBS`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GBS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GBS` | `b7d4cdce8086d110…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GKO`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GKO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GKO` | `c54c8e42f43bd700…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GL2`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GL2) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GL2` | `e023460fc2b265e6…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GL3`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GL3) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GL3` | `bf4ede65d9c8fdac…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GTL`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GTL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GTL` | `1132f8899571632d…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GTO`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GTO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GTO` | `271bd53de897396f…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GTP`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GTP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GTP` | `814ee8eb96463d1f…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GTS`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.GTS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.GTS` | `f23ea06ad0fc4cdc…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.TXT.0102`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.TXT.0102) | excellon | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.TXT.0102` | `2debe14a354badfe…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.TXT.0116`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.TXT.0116) | excellon | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.TXT.0116` | `af43b4d6cbe717f8…` |
+| [`cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.TXT.1516`](cad/Hardware/Production/SparkFun_Artemis-Panel/SparkFun_Artemis-Panel.TXT.1516) | excellon | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/Production/SparkFun_Artemis-Panel.zip), member `SparkFun_Artemis-Panel.TXT.1516` | `f7d42b4f1c7cbae0…` |
+| [`cad/Hardware/SparkFun_Artemis.brd`](cad/Hardware/SparkFun_Artemis.brd) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/SparkFun_Artemis.brd) | `877b565be79d75ba…` |
+| [`cad/Hardware/SparkFun_Artemis.sch`](cad/Hardware/SparkFun_Artemis.sch) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Artemis/e1d026549109ea02264e977fc1f7b8d49bcfdfe9/Hardware/SparkFun_Artemis.sch) | `69dbbd8de41de779…` |
+
+## Not copied
+
+Members of the archives above that are not CAD, left out of the mirror:
+
+- `ordering_instructions.txt` in SparkFun_Artemis-Panel.zip: text, report or list
