@@ -1,18 +1,52 @@
 # SparkFun Thing Plus - RP2040
 
 Design files published by **SparkFun Electronics**, copied here without
-modification from the official sources listed below. Each file is byte-identical to
-the SHA-256 recorded for it in
-[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/).
+modification from the official sources listed below: the files named in
+[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/), each matching
+its recorded SHA-256, and every other CAD file in the manufacturer's repository at
+the commit the record pins, each matching its git blob ID there. Archives are
+unpacked and only their CAD members kept.
 
 - Board ID: `sparkfun:thing-plus-rp2040`
 - Part number: DEV-17745
 - Licence: CC BY-SA 4.0 (https://github.com/sparkfun/SparkFun_Thing_Plus-RP2040/blob/HEAD/LICENSE.md)
 - Attribution: SparkFun Electronics
 - Changes: none
+- CAD files: 27
 
-| File | Kind | Format | Source | SHA-256 | Retrieved |
-|---|---|---|---|---|---|
-| [`cad/RP2040_Thing_Plus-Panel.GBL`](cad/RP2040_Thing_Plus-Panel.GBL) | cad | gerbers | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GBL) | `55cbd744b18406f1…` | 2026-09-29T06:10:49Z |
-| [`cad/RP2040_Thing_Plus.brd`](cad/RP2040_Thing_Plus.brd) | cad | eagle, pcb_source | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/RP2040_Thing_Plus.brd) | `5dab8d65a2d4ce16…` | 2026-09-29T06:10:49Z |
-| [`cad/RP2040_Thing_Plus.sch`](cad/RP2040_Thing_Plus.sch) | cad | schematic | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/RP2040_Thing_Plus.sch) | `1427aa2d386fe21c…` | 2026-09-29T06:10:49Z |
+| File | Format | Source | SHA-256 |
+|---|---|---|---|
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GBL`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GBL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GBL) | `55cbd744b18406f1…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GBO`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GBO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GBO) | `dfe377b9b80d3963…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GBP`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GBP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GBP) | `7109a1b6abace0d1…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GBS`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GBS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GBS) | `79cd4bef9fbc2377…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GKO`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GKO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GKO) | `cdea70e1d2165f3d…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GL2`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GL2) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GL2) | `0b22a7e374bb5662…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GL3`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GL3) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GL3) | `d08424b313b529ad…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GTL`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GTL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GTL) | `e1735eba335a324d…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GTO`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GTO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GTO) | `7fb7aea44be2a0ef…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GTP`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GTP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GTP) | `bac3fcb21f3423cf…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.GTS`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.GTS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.GTS) | `7893387fb77bacdb…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.TXT`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.TXT) | excellon | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.TXT) | `988cf7d2362f9406…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel.brd`](cad/Hardware/Production/RP2040_Thing_Plus-Panel.brd) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.brd) | `7ea9336961356c86…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GBL`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GBL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GBL` | `55cbd744b18406f1…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GBO`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GBO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GBO` | `dfe377b9b80d3963…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GBP`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GBP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GBP` | `7109a1b6abace0d1…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GBS`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GBS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GBS` | `79cd4bef9fbc2377…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GKO`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GKO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GKO` | `cdea70e1d2165f3d…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GL2`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GL2) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GL2` | `0b22a7e374bb5662…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GL3`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GL3) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GL3` | `d08424b313b529ad…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GTL`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GTL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GTL` | `e1735eba335a324d…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GTO`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GTO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GTO` | `7fb7aea44be2a0ef…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GTP`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GTP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GTP` | `bac3fcb21f3423cf…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GTS`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.GTS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.GTS` | `7893387fb77bacdb…` |
+| [`cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.TXT`](cad/Hardware/Production/RP2040_Thing_Plus-Panel/RP2040_Thing_Plus-Panel.TXT) | excellon | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/Production/RP2040_Thing_Plus-Panel.zip), member `RP2040_Thing_Plus-Panel.TXT` | `988cf7d2362f9406…` |
+| [`cad/Hardware/RP2040_Thing_Plus.brd`](cad/Hardware/RP2040_Thing_Plus.brd) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/RP2040_Thing_Plus.brd) | `5dab8d65a2d4ce16…` |
+| [`cad/Hardware/RP2040_Thing_Plus.sch`](cad/Hardware/RP2040_Thing_Plus.sch) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Thing_Plus-RP2040/38fd2d27eaa2e6e9c16e8496f7d1777f83df842a/Hardware/RP2040_Thing_Plus.sch) | `1427aa2d386fe21c…` |
+
+## Not copied
+
+Members of the archives above that are not CAD, left out of the mirror:
+
+- `ordering_instructions.txt` in RP2040_Thing_Plus-Panel.zip: text, report or list
+- `Hardware/Production/RP2040_Thing_Plus-PanelizerSettings.txt` in RP2040_Thing_Plus-PanelizerSettings.txt: not a CAD file (text, report or list)

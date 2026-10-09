@@ -1,17 +1,41 @@
 # Qwiic Power Switch
 
 Design files published by **SparkFun Electronics**, copied here without
-modification from the official sources listed below. Each file is byte-identical to
-the SHA-256 recorded for it in
-[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/).
+modification from the official sources listed below: the files named in
+[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/), each matching
+its recorded SHA-256, and every other CAD file in the manufacturer's repository at
+the commit the record pins, each matching its git blob ID there. Archives are
+unpacked and only their CAD members kept.
 
 - Board ID: `sparkfun:qwiic-power-switch`
 - Part number: 26784
 - Licence: CC BY-SA 4.0 (https://github.com/sparkfun/SparkFun_Qwiic_Power_Switch/blob/HEAD/LICENSE.md)
 - Attribution: SparkFun Electronics
 - Changes: none
+- CAD files: 23
 
-| File | Kind | Format | Source | SHA-256 | Retrieved |
-|---|---|---|---|---|---|
-| [`cad/Qwiic-Power-Switch.GBL`](cad/Qwiic-Power-Switch.GBL) | cad | gerbers | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GBL) | `599ceea7c92f5049…` | 2026-09-29T07:22:12Z |
-| [`cad/Qwiic-Power-Switch.brd`](cad/Qwiic-Power-Switch.brd) | cad | eagle, pcb_source | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Qwiic%20Power%20Switch.brd) | `170581be5d7cb651…` | 2026-09-29T07:22:12Z |
+| File | Format | Source | SHA-256 |
+|---|---|---|---|
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GBL`](cad/Hardware/Production/Qwiic-Power-Switch.GBL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GBL) | `599ceea7c92f5049…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GBO`](cad/Hardware/Production/Qwiic-Power-Switch.GBO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GBO) | `bbca9ba4d3263e70…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GBP`](cad/Hardware/Production/Qwiic-Power-Switch.GBP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GBP) | `bc3cc3bbefac66fa…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GBS`](cad/Hardware/Production/Qwiic-Power-Switch.GBS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GBS) | `b81c53460dc9c8be…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GKO`](cad/Hardware/Production/Qwiic-Power-Switch.GKO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GKO) | `c9f2ad5bf83a3a01…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GTL`](cad/Hardware/Production/Qwiic-Power-Switch.GTL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GTL) | `a01c3d251424cb43…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GTO`](cad/Hardware/Production/Qwiic-Power-Switch.GTO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GTO) | `f858ffb881f14658…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GTP`](cad/Hardware/Production/Qwiic-Power-Switch.GTP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GTP) | `b7a58d21cb27e119…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.GTS`](cad/Hardware/Production/Qwiic-Power-Switch.GTS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.GTS) | `aeb5e09e8eab02b6…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch.TXT`](cad/Hardware/Production/Qwiic-Power-Switch.TXT) | excellon | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.TXT) | `9246c340ee58fd0b…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GBL`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GBL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.GBL` | `599ceea7c92f5049…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GBO`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GBO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.GBO` | `bbca9ba4d3263e70…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GBS`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GBS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.GBS` | `b81c53460dc9c8be…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GKO`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GKO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.GKO` | `c9f2ad5bf83a3a01…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GTL`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GTL) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.GTL` | `a01c3d251424cb43…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GTO`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GTO) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.GTO` | `f858ffb881f14658…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GTP`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GTP) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.GTP` | `b7a58d21cb27e119…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GTS`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.GTS) | gerber | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.GTS` | `aeb5e09e8eab02b6…` |
+| [`cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.TXT`](cad/Hardware/Production/Qwiic-Power-Switch/Qwiic-Power-Switch.TXT) | excellon | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Production/Qwiic%20Power%20Switch.zip), member `Qwiic Power Switch.TXT` | `9246c340ee58fd0b…` |
+| [`cad/Hardware/Qwiic-Power-Switch.brd`](cad/Hardware/Qwiic-Power-Switch.brd) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Qwiic%20Power%20Switch.brd) | `170581be5d7cb651…` |
+| [`cad/Hardware/Qwiic-Power-Switch.sch`](cad/Hardware/Qwiic-Power-Switch.sch) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/Hardware/Qwiic%20Power%20Switch.sch) | `f3bb53382f8f1b97…` |
+| [`cad/docs/assets/board_files/Qwiic_Power_Switch_V10/Qwiic-Power-Switch.brd`](cad/docs/assets/board_files/Qwiic_Power_Switch_V10/Qwiic-Power-Switch.brd) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/docs/assets/board_files/Qwiic_Power_Switch_V10.zip), member `Qwiic Power Switch.brd` | `170581be5d7cb651…` |
+| [`cad/docs/assets/board_files/Qwiic_Power_Switch_V10/Qwiic-Power-Switch.sch`](cad/docs/assets/board_files/Qwiic_Power_Switch_V10/Qwiic-Power-Switch.sch) | eagle | [source](https://raw.githubusercontent.com/sparkfun/SparkFun_Qwiic_Power_Switch/53923a22dddca15f32a1b240cad53cb96e67f99f/docs/assets/board_files/Qwiic_Power_Switch_V10.zip), member `Qwiic Power Switch.sch` | `d08373a297cddf3e…` |
