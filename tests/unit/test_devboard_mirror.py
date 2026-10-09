@@ -325,6 +325,70 @@ class CheckTests(unittest.TestCase):
         self.assertTrue(any("untracked file" in p for p in mirror.check(self.root, [self.record])))
 
 
+class LicenceTextTests(unittest.TestCase):
+    """MIT, BSD and Apache-2.0 require their text in every copy, so ATTRIBUTION.md carries it."""
+
+    MIT = "MIT License\r\n\r\nCopyright (c) 2021 Example Corp\r\n\r\nPermission is hereby granted, free of charge.\r\n"
+
+    def _mit_record(self) -> dict:
+        record = _record("open:a", {"eagle": _entry("https://x/a.brd", EAGLE_BRD)})
+        record["licenses"] = dict(record["licenses"], cad_license="MIT", hardware_license="MIT")
+        return record
+
+    def _write_notice(self, root: Path, text: str) -> None:
+        path = root / mirror.NOTICES_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        notice = {"licence": "MIT", "source": "https://x/LICENSE", "sha256": _sha(text.encode()), "text": text}
+        path.write_text(json.dumps({"notices": {"open:a": notice}}), encoding="utf-8")
+
+    def test_the_licence_text_is_written_verbatim_into_the_attribution(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_notice(root, self.MIT)
+            report = mirror.build(root, [self._mit_record()], FakeFetcher({"https://x/a.brd": EAGLE_BRD}))
+            self.assertTrue(report.ok)
+            attribution = (root / "boards/cad/open/a/ATTRIBUTION.md").read_text(encoding="utf-8")
+            self.assertIn(mirror.LICENCE_TEXT_HEADING, attribution)
+            self.assertIn("Copyright (c) 2021 Example Corp", attribution)
+            self.assertIn("https://x/LICENSE", attribution)
+            self.assertEqual(mirror.check(root, [self._mit_record()]), [])
+
+    def test_a_build_without_the_licence_text_is_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            report = mirror.build(Path(tmp), [self._mit_record()], FakeFetcher({"https://x/a.brd": EAGLE_BRD}))
+        self.assertFalse(report.ok)
+        self.assertIn("needs its licence text", report.refused[0])
+
+    def test_check_fails_when_the_attribution_lost_the_text(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_notice(root, self.MIT)
+            mirror.build(root, [self._mit_record()], FakeFetcher({"https://x/a.brd": EAGLE_BRD}))
+            (root / "boards/cad/open/a/ATTRIBUTION.md").write_text("# Example\n", encoding="utf-8")
+            problems = mirror.check(root, [self._mit_record()])
+        self.assertEqual(problems, ["no MIT licence text in ATTRIBUTION.md: open:a"])
+
+    def test_check_fails_when_the_text_does_not_match_its_digest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_notice(root, self.MIT)
+            mirror.build(root, [self._mit_record()], FakeFetcher({"https://x/a.brd": EAGLE_BRD}))
+            notices = json.loads((root / mirror.NOTICES_PATH).read_text(encoding="utf-8"))
+            notices["notices"]["open:a"]["sha256"] = "0" * 64
+            (root / mirror.NOTICES_PATH).write_text(json.dumps(notices), encoding="utf-8")
+            problems = mirror.check(root, [self._mit_record()])
+        self.assertEqual(problems, ["licence text does not match its digest: open:a"])
+
+    def test_share_alike_boards_need_no_licence_text(self) -> None:
+        record = _record("open:a", {"eagle": _entry("https://x/a.brd", EAGLE_BRD)})
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = mirror.build(root, [record], FakeFetcher({"https://x/a.brd": EAGLE_BRD}))
+            attribution = (root / "boards/cad/open/a/ATTRIBUTION.md").read_text(encoding="utf-8")
+        self.assertTrue(report.ok)
+        self.assertNotIn(mirror.LICENCE_TEXT_HEADING, attribution)
+
+
 class CommittedMirrorTests(unittest.TestCase):
     """The mirror in this repository is complete and every file is the verified one."""
 

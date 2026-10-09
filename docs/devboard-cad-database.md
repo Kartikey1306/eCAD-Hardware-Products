@@ -179,6 +179,23 @@ use and modification under attribution and share-alike — the non-commercial va
 separately named BY-NC-SA — so the permissions are determinable while the version is not.
 Both facts go in the record.
 
+Some manufacturers state their terms outside GitHub: inside the download package, or on a
+documentation page. A person reads those and records them in
+`tools/devboard_cad/licence_statements.json`, with the SHA-256 of the bytes read and the
+sentences quoted. `read_licenses.py --statements` applies a statement only while the source
+still has that digest and every quote is still in it, so a vendor changing its terms
+leaves the record as it was and reports the refusal. A statement can be limited to the files
+it covers: Raspberry Pi's MIT licence for the Raspberry Pi 5 covers the 3D model, so only
+`cad_license` and `mechanical_cad_license` are set and `hardware_license` says
+"MIT (3D model only)".
+
+| Board | Licence | Read from |
+|---|---|---|
+| `arduino:uno-rev3` | CC BY-SA 4.0 | `License.txt` in the CAD package linked from docs.arduino.cc. The older `content.arduino.cc` archive marks the same files `CC-SA-BY-NC`, so the record points at the package instead. |
+| `raspberry-pi:5` | MIT (3D model only) | `LICENSE.txt` in the STEP package |
+| `raspberry-pi:cmio` | BSD-3-Clause | `README.txt` in the design package, which carries the three clauses without naming them |
+| `raspberry-pi:pico` | Permission grant in 0BSD wording | the Pico documentation, which grants use, copying, modification and distribution "for any purpose, with or without fee"; the design package repeats it in `LICENSE.txt` |
+
 ## Mirror
 
 `boards/cad/` holds an unmodified copy of every verified **CAD file** of every board whose
@@ -198,7 +215,13 @@ tools/devboard_cad/mirror-manifest.json
 
 `ATTRIBUTION.md` stays beside the files on purpose: CC BY and CC BY-SA require the credit
 and the licence notice to travel with the material, so a board's folder copied on its own
-still carries them.
+still carries them. MIT, BSD and Apache-2.0 go further and require the licence text itself
+in every copy, so for those boards `ATTRIBUTION.md` ends with the manufacturer's licence,
+verbatim. `read_licenses.py --notices` collects it into
+`tools/devboard_cad/licence-notices.json`, from the repository's licence file at the commit
+the board's files are pinned to, or from the package member a statement was read from.
+`mirror.py build` refuses such a board without its text, and `check` fails if an
+`ATTRIBUTION.md` lacks it or the text no longer matches its digest.
 
 `mirror.py build` copies a file only when all three hold:
 

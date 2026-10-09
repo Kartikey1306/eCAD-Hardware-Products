@@ -21,3 +21,32 @@ the SHA-256 recorded for it in
 | [`cad/Stamp_UWB.kicad_sym`](cad/Stamp_UWB.kicad_sym) | cad | kicad, symbol_library | [source](https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/KiCad/Symbols/Stamp_UWB.kicad_sym) | `3aff76f5992cd67c…` | 2026-09-29T08:38:39Z |
 | [`cad/Unit_Type_A.PcbDoc`](cad/Unit_Type_A.PcbDoc) | cad | altium | [source](https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/Common/Unit_Type_A/Footprints/Unit_Type_A.PcbDoc) | `bb3a400809793693…` | 2026-09-29T08:38:40Z |
 | [`cad/Unit_Type_A.dxf`](cad/Unit_Type_A.dxf) | cad | dxf | [source](https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/Common/Unit_Type_A/Structures/Unit_Type_A.dxf) | `7988e6f792f2878f…` | 2026-09-29T08:38:38Z |
+
+## Licence text
+
+MIT requires its text to accompany every copy. Verbatim from
+[the manufacturer's licence](https://raw.githubusercontent.com/m5stack/M5_Hardware/a240115c94b19ecf647f229c47fa9a8ce46ccdc4/LICENSE), SHA-256 `44611d917bece311…`:
+
+````text
+MIT License
+
+Copyright (c) 2021 M5Stack
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+````

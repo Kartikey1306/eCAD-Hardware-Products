@@ -23,6 +23,14 @@ has never run.
   format and its content are CAD; `mirror.py check` proves completeness and integrity (from
   the bytes, or from Git LFS pointers if the mirror moves to LFS) and runs in the
   test suite.
+- Licences read from a manufacturer's own package or page
+  (`tools/devboard_cad/licence_statements.json`, `read_licenses.py --statements`), each
+  applied only while the source keeps its reviewed SHA-256 and every quote. Four boards
+  gain an open licence this way: Arduino UNO R3 (CC BY-SA 4.0), Raspberry Pi 5 (MIT, 3D
+  model only), Raspberry Pi Compute Module IO board (BSD-3-Clause) and Raspberry Pi Pico
+  (a grant in 0BSD wording). The Pico record gains Raspberry Pi's Cadence Allegro design
+  package, and the UNO R3 record points at the CC BY-SA 4.0 package instead of the
+  archive marked `CC-SA-BY-NC`.
 - The digital domain (issue #27, plan §21 item 5): Verilog sources are read
   by a strict allow-list grammar (`tools/ecad_model/verilog.py`) into the
   engineering model, the adapter (`tools/ecad_model/domains/digital.py`)
@@ -106,6 +114,13 @@ has never run.
   lists the repository root, and reads the README through GitHub's readme
   endpoint. A README that points at a licence file which is not there still
   leaves the board UNVERIFIED.
+- The mirror carries the licence text where the licence requires it. MIT, BSD
+  and Apache-2.0 require their text in every copy, and the five mirrored boards
+  under them (M5Stack, Radxa `hw`, Seeed XIAO, Seeed Wio Terminal, ROBOTIS
+  XelNetwork) had only the licence's name. `ATTRIBUTION.md` now ends with the
+  manufacturer's licence file, verbatim, from the commit the files are pinned
+  to (`tools/devboard_cad/licence-notices.json`, `read_licenses.py --notices`);
+  `mirror.py check` fails without it.
 
 ### Fixed (review of the electrical branch, plan §7.6)
 

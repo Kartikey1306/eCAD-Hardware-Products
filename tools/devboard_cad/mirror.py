@@ -19,6 +19,11 @@ Three rules decide what is copied, and none of them is negotiable:
    copied; their records keep the link and digest. Each payload is identified again from
    its content, and one that is not CAD, such as a web page or JSON, is refused.
 
+Each board's ``ATTRIBUTION.md`` credits the manufacturer and names the licence. For MIT,
+BSD and Apache-2.0, whose terms require the licence text itself to accompany every copy,
+it also carries that text verbatim from ``licence-notices.json``, and ``check`` fails
+without it.
+
 The files are committed as regular files (``.gitattributes`` exempts them from the
 repository's LFS rules and from line-ending conversion, so the bytes stay identical).
 ``check`` also accepts Git LFS pointer files, whose ``oid`` is the SHA-256 of the object,
@@ -47,7 +52,11 @@ from devboard_cad.verify import Fetcher, detect_format, is_binary_stl  # noqa: E
 TOOL_ID = "devboard-cad-mirror@0.1.0"
 MIRROR_DIR = Path("boards") / "cad"
 MANIFEST_PATH = Path("tools") / "devboard_cad" / "mirror-manifest.json"
+NOTICES_PATH = Path("tools") / "devboard_cad" / "licence-notices.json"
 ATTRIBUTION_NAME = "ATTRIBUTION.md"
+LICENCE_TEXT_HEADING = "## Licence text"
+# Licences whose terms require their text to accompany every copy.
+NOTICE_LICENCES = frozenset({"MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause"})
 LFS_POINTER_PREFIX = b"version https://git-lfs.github.com/spec/v1"
 
 CAD_FORMATS = frozenset({"eagle", "kicad", "gerber", "excellon", "step", "stl", "dxf"})
@@ -245,7 +254,8 @@ def manifest_entry(source: Source, path: Path, kind: str, detected: Optional[str
     }
 
 
-def render_attribution(record: Dict[str, Any], entries: Sequence[Dict[str, Any]]) -> str:
+def render_attribution(record: Dict[str, Any], entries: Sequence[Dict[str, Any]],
+                       notice: Optional[Dict[str, Any]] = None) -> str:
     licences = record.get("licenses") or {}
     licence = licences.get("cad_license") or licences.get("hardware_license") or "see source"
     licence_url = licences.get("license_url")
@@ -272,8 +282,31 @@ def render_attribution(record: Dict[str, Any], entries: Sequence[Dict[str, Any]]
             f"| [`{rel}`]({rel}) | {entry['category']} | {', '.join(entry['formats'])} "
             f"| [source]({entry['url']}) | `{entry['sha256'][:16]}…` | {entry['retrieved_at'] or ''} |"
         )
+    if notice:
+        lines += [
+            "",
+            LICENCE_TEXT_HEADING,
+            "",
+            f"{notice['licence']} requires its text to accompany every copy. Verbatim from",
+            f"[the manufacturer's licence]({notice['source']}), SHA-256 `{notice['sha256'][:16]}…`:",
+            "",
+            "````text",
+            notice["text"].replace("\r\n", "\n").rstrip("\n"),
+            "````",
+        ]
     lines.append("")
     return "\n".join(lines)
+
+
+def load_notices(root: Path) -> Dict[str, Dict[str, Any]]:
+    path = root / NOTICES_PATH
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8")).get("notices", {})
+
+
+def needs_notice(entry: Dict[str, Any]) -> bool:
+    return entry.get("licence") in NOTICE_LICENCES
 
 
 def load_manifest(root: Path) -> Dict[str, Any]:
@@ -369,12 +402,17 @@ def build(root: Path, records: Sequence[Dict[str, Any]], fetcher: Any,
         entries.append(entry)
         per_board.setdefault(source.board_id, []).append(entry)
 
+    notices = load_notices(root)
     for source in accepted:
         board_entries = per_board.pop(source.board_id, None)
         if board_entries is None:
             continue
+        notice = notices.get(source.board_id) if needs_notice(board_entries[0]) else None
+        if needs_notice(board_entries[0]) and notice is None:
+            report.refused.append(f"{source.board_id}: {board_entries[0]['licence']} needs its licence "
+                                  f"text; run read_licenses.py --notices")
         attribution = root / board_dir(source.board_id) / ATTRIBUTION_NAME
-        attribution.write_text(render_attribution(source.record, board_entries), encoding="utf-8")
+        attribution.write_text(render_attribution(source.record, board_entries, notice), encoding="utf-8")
     write_manifest(root, entries)
     report.removed = prune(root, entries)
     return report
@@ -427,6 +465,7 @@ def check(root: Path, records: Sequence[Dict[str, Any]]) -> List[str]:
     problems: List[str] = []
     manifest = load_manifest(root)
     entries = manifest.get("entries", [])
+    notices = load_notices(root)
     by_key = {(e["board_id"], e["url"]): e for e in entries}
     allowed = {r["board_id"] for r in records if redistributable(r)}
 
@@ -452,6 +491,14 @@ def check(root: Path, records: Sequence[Dict[str, Any]]) -> List[str]:
         attribution = root / board_dir(entry["board_id"]) / ATTRIBUTION_NAME
         if not attribution.is_file():
             problems.append(f"no {ATTRIBUTION_NAME}: {entry['board_id']}")
+        elif needs_notice(entry):
+            notice = notices.get(entry["board_id"])
+            body = attribution.read_text(encoding="utf-8")
+            if notice is None or LICENCE_TEXT_HEADING not in body \
+                    or notice["text"].replace("\r\n", "\n").strip() not in body:
+                problems.append(f"no {entry['licence']} licence text in {ATTRIBUTION_NAME}: {entry['board_id']}")
+            elif hashlib.sha256(notice["text"].encode("utf-8")).hexdigest() != notice["sha256"]:
+                problems.append(f"licence text does not match its digest: {entry['board_id']}")
 
     mirrored = {(root / e["path"]).resolve() for e in entries}
     boards = {board_dir(e["board_id"]) for e in entries}

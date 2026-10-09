@@ -18,15 +18,25 @@ absent from the repository. Every CC BY-SA version permits commercial use and mo
 under attribution and share-alike -- the non-commercial variants are separately named
 BY-NC-SA -- so the permissions are determinable while the version is not. Both facts are
 recorded.
+
+Manufacturers outside GitHub state their terms inside a download package or on a
+documentation page. Those statements are read by a person and kept in
+licence_statements.json with the SHA-256 of the bytes they were read from;
+``--statements`` applies one only while the bytes are unchanged and every quoted sentence
+is still in them. ``--notices`` writes licence-notices.json: MIT, BSD and Apache-2.0 require
+their text to accompany each copy, so the mirror writes it into the board's ATTRIBUTION.md.
 """
 
 from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
+import io
 import json
 import re
 import sys
+import zipfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -35,7 +45,7 @@ REPO_ROOT = HERE.parents[2]
 sys.path.insert(0, str(HERE.parents[1]))
 
 from devboard_cad.harvest_github import _gh_api  # noqa: E402
-from devboard_cad.verify import derive_status, records_dir  # noqa: E402
+from devboard_cad.verify import Fetcher, derive_status, records_dir  # noqa: E402
 
 # name -> (url, redistribution, modification, commercial, attribution)
 KNOWN: Dict[str, Tuple[str, bool, bool, bool, bool]] = {
@@ -59,7 +69,16 @@ KNOWN: Dict[str, Tuple[str, bool, bool, bool, bool]] = {
     # Named but unversioned. Determinable permissions, undeterminable version.
     "CC BY-SA (version not stated by the manufacturer)":
         (None, True, True, True, True),
+    # Raspberry Pi's grant for the Pico designs names no licence. Its wording is 0BSD's:
+    # use, copy, modify and distribute for any purpose, with or without fee, no conditions.
+    "Permission grant in 0BSD wording (no licence named)":
+        (None, True, True, True, False),
 }
+
+# Licences whose terms require their text to accompany every copy.
+NOTICE_LICENCES = frozenset({"MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause"})
+STATEMENTS_PATH = Path("tools") / "devboard_cad" / "licence_statements.json"
+NOTICES_PATH = Path("tools") / "devboard_cad" / "licence-notices.json"
 
 SPDX_ALIASES = {
     "CC-BY-4.0": "CC BY 4.0", "CC-BY-3.0": "CC BY 3.0",
@@ -203,12 +222,187 @@ def repo_slug(record: Dict[str, Any]) -> str:
     return repo.split("github.com/", 1)[1].strip("/") if "github.com/" in repo else "its repository"
 
 
+# --------------------------------------------------------------------------------------
+# statements read by a person from a manufacturer's package or page
+# --------------------------------------------------------------------------------------
+
+def _normalise(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def statement_text(payload: bytes, member: Optional[str]) -> str:
+    """The text a statement is quoted from: one member of a ZIP package, or the whole file."""
+    if member:
+        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            payload = archive.read(member)
+    return payload.decode("utf-8", "replace")
+
+
+def check_statement(statement: Dict[str, Any], payload: Optional[bytes]) -> Optional[str]:
+    """Why ``statement`` cannot be applied to ``payload``, or None when every check holds.
+
+    The bytes must be the ones the statement was read from, and every quoted sentence must
+    still be in them. A licence outside KNOWN is refused: its permissions are not settled.
+    """
+    if statement.get("licence") not in KNOWN:
+        return f"licence {statement.get('licence')!r} is not in the table of settled licences"
+    if payload is None:
+        return "source not retrieved"
+    digest = hashlib.sha256(payload).hexdigest()
+    if digest != statement.get("sha256"):
+        return f"sha256 {digest[:16]} != reviewed {str(statement.get('sha256'))[:16]}"
+    try:
+        text = _normalise(statement_text(payload, statement.get("member")))
+    except (KeyError, zipfile.BadZipFile) as exc:
+        return f"member {statement.get('member')!r} not readable: {exc}"
+    missing = [q for q in statement.get("quotes", []) if _normalise(q) not in text]
+    if not statement.get("quotes") or missing:
+        return f"quote not found: {missing[0] if missing else '(no quote given)'}"
+    return None
+
+
+def apply_statement(record: Dict[str, Any], statement: Dict[str, Any]) -> bool:
+    """Record the statement's licence, limited to the fields it covers when it names them."""
+    name = statement["licence"]
+    member = statement.get("member")
+    source = f"{member} in {statement['source']}" if member else statement["source"]
+    before = json.dumps(record["licenses"], sort_keys=True)
+    apply_licence(record, name, statement.get("url") or statement["source"],
+                  statement["quotes"][0], source)
+    fields = statement.get("fields")
+    if fields:
+        licenses = record["licenses"]
+        for field in ("cad_license", "schematic_license", "pcb_license", "mechanical_cad_license"):
+            licenses[field] = name if field in fields else None
+        licenses["hardware_license"] = f"{name} ({statement['scope']})" if statement.get("scope") else name
+    return json.dumps(record["licenses"], sort_keys=True) != before
+
+
+def apply_statements(root: Path, fetcher: Any) -> Tuple[int, List[str]]:
+    """Apply licence_statements.json to the records it names; return (changed, refusals)."""
+    statements = json.loads((root / STATEMENTS_PATH).read_text(encoding="utf-8"))["statements"]
+    changed, refused = 0, []
+    for statement in statements:
+        path = records_dir(root) / (statement["board_id"].replace(":", "__") + ".json")
+        if not path.is_file():
+            refused.append(f"{statement['board_id']}: no such record")
+            continue
+        problem = check_statement(statement, fetcher.get(statement["source"]).payload)
+        if problem:
+            refused.append(f"{statement['board_id']}: {problem}")
+            continue
+        record = json.loads(path.read_text(encoding="utf-8"))
+        if apply_statement(record, statement):
+            record["record_status"] = derive_status(record)
+            with path.open("w", encoding="utf-8", newline="\n") as handle:
+                json.dump(record, handle, indent=2)
+                handle.write("\n")
+            changed += 1
+            print(f"  {record['board_id']:44} {statement['licence']}", flush=True)
+    return changed, refused
+
+
+# --------------------------------------------------------------------------------------
+# licence texts that must travel with the files
+# --------------------------------------------------------------------------------------
+
+RAW_GITHUB = re.compile(r"^https://raw\.githubusercontent\.com/([^/]+)/([^/]+)/([0-9a-f]{40})/")
+
+
+def notice_licence(record: Dict[str, Any]) -> Optional[str]:
+    licenses = record.get("licenses") or {}
+    name = licenses.get("cad_license") or licenses.get("hardware_license")
+    return name if name in NOTICE_LICENCES else None
+
+
+def github_licence_url(record: Dict[str, Any]) -> Optional[str]:
+    """The licence file at the commit the record's files are pinned to, as a raw URL."""
+    for entry in (record.get("files") or {}).values():
+        match = RAW_GITHUB.match((entry or {}).get("url") or "")
+        if not match or entry.get("available") is not True:
+            continue
+        owner, repo, commit = match.groups()
+        try:
+            listing = _gh_api(f"repos/{owner}/{repo}/contents?ref={commit}")
+        except Exception:  # noqa: BLE001 - no listing, no notice; reported by the caller
+            return None
+        names = [e.get("name", "") for e in listing if isinstance(e, dict) and e.get("type") == "file"]
+        found = sorted(n for n in names if LICENCE_FILE.match(n))
+        return f"https://raw.githubusercontent.com/{owner}/{repo}/{commit}/{found[0]}" if found else None
+    return None
+
+
+def write_notices(root: Path, fetcher: Any) -> Tuple[int, List[str]]:
+    """Write the licence text of every redistributable MIT, BSD or Apache board.
+
+    The text comes from the manufacturer: the package member a statement was read from, or
+    the repository's licence file at the commit the board's files are pinned to.
+    """
+    path = root / STATEMENTS_PATH
+    statements = {s["board_id"]: s for s in
+                  json.loads(path.read_text(encoding="utf-8"))["statements"]} if path.is_file() else {}
+    notices: Dict[str, Dict[str, str]] = {}
+    missing: List[str] = []
+    for path in sorted(records_dir(root).glob("*.json")):
+        record = json.loads(path.read_text(encoding="utf-8"))
+        board = record["board_id"]
+        if record["licenses"].get("redistribution_allowed") is not True or not notice_licence(record):
+            continue
+        statement = statements.get(board)
+        if statement and statement.get("member"):
+            payload = fetcher.get(statement["source"]).payload
+            if payload is None or check_statement(statement, payload):
+                missing.append(f"{board}: {statement['source']} no longer matches its statement")
+                continue
+            with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+                data = archive.read(statement["member"])
+            source = f"{statement['source']}#{statement['member']}"
+        else:
+            url = github_licence_url(record)
+            payload = fetcher.get(url).payload if url else None
+            if payload is None:
+                missing.append(f"{board}: no licence file found")
+                continue
+            data, source = payload, url
+        notices[board] = {"licence": notice_licence(record), "source": source,
+                          "sha256": hashlib.sha256(data).hexdigest(),
+                          "text": data.decode("utf-8", "replace")}
+    body = {"purpose": ("The manufacturer's licence text for every mirrored board whose licence "
+                        "requires it to accompany each copy. mirror.py writes it into the "
+                        "board's ATTRIBUTION.md."),
+            "notices": notices}
+    (root / NOTICES_PATH).write_text(json.dumps(body, indent=2, ensure_ascii=False) + "\n",
+                                     encoding="utf-8")
+    return len(notices), missing
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", default=str(REPO_ROOT))
     parser.add_argument("--overwrite", action="store_true",
                         help="re-read even when a licence is already recorded")
+    parser.add_argument("--statements", action="store_true",
+                        help="apply licence_statements.json: licences a person read from a "
+                             "manufacturer's package or page, each quote re-checked against the bytes")
+    parser.add_argument("--notices", action="store_true",
+                        help="write licence-notices.json: the licence text of every mirrored "
+                             "MIT, BSD or Apache board")
     args = parser.parse_args(argv)
+
+    if args.statements or args.notices:
+        root = Path(args.root).resolve()
+        fetcher = Fetcher()
+        refused: List[str] = []
+        if args.statements:
+            changed, refused = apply_statements(root, fetcher)
+            print(f"\nstatements applied={changed}  refused={len(refused)}")
+        if args.notices:
+            written, missing = write_notices(root, fetcher)
+            refused += missing
+            print(f"\nlicence texts written={written}  missing={len(missing)}")
+        for line in refused:
+            print(f"REFUSED {line}", file=sys.stderr)
+        return 1 if refused else 0
 
     read = unknown = 0
     for path in sorted(records_dir(Path(args.root).resolve()).glob("*.json")):
