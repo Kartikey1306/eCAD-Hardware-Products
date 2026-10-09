@@ -1,19 +1,51 @@
 # Raspberry Pi Compute Module IO Board schematics
 
 Design files published by **Raspberry Pi**, copied here without
-modification from the official sources listed below. Each file is byte-identical to
-the SHA-256 recorded for it in
-[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/).
+modification from the official sources listed below: the files named in
+[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/), each matching
+its recorded SHA-256, and every other CAD file in the manufacturer's repository at
+the commit the record pins, each matching its git blob ID there. Archives are
+unpacked and only their CAD members kept.
 
 - Board ID: `raspberry-pi:cmio`
 - Part number: UNVERIFIED
 - Licence: BSD-3-Clause (https://pip.raspberrypi.com/documents/RP-008376-DS)
 - Attribution: Raspberry Pi
 - Changes: none
+- CAD files: 17
 
-| File | Kind | Format | Source | SHA-256 | Retrieved |
-|---|---|---|---|---|---|
-| [`cad/RP-008376-DS.zip`](cad/RP-008376-DS.zip) | cad | pcb_source | [source](https://pip.raspberrypi.com/documents/RP-008376-DS) | `e33a46326831a20e…` | 2026-09-29T07:21:41Z |
+| File | Format | Source | SHA-256 |
+|---|---|---|---|
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6-np.drl`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6-np.drl) | excellon | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6-np.drl` | `832055a646e608e8…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6.drl`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6.drl) | excellon | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6.drl` | `95b7e34a38276a8f…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6.rou`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6.rou) | excellon | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-1-6.rou` | `fdc3e2b49e3f52d9…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-BRD.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-BRD.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-BRD.art` | `a13479197723d241…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-BSM.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-BSM.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-BSM.art` | `f29a734f0dade937…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-DRM.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-DRM.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-DRM.art` | `96a6943ee523d2b3…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L01.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L01.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-L01.art` | `4d74c5bcedc582af…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L02.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L02.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-L02.art` | `5ba5c436f9b82ea5…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L03.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L03.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-L03.art` | `650f4743e6b1d89c…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L04.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L04.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-L04.art` | `2dd0152c2ce83c2c…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L05.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L05.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-L05.art` | `ed62612e0471ad9d…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L06.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-L06.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-L06.art` | `67910415ddb26a80…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-TCL.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-TCL.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-TCL.art` | `60d91e0f8466cb63…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-TPM.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-TPM.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-TPM.art` | `b2586b57de409147…` |
+| [`cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-TSM.art`](cad/RP-008376-DS/GERBERS/RPI-CMIO-V1_2-PUBLIC-TSM.art) | gerber | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `GERBERS/RPI-CMIO-V1_2-PUBLIC-TSM.art` | `473a0806ecdc3d9c…` |
+| [`cad/RP-008376-DS/RPI-CMIO-V1_2-PUBLIC.DSN`](cad/RP-008376-DS/RPI-CMIO-V1_2-PUBLIC.DSN) | orcad | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `RPI-CMIO-V1_2-PUBLIC.DSN` | `9f3211e36c92551b…` |
+| [`cad/RP-008376-DS/RPI-CMIO-V1_2-PUBLIC.brd`](cad/RP-008376-DS/RPI-CMIO-V1_2-PUBLIC.brd) | allegro | [source](https://pip.raspberrypi.com/documents/RP-008376-DS), member `RPI-CMIO-V1_2-PUBLIC.brd` | `6fce1f10b1631f7c…` |
+
+## Not copied
+
+Members of the archives above that are not CAD, left out of the mirror:
+
+- `GERBERS/README.txt` in RP-008376-DS.zip: text, report or list
+- `GERBERS/RPI-CMIO-V1_2-PUBLIC-BAS.pdf` in RP-008376-DS.zip: PDF document
+- `GERBERS/RPI-CMIO-V1_2-PUBLIC-IPC.ipc` in RP-008376-DS.zip: text, report or list
+- `GERBERS/RPI-CMIO-V1_2-PUBLIC-PLACE.txt` in RP-008376-DS.zip: text, report or list
+- `GERBERS/RPI-CMIO-V1_2-PUBLIC-TAS.pdf` in RP-008376-DS.zip: PDF document
+- `README.txt` in RP-008376-DS.zip: text, report or list
+- `RPI-CMIO-V1_2-PUBLIC-BOM.xlsx` in RP-008376-DS.zip: archive inside the archive
+- `RPI-CMIO-V1_2-PUBLIC-SCHEMATIC.pdf` in RP-008376-DS.zip: PDF document
 
 ## Licence text
 

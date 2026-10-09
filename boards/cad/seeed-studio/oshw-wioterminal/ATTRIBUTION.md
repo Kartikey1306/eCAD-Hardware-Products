@@ -1,22 +1,41 @@
 # Seeed WioTerminal
 
 Design files published by **Seeed Studio**, copied here without
-modification from the official sources listed below. Each file is byte-identical to
-the SHA-256 recorded for it in
-[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/).
+modification from the official sources listed below: the files named in
+[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/), each matching
+its recorded SHA-256, and every other CAD file in the manufacturer's repository at
+the commit the record pins, each matching its git blob ID there. Archives are
+unpacked and only their CAD members kept.
 
 - Board ID: `seeed-studio:oshw-wioterminal`
 - Part number: 4509
 - Licence: Apache-2.0 (https://github.com/Seeed-Studio/OSHW-WioTerminal/blob/main/LICENSE)
 - Attribution: Seeed Studio
 - Changes: none
+- CAD files: 20
 
-| File | Kind | Format | Source | SHA-256 | Retrieved |
-|---|---|---|---|---|---|
-| [`cad/3D_Models_of_Enclosure-WioTerminal.stp`](cad/3D_Models_of_Enclosure-WioTerminal.stp) | cad | step | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/07%203D%20Models%20of%20the%20Enclosure/3D_Models_of_Enclosure-WioTerminal.stp) | `a9d571b24244c227…` | 2026-09-29T07:23:25Z |
-| [`cad/Wio-Terminal-PCB-V3.0.dxf`](cad/Wio-Terminal-PCB-V3.0.dxf) | cad | dxf | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio-Terminal/Wio-Terminal-PCB-V3.0.dxf) | `5f238dd626e41b98…` | 2026-09-29T07:23:25Z |
-| [`cad/wio-terminal.GBL`](cad/wio-terminal.GBL) | cad | gerbers | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GBL) | `a70bf590de0af8c7…` | 2026-09-29T07:23:25Z |
-| [`cad/wio-terminal.brd`](cad/wio-terminal.brd) | cad | eagle, pcb_source | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio-Terminal/wio%20terminal.brd) | `5a456aca8f41472a…` | 2026-09-29T07:23:25Z |
+| File | Format | Source | SHA-256 |
+|---|---|---|---|
+| [`cad/02-Gerber-Files/wio-terminal.GBL`](cad/02-Gerber-Files/wio-terminal.GBL) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GBL) | `a70bf590de0af8c7…` |
+| [`cad/02-Gerber-Files/wio-terminal.GBO`](cad/02-Gerber-Files/wio-terminal.GBO) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GBO) | `ce3a5f5ab8f0fd5a…` |
+| [`cad/02-Gerber-Files/wio-terminal.GBP`](cad/02-Gerber-Files/wio-terminal.GBP) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GBP) | `38f4fd20f7c5cfff…` |
+| [`cad/02-Gerber-Files/wio-terminal.GBS`](cad/02-Gerber-Files/wio-terminal.GBS) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GBS) | `2cbf23f7067ee83a…` |
+| [`cad/02-Gerber-Files/wio-terminal.GL2`](cad/02-Gerber-Files/wio-terminal.GL2) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GL2) | `135b932d1de5c848…` |
+| [`cad/02-Gerber-Files/wio-terminal.GL3`](cad/02-Gerber-Files/wio-terminal.GL3) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GL3) | `c16edf9a0be6035a…` |
+| [`cad/02-Gerber-Files/wio-terminal.GML`](cad/02-Gerber-Files/wio-terminal.GML) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GML) | `a1f410f549f4ee34…` |
+| [`cad/02-Gerber-Files/wio-terminal.GTL`](cad/02-Gerber-Files/wio-terminal.GTL) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GTL) | `2125f558d830bab5…` |
+| [`cad/02-Gerber-Files/wio-terminal.GTO`](cad/02-Gerber-Files/wio-terminal.GTO) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GTO) | `53f0023da04e09ef…` |
+| [`cad/02-Gerber-Files/wio-terminal.GTP`](cad/02-Gerber-Files/wio-terminal.GTP) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GTP) | `56a4e0fb0ffbe7a0…` |
+| [`cad/02-Gerber-Files/wio-terminal.GTS`](cad/02-Gerber-Files/wio-terminal.GTS) | gerber | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.GTS) | `c877e6cb771d4713…` |
+| [`cad/02-Gerber-Files/wio-terminal.TXT`](cad/02-Gerber-Files/wio-terminal.TXT) | excellon | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/02%20Gerber%20Files/wio%20terminal.TXT) | `294d12de8d08f5ab…` |
+| [`cad/07-3D-Models-of-the-Enclosure/3D_Models_of_Enclosure-WioTerminal.stp`](cad/07-3D-Models-of-the-Enclosure/3D_Models_of_Enclosure-WioTerminal.stp) | step | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/07%203D%20Models%20of%20the%20Enclosure/3D_Models_of_Enclosure-WioTerminal.stp) | `a9d571b24244c227…` |
+| [`cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal-Chassis-Battery/Wio-Terminal-Chassis-Battery.dxf`](cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal-Chassis-Battery/Wio-Terminal-Chassis-Battery.dxf) | dxf | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio%20Terminal%20Chassis%20Battery/Wio-Terminal-Chassis-Battery.dxf) | `b34291d5f3a103a8…` |
+| [`cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal-Enclosure-Dimensions---Back/Wio-Terminal-Main-Back-V3.0-White-72x57x7.1mm.dxf`](cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal-Enclosure-Dimensions---Back/Wio-Terminal-Main-Back-V3.0-White-72x57x7.1mm.dxf) | dxf | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio%20Terminal%20Enclosure%20Dimensions%20-%20Back/Wio-Terminal-Main-Back-V3.0-White-72x57x7.1mm.dxf) | `217ce33990bceda0…` |
+| [`cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal-Enclosure-Dimensions---Front/Wio-Terminal-Main-V3.0-White-72x57x10.4mm.dxf`](cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal-Enclosure-Dimensions---Front/Wio-Terminal-Main-V3.0-White-72x57x10.4mm.dxf) | dxf | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio%20Terminal%20Enclosure%20Dimensions%20-%20Front/Wio-Terminal-Main-V3.0-White-72x57x10.4mm.dxf) | `514f38434f1f2714…` |
+| [`cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal/Wio-Terminal-3D.stp`](cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal/Wio-Terminal-3D.stp) | step | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio-Terminal/Wio%20Terminal%203D.stp) | `a9d571b24244c227…` |
+| [`cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal/Wio-Terminal-PCB-V3.0.dxf`](cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal/Wio-Terminal-PCB-V3.0.dxf) | dxf | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio-Terminal/Wio-Terminal-PCB-V3.0.dxf) | `5f238dd626e41b98…` |
+| [`cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal/wio-terminal.brd`](cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal/wio-terminal.brd) | eagle | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio-Terminal/wio%20terminal.brd) | `5a456aca8f41472a…` |
+| [`cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal/wio-terminal.sch`](cad/Design-Files-in-Wio-Terminal-Wiki/Wio-Terminal/wio-terminal.sch) | eagle | [source](https://raw.githubusercontent.com/Seeed-Studio/OSHW-WioTerminal/c9192a3c7aeb40c7d3c09e5397f0a531f2847d0c/Design%20Files%20in%20Wio%20Terminal%20Wiki/Wio-Terminal/wio%20terminal.sch) | `b10d2589b887f535…` |
 
 ## Licence text
 

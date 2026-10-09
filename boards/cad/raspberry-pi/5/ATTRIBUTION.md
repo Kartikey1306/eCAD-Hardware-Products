@@ -1,19 +1,28 @@
 # Raspberry Pi 5
 
 Design files published by **Raspberry Pi**, copied here without
-modification from the official sources listed below. Each file is byte-identical to
-the SHA-256 recorded for it in
-[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/).
+modification from the official sources listed below: the files named in
+[`tools/devboard_cad/records/`](../../../../tools/devboard_cad/records/), each matching
+its recorded SHA-256, and every other CAD file in the manufacturer's repository at
+the commit the record pins, each matching its git blob ID there. Archives are
+unpacked and only their CAD members kept.
 
 - Board ID: `raspberry-pi:5`
 - Part number: UNVERIFIED
 - Licence: MIT (https://pip.raspberrypi.com/documents/RP-010083-CA)
 - Attribution: Raspberry Pi
 - Changes: none
+- CAD files: 1
 
-| File | Kind | Format | Source | SHA-256 | Retrieved |
-|---|---|---|---|---|---|
-| [`cad/RP-010083-CA.zip`](cad/RP-010083-CA.zip) | cad | step | [source](https://pip.raspberrypi.com/documents/RP-010083-CA) | `6841637b4cfa9763…` | 2026-09-29T07:21:20Z |
+| File | Format | Source | SHA-256 |
+|---|---|---|---|
+| [`cad/RP-010083-CA/rpi-5b_no_graphics.step`](cad/RP-010083-CA/rpi-5b_no_graphics.step) | step | [source](https://pip.raspberrypi.com/documents/RP-010083-CA), member `rpi-5b_no_graphics.step` | `78164070c1cc7ab8…` |
+
+## Not copied
+
+Members of the archives above that are not CAD, left out of the mirror:
+
+- `LICENSE.txt` in RP-010083-CA.zip: text, report or list
 
 ## Licence text
 
