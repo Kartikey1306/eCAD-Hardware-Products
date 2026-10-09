@@ -114,6 +114,8 @@ EXTENSION_FOR_FORMAT = {
     "gerber": ".gbr", "excellon": ".drl", "csv": ".csv", "eagle": ".xml",
 }
 RAW_GITHUB = re.compile(r"^https://raw\.githubusercontent\.com/([^/]+)/([^/]+)/([0-9a-f]{40})/(.+)$")
+# A record for one board of a repository that holds several names the board's folder.
+TREE_FOLDER = re.compile(r"github\.com/[^/]+/[^/]+/tree/[0-9a-f]{40}/(.+?)/?$")
 
 
 # --------------------------------------------------------------------------------------
@@ -521,11 +523,14 @@ def render_attribution(record: Dict[str, Any], entries: Sequence[Dict[str, Any]]
         for archive, member, reason in sorted(left_out):
             lines.append(f"- `{member}` in {file_name(archive, 'zip')}: {reason}")
     if notice:
+        why = (f"{notice['licence']} requires its text to accompany every copy."
+               if notice["licence"] in NOTICE_LICENCES else
+               "The licence notice and copyright lines, as the licensor wrote them.")
         lines += [
             "",
             LICENCE_TEXT_HEADING,
             "",
-            f"{notice['licence']} requires its text to accompany every copy. Verbatim from",
+            f"{why} Verbatim from",
             f"[the manufacturer's licence]({notice['source']}), SHA-256 `{notice['sha256'][:16]}…`:",
             "",
             "````text",
@@ -603,10 +608,13 @@ def build_index(records: Iterable[Dict[str, Any]], gh_api: Callable[[str], Any],
                 notes.append(f"{record['board_id']}: files span {len(pins)} commits; not indexed")
             continue
         owner, repo, commit = next(iter(pins))  # type: ignore[misc]
+        folder_match = TREE_FOLDER.search((record.get("sources") or {}).get("official_cad_repository") or "")
+        folder = urllib.parse.unquote(folder_match.group(1)) + "/" if folder_match else ""
         tree = gh_api(f"repos/{owner}/{repo}/git/trees/{commit}?recursive=1")
         if tree.get("truncated"):
             notes.append(f"{record['board_id']}: the tree listing of {owner}/{repo} is truncated")
-        blobs = [e for e in tree.get("tree", []) if e.get("type") == "blob"]
+        blobs = [e for e in tree.get("tree", []) if e.get("type") == "blob"
+                 and e["path"].startswith(folder)]
         gerber_dirs = {PurePosixPath(e["path"]).parent for e in blobs
                        if e["path"].lower().endswith(GERBER_SUFFIXES)}
         files = [{"path": e["path"], "blob": e["sha"], "size": e.get("size")} for e in blobs
@@ -788,7 +796,7 @@ def build_board(root: Path, sources: Sequence[Source], fetcher: Any,
         board_entries.append(manifest_entry(item, path))
     if not board_entries:
         return board_entries
-    notice = notices.get(board_id) if needs_notice(board_entries[0]) else None
+    notice = notices.get(board_id)
     if needs_notice(board_entries[0]) and notice is None:
         report.refused.append(f"{board_id}: {board_entries[0]['licence']} needs its licence "
                               f"text; run read_licenses.py --notices")

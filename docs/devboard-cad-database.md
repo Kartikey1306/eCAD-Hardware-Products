@@ -195,6 +195,14 @@ it covers: Raspberry Pi's MIT licence for the Raspberry Pi 5 covers the 3D model
 | `raspberry-pi:5` | MIT (3D model only) | `LICENSE.txt` in the STEP package |
 | `raspberry-pi:cmio` | BSD-3-Clause | `README.txt` in the design package, which carries the three clauses without naming them |
 | `raspberry-pi:pico` | Permission grant in 0BSD wording | the Pico documentation, which grants use, copying, modification and distribution "for any purpose, with or without fee"; the design package repeats it in `LICENSE.txt` |
+| 10 SparkFun boards | CC BY-SA 4.0 | the design file itself: "Released under the Creative Commons Attribution Share-Alike 4.0 License", on SparkFun's `CREATIVE_COMMONS` drawing frame placed on the schematic and board (Eagle) or as footprint text on the PCB (KiCad). Their READMEs point to a `LICENSE.md` that is not in the repository. |
+| 11 BeagleBoard capes | CC BY 4.0 (9), CC BY-SA 4.0 (2) | the `LICENSE` file in each cape's folder of `beagleboard/capes`; each names its own copyright holder, so these statements are marked `notice` and the licence file goes into the board's `ATTRIBUTION.md` |
+
+`beagleboard/capes` holds thirteen capes in one repository, under two licences and several
+copyright holders, so it is recorded as one record per cape (`harvest_github.py harvest
+--path beaglebone/Load`): the record's `official_cad_repository` is the cape's folder at the
+pinned commit, and `mirror.py index` takes only that folder. The Servo and GamePup capes
+have no licence file and are not recorded.
 
 ## Mirror
 
@@ -235,7 +243,9 @@ verbatim. `read_licenses.py --notices` collects it into
 `tools/devboard_cad/licence-notices.json`, from the repository's licence file at the commit
 the board's files are pinned to, or from the package member a statement was read from.
 `mirror.py build` refuses such a board without its text, and `check` fails if an
-`ATTRIBUTION.md` lacks it or the text no longer matches its digest.
+`ATTRIBUTION.md` lacks it or the text no longer matches its digest. A statement marked
+`notice` puts its licence file into `ATTRIBUTION.md` whatever the licence, for boards whose
+licence file names copyright holders other than the publisher.
 
 `mirror.py build` copies a file only when all of these hold:
 

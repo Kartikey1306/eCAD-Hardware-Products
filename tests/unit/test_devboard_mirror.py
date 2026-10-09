@@ -379,6 +379,22 @@ class LicenceTextTests(unittest.TestCase):
             problems = mirror.check(root, [self._mit_record()])
         self.assertEqual(problems, ["licence text does not match its digest: open:a"])
 
+    def test_a_cc_board_with_a_notice_carries_its_copyright_lines(self) -> None:
+        record = _record("open:a", {"eagle": _entry("https://x/a.brd", EAGLE_BRD)})
+        text = "CC-BY-4.0\n\nCopyright (c) 2017 Example Author\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / mirror.NOTICES_PATH).parent.mkdir(parents=True, exist_ok=True)
+            (root / mirror.NOTICES_PATH).write_text(json.dumps({"notices": {"open:a": {
+                "licence": "CC BY-SA 4.0", "source": "https://x/LICENSE", "sha256": _sha(text.encode()), "text": text}}}),
+                encoding="utf-8")
+            report = mirror.build(root, [record], FakeFetcher({"https://x/a.brd": EAGLE_BRD}))
+            attribution = (root / "boards/cad/open/a/ATTRIBUTION.md").read_text(encoding="utf-8")
+            self.assertEqual(mirror.check(root, [record]), [])
+        self.assertTrue(report.ok)
+        self.assertIn("Copyright (c) 2017 Example Author", attribution)
+        self.assertIn("as the licensor wrote them", attribution)
+
     def test_share_alike_boards_need_no_licence_text(self) -> None:
         record = _record("open:a", {"eagle": _entry("https://x/a.brd", EAGLE_BRD)})
         with tempfile.TemporaryDirectory() as tmp:
@@ -480,6 +496,13 @@ class RepositoryIndexTests(unittest.TestCase):
         self.assertEqual([f["path"] for f in boards["vendor:board"]["files"]],
                          ["fab/board.GTL", "fab/board.TXT", "hw/board.kicad_pcb", "hw/power.kicad_sch"])
         self.assertEqual(notes, [])
+
+    def test_a_board_that_is_a_folder_indexes_only_that_folder(self) -> None:
+        record = _repo_record({"hw/board.kicad_pcb": KICAD_PCB})
+        record["sources"] = {"official_cad_repository": f"https://github.com/vendor/board/tree/{COMMIT}/hw"}
+        boards, _ = mirror.build_index([record], lambda path: {"tree": self.TREE}, "now")
+        self.assertEqual([f["path"] for f in boards["vendor:board"]["files"]],
+                         ["hw/board.kicad_pcb", "hw/power.kicad_sch"])
 
     def test_a_record_spanning_two_commits_is_not_indexed(self) -> None:
         record = _record("vendor:board", {
