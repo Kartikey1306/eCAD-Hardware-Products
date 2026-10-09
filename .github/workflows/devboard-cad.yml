@@ -17,12 +17,14 @@ on:
       - "schemas/devboard-cad/**"
       - "tools/devboard_cad/**"
       - "tests/unit/test_devboard_*.py"
+      - "boards/cad/**"
       - ".github/workflows/devboard-cad.yml"
   push:
     branches: [master]
     paths:
       - "schemas/devboard-cad/**"
       - "tools/devboard_cad/**"
+      - "boards/cad/**"
   schedule:
     # Weekly drift check. Records age against the vendors, not against this repository.
     - cron: "17 4 * * 1"
@@ -58,8 +60,11 @@ jobs:
       - name: Validate every record against the schema
         run: python tools/devboard_cad/validate_records.py
 
+      - name: Check the design-file mirror is complete, intact and licensed
+        run: python tools/devboard_cad/mirror.py check
+
       - name: Run the dev-board test suites
-        run: python -m pytest tests/unit/test_devboard_database.py tests/unit/test_devboard_verify.py -v
+        run: python -m pytest tests/unit/test_devboard_database.py tests/unit/test_devboard_verify.py tests/unit/test_devboard_mirror.py -v
 
   revalidate:
     name: Re-check claimed URLs against the vendors
