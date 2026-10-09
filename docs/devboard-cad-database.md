@@ -198,19 +198,33 @@ it covers: Raspberry Pi's MIT licence for the Raspberry Pi 5 covers the 3D model
 
 ## Mirror
 
-`boards/cad/` holds an unmodified copy of every verified **CAD file** of every board whose
-record sets `licenses.redistribution_allowed` to `true` (issue #48). Boards without that
+`boards/cad/` holds an unmodified copy of the **CAD files** of every board whose record
+sets `licenses.redistribution_allowed` to `true` (issue #48). Boards without that
 permission keep their link and digest only; nothing of theirs is copied. Documents (schematic
-PDFs, drawings, BOMs, datasheets) are not copied either: their records keep the link and
-digest, so the folder holds CAD and nothing else.
+PDFs, drawings, BOMs, datasheets, readmes) are not copied either, so the folder holds CAD
+and nothing else.
+
+A record names one file per format, which is enough to say a format exists but not to
+build the board: a KiCad project has several schematic sheets, a project file and its own
+footprints, and fabrication outputs and 3D models sit beside the sources. So the mirror
+takes the whole design. When a record's files are pinned to one commit of the
+manufacturer's repository, `mirror.py index` lists every CAD file in that commit into
+`tools/devboard_cad/repo-cad-index.json`, with its git blob ID, and every one of them is
+mirrored in the repository's own folder layout, so hierarchical sheets and 3D model paths
+still resolve.
 
 ```
 boards/cad/<vendor>/<board>/
-  ATTRIBUTION.md   manufacturer, licence, and the source and digest of each file
-  cad/             Eagle, KiCad and Altium sources and libraries, Gerber and drill files,
-                   Gerber archives, STEP, STL and DXF models
+  ATTRIBUTION.md   manufacturer, licence, every file with its source and digest, and what
+                   was left out of archives
+  cad/             the design in the manufacturer's layout: Eagle, KiCad, Altium, OrCAD and
+                   Allegro sources, projects and libraries, Gerber and drill files, STEP,
+                   IGES, STL, VRML and DXF models; archives unpacked to their CAD members
+tools/devboard_cad/repo-cad-index.json
+                   every CAD file at each board's pinned commit, with its git blob ID
 tools/devboard_cad/mirror-manifest.json
-                   one entry per file: board, path, formats, source, sha256, size, licence
+                   one entry per file: board, path, source, sha256, git blob, archive member,
+                   size, licence; and the indexed files left out, with the reason
 ```
 
 `ATTRIBUTION.md` stays beside the files on purpose: CC BY and CC BY-SA require the credit
@@ -223,21 +237,32 @@ the board's files are pinned to, or from the package member a statement was read
 `mirror.py build` refuses such a board without its text, and `check` fails if an
 `ATTRIBUTION.md` lacks it or the text no longer matches its digest.
 
-`mirror.py build` copies a file only when all three hold:
+`mirror.py build` copies a file only when all of these hold:
 
 1. the board's licence allows redistribution;
-2. the bytes have the SHA-256 recorded in `evidence.sha256`, so the mirror can only ever
-   hold what the database says was checked;
-3. the verifier recorded a CAD format for it (for STEP, the part of `detected_format`
-   before the colon), and the bytes are CAD again when read: Eagle, KiCad and Altium
-   sources, Gerber and drill files, STEP, STL and DXF models, or an archive containing
-   them. A file recorded as CAD whose bytes turn out to be a web page, JSON or a document
-   is refused and reported, never skipped silently.
+2. the bytes are the verified bytes. A file the record names must have the SHA-256 in
+   `evidence.sha256`. A file from the index must have its git blob ID at the pinned commit,
+   the identifier git itself stores the file under, so it is the manufacturer's file
+   exactly; one the repository keeps in Git LFS is fetched from LFS and must match the
+   pointer's SHA-256;
+3. the bytes are CAD when read: identified from content, with a suffix deciding only for
+   native formats that have no signature (OrCAD, SolidWorks, KiCad's JSON project file).
+   An archive is unpacked and only its CAD members are written, in a folder named after
+   it; its PDFs, spreadsheets, readmes and reports are left out and listed in
+   `ATTRIBUTION.md`.
+
+A file the record names that fails any of these is refused and the build fails. A file the
+index chose by its name alone may simply not be CAD (a `.sch` in an unidentified binary
+format, a `.zip` of datasheets): it is left out, listed in `ATTRIBUTION.md` and in the
+manifest's `excluded`, and `check` accepts it only for that exact blob. An archive named `X.zip`
+that holds a folder `X/` is unpacked into one folder `X`, not two. Paths longer than
+200 characters, which Windows checkouts cannot hold, are flattened under a digest prefix,
+and an archive member over GitHub's 100 MiB limit is left out and listed.
 
 A build rewrites the manifest for the vendors it covers and removes whatever the manifest
 no longer names, including a board left without CAD files. `check` fails on a missing
-file, a digest mismatch, a stray file anywhere in `boards/cad/`, a missing attribution, or
-a board that has lost its licence.
+file, a digest or git blob mismatch, a stray file anywhere in `boards/cad/`, a missing
+attribution, or a board that has lost its licence.
 
 The files are committed as regular files, exactly as published. `.gitattributes`
 exempts `boards/cad/*/*/cad/` from the repository's LFS rules and from line-ending
@@ -246,6 +271,9 @@ refuses LFS uploads to a public fork, which is how this repository takes contrib
 Every file is under GitHub's 100 MB limit.
 
 ```bash
+# List every CAD file at each mirrored board's pinned commit (uses the GitHub API).
+python3 tools/devboard_cad/mirror.py index
+
 # Copy the CAD files of one vendor, or of all vendors, reusing files whose digest matches.
 python3 tools/devboard_cad/mirror.py build --vendor sparkfun
 python3 tools/devboard_cad/mirror.py build

@@ -389,6 +389,209 @@ class LicenceTextTests(unittest.TestCase):
         self.assertNotIn(mirror.LICENCE_TEXT_HEADING, attribution)
 
 
+COMMIT = "c" * 40
+RAW = f"https://raw.githubusercontent.com/vendor/board/{COMMIT}"
+PADS_GERBER = b"*\r\n*\r\nG04 PADS Layout generated Gerber (RS-274-X) file*\r\n%FSLAX35Y35*%\r\nM02*\r\n"
+PADS_DRILL = b"%\r\nT1C.00984F0S0\r\nX042087Y042874\r\nX041535Y042894\r\nM30\r\n"
+KICAD_SCH = b'(kicad_sch (version 20231120) (generator "eeschema"))\n'
+
+
+def _blob(data: bytes) -> str:
+    return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+
+
+def _repo_record(files: Dict[str, bytes]) -> dict:
+    """A record naming the PCB only, pinned to COMMIT; the repository holds ``files``."""
+    return _record("vendor:board", {"pcb_source": _entry(f"{RAW}/hw/board.kicad_pcb", files["hw/board.kicad_pcb"])})
+
+
+def _index(files: Dict[str, bytes]) -> dict:
+    return {"vendor:board": {"repository": "vendor/board", "commit": COMMIT, "indexed_at": "2026-10-09T00:00:00Z",
+                             "files": [{"path": p, "blob": _blob(d), "size": len(d)} for p, d in sorted(files.items())]}}
+
+
+class DetectionTests(unittest.TestCase):
+    def test_gerber_and_drill_files_without_a_first_line_header_are_cad(self) -> None:
+        self.assertEqual(mirror.category(PADS_GERBER, "L1-Top.pho"), ("cad", "gerber"))
+        self.assertEqual(mirror.category(PADS_DRILL, "drill.drl"), ("cad", "excellon"))
+        self.assertEqual(mirror.category(b"%\nM48\nINCH\nT01C0.02\n%\nX1Y1\n", "board.TXT"), ("cad", "excellon"))
+
+    def test_project_rule_and_model_files_are_cad(self) -> None:
+        self.assertEqual(mirror.category(b'{"board": {}, "meta": {"version": 1}}', "a.kicad_pro"), ("cad", "kicad"))
+        self.assertEqual(mirror.category(b"(version 1)\n(rule clearance)\n", "a.kicad_dru"), ("cad", "kicad"))
+        self.assertEqual(mirror.category(b"update=22/05/2020\n[pcbnew]\nversion=1\n", "a.pro"), ("cad", "kicad"))
+        self.assertEqual(mirror.category(b"#VRML V2.0 utf8\nShape {}\n", "part.wrl"), ("cad", "vrml"))
+        allegro = b"\x03\x00\x00\x00\x01\x00\x00\x00\x03\x00\x00\x00\t\x00\x00\x00" + b"\x05" * 60
+        self.assertEqual(mirror.category(b"\x00\t\x14\x00" + allegro, "board.brd"), ("cad", "allegro"))
+        self.assertEqual(mirror.category(b"\x02\x15\x14\x00" + allegro, "BeagleV-FIRE.brd"), ("cad", "allegro"))
+        self.assertIsNone(mirror.category(b"\x02\x15\x14\x00" + b"\x05" * 76, "mystery.brd")[0])
+        self.assertEqual(mirror.category(b"%TF.GenerationSoftware,KiCad,Pcbnew,8.0.6*%\n%FSLAX46Y46*%\n", "p.GBL"),
+                         ("cad", "gerber"))
+        self.assertEqual(mirror.category(b";LEADER: 12 \n;HEADER: \n;CODE  : ASCII \n%\nT1C0.0120\nX1200Y3400\n",
+                                         "board-1-12.drl"), ("cad", "excellon"))
+        self.assertEqual(mirror.category(b"# Blender\nmtllib a.mtl\nv 1.0 2.0 3.0\nv 1 2 4\nv 1 3 3\nf 1 2 3\n", "a.obj"),
+                         ("cad", "obj"))
+        far_faces = b"mtllib 1.mtl\n\n" + b"v  -3.590774 18.753864 11.200044\n" * 40000 + b"f 1 2 3\n"
+        self.assertEqual(mirror.category(far_faces, "Dial_Subject.obj"), ("cad", "obj"))
+        allegro_drill = (b";LEADER: 12 \n;HEADER: \n;CODE  : ASCII \n;   Holesize 1. = 8.000000 PLATED MILS\n"
+                         b"%\nG90\nX0129522Y0132875\nX0217900Y0044200\nX0135821Y0136025\nM30\n")
+        self.assertEqual(mirror.category(allegro_drill, "BeagleBone-AI-1-12.drl"), ("cad", "excellon"))
+        self.assertEqual(mirror.category(b"\xef\xbb\xbf[Design]\nVersion=1.0\n", "b.PrjPcb"), ("cad", "altium"))
+
+    def test_text_projects_and_pads_schematics_are_cad(self) -> None:
+        kicad5 = b"update=Sunday, September 10, 2017 'PMt' 11:44:10 PM\nversion=1\nlast_client=kicad\n[pcbnew]\n"
+        self.assertEqual(mirror.category(kicad5, "feather.pro"), ("cad", "kicad"))
+        self.assertEqual(mirror.category(b"[Design]\r\nVersion=1.0\r\n", "board.PrjPcb"), ("cad", "altium"))
+        self.assertEqual(mirror.category(b'(ExpressProject ""\r\n  (ProjectVersion "19981106")', "a.opj"),
+                         ("cad", "orcad"))
+        pads = b"\x00\xfe\x0b\x00" + b"\x00" * 28 + b"\x01\x00\x00\x00L\x02\x00\x00\x15\x00\x00\x00" + b"\x00" * 64
+        self.assertEqual(mirror.category(pads, "POWERXEL.sch"), ("cad", "pads"))
+        self.assertIsNone(mirror.category(b"\x00\xfe\x0b\x00" + b"\x07" * 80, "mystery.sch")[0])
+
+    def test_prose_json_and_a_readme_are_not_cad(self) -> None:
+        self.assertIsNone(mirror.category(b"Order these boards in green.\n", "ordering_instructions.txt")[0])
+        self.assertIsNone(mirror.category(b'{"name": "package"}', "package.json")[0])
+        self.assertIsNone(mirror.category(b"update=1\n[general]\n", "qt.pro")[0])
+        self.assertIsNone(mirror.category(b"EAGLE AutoRouter Statistics:\n\nJob : jig.brd\n", "jig.pro")[0])
+        self.assertIsNone(mirror.category(b";\tSTMicroelectronics Project file\n\n[Version]\n", "firmware_v01.stp")[0])
+
+
+class RepositoryIndexTests(unittest.TestCase):
+    TREE = [
+        {"path": "hw/board.kicad_pcb", "type": "blob", "sha": "1" * 40, "size": 10},
+        {"path": "hw/power.kicad_sch", "type": "blob", "sha": "2" * 40, "size": 10},
+        {"path": "fab/board.GTL", "type": "blob", "sha": "3" * 40, "size": 10},
+        {"path": "fab/board.TXT", "type": "blob", "sha": "4" * 40, "size": 10},
+        {"path": "fab/ordering_instructions.txt", "type": "blob", "sha": "5" * 40, "size": 10},
+        {"path": "docs/notes.txt", "type": "blob", "sha": "6" * 40, "size": 10},
+        {"path": "docs/schematic.pdf", "type": "blob", "sha": "7" * 40, "size": 10},
+        {"path": "fab", "type": "tree", "sha": "8" * 40},
+    ]
+
+    def test_every_design_file_at_the_pinned_commit_is_indexed(self) -> None:
+        record = _repo_record({"hw/board.kicad_pcb": KICAD_PCB})
+        calls = []
+
+        def gh_api(path: str):
+            calls.append(path)
+            return {"tree": self.TREE, "truncated": False}
+        boards, notes = mirror.build_index([record], gh_api, "2026-10-09T00:00:00Z")
+        self.assertEqual(calls, [f"repos/vendor/board/git/trees/{COMMIT}?recursive=1"])
+        self.assertEqual([f["path"] for f in boards["vendor:board"]["files"]],
+                         ["fab/board.GTL", "fab/board.TXT", "hw/board.kicad_pcb", "hw/power.kicad_sch"])
+        self.assertEqual(notes, [])
+
+    def test_a_record_spanning_two_commits_is_not_indexed(self) -> None:
+        record = _record("vendor:board", {
+            "pcb_source": _entry(f"{RAW}/a.kicad_pcb", KICAD_PCB),
+            "schematic": _entry(f"https://raw.githubusercontent.com/vendor/board/{'d' * 40}/a.kicad_sch", KICAD_SCH),
+        })
+        boards, notes = mirror.build_index([record], lambda path: {"tree": []}, "now")
+        self.assertEqual(boards, {})
+        self.assertIn("2 commits", notes[0])
+
+    def test_the_index_adds_files_and_the_record_file_gains_its_blob(self) -> None:
+        files = {"hw/board.kicad_pcb": KICAD_PCB, "hw/power.kicad_sch": KICAD_SCH}
+        sources = mirror.select([_repo_record(files)], _index(files))
+        self.assertEqual([s.repo_path for s in sources], ["hw/board.kicad_pcb", "hw/power.kicad_sch"])
+        self.assertEqual(sources[0].blob, _blob(KICAD_PCB))
+        self.assertIsNotNone(sources[0].sha256)
+        self.assertIsNone(sources[1].sha256)
+
+
+class RepositoryBuildTests(unittest.TestCase):
+    FILES = {"hw/board.kicad_pcb": KICAD_PCB, "hw/power.kicad_sch": KICAD_SCH, "fab/drill.drl": PADS_DRILL}
+
+    def _build(self, files: Dict[str, bytes], served: Dict[str, bytes], record: Optional[dict] = None):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        record = record or _repo_record(files)
+        report = mirror.build(root, [record], FakeFetcher(served), index=_index(files))
+        return root, record, report
+
+    def test_the_whole_design_is_written_in_the_repository_layout(self) -> None:
+        root, record, report = self._build(self.FILES, {f"{RAW}/{p}": d for p, d in self.FILES.items()})
+        self.assertTrue(report.ok, report.refused)
+        for path, data in self.FILES.items():
+            self.assertEqual((root / "boards/cad/vendor/board/cad" / path).read_bytes(), data)
+        manifest = json.loads((root / mirror.MANIFEST_PATH).read_text(encoding="utf-8"))
+        self.assertEqual({e["git_blob"] for e in manifest["entries"]}, {_blob(d) for d in self.FILES.values()})
+        self.assertEqual(mirror.check(root, [record], _index(self.FILES)), [])
+
+    def test_bytes_that_are_not_the_commit_blob_are_refused(self) -> None:
+        served = {f"{RAW}/{p}": d for p, d in self.FILES.items()}
+        served[f"{RAW}/hw/power.kicad_sch"] = KICAD_SCH + b"; edited\n"
+        root, record, report = self._build(self.FILES, served)
+        self.assertIn("git blob", report.refused[0])
+        self.assertIn(f"missing: vendor:board {RAW}/hw/power.kicad_sch", mirror.check(root, [record], _index(self.FILES)))
+
+    def test_a_git_lfs_pointer_is_resolved_and_checked_against_its_oid(self) -> None:
+        step = b"ISO-10303-21;\nHEADER;\nENDSEC;\n"
+        pointer = (b"version https://git-lfs.github.com/spec/v1\noid sha256:" + _sha(step).encode()
+                   + b"\nsize " + str(len(step)).encode() + b"\n")
+        files = {"hw/board.kicad_pcb": KICAD_PCB, "3d/board.step": pointer}
+        served = {f"{RAW}/hw/board.kicad_pcb": KICAD_PCB, f"{RAW}/3d/board.step": pointer,
+                  f"https://media.githubusercontent.com/media/vendor/board/{COMMIT}/3d/board.step": step}
+        root, record, report = self._build(files, served)
+        self.assertTrue(report.ok, report.refused)
+        self.assertEqual((root / "boards/cad/vendor/board/cad/3d/board.step").read_bytes(), step)
+
+    def test_a_git_lfs_object_missing_from_github_is_left_out_and_listed(self) -> None:
+        pointer = (b"version https://git-lfs.github.com/spec/v1\noid sha256:" + b"e" * 64 + b"\nsize 94254684\n")
+        files = {"hw/board.kicad_pcb": KICAD_PCB, "3D/board-3d.zip": pointer}
+        root, record, report = self._build(files, {f"{RAW}/hw/board.kicad_pcb": KICAD_PCB, f"{RAW}/3D/board-3d.zip": pointer})
+        self.assertTrue(report.ok, report.refused)
+        manifest = json.loads((root / mirror.MANIFEST_PATH).read_text(encoding="utf-8"))
+        self.assertTrue(manifest["excluded"][0]["reason"].startswith(mirror.LFS_MISSING))
+        self.assertEqual(mirror.check(root, [record], _index(files)), [])
+
+    def test_an_archive_is_unpacked_to_its_cad_members_and_the_rest_listed(self) -> None:
+        archive = _zip({"fab/top.GTL": GERBER, "fab/drill.TXT": PADS_DRILL, "schematic.pdf": PDF,
+                        "BOM.xlsx": b"PK\x03\x04 not really", "ordering_instructions.txt": b"Order green.\n"})
+        files = {"hw/board.kicad_pcb": KICAD_PCB, "Production/panel.zip": archive}
+        root, record, report = self._build(files, {f"{RAW}/{p}": d for p, d in files.items()})
+        self.assertTrue(report.ok, report.refused)
+        folder = root / "boards/cad/vendor/board/cad/Production/panel"
+        self.assertEqual(sorted(p.relative_to(folder).as_posix() for p in folder.rglob("*") if p.is_file()),
+                         ["fab/drill.TXT", "fab/top.GTL"])
+        self.assertFalse(any(p.suffix.lower() in (".pdf", ".xlsx", ".zip", ".txt") and p.name != "drill.TXT"
+                             for p in (root / "boards/cad").rglob("*")))
+        attribution = (root / "boards/cad/vendor/board/ATTRIBUTION.md").read_text(encoding="utf-8")
+        self.assertIn(mirror.NOT_COPIED_HEADING, attribution)
+        self.assertIn("`schematic.pdf` in panel.zip: PDF document", attribution)
+        self.assertEqual(mirror.check(root, [record], _index(files)), [])
+
+    def test_an_indexed_archive_of_documents_is_left_out_not_failed(self) -> None:
+        files = {"hw/board.kicad_pcb": KICAD_PCB, "docs/datasheets.zip": _zip({"a.pdf": PDF})}
+        root, record, report = self._build(files, {f"{RAW}/{p}": d for p, d in files.items()})
+        self.assertTrue(report.ok, report.refused)
+        manifest = json.loads((root / mirror.MANIFEST_PATH).read_text(encoding="utf-8"))
+        self.assertEqual([e["reason"] for e in manifest["excluded"]], ["archive holds no CAD files"])
+        self.assertEqual(mirror.check(root, [record], _index(files)), [])
+
+    def test_a_recorded_archive_of_documents_is_refused(self) -> None:
+        record = _record("open:a", {"gerbers": _entry("https://x/fab.zip", _zip({"a.pdf": PDF}), detected="zip")})
+        with tempfile.TemporaryDirectory() as tmp:
+            report = mirror.build(Path(tmp), [record], FakeFetcher({"https://x/fab.zip": _zip({"a.pdf": PDF})}))
+        self.assertIn("archive holds no CAD files", report.refused[0])
+
+    def test_an_archive_holding_a_folder_of_its_own_name_is_not_nested_twice(self) -> None:
+        archive = _zip({"panel/panel.GTL": GERBER})
+        files = {"hw/board.kicad_pcb": KICAD_PCB, "Production/panel.zip": archive}
+        root, record, report = self._build(files, {f"{RAW}/{p}": d for p, d in files.items()})
+        self.assertTrue((root / "boards/cad/vendor/board/cad/Production/panel/panel.GTL").is_file())
+
+    def test_a_path_too_long_for_windows_is_flattened(self) -> None:
+        deep = "/".join(["a-very-long-folder-name-from-the-vendor"] * 6) + "/board.kicad_sch"
+        files = {"hw/board.kicad_pcb": KICAD_PCB, deep: KICAD_SCH}
+        root, record, report = self._build(files, {f"{RAW}/{p}": d for p, d in files.items()})
+        written = [p for p in (root / "boards/cad").rglob("*.kicad_sch")]
+        self.assertEqual(len(written), 1)
+        self.assertLessEqual(len(written[0].relative_to(root).as_posix()), mirror.MAX_PATH_LENGTH)
+        self.assertEqual(mirror.check(root, [record], _index(files)), [])
+
+
 class CommittedMirrorTests(unittest.TestCase):
     """The mirror in this repository is complete and every file is the verified one."""
 

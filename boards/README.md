@@ -72,12 +72,15 @@ minimal until datasheet review.
 
 ## Design files
 
-[`cad/`](cad/) holds the published CAD files of every catalogued board whose licence
-allows redistribution: Eagle, KiCad and Altium sources and libraries, Gerber and drill
-files, and STEP, STL and DXF models. Each file is byte-identical to the digest in its
-record, and each board's `ATTRIBUTION.md` credits the manufacturer and names the
-licence. Documents (PDFs, BOMs) stay as links in the records. How it is built and
-checked: [docs/devboard-cad-database.md](../docs/devboard-cad-database.md#mirror).
+[`cad/`](cad/) holds the published CAD design of every catalogued board whose licence
+allows redistribution: every CAD file in the manufacturer's repository at the commit its
+record pins, in the manufacturer's folder layout. That means Eagle, KiCad, Altium, OrCAD
+and Allegro sources, projects and libraries, Gerber and drill files, and STEP, IGES, STL,
+VRML and DXF models; archives are unpacked to their CAD members. Each file is
+byte-identical to its recorded digest or to its git blob at that commit, and each board's
+`ATTRIBUTION.md` credits the manufacturer, names the licence and lists what was left out.
+Documents (PDFs, BOMs, readmes) are never copied. How it is built and checked:
+[docs/devboard-cad-database.md](../docs/devboard-cad-database.md#mirror).
 
 ## Roadmap (from #28)
 

@@ -15,14 +15,19 @@ has never run.
 
 ### Added
 
-- The dev-board CAD mirror (issue #48): `tools/devboard_cad/mirror.py` copies every
-  verified CAD file of every board whose licence allows redistribution into
+- The dev-board CAD mirror (issue #48): `tools/devboard_cad/mirror.py` copies the CAD
+  design of every board whose licence allows redistribution into
   `boards/cad/<vendor>/<board>/cad/`, unmodified, with an `ATTRIBUTION.md` per board;
-  the index is `tools/devboard_cad/mirror-manifest.json`. Documents (PDFs, BOMs) are not
-  copied. A file is copied only if its SHA-256 matches the record and its recorded
-  format and its content are CAD; `mirror.py check` proves completeness and integrity (from
-  the bytes, or from Git LFS pointers if the mirror moves to LFS) and runs in the
-  test suite.
+  the index is `tools/devboard_cad/mirror-manifest.json`. A record names one file per
+  format, so `mirror.py index` lists every CAD file at the repository commit the record
+  pins (`repo-cad-index.json`) and the whole design is mirrored in the manufacturer's
+  layout: every schematic sheet, project file, library, fabrication output and 3D model.
+  A file is copied only if its SHA-256 matches the record or its git blob ID matches the
+  commit (Git LFS objects against their pointer), and only if its content is CAD.
+  Archives are unpacked to their CAD members; documents (PDFs, BOMs, readmes, reports) are
+  never copied, and what was left out is listed. `mirror.py check` proves completeness and
+  integrity (from the bytes, or from Git LFS pointers if the mirror moves to LFS) and runs
+  in the test suite.
 - Licences read from a manufacturer's own package or page
   (`tools/devboard_cad/licence_statements.json`, `read_licenses.py --statements`), each
   applied only while the source keeps its reviewed SHA-256 and every quote. Four boards
