@@ -346,17 +346,19 @@ def write_notices(root: Path, fetcher: Any) -> Tuple[int, List[str]]:
     for path in sorted(records_dir(root).glob("*.json")):
         record = json.loads(path.read_text(encoding="utf-8"))
         board = record["board_id"]
-        if record["licenses"].get("redistribution_allowed") is not True or not notice_licence(record):
-            continue
         statement = statements.get(board)
-        if statement and statement.get("member"):
+        # A statement marked "notice" carries copyright lines the licence asks to keep,
+        # whatever the licence; MIT, BSD and Apache always need their text.
+        wanted = notice_licence(record) or (statement or {}).get("notice")
+        if record["licenses"].get("redistribution_allowed") is not True or not wanted:
+            continue
+        if statement and (statement.get("member") or statement.get("notice")):
             payload = fetcher.get(statement["source"]).payload
             if payload is None or check_statement(statement, payload):
                 missing.append(f"{board}: {statement['source']} no longer matches its statement")
                 continue
-            with zipfile.ZipFile(io.BytesIO(payload)) as archive:
-                data = archive.read(statement["member"])
-            source = f"{statement['source']}#{statement['member']}"
+            data = statement_text(payload, statement.get("member")).encode("utf-8")
+            source = statement["source"] + (f"#{statement['member']}" if statement.get("member") else "")
         else:
             url = github_licence_url(record)
             payload = fetcher.get(url).payload if url else None
@@ -364,7 +366,9 @@ def write_notices(root: Path, fetcher: Any) -> Tuple[int, List[str]]:
                 missing.append(f"{board}: no licence file found")
                 continue
             data, source = payload, url
-        notices[board] = {"licence": notice_licence(record), "source": source,
+        licenses = record["licenses"]
+        notices[board] = {"licence": notice_licence(record) or licenses.get("cad_license")
+                          or licenses.get("hardware_license"), "source": source,
                           "sha256": hashlib.sha256(data).hexdigest(),
                           "text": data.decode("utf-8", "replace")}
     body = {"purpose": ("The manufacturer's licence text for every mirrored board whose licence "

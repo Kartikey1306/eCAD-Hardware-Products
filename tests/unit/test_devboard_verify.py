@@ -355,6 +355,19 @@ class TestGithubHarvester(unittest.TestCase):
             harvest._pick(["old/Board.kicad_pcb", "Board.kicad_pcb"], "pcb_source"),
             "Board.kicad_pcb")
 
+    def test_a_board_in_a_shared_repository_is_recorded_as_its_folder(self) -> None:
+        sha = "b" * 40
+        meta = {"html_url": "https://github.com/beagleboard/capes"}
+        identity = {"manufacturer": "BeagleBoard.org Foundation", "family": "Capes",
+                    "board": "BeagleBone Load Cape", "official_product_page": "https://www.beagleboard.org/boards"}
+        found = harvest.classify_paths(["beaglebone/Load/Load_Cape.brd", "beaglebone/Load/Load_Cape.sch"])
+        record = harvest.build_record("beagleboard:beaglebone-load-cape", "beagleboard/capes", sha, meta,
+                                      found, identity, folder="beaglebone/Load")
+        self.assertEqual(record["sources"]["official_cad_repository"],
+                         f"https://github.com/beagleboard/capes/tree/{sha}/beaglebone/Load")
+        self.assertIn("folder beaglebone/Load", record["notes"])
+        self.assertTrue(record["files"]["eagle"]["url"].endswith("/beaglebone/Load/Load_Cape.brd"))
+
     def test_absence_is_claimed_only_against_a_pinned_index(self) -> None:
         files = harvest.build_files("adafruit/X", "a" * 40, harvest.classify_paths(self.PATHS))
         self.assertIs(files["step"]["available"], False)
@@ -734,6 +747,32 @@ class TestLicenceStatements(unittest.TestCase):
             url = licences.github_licence_url(record)
         self.assertEqual(url, f"https://raw.githubusercontent.com/v/r/{commit}/LICENSE")
         self.assertEqual(calls, [f"repos/v/r/contents?ref={commit}"])
+
+    def test_a_notice_statement_keeps_the_licence_file_whatever_the_licence(self) -> None:
+        text = b"CC-BY-4.0\n\nCopyright (c) 2017 Aron Phillips, GHI Electronics\n\nAttribution 4.0 International\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "tools/devboard_cad/records").mkdir(parents=True)
+            record = self._record()
+            record["board_id"] = "beagleboard:beaglebone-load-cape"
+            record["files"] = {}
+            statement = self._statement(text, member=None, licence="CC BY 4.0", notice=True,
+                                        board_id=record["board_id"], source="https://example.com/LICENSE",
+                                        quotes=["Copyright (c) 2017 Aron Phillips, GHI Electronics"])
+            licences.apply_statement(record, statement)
+            (root / "tools/devboard_cad/records/beagleboard__beaglebone-load-cape.json").write_text(
+                json.dumps(record), encoding="utf-8")
+            (root / licences.STATEMENTS_PATH).write_text(json.dumps({"statements": [statement]}), encoding="utf-8")
+
+            class Fetch:
+                def get(self, url):
+                    return FetchResult(url, 200, text, "text/plain", url, None)
+            written, missing = licences.write_notices(root, Fetch())
+            notices = json.loads((root / licences.NOTICES_PATH).read_text(encoding="utf-8"))["notices"]
+        self.assertEqual((written, missing), (1, []))
+        notice = notices["beagleboard:beaglebone-load-cape"]
+        self.assertEqual(notice["licence"], "CC BY 4.0")
+        self.assertIn("Aron Phillips, GHI Electronics", notice["text"])
 
     def test_committed_statements_name_settled_licences_and_existing_records(self) -> None:
         body = json.loads((REPO_ROOT / licences.STATEMENTS_PATH).read_text(encoding="utf-8"))
