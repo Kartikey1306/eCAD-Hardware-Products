@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eNANO-600
   (gr_line (start 100.000 100.000) (end 300.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "018bac3a-ec69-7ebc-348b-154b77533543")
@@ -100,7 +99,6 @@
     (uuid "77a93404-9acf-61a8-d701-b6264db9eb2d")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "f7353366-877c-c9d0-c808-7151ef23f7cd")
@@ -118,8 +116,6 @@
     (uuid "feacde19-88b4-1475-292b-8ea989efdb8c")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "12e9e78c-491e-d2fa-452c-d5c3fc0efd1e")

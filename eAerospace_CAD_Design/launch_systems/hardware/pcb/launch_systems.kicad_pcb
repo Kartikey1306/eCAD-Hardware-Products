@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eLV-500
   (gr_line (start 100.000 100.000) (end 333.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "160957fc-0c11-8fd5-0c30-fe6b9125ab8e")
@@ -100,7 +99,6 @@
     (uuid "6e18648e-be8d-3d29-ca53-6a0496a2fabc")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "c00221c6-75d9-1ed6-41f1-bf16571ea9b9")
@@ -118,8 +116,6 @@
     (uuid "ed7c455c-b9b2-1d2c-ff77-6b5ebd0315a1")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "4e6e1e05-7205-16ea-8d7e-360a52cdfef7")

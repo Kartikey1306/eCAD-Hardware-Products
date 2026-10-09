@@ -78,13 +78,11 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eSPX-300
   (gr_circle (center 170.000 170.000) (end 240.000 170.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "6dc79718-155f-218a-a5f4-4db3535f48a5")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 235.000 170.000) (end 236.600 170.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "2b0bd54f-80e3-0ae9-49ce-7d444eb5788f")
@@ -102,8 +100,6 @@
     (uuid "b45d4ec5-cb9c-00ae-cb7a-f8a430f521d3")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "ebbf05dd-78f8-2e2b-5ab6-22f733196695")

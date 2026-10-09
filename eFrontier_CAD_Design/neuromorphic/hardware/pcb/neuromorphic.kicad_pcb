@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eNEU-400
   (gr_line (start 100.000 100.000) (end 220.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "fc79eefe-3d4b-77dd-608a-63cb7633fc32")
@@ -100,7 +99,6 @@
     (uuid "51d9f1e7-11f9-c2a6-07c3-8dacfe8cbc95")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "688d31de-5855-5557-ec2e-70b23a25db9c")
@@ -118,8 +116,6 @@
     (uuid "781a7878-213c-4755-faba-c6569dad13bc")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U2"
     (layer "F.Cu")
     (uuid "030f512c-1cdc-767d-b981-101b648f8ae1")

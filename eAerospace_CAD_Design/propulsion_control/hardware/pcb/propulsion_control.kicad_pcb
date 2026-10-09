@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- ePCU-700
   (gr_line (start 100.000 100.000) (end 260.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "e15b833a-1ee6-9244-fc2b-6266ee44e758")
@@ -98,7 +97,6 @@
     (uuid "4bb2d47e-72c5-3dd2-3858-1d2ead5f067d")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "81414899-e942-9467-dfdd-743f50a787c0")
@@ -116,8 +114,6 @@
     (uuid "a9835c99-402c-ad90-ed1b-1fc2802c4d9f")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:J1"
     (layer "F.Cu")
     (uuid "63cf9be2-6741-84df-5519-37f9d95f1f9f")

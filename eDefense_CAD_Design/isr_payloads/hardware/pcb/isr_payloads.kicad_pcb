@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eISR-1200
   (gr_line (start 100.000 100.000) (end 220.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "a3048b5d-0d2d-7e70-3f02-515bf70fa9b6")
@@ -100,7 +99,6 @@
     (uuid "34a601c2-e9ce-4893-dc92-7317bcb21cd6")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "1f90106b-7a9c-114c-1551-7acc89a12668")
@@ -118,8 +116,6 @@
     (uuid "aa7229b0-2464-7852-d77d-95561896f266")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "1a3cd3b2-8c2c-8d39-77cb-bde2759f3340")

@@ -78,7 +78,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eTD-300
   (gr_line (start 100.000 100.000) (end 175.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "fe5d66e2-3f82-937b-8612-0f67d10bb5b8")
@@ -96,7 +95,6 @@
     (uuid "492e4db7-67c2-bfcd-74e4-4c67349dd668")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "ca985a44-9d42-5241-ff5e-8ef1b6a51905")
@@ -114,8 +112,6 @@
     (uuid "daff7a6c-6075-ed7d-33ee-06c6de41417c")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "09f24734-d0fe-f2fc-d1ae-cd154f9675e4")

@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eATM-3000
   (gr_line (start 100.000 100.000) (end 360.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "3d0c4e64-6423-05f8-ba65-29c84e7b9b2a")
@@ -100,7 +99,6 @@
     (uuid "54589268-fb48-e42b-4e20-cd2ac0258ce5")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "f96d5d2d-3f70-7f17-8f68-841a56f1a75f")
@@ -118,8 +116,6 @@
     (uuid "64aef583-9706-f8ea-dadc-417992b0e825")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U3"
     (layer "F.Cu")
     (uuid "8b45d986-7d76-e5c0-79f5-77d3b9bbc22b")

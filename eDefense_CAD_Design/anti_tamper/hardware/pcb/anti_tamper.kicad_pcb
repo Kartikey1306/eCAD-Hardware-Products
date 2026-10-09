@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eATP-500
   (gr_line (start 100.000 100.000) (end 180.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "c7c1419b-da17-6b83-ea39-7546f5b0e97b")
@@ -98,7 +97,6 @@
     (uuid "4e630eaa-9430-2aab-c5f1-fa95f2a12fd7")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "60f17e49-5088-0fe6-734a-a31a70fee3d9")
@@ -116,8 +114,6 @@
     (uuid "81687f21-f925-48a8-9ae1-2e234f615534")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U2"
     (layer "F.Cu")
     (uuid "651761f2-f2e1-13de-f855-3cf52ee25296")

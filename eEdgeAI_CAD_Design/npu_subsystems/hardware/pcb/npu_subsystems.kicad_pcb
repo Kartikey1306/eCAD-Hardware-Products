@@ -84,7 +84,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eNPU-800
   (gr_line (start 100.000 100.000) (end 220.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "995fcdb1-d682-f02a-ea2e-08bd17e089ed")
@@ -102,7 +101,6 @@
     (uuid "6a54311a-a55e-69c5-dc17-869e576861cc")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "bee0da70-3116-e9c0-098f-013e87d2e049")
@@ -120,8 +118,6 @@
     (uuid "cfd4e0fb-181d-281e-d1fd-8ac603bb7fd3")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "6c4ead73-381c-c4f2-8ff1-9798722a044a")

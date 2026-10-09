@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eEMR-800
   (gr_line (start 100.000 100.000) (end 320.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "e2949398-96b9-07ed-6c55-b6c94c938bd9")
@@ -98,7 +97,6 @@
     (uuid "06779dc6-80d4-966f-b1c1-205779e1a77b")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "c7be2104-4e50-4d79-568a-01b4501ebb61")
@@ -116,8 +114,6 @@
     (uuid "8d33da08-f529-a6c7-ec61-00c8be980603")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U2"
     (layer "F.Cu")
     (uuid "f770935f-b1ae-15d7-5fcd-ae63d293e2a4")

@@ -84,7 +84,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eGS-1200
   (gr_line (start 100.000 100.000) (end 320.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "c0daa52f-5755-cd71-788c-98dfbc61420c")
@@ -102,7 +101,6 @@
     (uuid "71e2cc9e-784c-4e2e-2f6f-db73d34ef905")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "e3eed900-89b7-9788-2889-35db5faeffb0")
@@ -120,8 +118,6 @@
     (uuid "282b6af6-3eda-6e51-9a38-6298cb0f604c")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U2"
     (layer "F.Cu")
     (uuid "b59cacc8-2489-f6ab-41da-6be97de2584a")

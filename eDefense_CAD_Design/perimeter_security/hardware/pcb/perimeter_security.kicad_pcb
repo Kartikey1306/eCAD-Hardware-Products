@@ -78,7 +78,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- ePER-700
   (gr_line (start 100.000 100.000) (end 260.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "30f8cd15-9aaf-a9d0-eae2-46dd0a235b1f")
@@ -96,7 +95,6 @@
     (uuid "caaebb2b-d769-38a7-1896-4736351720f2")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "e6d77cf7-72a8-3600-59ee-7eb593bb4dc8")
@@ -114,8 +112,6 @@
     (uuid "38c7787b-0890-30d7-3429-13a4383ad7ef")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "57113f85-aa87-2dd1-cdd1-6aca73d3d90f")

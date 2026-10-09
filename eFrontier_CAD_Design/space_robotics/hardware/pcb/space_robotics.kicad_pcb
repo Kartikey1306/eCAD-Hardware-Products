@@ -84,7 +84,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eSRB-900
   (gr_line (start 100.000 100.000) (end 280.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "aa7d9a0d-c27c-7f63-4a80-c7215dc689d8")
@@ -102,7 +101,6 @@
     (uuid "f52ba8cc-adb0-c7cf-25b1-eaa6b293e1a3")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "c9d15b24-aeca-136b-b0ac-af6da3d4a298")
@@ -120,8 +118,6 @@
     (uuid "036f6981-7fb6-d317-4694-7a9ce436d9d8")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "ffacf5ff-287d-bad1-f682-882584d27e01")

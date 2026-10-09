@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eKSK-900
   (gr_line (start 100.000 100.000) (end 320.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "be11ad70-5cf6-6fe1-0181-5cb210e876d6")
@@ -98,7 +97,6 @@
     (uuid "7ee83ced-a701-cf5e-e1ec-0bb2bae76e75")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "973580f5-b214-2534-b566-7593818c3b46")
@@ -116,8 +114,6 @@
     (uuid "29d44dc7-aff2-6e7d-0242-d6683017ce96")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U4"
     (layer "F.Cu")
     (uuid "098269f3-05ce-b96d-e4c0-a72ccc0a2a94")

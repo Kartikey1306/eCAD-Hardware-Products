@@ -78,7 +78,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eMIL-100
   (gr_line (start 100.000 100.000) (end 320.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "3f16e6b4-56bd-9b02-0b04-aa3f81e16853")
@@ -96,7 +95,6 @@
     (uuid "24418f43-a96a-d3b2-e1d4-71d9078505e1")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "452bc701-2c90-cbb5-d708-a0b432b7db75")
@@ -114,8 +112,6 @@
     (uuid "f9bf0d37-1d9c-785e-390e-3a8ce97e63f5")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "fcf4349e-5d89-d209-7874-4467de561569")

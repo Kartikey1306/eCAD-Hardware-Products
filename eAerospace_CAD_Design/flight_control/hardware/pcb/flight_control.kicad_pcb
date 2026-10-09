@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eFCS-2000
   (gr_line (start 100.000 100.000) (end 333.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "eed0c515-eb59-56b4-5a85-9fb2a3bb9aa0")
@@ -100,7 +99,6 @@
     (uuid "ce14f27f-9317-4bb3-6c3d-6ef334550737")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "9842342f-d031-d6fd-7963-cc7c0ea8c6ee")
@@ -118,8 +116,6 @@
     (uuid "7f86b4a4-e4e3-3d43-1b9d-d43bcfd60939")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U7"
     (layer "F.Cu")
     (uuid "8f21206f-13af-8743-b3b2-0a206e28bd7a")

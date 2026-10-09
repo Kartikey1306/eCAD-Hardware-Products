@@ -84,7 +84,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eEW-4400
   (gr_line (start 100.000 100.000) (end 333.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "db8c890b-cf65-a1c9-bfbf-c407b5cda377")
@@ -102,7 +101,6 @@
     (uuid "36b8d4e5-6407-d433-9fc4-ff9f9f9cafcf")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "fb5ac353-6cff-16aa-b9e8-0eaa7fcfcb43")
@@ -120,8 +118,6 @@
     (uuid "d8049bad-5ad3-78ae-98c5-d986ff237ca3")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U3"
     (layer "F.Cu")
     (uuid "afa2d5e2-0748-73bd-2e48-be81e2702706")

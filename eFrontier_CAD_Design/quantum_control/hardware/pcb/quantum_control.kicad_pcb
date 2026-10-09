@@ -86,7 +86,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eQC-1000
   (gr_line (start 100.000 100.000) (end 380.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "2594735f-7670-1bb0-f706-3eaab6e919e3")
@@ -104,7 +103,6 @@
     (uuid "26978fed-4978-816c-35c5-9baf50760d9c")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "016ca51e-b632-4d8b-1113-dacf7a8473b9")
@@ -122,8 +120,6 @@
     (uuid "92c75d8c-3d7d-d737-30bb-7ed3b8ff949e")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "7a1fc611-fda6-8068-0951-90fe12a7a367")

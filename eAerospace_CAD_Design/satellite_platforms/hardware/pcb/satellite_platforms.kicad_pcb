@@ -86,7 +86,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eSAT-8000
   (gr_line (start 100.000 100.000) (end 333.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "714b21d9-141a-349a-b184-0520cf73c173")
@@ -104,7 +103,6 @@
     (uuid "d3cec7ad-9443-b2e0-bb78-54794b74d8b6")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "335bffab-abef-0281-bf0f-546df096f6ed")
@@ -122,8 +120,6 @@
     (uuid "06b1f371-5726-5e07-b396-9d7949a5e430")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "6f48a854-a68d-1d1a-945e-78e4147d1c79")

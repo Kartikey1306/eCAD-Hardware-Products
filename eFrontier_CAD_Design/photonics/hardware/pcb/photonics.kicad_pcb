@@ -84,7 +84,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- ePHO-800
   (gr_line (start 100.000 100.000) (end 320.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "df7a9976-7c6c-9bb8-dda4-30798f68168e")
@@ -102,7 +101,6 @@
     (uuid "4855bb4f-02a5-fe65-0c3b-1fa3e6a9bf72")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "0e2512c6-fcd5-b428-68a8-fcd9bfd0c435")
@@ -120,8 +118,6 @@
     (uuid "a3be2fe6-a6d0-9f20-e748-6619a4f4cd63")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "5b28efd9-fdf4-fa45-c4db-145b216d5692")

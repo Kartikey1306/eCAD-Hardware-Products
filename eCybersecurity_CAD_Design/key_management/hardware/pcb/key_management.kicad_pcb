@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eKMS-3000
   (gr_line (start 100.000 100.000) (end 350.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "3e169f97-6ee8-ca4a-6021-f2356f91f8ba")
@@ -98,7 +97,6 @@
     (uuid "33b43aa1-daea-99e8-0c4b-e3264795c92d")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "6ac4a718-2b7e-8f5c-ad7a-4473523c6822")
@@ -116,8 +114,6 @@
     (uuid "cf03cf95-516f-aeb8-1abd-1544140a051c")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:J1"
     (layer "F.Cu")
     (uuid "4ee81a86-8834-84be-2f52-cdee7c18d3fb")

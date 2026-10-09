@@ -11,9 +11,6 @@
     (comment 3 "ERAD360-SCH-001 Rev A")
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; POWER MANAGEMENT — TPS65219 PMIC (U10)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "TI:TPS65219") (at 80 60) (unit 1)
     (uuid "u10-pmic")
     (property "Reference" "U10" (at 80 45 0))
@@ -35,45 +32,35 @@
     (pin "24" (name "GND") (uuid "u10-p24"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; MAIN PROCESSOR — RK3588S (U3)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "Rockchip:RK3588S") (at 200 60) (unit 1)
     (uuid "u3-rk3588s")
     (property "Reference" "U3" (at 200 30 0))
     (property "Value" "RK3588S" (at 200 35 0))
     (property "Footprint" "Package_BGA:FCBGA-775_25x25mm_Pitch0.65mm" (at 200 40 0))
     (property "Description" "8-core ARM A76/A55, 6 TOPS NPU, Mali-G610" (at 0 0 0))
-    ;; CPU Power
     (pin "A2" (name "VDD_CPU_B0") (uuid "u3-a2"))
     (pin "A3" (name "VDD_CPU_B1") (uuid "u3-a3"))
     (pin "B1" (name "VDD_NPU") (uuid "u3-b1"))
     (pin "C1" (name "VDD_GPU") (uuid "u3-c1"))
     (pin "D1" (name "VDDIO_MISC") (uuid "u3-d1"))
-    ;; SPI0 → Front Radar AWR2944 (U1)
     (pin "E1" (name "SPI0_CLK") (uuid "u3-e1"))
     (pin "E2" (name "SPI0_MOSI") (uuid "u3-e2"))
     (pin "E3" (name "SPI0_MISO") (uuid "u3-e3"))
     (pin "E4" (name "SPI0_CS0") (uuid "u3-e4"))
-    ;; SPI1 → Rear Radar AWR2944 (U2)
     (pin "F1" (name "SPI1_CLK") (uuid "u3-f1"))
     (pin "F2" (name "SPI1_MOSI") (uuid "u3-f2"))
     (pin "F3" (name "SPI1_MISO") (uuid "u3-f3"))
     (pin "F4" (name "SPI1_CS0") (uuid "u3-f4"))
-    ;; I2C0 → GPS (U7) + Co-processor (U8)
     (pin "G1" (name "I2C0_SDA") (uuid "u3-g1"))
     (pin "G2" (name "I2C0_SCL") (uuid "u3-g2"))
-    ;; UART2 → Debug Console
     (pin "H1" (name "UART2_TX") (uuid "u3-h1"))
     (pin "H2" (name "UART2_RX") (uuid "u3-h2"))
-    ;; MIPI-DSI → AMOLED Display (U6)
     (pin "J1" (name "MIPI_DSI_D0_P") (uuid "u3-j1"))
     (pin "J2" (name "MIPI_DSI_D0_N") (uuid "u3-j2"))
     (pin "J3" (name "MIPI_DSI_D1_P") (uuid "u3-j3"))
     (pin "J4" (name "MIPI_DSI_D1_N") (uuid "u3-j4"))
     (pin "J5" (name "MIPI_DSI_CLK_P") (uuid "u3-j5"))
     (pin "J6" (name "MIPI_DSI_CLK_N") (uuid "u3-j6"))
-    ;; DDR4 → SDRAM (U11)
     (pin "K1" (name "DDR4_DQ0") (uuid "u3-k1"))
     (pin "K2" (name "DDR4_DQ1") (uuid "u3-k2"))
     (pin "K3" (name "DDR4_DQ2") (uuid "u3-k3"))
@@ -86,19 +73,13 @@
     (pin "L6" (name "DDR4_CK_N") (uuid "u3-l6"))
     (pin "L7" (name "DDR4_CKE") (uuid "u3-l7"))
     (pin "L8" (name "DDR4_CS_N") (uuid "u3-l8"))
-    ;; UART3 → V2X TEKTON3 (U4)
     (pin "M1" (name "UART3_TX") (uuid "u3-m1"))
     (pin "M2" (name "UART3_RX") (uuid "u3-m2"))
-    ;; Crystal
     (pin "P1" (name "XTAL_IN") (uuid "u3-p1"))
     (pin "P2" (name "XTAL_OUT") (uuid "u3-p2"))
-    ;; Ground
     (pin "Z1" (name "GND") (uuid "u3-z1"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; FRONT RADAR — AWR2944 (U1)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "TI:AWR2944") (at 60 150) (unit 1)
     (uuid "u1-awr2944-front")
     (property "Reference" "U1" (at 60 135 0))
@@ -124,9 +105,6 @@
     (pin "M1" (name "GND") (uuid "u1-m1"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; REAR RADAR — AWR2944 (U2)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "TI:AWR2944") (at 60 200) (unit 1)
     (uuid "u2-awr2944-rear")
     (property "Reference" "U2" (at 60 185 0))
@@ -143,9 +121,6 @@
     (pin "M1" (name "GND") (uuid "u2-m1"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; V2X TRANSCEIVER — TEKTON3 (U4)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "Autotalks:TEKTON3") (at 60 250) (unit 1)
     (uuid "u4-tekton3")
     (property "Reference" "U4" (at 60 235 0))
@@ -162,9 +137,6 @@
     (pin "F1" (name "GND") (uuid "u4-f1"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; LASER APD ARRAY — 5× G12183-010K (U5A-E)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "Hamamatsu:G12183") (at 60 300) (unit 1)
     (uuid "u5-laser-array")
     (property "Reference" "U5A-E" (at 60 285 0))
@@ -183,9 +155,6 @@
     (pin "10" (name "CATHODE_5") (uuid "u5e-2"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; DISPLAY — 4" AMOLED (U6)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "Samsung:AMS395GE04") (at 340 60) (unit 1)
     (uuid "u6-amoled")
     (property "Reference" "U6" (at 340 45 0))
@@ -203,9 +172,6 @@
     (pin "40" (name "RESET") (uuid "u6-40"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; GPS — NEO-M9N (U7)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "u-blox:NEO-M9N") (at 340 120) (unit 1)
     (uuid "u7-neo-m9n")
     (property "Reference" "U7" (at 340 105 0))
@@ -221,9 +187,6 @@
     (pin "1" (name "GND") (uuid "u7-1"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; CO-PROCESSOR — STM32H7B3 (U8)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "STM:STM32H7B3LIH6Q") (at 200 200) (unit 1)
     (uuid "u8-stm32h7b3")
     (property "Reference" "U8" (at 200 180 0))
@@ -247,9 +210,6 @@
     (pin "72" (name "JTAG_TCK") (uuid "u8-72"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; OBD-II — ELM327 (U9A) + MCP2551 (U9B)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "Microchip:ELM327") (at 340 200) (unit 1)
     (uuid "u9a-elm327")
     (property "Reference" "U9A" (at 340 185 0))
@@ -275,9 +235,6 @@
     (pin "7" (name "CANH") (uuid "u9b-7"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; DDR4 SDRAM — K4A8G165WC (U11)
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "Samsung:K4A8G165WC") (at 340 150) (unit 1)
     (uuid "u11-ddr4")
     (property "Reference" "U11" (at 340 135 0))
@@ -294,9 +251,6 @@
     (pin "VSS" (name "VSS") (uuid "u11-vss"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; CONNECTORS
-  ;; ═══════════════════════════════════════════════════════════
   (symbol (lib_id "Connector:USB_C") (at 20 60) (unit 1)
     (uuid "j1-usbc")
     (property "Reference" "J1" (at 20 45 0))
@@ -332,64 +286,49 @@
     (pin "2" (name "GND") (uuid "j5-2"))
   )
 
-  ;; ═══════════════════════════════════════════════════════════
-  ;; NET CONNECTIONS (wires)
-  ;; ═══════════════════════════════════════════════════════════
 
-  ;; Power: USB-C → PMIC → Rails
   (wire (pts (xy 20 60) (xy 80 60)) (net "VCC_5V"))
   (wire (pts (xy 80 62) (xy 200 62)) (net "VCC_0V85"))
   (wire (pts (xy 80 64) (xy 200 64)) (net "VCC_1V8"))
   (wire (pts (xy 80 66) (xy 60 150)) (net "VCC_1V1"))
   (wire (pts (xy 80 68) (xy 340 60)) (net "VCC_3V3"))
 
-  ;; SPI0: RK3588S ↔ AWR2944 Front
   (wire (pts (xy 200 80) (xy 60 155)) (net "SPI0_CLK"))
   (wire (pts (xy 200 82) (xy 60 157)) (net "SPI0_MOSI"))
   (wire (pts (xy 200 84) (xy 60 159)) (net "SPI0_MISO"))
   (wire (pts (xy 200 86) (xy 60 161)) (net "SPI0_CS0"))
 
-  ;; SPI1: RK3588S ↔ AWR2944 Rear
   (wire (pts (xy 200 90) (xy 60 205)) (net "SPI1_CLK"))
   (wire (pts (xy 200 92) (xy 60 207)) (net "SPI1_MOSI"))
   (wire (pts (xy 200 94) (xy 60 209)) (net "SPI1_MISO"))
   (wire (pts (xy 200 96) (xy 60 211)) (net "SPI1_CS0"))
 
-  ;; I2C0: RK3588S ↔ GPS + Co-processor
   (wire (pts (xy 200 100) (xy 340 122)) (net "I2C0_SDA"))
   (wire (pts (xy 200 102) (xy 340 124)) (net "I2C0_SCL"))
   (wire (pts (xy 200 100) (xy 200 202)) (net "I2C0_SDA"))
   (wire (pts (xy 200 102) (xy 200 204)) (net "I2C0_SCL"))
 
-  ;; UART3: RK3588S ↔ TEKTON3 V2X
   (wire (pts (xy 200 110) (xy 60 252)) (net "UART3_TX"))
   (wire (pts (xy 200 112) (xy 60 254)) (net "UART3_RX"))
 
-  ;; UART4: STM32 ↔ ELM327 OBD-II
   (wire (pts (xy 200 210) (xy 340 202)) (net "UART4_TX"))
   (wire (pts (xy 200 212) (xy 340 204)) (net "UART4_RX"))
 
-  ;; MIPI-DSI: RK3588S → AMOLED
   (wire (pts (xy 200 120) (xy 340 62)) (net "MIPI_DSI_D0_P"))
   (wire (pts (xy 200 122) (xy 340 64)) (net "MIPI_DSI_CLK_P"))
 
-  ;; DDR4: RK3588S ↔ SDRAM
   (wire (pts (xy 200 130) (xy 340 152)) (net "DDR4_BUS"))
 
-  ;; CAN: MCP2551 ↔ OBD-II connector
   (wire (pts (xy 340 242) (xy 20 142)) (net "CANH"))
   (wire (pts (xy 340 244) (xy 20 144)) (net "CANL"))
 
-  ;; Laser ADC: APD → TIA → STM32 ADC
   (wire (pts (xy 60 302) (xy 200 215)) (net "LASER_TIA_1"))
   (wire (pts (xy 60 304) (xy 200 217)) (net "LASER_TIA_2"))
   (wire (pts (xy 60 306) (xy 200 219)) (net "LASER_TIA_3"))
   (wire (pts (xy 60 308) (xy 200 221)) (net "LASER_TIA_4"))
   (wire (pts (xy 60 310) (xy 200 223)) (net "LASER_TIA_5"))
 
-  ;; V2X Antenna
   (wire (pts (xy 20 182) (xy 60 256)) (net "V2X_ANT"))
 
-  ;; GPS Antenna
   (wire (pts (xy 340 118) (xy 380 118)) (net "GPS_RF"))
 )

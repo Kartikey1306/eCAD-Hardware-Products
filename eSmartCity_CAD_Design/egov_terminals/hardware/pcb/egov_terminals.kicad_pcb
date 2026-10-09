@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eGOV-500
   (gr_line (start 100.000 100.000) (end 300.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "6719c844-4928-35a3-919b-4c29a0a737e6")
@@ -98,7 +97,6 @@
     (uuid "77dcce76-20e6-7f4c-b9cd-2655343a8bf1")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "99f0f92e-5b59-9028-0cfd-4c42f4eaddd9")
@@ -116,8 +114,6 @@
     (uuid "a419f77c-d177-f29c-93e5-ed1de35f6192")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:J1"
     (layer "F.Cu")
     (uuid "dca64074-4826-bac4-c07a-5b0f778ce17c")

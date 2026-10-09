@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eOTS-800
   (gr_line (start 100.000 100.000) (end 260.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "7f904c2e-b611-f1b2-b402-17e5d099cfa5")
@@ -98,7 +97,6 @@
     (uuid "22ca6cf2-aebd-ff6f-676f-5ae759bc7a03")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "9c1944cb-ea2c-58cd-0bd8-98cbec3dfdee")
@@ -116,8 +114,6 @@
     (uuid "d5f88de0-4400-ee28-3217-a99e386ff771")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:J1"
     (layer "F.Cu")
     (uuid "522c581f-aee7-99c7-b6df-21d9b693dd8f")

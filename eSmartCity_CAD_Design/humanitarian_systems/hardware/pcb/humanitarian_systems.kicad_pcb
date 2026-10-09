@@ -78,7 +78,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eHUM-400
   (gr_line (start 100.000 100.000) (end 280.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "eefc84e3-d319-9dce-c451-d4f5743b632e")
@@ -96,7 +95,6 @@
     (uuid "9715f832-9f47-a81c-80da-681efda347ad")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "076e4ee3-c5c8-c6fb-95ce-94f63dd55942")
@@ -114,8 +112,6 @@
     (uuid "0401dc1e-7b11-1cfc-25b8-0a35cdb26e58")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U2"
     (layer "F.Cu")
     (uuid "c9047bfa-d317-7027-0371-eb71c7445ce5")

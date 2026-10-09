@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eFOR-900
   (gr_line (start 100.000 100.000) (end 340.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "74b3272f-da97-a5a6-66ff-fc7b4ae36f2a")
@@ -100,7 +99,6 @@
     (uuid "e5430fa9-4542-9f3e-7735-37cce2c4b8dc")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "98d5d230-73c5-3148-e994-ea1b6a23c493")
@@ -118,8 +116,6 @@
     (uuid "b6771a13-8b29-eaf2-e2f2-b26b330b4657")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U2"
     (layer "F.Cu")
     (uuid "4cc584a6-66d1-1eca-4d55-e5d865fae7ad")

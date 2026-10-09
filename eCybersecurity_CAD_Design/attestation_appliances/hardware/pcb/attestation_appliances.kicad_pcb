@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eATT-600
   (gr_line (start 100.000 100.000) (end 320.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "f881b4d9-1469-a62a-d506-d779ddbf2d18")
@@ -98,7 +97,6 @@
     (uuid "a3a15fae-ddfd-3891-57fb-3f9ff4390881")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "f895ba9b-5460-51ea-5bcb-9c77cc254f85")
@@ -116,8 +114,6 @@
     (uuid "7c197e17-91fa-a628-7bc8-a5c0580007af")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:J1"
     (layer "F.Cu")
     (uuid "c5263fda-dc52-8e77-b74e-7e739958153f")

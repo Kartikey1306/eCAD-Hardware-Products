@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eCUAS-900
   (gr_line (start 100.000 100.000) (end 300.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "48fb9aee-6ea9-5432-c697-6227f07bdf91")
@@ -100,7 +99,6 @@
     (uuid "edd135af-396f-3a18-7d56-5aa586997634")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "1a89e920-f828-d3c8-c238-9d54d7496ea1")
@@ -118,8 +116,6 @@
     (uuid "d25af557-9935-6de7-2338-388571a9bb58")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U5"
     (layer "F.Cu")
     (uuid "5b194e6b-ef10-3479-fb80-1ab450b4fdec")

@@ -78,7 +78,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eGNSS-400
   (gr_line (start 100.000 100.000) (end 200.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "13e6843a-b1fc-92be-14f1-292285e291d0")
@@ -96,7 +95,6 @@
     (uuid "cebe8a88-4f9a-d128-215f-d2f8826891de")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "806a799a-5af2-eb8d-7e8c-243c41272a08")
@@ -114,8 +112,6 @@
     (uuid "c1a5fbb8-d90a-8cfe-abfd-4558568464ed")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:ANT1"
     (layer "F.Cu")
     (uuid "e30d3822-845c-2b04-aebf-896d1cef70e6")

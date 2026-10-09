@@ -84,7 +84,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eRUR-700
   (gr_line (start 100.000 100.000) (end 360.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "49bd882e-ee38-c675-8b35-f1f46c05f9e4")
@@ -102,7 +101,6 @@
     (uuid "6a93134d-2490-780a-39ce-67c88804d000")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "64cf1c7d-6b74-e60b-6f2d-569d9ddc653c")
@@ -120,8 +118,6 @@
     (uuid "2f7062e8-9dfc-9e0d-28b4-4e672b47b02d")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U4"
     (layer "F.Cu")
     (uuid "9aa3d96a-c7ac-ec22-08f7-ef2af1e86eb0")

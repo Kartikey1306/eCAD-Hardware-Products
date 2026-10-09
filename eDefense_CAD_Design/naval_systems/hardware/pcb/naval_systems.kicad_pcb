@@ -84,7 +84,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eNAV-5000
   (gr_line (start 100.000 100.000) (end 333.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "9d0031fb-1b5e-fa32-b1ea-4ab937552f38")
@@ -102,7 +101,6 @@
     (uuid "4e37ec11-e238-da84-2cf5-648e4eaf7110")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "2e185521-38e5-a727-085b-7bca047970e9")
@@ -120,8 +118,6 @@
     (uuid "db57688e-b447-0828-7ffe-a28479b057c9")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "bcbabcf1-5db8-4ccb-6802-67a99ab23fe2")

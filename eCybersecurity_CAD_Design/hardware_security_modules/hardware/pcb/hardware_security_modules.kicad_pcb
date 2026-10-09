@@ -86,7 +86,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eHSM-9000
   (gr_line (start 100.000 100.000) (end 400.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "e9d00be4-a489-b9f9-dd85-4e812e42969f")
@@ -104,7 +103,6 @@
     (uuid "c5ac1876-95f1-30a2-b1a6-e10a6397cba3")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "76ead4dd-412d-dbf6-1463-a8f6cb70a678")
@@ -122,8 +120,6 @@
     (uuid "32354419-625d-b913-a765-cfee6f64690c")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U1"
     (layer "F.Cu")
     (uuid "b9190bf5-d7b4-ddac-c8cd-c4a52900c367")

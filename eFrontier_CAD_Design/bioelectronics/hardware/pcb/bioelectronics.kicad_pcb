@@ -82,7 +82,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eBIO-500
   (gr_line (start 100.000 100.000) (end 260.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "b1a17860-201c-5c6a-7c4e-0799ddad5a40")
@@ -100,7 +99,6 @@
     (uuid "2183df41-a888-714e-b4e5-12bdd4535d77")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "e177ac6a-1185-7dc7-c38b-716968ddffbc")
@@ -118,8 +116,6 @@
     (uuid "6ff26705-c2c8-6c69-8a13-c337fd8811a1")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U34"
     (layer "F.Cu")
     (uuid "61e1b84d-c005-e2e9-1a49-c2939b5efa05")

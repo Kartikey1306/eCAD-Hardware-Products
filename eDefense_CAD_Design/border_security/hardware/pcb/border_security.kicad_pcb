@@ -76,7 +76,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eBRD-600
   (gr_line (start 100.000 100.000) (end 190.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "18895b74-e9ce-d395-4727-613ca50df5f7")
@@ -94,7 +93,6 @@
     (uuid "17faacfe-df8e-9c74-168e-957a8057bd9d")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "589988c1-5f97-1233-5d1d-55e015ecf730")
@@ -112,8 +110,6 @@
     (uuid "64c4f028-539a-f787-57ba-247b363d4879")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U7"
     (layer "F.Cu")
     (uuid "27d72565-e33f-8e2c-c1bb-8c77037e96b5")

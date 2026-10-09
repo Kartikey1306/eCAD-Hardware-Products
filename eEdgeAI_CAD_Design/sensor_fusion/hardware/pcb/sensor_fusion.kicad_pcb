@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eSFU-500
   (gr_line (start 100.000 100.000) (end 240.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "f2fdd73b-2296-527e-0da4-23799ed87f97")
@@ -98,7 +97,6 @@
     (uuid "24ac69c8-724d-148c-8f8d-189352372404")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "51b42dc0-cca7-cecb-687b-ce9a9682af35")
@@ -116,8 +114,6 @@
     (uuid "fd247d15-5651-aa0e-9df1-4c5d017c3ef2")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U12"
     (layer "F.Cu")
     (uuid "08da165d-f624-0608-8c99-eb11be77b9d7")

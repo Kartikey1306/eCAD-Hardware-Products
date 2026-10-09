@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eSCT-700
   (gr_line (start 100.000 100.000) (end 300.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "b9a3301a-b181-feb7-ec14-9f3ac28e8143")
@@ -98,7 +97,6 @@
     (uuid "bf3cf8b0-4ce5-b79b-3721-e846e40efa48")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "9d6cc196-9218-cc10-254e-e12a690a4aac")
@@ -116,8 +114,6 @@
     (uuid "192d2d6f-9909-da3a-5e43-8bff323b483d")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U12"
     (layer "F.Cu")
     (uuid "cfa2f2c7-215b-c781-8160-9aacc0c381f4")

@@ -78,7 +78,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eDIS-600
   (gr_line (start 100.000 100.000) (end 220.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "43a2b77d-a580-83ab-c9e1-d687b670ab48")
@@ -96,7 +95,6 @@
     (uuid "4edd0af8-511f-bae2-bcf4-20a6ea917170")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "4101e7bc-f0e5-fcd8-37bd-4da26d5de780")
@@ -114,8 +112,6 @@
     (uuid "d4464aa0-dab9-d8d9-0992-51d29fffe4bf")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U10"
     (layer "F.Cu")
     (uuid "5fd8b2bc-8058-bc86-1194-f7e3811cbd35")

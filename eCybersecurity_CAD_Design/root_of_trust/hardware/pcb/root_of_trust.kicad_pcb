@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eROT-400
   (gr_line (start 100.000 100.000) (end 185.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "d8e673fa-c9c1-b51b-c0ff-2c2ff25dde65")
@@ -98,7 +97,6 @@
     (uuid "28411071-a4d2-dfa5-3f77-e2c8fd2a9e4c")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "3183ea4f-f4c3-678e-a61e-d521ec873bc7")
@@ -116,8 +114,6 @@
     (uuid "76497d80-4619-a4cb-23b4-d83647752750")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U3"
     (layer "F.Cu")
     (uuid "31e166b1-a7d7-7208-3507-c06b622cfa82")

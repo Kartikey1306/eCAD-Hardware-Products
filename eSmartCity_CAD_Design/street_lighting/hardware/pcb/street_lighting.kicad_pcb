@@ -76,13 +76,11 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eSL-400
   (gr_circle (center 135.000 135.000) (end 170.000 135.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "f7b4ea8d-7e97-f063-b43b-27c31664d34f")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 165.000 135.000) (end 166.600 135.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "72774ec1-95de-0d4a-8582-b21c4078cbe6")
@@ -100,8 +98,6 @@
     (uuid "f2b4f156-74b3-db06-59d6-a606c472ce4b")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:FL1"
     (layer "F.Cu")
     (uuid "f3c65c58-34d1-55c7-95e7-09a958b82dd7")

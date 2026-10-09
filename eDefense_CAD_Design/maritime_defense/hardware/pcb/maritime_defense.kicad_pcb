@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eMDS-800
   (gr_line (start 100.000 100.000) (end 300.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "9205f5ec-77e1-413f-a4c4-06785bf50e11")
@@ -98,7 +97,6 @@
     (uuid "30e4edea-3458-d25e-93a6-32a84726c079")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "0f1c607a-7e38-8928-eb92-3b39116609cc")
@@ -116,8 +114,6 @@
     (uuid "7b316d60-3253-7c67-a2bd-0bf766d545ec")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:U4"
     (layer "F.Cu")
     (uuid "9eeb7d86-5ade-17be-84c9-f8468b1d9c8b")

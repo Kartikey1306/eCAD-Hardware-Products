@@ -80,7 +80,6 @@
   (net 3 "+3V3")
   (net 4 "+1V8")
 
-  ; Board outline -- eZTG-1000
   (gr_line (start 100.000 100.000) (end 320.000 100.000)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts")
     (uuid "e33dfb90-bef8-35f6-7df7-91d0a7a9c9ac")
@@ -98,7 +97,6 @@
     (uuid "ad88951d-d217-08a8-1e2a-4da289c46539")
   )
 
-  ; M3 mounting holes
   (gr_circle (center 105.000 105.000) (end 106.600 105.000)
     (stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts")
     (uuid "db7a20d4-3507-3c1e-6dc3-5f374b7adc33")
@@ -116,8 +114,6 @@
     (uuid "c497e836-53f7-c1fa-b7c2-3dc79dc25f92")
   )
 
-  ; Placed components. Body outline on F.Fab, courtyard on F.CrtYd.
-  ; No pads: see the note in fabrication_notes.md.
   (footprint "eos_placement:J3"
     (layer "F.Cu")
     (uuid "f8446215-2c67-df7e-acd7-205646463927")
