@@ -15,6 +15,14 @@ has never run.
 
 ### Added
 
+- The dev-board CAD mirror (issue #48): `tools/devboard_cad/mirror.py` copies every
+  verified CAD file of every board whose licence allows redistribution into
+  `boards/cad/<vendor>/<board>/cad/`, unmodified, with an `ATTRIBUTION.md` per board;
+  the index is `tools/devboard_cad/mirror-manifest.json`. Documents (PDFs, BOMs) are not
+  copied. A file is copied only if its SHA-256 matches the record and its recorded
+  format and its content are CAD; `mirror.py check` proves completeness and integrity (from
+  the bytes, or from Git LFS pointers if the mirror moves to LFS) and runs in the
+  test suite.
 - The digital domain (issue #27, plan §21 item 5): Verilog sources are read
   by a strict allow-list grammar (`tools/ecad_model/verilog.py`) into the
   engineering model, the adapter (`tools/ecad_model/domains/digital.py`)
@@ -87,6 +95,17 @@ has never run.
   `NOT_IMPLEMENTED`; no derived number changed.
 - `.gitattributes` keeps every dataset file, `LICENSE` and the cited product
   sheet byte-exact on checkout.
+
+### Fixed
+
+- `read_licenses.py` finds the licence file whatever its case. It asked GitHub
+  for fixed spellings (`LICENSE.md`, `LICENSE`, ...), and GitHub paths are
+  case-sensitive, so SparkFun's `license.md` and `License.md` were never read:
+  10 boards whose manufacturer states "SparkFun hardware is released under
+  Creative Commons Share-alike 4.0 International" stayed UNVERIFIED. It now
+  lists the repository root, and reads the README through GitHub's readme
+  endpoint. A README that points at a licence file which is not there still
+  leaves the board UNVERIFIED.
 
 ### Fixed (review of the electrical branch, plan §7.6)
 

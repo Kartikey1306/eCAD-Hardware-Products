@@ -151,10 +151,11 @@ exhaustive, `seed_direct.py` never records `available: false` — absence is onl
 against an index that enumerates everything.
 
 `verify.py` caches responses outside the repository (`~/.cache/devboard-cad`, or
-`DEVBOARD_CAD_CACHE`) and rate-limits per host. **Vendor files are never
-committed**: records hold digests and URLs only. Most board CAD is not
+`DEVBOARD_CAD_CACHE`) and rate-limits per host, and it never commits what it
+fetched: records hold digests and URLs only. Most board CAD is not
 redistributable, which is exactly why `licenses.redistribution_allowed` is a
-field rather than an assumption.
+field rather than an assumption. Only the [mirror](#mirror) copies files, and only
+for boards where that field is `true`.
 
 ## Licensing
 
@@ -177,6 +178,70 @@ point at is usually absent from the repository. Every CC BY-SA version permits c
 use and modification under attribution and share-alike — the non-commercial variants are
 separately named BY-NC-SA — so the permissions are determinable while the version is not.
 Both facts go in the record.
+
+## Mirror
+
+`boards/cad/` holds an unmodified copy of every verified **CAD file** of every board whose
+record sets `licenses.redistribution_allowed` to `true` (issue #48). Boards without that
+permission keep their link and digest only; nothing of theirs is copied. Documents (schematic
+PDFs, drawings, BOMs, datasheets) are not copied either: their records keep the link and
+digest, so the folder holds CAD and nothing else.
+
+```
+boards/cad/<vendor>/<board>/
+  ATTRIBUTION.md   manufacturer, licence, and the source and digest of each file
+  cad/             Eagle, KiCad and Altium sources and libraries, Gerber and drill files,
+                   Gerber archives, STEP, STL and DXF models
+tools/devboard_cad/mirror-manifest.json
+                   one entry per file: board, path, formats, source, sha256, size, licence
+```
+
+`ATTRIBUTION.md` stays beside the files on purpose: CC BY and CC BY-SA require the credit
+and the licence notice to travel with the material, so a board's folder copied on its own
+still carries them.
+
+`mirror.py build` copies a file only when all three hold:
+
+1. the board's licence allows redistribution;
+2. the bytes have the SHA-256 recorded in `evidence.sha256`, so the mirror can only ever
+   hold what the database says was checked;
+3. the verifier recorded a CAD format for it (for STEP, the part of `detected_format`
+   before the colon), and the bytes are CAD again when read: Eagle, KiCad and Altium
+   sources, Gerber and drill files, STEP, STL and DXF models, or an archive containing
+   them. A file recorded as CAD whose bytes turn out to be a web page, JSON or a document
+   is refused and reported, never skipped silently.
+
+A build rewrites the manifest for the vendors it covers and removes whatever the manifest
+no longer names, including a board left without CAD files. `check` fails on a missing
+file, a digest mismatch, a stray file anywhere in `boards/cad/`, a missing attribution, or
+a board that has lost its licence.
+
+The files are committed as regular files, exactly as published. `.gitattributes`
+exempts `boards/cad/*/*/cad/` from the repository's LFS rules and from line-ending
+conversion, so every byte matches its digest. Git LFS was the first choice, but GitHub
+refuses LFS uploads to a public fork, which is how this repository takes contributions.
+Every file is under GitHub's 100 MB limit.
+
+```bash
+# Copy the CAD files of one vendor, or of all vendors, reusing files whose digest matches.
+python3 tools/devboard_cad/mirror.py build --vendor sparkfun
+python3 tools/devboard_cad/mirror.py build
+
+# Fail unless every redistributable CAD file is mirrored and every digest matches.
+python3 tools/devboard_cad/mirror.py check
+```
+
+To check out only the boards you need:
+
+```bash
+git sparse-checkout set --no-cone '/*' '!/boards/cad/*/*/' '/boards/cad/adafruit/feather-rp2040/'
+```
+
+`check` also reads Git LFS pointer files: a pointer's `oid` is the SHA-256 of the object
+it stands for. If the mirror later moves to LFS
+(`git lfs migrate import --include="boards/cad/*/*/cad/**"`), completeness and integrity
+stay provable in CI without downloading the binaries. `tests/unit/test_devboard_mirror.py`
+runs it against the committed mirror.
 
 ## Schema
 
