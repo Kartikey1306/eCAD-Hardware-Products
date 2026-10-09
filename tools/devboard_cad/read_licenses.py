@@ -112,15 +112,47 @@ def _text(repo: str, path: str) -> str:
     return ""
 
 
+LICENCE_FILE = re.compile(r"^(licen[cs]e|copying)(\.(md|markdown|txt))?$", re.I)
+LICENCE_FILE_FALLBACK = ("LICENSE.md", "LICENSE", "license.txt", "LICENSE.txt", "COPYING")
+
+
+def licence_files(repo: str) -> List[str]:
+    """The licence files at the repository root, whatever their case.
+
+    GitHub paths are case-sensitive, so asking for a fixed list of spellings misses
+    SparkFun's ``license.md`` and ``License.md``: boards whose manufacturer states the
+    licence in so many words stayed UNVERIFIED. Listing the root finds every spelling.
+    """
+    try:
+        listing = _gh_api(f"repos/{repo}/contents")
+    except Exception:  # noqa: BLE001 - fall back to the known spellings
+        return list(LICENCE_FILE_FALLBACK)
+    if not isinstance(listing, list):
+        return list(LICENCE_FILE_FALLBACK)
+    names = [e.get("name", "") for e in listing if isinstance(e, dict) and e.get("type") == "file"]
+    return sorted((n for n in names if LICENCE_FILE.match(n)), key=lambda n: (n.lower().startswith("copying"), n))
+
+
+def readme_text(repo: str) -> str:
+    """The repository README through GitHub's readme endpoint, which ignores case."""
+    try:
+        payload = _gh_api(f"repos/{repo}/readme")
+        if isinstance(payload, dict) and payload.get("content"):
+            return base64.b64decode(payload["content"]).decode("utf-8", "replace")
+    except Exception:  # noqa: BLE001
+        pass
+    return ""
+
+
 def read_statement(repo: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """Return (licence name, url, quoted sentence) read from the manufacturer's files."""
-    for path in ("LICENSE.md", "LICENSE", "license.txt", "LICENSE.txt", "COPYING"):
+    for path in licence_files(repo):
         body = _text(repo, path)
         if body:
             for pattern, name in TEXT_PATTERNS:
                 if re.search(pattern, body, re.I):
                     return name, f"https://github.com/{repo}/blob/HEAD/{path}", _quote(body, pattern)
-    readme = _text(repo, "README.md") or _text(repo, "readme.md")
+    readme = readme_text(repo)
     if readme:
         for pattern, name in TEXT_PATTERNS:
             if re.search(pattern, readme, re.I):

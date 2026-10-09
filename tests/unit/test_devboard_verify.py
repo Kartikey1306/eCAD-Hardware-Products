@@ -596,5 +596,71 @@ class TestLicenceReading(unittest.TestCase):
         self.assertTrue(record["licenses"]["commercial_use_allowed"])
 
 
+
+class TestLicenceFileLookup(unittest.TestCase):
+    """GitHub paths are case-sensitive, so the licence file is found by listing the root."""
+
+    @staticmethod
+    def _b64(text: str) -> str:
+        import base64
+        return base64.b64encode(text.encode("utf-8")).decode("ascii")
+
+    def _api(self, files: dict, listing_fails: bool = False):
+        def fake(path: str):
+            if path.endswith("/contents"):
+                if listing_fails:
+                    raise RuntimeError("rate limited")
+                return [{"name": n, "type": "file"} for n in files] + [{"name": "Hardware", "type": "dir"}]
+            if path.endswith("/readme"):
+                name = next((n for n in files if n.lower().startswith("readme")), None)
+                if name is None:
+                    raise RuntimeError("404")
+                return {"content": self._b64(files[name])}
+            name = path.rsplit("/contents/", 1)[1]
+            if name not in files:
+                raise RuntimeError("404")
+            return {"content": self._b64(files[name])}
+        return fake
+
+    SPARKFUN = ("SparkFun License Information\n\nHardware\n---------\n\n"
+                "**SparkFun hardware is released under [Creative Commons Share-alike 4.0 International]"
+                "(http://creativecommons.org/licenses/by-sa/4.0/).**\n")
+
+    def test_lists_licence_files_in_any_case(self) -> None:
+        files = {"license.md": "x", "License.md": "x", "COPYING": "x", "README.md": "x", "licenses.json": "x"}
+        from unittest import mock
+        with mock.patch.object(licences, "_gh_api", self._api(files)):
+            found = licences.licence_files("vendor/board")
+        self.assertEqual(found, ["License.md", "license.md", "COPYING"])
+
+    def test_reads_a_lower_case_license_md(self) -> None:
+        from unittest import mock
+        with mock.patch.object(licences, "_gh_api", self._api({"license.md": self.SPARKFUN, "README.md": "Board"})):
+            name, url, quote = licences.read_statement("sparkfun/MicroMod_Artemis_Processor")
+        self.assertEqual(name, "CC BY-SA 4.0")
+        self.assertEqual(url, "https://github.com/sparkfun/MicroMod_Artemis_Processor/blob/HEAD/license.md")
+        self.assertIn("SparkFun hardware is released under", quote)
+
+    def test_falls_back_to_known_spellings_when_the_listing_fails(self) -> None:
+        from unittest import mock
+        with mock.patch.object(licences, "_gh_api", self._api({"LICENSE.md": self.SPARKFUN}, listing_fails=True)):
+            name, url, _quote = licences.read_statement("vendor/board")
+        self.assertEqual(name, "CC BY-SA 4.0")
+        self.assertTrue(url.endswith("/LICENSE.md"))
+
+    def test_reads_a_readme_whatever_its_case(self) -> None:
+        from unittest import mock
+        readme = "This board is released under CC BY-SA 4.0."
+        with mock.patch.object(licences, "_gh_api", self._api({"Readme.md": readme})):
+            name, url, _quote = licences.read_statement("vendor/board")
+        self.assertEqual((name, url), ("CC BY-SA 4.0", "https://github.com/vendor/board"))
+
+    def test_a_pointer_to_a_missing_licence_file_stays_unverified(self) -> None:
+        from unittest import mock
+        readme = "This product is open source! Please review the LICENSE.md file for license information."
+        with mock.patch.object(licences, "_gh_api", self._api({"README.md": readme})):
+            self.assertEqual(licences.read_statement("vendor/board"), (None, None, None))
+
+
 if __name__ == "__main__":
     unittest.main()
