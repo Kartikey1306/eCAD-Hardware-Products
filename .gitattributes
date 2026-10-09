@@ -45,3 +45,10 @@ eRobotics_CAD_Design/robot_components/product_datasheet.md -text
 # Origins that dataset items copy and bind by hash (REUSE-1).
 rtl/uart_tx.v -text
 rtl/uart_rx.v -text
+
+# Mirrored development-board design files (issue #48). Each one is a vendor file
+# bound to the SHA-256 in its board record, so it is committed exactly as
+# published: a regular file (GitHub refuses Git LFS uploads to a public fork),
+# never converted, and diffed as binary. This line overrides the *.brd, *.sch
+# and other LFS rules above for this directory only.
+boards/cad/*/*/cad/** -filter -diff -merge -text

@@ -151,10 +151,11 @@ exhaustive, `seed_direct.py` never records `available: false` — absence is onl
 against an index that enumerates everything.
 
 `verify.py` caches responses outside the repository (`~/.cache/devboard-cad`, or
-`DEVBOARD_CAD_CACHE`) and rate-limits per host. **Vendor files are never
-committed**: records hold digests and URLs only. Most board CAD is not
+`DEVBOARD_CAD_CACHE`) and rate-limits per host, and it never commits what it
+fetched: records hold digests and URLs only. Most board CAD is not
 redistributable, which is exactly why `licenses.redistribution_allowed` is a
-field rather than an assumption.
+field rather than an assumption. Only the [mirror](#mirror) copies files, and only
+for boards where that field is `true`.
 
 ## Licensing
 
@@ -177,6 +178,121 @@ point at is usually absent from the repository. Every CC BY-SA version permits c
 use and modification under attribution and share-alike — the non-commercial variants are
 separately named BY-NC-SA — so the permissions are determinable while the version is not.
 Both facts go in the record.
+
+Some manufacturers state their terms outside GitHub: inside the download package, or on a
+documentation page. A person reads those and records them in
+`tools/devboard_cad/licence_statements.json`, with the SHA-256 of the bytes read and the
+sentences quoted. `read_licenses.py --statements` applies a statement only while the source
+still has that digest and every quote is still in it, so a vendor changing its terms
+leaves the record as it was and reports the refusal. A statement can be limited to the files
+it covers: Raspberry Pi's MIT licence for the Raspberry Pi 5 covers the 3D model, so only
+`cad_license` and `mechanical_cad_license` are set and `hardware_license` says
+"MIT (3D model only)".
+
+| Board | Licence | Read from |
+|---|---|---|
+| `arduino:uno-rev3` | CC BY-SA 4.0 | `License.txt` in the CAD package linked from docs.arduino.cc. The older `content.arduino.cc` archive marks the same files `CC-SA-BY-NC`, so the record points at the package instead. |
+| `raspberry-pi:5` | MIT (3D model only) | `LICENSE.txt` in the STEP package |
+| `raspberry-pi:cmio` | BSD-3-Clause | `README.txt` in the design package, which carries the three clauses without naming them |
+| `raspberry-pi:pico` | Permission grant in 0BSD wording | the Pico documentation, which grants use, copying, modification and distribution "for any purpose, with or without fee"; the design package repeats it in `LICENSE.txt` |
+
+## Mirror
+
+`boards/cad/` holds an unmodified copy of the **CAD files** of every board whose record
+sets `licenses.redistribution_allowed` to `true` (issue #48). Boards without that
+permission keep their link and digest only; nothing of theirs is copied. Documents (schematic
+PDFs, drawings, BOMs, datasheets, readmes) are not copied either, so the folder holds CAD
+and nothing else.
+
+A record names one file per format, which is enough to say a format exists but not to
+build the board: a KiCad project has several schematic sheets, a project file and its own
+footprints, and fabrication outputs and 3D models sit beside the sources. So the mirror
+takes the whole design. When a record's files are pinned to one commit of the
+manufacturer's repository, `mirror.py index` lists every CAD file in that commit into
+`tools/devboard_cad/repo-cad-index.json`, with its git blob ID, and every one of them is
+mirrored in the repository's own folder layout, so hierarchical sheets and 3D model paths
+still resolve.
+
+```
+boards/cad/<vendor>/<board>/
+  ATTRIBUTION.md   manufacturer, licence, every file with its source and digest, and what
+                   was left out of archives
+  cad/             the design in the manufacturer's layout: Eagle, KiCad, Altium, OrCAD and
+                   Allegro sources, projects and libraries, Gerber and drill files, STEP,
+                   IGES, STL, VRML and DXF models; archives unpacked to their CAD members
+tools/devboard_cad/repo-cad-index.json
+                   every CAD file at each board's pinned commit, with its git blob ID
+tools/devboard_cad/mirror-manifest.json
+                   one entry per file: board, path, source, sha256, git blob, archive member,
+                   size, licence; and the indexed files left out, with the reason
+```
+
+`ATTRIBUTION.md` stays beside the files on purpose: CC BY and CC BY-SA require the credit
+and the licence notice to travel with the material, so a board's folder copied on its own
+still carries them. MIT, BSD and Apache-2.0 go further and require the licence text itself
+in every copy, so for those boards `ATTRIBUTION.md` ends with the manufacturer's licence,
+verbatim. `read_licenses.py --notices` collects it into
+`tools/devboard_cad/licence-notices.json`, from the repository's licence file at the commit
+the board's files are pinned to, or from the package member a statement was read from.
+`mirror.py build` refuses such a board without its text, and `check` fails if an
+`ATTRIBUTION.md` lacks it or the text no longer matches its digest.
+
+`mirror.py build` copies a file only when all of these hold:
+
+1. the board's licence allows redistribution;
+2. the bytes are the verified bytes. A file the record names must have the SHA-256 in
+   `evidence.sha256`. A file from the index must have its git blob ID at the pinned commit,
+   the identifier git itself stores the file under, so it is the manufacturer's file
+   exactly; one the repository keeps in Git LFS is fetched from LFS and must match the
+   pointer's SHA-256;
+3. the bytes are CAD when read: identified from content, with a suffix deciding only for
+   native formats that have no signature (OrCAD, SolidWorks, KiCad's JSON project file).
+   An archive is unpacked and only its CAD members are written, in a folder named after
+   it; its PDFs, spreadsheets, readmes and reports are left out and listed in
+   `ATTRIBUTION.md`.
+
+A file the record names that fails any of these is refused and the build fails. A file the
+index chose by its name alone may simply not be CAD (a `.sch` in an unidentified binary
+format, a `.zip` of datasheets): it is left out, listed in `ATTRIBUTION.md` and in the
+manifest's `excluded`, and `check` accepts it only for that exact blob. An archive named `X.zip`
+that holds a folder `X/` is unpacked into one folder `X`, not two. Paths longer than
+200 characters, which Windows checkouts cannot hold, are flattened under a digest prefix,
+and an archive member over GitHub's 100 MiB limit is left out and listed.
+
+A build rewrites the manifest for the vendors it covers and removes whatever the manifest
+no longer names, including a board left without CAD files. `check` fails on a missing
+file, a digest or git blob mismatch, a stray file anywhere in `boards/cad/`, a missing
+attribution, or a board that has lost its licence.
+
+The files are committed as regular files, exactly as published. `.gitattributes`
+exempts `boards/cad/*/*/cad/` from the repository's LFS rules and from line-ending
+conversion, so every byte matches its digest. Git LFS was the first choice, but GitHub
+refuses LFS uploads to a public fork, which is how this repository takes contributions.
+Every file is under GitHub's 100 MB limit.
+
+```bash
+# List every CAD file at each mirrored board's pinned commit (uses the GitHub API).
+python3 tools/devboard_cad/mirror.py index
+
+# Copy the CAD files of one vendor, or of all vendors, reusing files whose digest matches.
+python3 tools/devboard_cad/mirror.py build --vendor sparkfun
+python3 tools/devboard_cad/mirror.py build
+
+# Fail unless every redistributable CAD file is mirrored and every digest matches.
+python3 tools/devboard_cad/mirror.py check
+```
+
+To check out only the boards you need:
+
+```bash
+git sparse-checkout set --no-cone '/*' '!/boards/cad/*/*/' '/boards/cad/adafruit/feather-rp2040/'
+```
+
+`check` also reads Git LFS pointer files: a pointer's `oid` is the SHA-256 of the object
+it stands for. If the mirror later moves to LFS
+(`git lfs migrate import --include="boards/cad/*/*/cad/**"`), completeness and integrity
+stay provable in CI without downloading the binaries. `tests/unit/test_devboard_mirror.py`
+runs it against the committed mirror.
 
 ## Schema
 

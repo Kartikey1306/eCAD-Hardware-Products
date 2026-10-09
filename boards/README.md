@@ -70,6 +70,18 @@ minimal until datasheet review.
 | M5Stack Stamp LoRa-1262 / Module13.2 | M5Stack | ESP32-S3 | SX1262, 868–923MHz LoRa; pairs with the eNet LoRaWAN study |
 | 8devices 8Sight T100 | 8devices | STM32N657 | Cortex-M55 800MHz + 600-GOPS Neural-ART NPU + HW ISP; Lynred LWIR, 320×240@60fps fully offline — NPU-vision reference design |
 
+## Design files
+
+[`cad/`](cad/) holds the published CAD design of every catalogued board whose licence
+allows redistribution: every CAD file in the manufacturer's repository at the commit its
+record pins, in the manufacturer's folder layout. That means Eagle, KiCad, Altium, OrCAD
+and Allegro sources, projects and libraries, Gerber and drill files, and STEP, IGES, STL,
+VRML and DXF models; archives are unpacked to their CAD members. Each file is
+byte-identical to its recorded digest or to its git blob at that commit, and each board's
+`ATTRIBUTION.md` credits the manufacturer, names the licence and lists what was left out.
+Documents (PDFs, BOMs, readmes) are never copied. How it is built and checked:
+[docs/devboard-cad-database.md](../docs/devboard-cad-database.md#mirror).
+
 ## Roadmap (from #28)
 
 - Per-family pages (Arduino, Pi, ESP32, STM32, nRF, FPGA, robotics kits)

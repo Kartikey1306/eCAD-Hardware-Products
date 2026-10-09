@@ -14,16 +14,38 @@
   "product_status": "active",
   "files": {
     "schematic": {
-      "available": null,
-      "url": null,
-      "verified_revision": null,
-      "evidence": null
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008379-DS",
+      "verified_revision": "Pico-R3",
+      "evidence": {
+        "captured_at": "2026-10-09T10:18:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008379-DS-1-RPi-Pico-R3-PUBLIC-20200119.zip",
+        "sha256": "90d120b7664bb1b7a458c50ab65ed087e28116e849f627793dc1ecf1585d415a",
+        "size_bytes": 651151,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "RPI-PICO-R3-PUBLIC-SCHEMATIC.pdf"
+      }
     },
     "pcb_source": {
-      "available": null,
-      "url": null,
-      "verified_revision": null,
-      "evidence": null
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008379-DS",
+      "verified_revision": "Pico-R3",
+      "evidence": {
+        "captured_at": "2026-10-09T10:18:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008379-DS-1-RPi-Pico-R3-PUBLIC-20200119.zip",
+        "sha256": "90d120b7664bb1b7a458c50ab65ed087e28116e849f627793dc1ecf1585d415a",
+        "size_bytes": 651151,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "RPI-PICO-R3a-PUBLIC.brd"
+      }
     },
     "gerbers": {
       "available": null,
@@ -32,10 +54,21 @@
       "evidence": null
     },
     "bom": {
-      "available": null,
-      "url": null,
+      "available": true,
+      "url": "https://pip.raspberrypi.com/documents/RP-008379-DS",
       "verified_revision": null,
-      "evidence": null
+      "evidence": {
+        "captured_at": "2026-10-09T10:18:15Z",
+        "producer_tool_id": "devboard-cad-verifier@0.1.0",
+        "http_status": 200,
+        "source_url": "https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008379-DS-1-RPi-Pico-R3-PUBLIC-20200119.zip",
+        "sha256": "90d120b7664bb1b7a458c50ab65ed087e28116e849f627793dc1ecf1585d415a",
+        "size_bytes": 651151,
+        "media_type": "application/zip",
+        "detected_format": "zip",
+        "verification_method": "http_get_archive_member",
+        "contained_member": "LICENSE.txt"
+      }
     },
     "pick_and_place": {
       "available": null,
@@ -130,16 +163,16 @@
     }
   },
   "licenses": {
-    "hardware_license": "UNVERIFIED",
-    "cad_license": null,
-    "schematic_license": null,
-    "pcb_license": null,
-    "mechanical_cad_license": null,
-    "redistribution_allowed": null,
-    "modification_allowed": null,
-    "commercial_use_allowed": null,
-    "attribution_required": null,
-    "license_url": null
+    "hardware_license": "Permission grant in 0BSD wording (no licence named)",
+    "cad_license": "Permission grant in 0BSD wording (no licence named)",
+    "schematic_license": "Permission grant in 0BSD wording (no licence named)",
+    "pcb_license": "Permission grant in 0BSD wording (no licence named)",
+    "mechanical_cad_license": "Permission grant in 0BSD wording (no licence named)",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": false,
+    "license_url": "https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html"
   },
   "sources": {
     "source_tier": "manufacturer_official",
@@ -152,5 +185,5 @@
     "direct_gerber_download": null
   },
   "record_status": "partial",
-  "notes": "Order code SC0915 and EAN 5056561801445 read from the official datasheet, Appendix A.2, Table 6. Availability is decided by verify.py from retrieved bytes. Licensing is left unverified: Raspberry Pi publishes the Pico CAD and schematic but the terms governing reuse of the design were not located on an official page, and issue #28 section 12 requires licensing to be tracked separately from file availability."
+  "notes": "Order code SC0915 and EAN 5056561801445 read from the official datasheet, Appendix A.2, Table 6. Availability is decided by verify.py from retrieved bytes. Licensing is left unverified: Raspberry Pi publishes the Pico CAD and schematic but the terms governing reuse of the design were not located on an official page, and issue #28 section 12 requires licensing to be tracked separately from file availability. Hardware licence read from https://raw.githubusercontent.com/raspberrypi/documentation/62ba0a0c2dd5030fe9b19458fa9bd174a451f79b/documentation/asciidoc/microcontrollers/pico-series/about_pico.adoc: \"Raspberry Pi grants permission to use, copy, modify, and distribute the following designs for any purpose, with or without fee.\"."
 }

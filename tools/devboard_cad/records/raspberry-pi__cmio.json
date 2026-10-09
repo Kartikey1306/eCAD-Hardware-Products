@@ -66,16 +66,16 @@
     }
   },
   "licenses": {
-    "hardware_license": "UNVERIFIED",
-    "cad_license": null,
-    "schematic_license": null,
-    "pcb_license": null,
-    "mechanical_cad_license": null,
-    "redistribution_allowed": null,
-    "modification_allowed": null,
-    "commercial_use_allowed": null,
-    "attribution_required": null,
-    "license_url": null
+    "hardware_license": "BSD-3-Clause",
+    "cad_license": "BSD-3-Clause",
+    "schematic_license": "BSD-3-Clause",
+    "pcb_license": "BSD-3-Clause",
+    "mechanical_cad_license": "BSD-3-Clause",
+    "redistribution_allowed": true,
+    "modification_allowed": true,
+    "commercial_use_allowed": true,
+    "attribution_required": true,
+    "license_url": "https://pip.raspberrypi.com/documents/RP-008376-DS"
   },
   "sources": {
     "source_tier": "manufacturer_official",
@@ -88,5 +88,5 @@
     "direct_gerber_download": null
   },
   "record_status": "partial",
-  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from raspberrypi/documentation@b47f68f."
+  "notes": "Candidate URLs curated from the manufacturer's official documentation; availability is decided by verify.py from retrieved bytes. Unlike a repository tree this list is not exhaustive, so formats absent from it are recorded as unknown rather than absent. URLs extracted from raspberrypi/documentation@b47f68f. Hardware licence read from README.txt in https://pip.raspberrypi.com/documents/RP-008376-DS: \"Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\"."
 }

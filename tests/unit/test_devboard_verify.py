@@ -15,6 +15,7 @@ infrastructure:
 
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import sys
@@ -594,6 +595,158 @@ class TestLicenceReading(unittest.TestCase):
                                None, None, "adafruit/X")
         self.assertIn("version is unverified", record["notes"])
         self.assertTrue(record["licenses"]["commercial_use_allowed"])
+
+
+
+class TestLicenceFileLookup(unittest.TestCase):
+    """GitHub paths are case-sensitive, so the licence file is found by listing the root."""
+
+    @staticmethod
+    def _b64(text: str) -> str:
+        import base64
+        return base64.b64encode(text.encode("utf-8")).decode("ascii")
+
+    def _api(self, files: dict, listing_fails: bool = False):
+        def fake(path: str):
+            if path.endswith("/contents"):
+                if listing_fails:
+                    raise RuntimeError("rate limited")
+                return [{"name": n, "type": "file"} for n in files] + [{"name": "Hardware", "type": "dir"}]
+            if path.endswith("/readme"):
+                name = next((n for n in files if n.lower().startswith("readme")), None)
+                if name is None:
+                    raise RuntimeError("404")
+                return {"content": self._b64(files[name])}
+            name = path.rsplit("/contents/", 1)[1]
+            if name not in files:
+                raise RuntimeError("404")
+            return {"content": self._b64(files[name])}
+        return fake
+
+    SPARKFUN = ("SparkFun License Information\n\nHardware\n---------\n\n"
+                "**SparkFun hardware is released under [Creative Commons Share-alike 4.0 International]"
+                "(http://creativecommons.org/licenses/by-sa/4.0/).**\n")
+
+    def test_lists_licence_files_in_any_case(self) -> None:
+        files = {"license.md": "x", "License.md": "x", "COPYING": "x", "README.md": "x", "licenses.json": "x"}
+        from unittest import mock
+        with mock.patch.object(licences, "_gh_api", self._api(files)):
+            found = licences.licence_files("vendor/board")
+        self.assertEqual(found, ["License.md", "license.md", "COPYING"])
+
+    def test_reads_a_lower_case_license_md(self) -> None:
+        from unittest import mock
+        with mock.patch.object(licences, "_gh_api", self._api({"license.md": self.SPARKFUN, "README.md": "Board"})):
+            name, url, quote = licences.read_statement("sparkfun/MicroMod_Artemis_Processor")
+        self.assertEqual(name, "CC BY-SA 4.0")
+        self.assertEqual(url, "https://github.com/sparkfun/MicroMod_Artemis_Processor/blob/HEAD/license.md")
+        self.assertIn("SparkFun hardware is released under", quote)
+
+    def test_falls_back_to_known_spellings_when_the_listing_fails(self) -> None:
+        from unittest import mock
+        with mock.patch.object(licences, "_gh_api", self._api({"LICENSE.md": self.SPARKFUN}, listing_fails=True)):
+            name, url, _quote = licences.read_statement("vendor/board")
+        self.assertEqual(name, "CC BY-SA 4.0")
+        self.assertTrue(url.endswith("/LICENSE.md"))
+
+    def test_reads_a_readme_whatever_its_case(self) -> None:
+        from unittest import mock
+        readme = "This board is released under CC BY-SA 4.0."
+        with mock.patch.object(licences, "_gh_api", self._api({"Readme.md": readme})):
+            name, url, _quote = licences.read_statement("vendor/board")
+        self.assertEqual((name, url), ("CC BY-SA 4.0", "https://github.com/vendor/board"))
+
+    def test_a_pointer_to_a_missing_licence_file_stays_unverified(self) -> None:
+        from unittest import mock
+        readme = "This product is open source! Please review the LICENSE.md file for license information."
+        with mock.patch.object(licences, "_gh_api", self._api({"README.md": readme})):
+            self.assertEqual(licences.read_statement("vendor/board"), (None, None, None))
+
+
+class TestLicenceStatements(unittest.TestCase):
+    """A statement read from a package applies only to the bytes it was read from."""
+
+    README = (b"Copyright (c) 2014 Example Ltd.\r\n\r\nRedistribution and use in source and binary forms, "
+              b"with or without \r\nmodification, are permitted provided that the following conditions \r\nare met:\r\n")
+
+    def _statement(self, package: bytes, **changes) -> dict:
+        statement = {
+            "board_id": "example:board", "licence": "BSD-3-Clause",
+            "source": "https://example.com/package.zip", "member": "README.txt",
+            "sha256": hashlib.sha256(package).hexdigest(),
+            "quotes": ["Redistribution and use in source and binary forms, with or without modification, "
+                       "are permitted provided that the following conditions are met:"],
+        }
+        statement.update(changes)
+        return statement
+
+    @staticmethod
+    def _record() -> dict:
+        return {"board_id": "example:board", "notes": "Harvested.", "sources": {},
+                "licenses": {"hardware_license": "UNVERIFIED", "cad_license": None, "schematic_license": None,
+                             "pcb_license": None, "mechanical_cad_license": None,
+                             "redistribution_allowed": None, "modification_allowed": None,
+                             "commercial_use_allowed": None, "attribution_required": None, "license_url": None}}
+
+    def test_a_quote_across_wrapped_lines_is_found_in_the_package_member(self) -> None:
+        package = _zip({"README.txt": self.README, "board.brd": b"<eagle/>"})
+        self.assertIsNone(licences.check_statement(self._statement(package), package))
+
+    def test_different_bytes_are_refused(self) -> None:
+        package = _zip({"README.txt": self.README})
+        problem = licences.check_statement(self._statement(package), package + b"\0")
+        self.assertIn("sha256", problem)
+
+    def test_a_quote_that_is_not_in_the_bytes_is_refused(self) -> None:
+        package = _zip({"README.txt": self.README})
+        problem = licences.check_statement(self._statement(package, quotes=["Released under CC0."]), package)
+        self.assertIn("quote not found", problem)
+
+    def test_a_licence_outside_the_settled_table_is_refused(self) -> None:
+        package = _zip({"README.txt": self.README})
+        problem = licences.check_statement(self._statement(package, licence="Vendor EULA"), package)
+        self.assertIn("not in the table", problem)
+
+    def test_a_scoped_statement_sets_only_the_fields_it_covers(self) -> None:
+        package = _zip({"README.txt": self.README})
+        statement = self._statement(package, licence="MIT", fields=["cad_license", "mechanical_cad_license"],
+                                    scope="3D model only")
+        record = self._record()
+        self.assertTrue(licences.apply_statement(record, statement))
+        licenses = record["licenses"]
+        self.assertEqual(licenses["hardware_license"], "MIT (3D model only)")
+        self.assertEqual((licenses["cad_license"], licenses["schematic_license"]), ("MIT", None))
+        self.assertTrue(licenses["redistribution_allowed"])
+        self.assertEqual(licenses["license_url"], "https://example.com/package.zip")
+        self.assertFalse(licences.apply_statement(record, statement))
+
+    def test_the_licence_file_is_read_at_the_pinned_commit(self) -> None:
+        from unittest import mock
+        commit = "a" * 40
+        record = {"files": {"pcb_source": {"available": True,
+                                           "url": f"https://raw.githubusercontent.com/v/r/{commit}/hw/a.kicad_pcb"}}}
+        calls = []
+
+        def fake(path: str):
+            calls.append(path)
+            return [{"name": "README.md", "type": "file"}, {"name": "LICENSE", "type": "file"}]
+        with mock.patch.object(licences, "_gh_api", fake):
+            url = licences.github_licence_url(record)
+        self.assertEqual(url, f"https://raw.githubusercontent.com/v/r/{commit}/LICENSE")
+        self.assertEqual(calls, [f"repos/v/r/contents?ref={commit}"])
+
+    def test_committed_statements_name_settled_licences_and_existing_records(self) -> None:
+        body = json.loads((REPO_ROOT / licences.STATEMENTS_PATH).read_text(encoding="utf-8"))
+        for statement in body["statements"]:
+            with self.subTest(board=statement["board_id"]):
+                self.assertIn(statement["licence"], licences.KNOWN)
+                self.assertRegex(statement["sha256"], r"^[0-9a-f]{64}$")
+                self.assertTrue(statement["quotes"])
+                path = REPO_ROOT / "tools/devboard_cad/records" / (statement["board_id"].replace(":", "__") + ".json")
+                record = json.loads(path.read_text(encoding="utf-8"))
+                expected = statement["licence"] if not statement.get("scope") \
+                    else f"{statement['licence']} ({statement['scope']})"
+                self.assertEqual(record["licenses"]["hardware_license"], expected)
 
 
 if __name__ == "__main__":
