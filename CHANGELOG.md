@@ -43,6 +43,11 @@ has never run.
   thirteen capes under two licences, is replaced by one record per licensed cape:
   `harvest_github.py harvest --path` records one folder of a shared repository, and
   `mirror.py index` takes only that folder (issue #51).
+- The XIAO Debug Mate's KiCad schematic (seven sheets) under CC BY-SA 4.0, read from the
+  drawing frame Seeed embeds in the design. A licence statement can quote a file that a
+  KiCad design embeds in itself (`embedded`), and `mirror.py` copies only the files a
+  scoped licence covers, listing the rest in `ATTRIBUTION.md` under "Not covered by the
+  licence": here the board layout and the four housing models.
 - The digital domain (issue #27, plan §21 item 5): Verilog sources are read
   by a strict allow-list grammar (`tools/ecad_model/verilog.py`) into the
   engineering model, the adapter (`tools/ecad_model/domains/digital.py`)

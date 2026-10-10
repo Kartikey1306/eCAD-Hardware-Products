@@ -1,5 +1,5 @@
 {
-  "purpose": "Licences a person read from a manufacturer's own package or page, for boards whose terms are not in a GitHub repository. read_licenses.py --statements applies one only when the source still has the reviewed SHA-256 and every quote is still in it. 'fields' and 'scope' limit a statement to the files it covers.",
+  "purpose": "Licences a person read from a manufacturer's own package or page, for boards whose terms are not in a GitHub repository. read_licenses.py --statements applies one only when the source still has the reviewed SHA-256 and every quote is still in it. 'fields' and 'scope' limit a statement to the files it covers. 'embedded' names a file a KiCad design embeds in itself, such as its drawing frame, and the quotes are checked in that file.",
   "statements": [
     {
       "board_id": "arduino:uno-rev3",
@@ -223,6 +223,25 @@
       ],
       "covers": "The designs listed above the grant: the Cadence Allegro design files (RP-008379-DS, which carries the same grant in its LICENSE.txt) and the STEP file (RP-008311-DS, byte-identical to Pico-R3-step.zip). Read from the source of the official documentation page, which answers automated clients with 403.",
       "read_at": "2026-10-09"
+    },
+    {
+      "board_id": "seeed-studio:oshw-xiao-debug-mate",
+      "licence": "CC BY-SA 4.0",
+      "source": "https://files.seeedstudio.com/wiki/xiao_debug_mate/res/Seeed_Studio_XIAO_Debug_Mate_V1.0_SCH&PCB_20250926.zip",
+      "sha256": "9272e43de06319c4e8bff9e6134c5f01e1cdd976f0e8bb40c7157fe1e9e73eb5",
+      "member": "Debugger for Seeed Studio XIAO_V1.0_SCH&PCB_20250926/Debugger for Seeed Studio XIAO.kicad_sch",
+      "embedded": "Seeed_SCH_Open_Source.kicad_wks",
+      "url": "https://wiki.seeedstudio.com/getting_started_with_xiao_debug_mate/",
+      "quotes": [
+        "CC BY-SA 4.0",
+        "(tbtext \"CC BY-SA 4.0\""
+      ],
+      "fields": [
+        "schematic_license"
+      ],
+      "scope": "schematic only",
+      "covers": "The seven KiCad schematic sheets of Seeed's SCH&PCB package, linked from the official wiki page: the root sheet embeds Seeed's drawing frame Seeed_SCH_Open_Source.kicad_wks, which prints \"CC BY-SA 4.0\" in the title block of every sheet (as the schematic PDF in the repository, 4_Hardware/Seeed_Studio_XIAO_Debug_Mate_V1.0_SCH_20250926.pdf, shows on all seven pages). The board layout (.kicad_pcb) carries no title block or licence text, and the housing STEP and 3MF files carry none, so they are not covered.",
+      "read_at": "2026-10-10"
     },
     {
       "board_id": "sparkfun:cellular-function-board-blues-wireless-notecarrier",

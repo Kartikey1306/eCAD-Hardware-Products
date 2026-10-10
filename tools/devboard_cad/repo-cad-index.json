@@ -7934,6 +7934,43 @@
     }
    ]
   },
+  "seeed-studio:oshw-xiao-debug-mate": {
+   "repository": "Seeed-Studio/OSHW-XIAO-Debug-Mate",
+   "commit": "51769f4dcb8829d95728eb34c37da2b4a58948bc",
+   "indexed_at": "2026-10-10T17:43:01Z",
+   "files": [
+    {
+     "path": "1_Libraries/SdFat_-_Adafruit_Fork/doc/html.zip",
+     "blob": "ee7cbc2112ce47913e31f8a748c2a52b38d8472c",
+     "size": 2604051
+    },
+    {
+     "path": "1_Libraries/SdFat_-_Adafruit_Fork/extras/USB_Host_Shield/USB_Host_Shield_2.0.zip",
+     "blob": "72b3069c450eb76bf9498010a7660e802acaff77",
+     "size": 476902
+    },
+    {
+     "path": "3_Product_housing/Debugger Keycap; FDM, ABS, L16.8W6.4H5, Green, Support-Removed and Deburred.stp",
+     "blob": "910c20129e7862a7516a0937e53a455658776c23",
+     "size": 48915
+    },
+    {
+     "path": "3_Product_housing/Debugger Lower Housing; FDM, ABS, L100 x W58 x H12.2, Black, Remove Supports and Deburr.stp",
+     "blob": "284652430689365f930fe408dbba5d08589e2fc6",
+     "size": 657230
+    },
+    {
+     "path": "3_Product_housing/Debugger Screen Mounting Block; FDM, ABS, L57.5W47.5H6.4, Black, Deburred.stp",
+     "blob": "aeef68799f70e62ebfaecf7d37b644168f86ddf4",
+     "size": 340568
+    },
+    {
+     "path": "3_Product_housing/Debugger Upper Housing; FDM, ABS, L100 x W57 x H11 mm, Black, Remove Supports and Deburr.stp",
+     "blob": "53f2a60c164e3ffe41e5a55134d6062187b9368c",
+     "size": 714803
+    }
+   ]
+  },
   "seeed-studio:oshw-xiao-series": {
    "repository": "Seeed-Studio/OSHW-XIAO-Series",
    "commit": "cc7f3bbfc69f20061e533304b160bedcf377844a",
