@@ -35,7 +35,7 @@ Members of the archives above that are not CAD, left out of the mirror:
 
 ## Not covered by the licence
 
-CAD files of this design that its licence (CC BY-SA 4.0 (schematic only)) does not cover, left out:
+CAD files of this design outside its licence, CC BY-SA 4.0 (schematic only), left out:
 
 - `3_Product_housing/Debugger Keycap; FDM, ABS, L16.8W6.4H5, Green, Support-Removed and Deburred.stp`
 - `3_Product_housing/Debugger Lower Housing; FDM, ABS, L100 x W58 x H12.2, Black, Remove Supports and Deburr.stp`

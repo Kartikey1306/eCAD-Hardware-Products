@@ -75525,6 +75525,38 @@
       "reason": "archive holds no CAD files"
     },
     {
+      "board_id": "seeed-studio:oshw-xiao-debug-mate",
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Debug-Mate/51769f4dcb8829d95728eb34c37da2b4a58948bc/3_Product_housing/Debugger%20Keycap%3B%20FDM%2C%20ABS%2C%20L16.8W6.4H5%2C%20Green%2C%20Support-Removed%20and%20Deburred.stp",
+      "repository_path": "3_Product_housing/Debugger Keycap; FDM, ABS, L16.8W6.4H5, Green, Support-Removed and Deburred.stp",
+      "git_blob": "910c20129e7862a7516a0937e53a455658776c23",
+      "sha256": null,
+      "reason": "not covered by the licence"
+    },
+    {
+      "board_id": "seeed-studio:oshw-xiao-debug-mate",
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Debug-Mate/51769f4dcb8829d95728eb34c37da2b4a58948bc/3_Product_housing/Debugger%20Lower%20Housing%3B%20FDM%2C%20ABS%2C%20L100%20x%20W58%20x%20H12.2%2C%20Black%2C%20Remove%20Supports%20and%20Deburr.stp",
+      "repository_path": "3_Product_housing/Debugger Lower Housing; FDM, ABS, L100 x W58 x H12.2, Black, Remove Supports and Deburr.stp",
+      "git_blob": "284652430689365f930fe408dbba5d08589e2fc6",
+      "sha256": null,
+      "reason": "not covered by the licence"
+    },
+    {
+      "board_id": "seeed-studio:oshw-xiao-debug-mate",
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Debug-Mate/51769f4dcb8829d95728eb34c37da2b4a58948bc/3_Product_housing/Debugger%20Screen%20Mounting%20Block%3B%20FDM%2C%20ABS%2C%20L57.5W47.5H6.4%2C%20Black%2C%20Deburred.stp",
+      "repository_path": "3_Product_housing/Debugger Screen Mounting Block; FDM, ABS, L57.5W47.5H6.4, Black, Deburred.stp",
+      "git_blob": "aeef68799f70e62ebfaecf7d37b644168f86ddf4",
+      "sha256": "593fe0df6e158e2710dafd6eab1429ed8beb0cd4e68a7cee14fc9f2def23831a",
+      "reason": "not covered by the licence"
+    },
+    {
+      "board_id": "seeed-studio:oshw-xiao-debug-mate",
+      "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Debug-Mate/51769f4dcb8829d95728eb34c37da2b4a58948bc/3_Product_housing/Debugger%20Upper%20Housing%3B%20FDM%2C%20ABS%2C%20L100%20x%20W57%20x%20H11%20mm%2C%20Black%2C%20Remove%20Supports%20and%20Deburr.stp",
+      "repository_path": "3_Product_housing/Debugger Upper Housing; FDM, ABS, L100 x W57 x H11 mm, Black, Remove Supports and Deburr.stp",
+      "git_blob": "53f2a60c164e3ffe41e5a55134d6062187b9368c",
+      "sha256": null,
+      "reason": "not covered by the licence"
+    },
+    {
       "board_id": "seeed-studio:oshw-xiao-series",
       "url": "https://raw.githubusercontent.com/Seeed-Studio/OSHW-XIAO-Series/cc7f3bbfc69f20061e533304b160bedcf377844a/xiao-weekly-search.zip",
       "repository_path": "xiao-weekly-search.zip",

@@ -383,7 +383,7 @@ def write_notices(root: Path, fetcher: Any) -> Tuple[int, List[str]]:
             if payload is None or check_statement(statement, payload):
                 missing.append(f"{board}: {statement['source']} no longer matches its statement")
                 continue
-            data = statement_text(payload, statement.get("member")).encode("utf-8")
+            data = statement_text(payload, statement.get("member"), statement.get("embedded")).encode("utf-8")
             source = statement["source"] + (f"#{statement['member']}" if statement.get("member") else "")
         else:
             url = github_licence_url(record)

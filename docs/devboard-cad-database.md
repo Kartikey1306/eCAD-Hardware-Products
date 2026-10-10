@@ -187,12 +187,17 @@ still has that digest and every quote is still in it, so a vendor changing its t
 leaves the record as it was and reports the refusal. A statement can be limited to the files
 it covers: Raspberry Pi's MIT licence for the Raspberry Pi 5 covers the 3D model, so only
 `cad_license` and `mechanical_cad_license` are set and `hardware_license` says
-"MIT (3D model only)". The mirror honours that scope file by file: a schematic (`.sch`,
-`.kicad_sch`, `.SchDoc`, OrCAD) needs `schematic_license`, a board (`.brd`, `.kicad_pcb`,
-`.PcbDoc`, Gerber and drill files) `pcb_license`, a model (STEP, IGES, STL, VRML, OBJ, DXF,
-native MCAD) `mechanical_cad_license`, and anything else, such as a project file,
-`cad_license`. A file whose field is empty is not copied and is listed in the board's
-`ATTRIBUTION.md` under "Not covered by the licence". A record without the per-kind fields is
+"MIT (3D model only)". The mirror honours that scope file by file. Gerber and drill files
+need `pcb_license` and STEP, IGES, STL, VRML, OBJ and DXF models `mechanical_cad_license`,
+known by their content whatever their suffix. A native design document is known by its
+suffix: a schematic (`.sch`, `.kicad_sch`, `.SchDoc`, OrCAD `.dsn`) needs `schematic_license`,
+a board (`.brd`, `.kicad_pcb`, `.PcbDoc`) `pcb_license`, and SolidWorks, Fusion 360 and
+FreeCAD models `mechanical_cad_license`. Projects, libraries and rule files (`.kicad_pro`,
+`.kicad_sym`, `.kicad_mod`, `.lbr`, `.SchLib`, `.PcbLib`, `.PrjPcb`, Fritzing `.fzz`) belong to
+the whole design: they need `cad_license`, and a licence that leaves any kind of file out
+does not reach them, so the Raspberry Pi 5's would not copy a project file. A file outside
+the licence is not copied; it is listed in the board's `ATTRIBUTION.md` under "Not covered by
+the licence" and in the manifest's `excluded`. A record without the per-kind fields is
 covered as a whole by `cad_license`.
 
 A statement's `embedded` names a file that a KiCad 9 design embeds in itself, such as its
@@ -207,7 +212,7 @@ statement rather than applying it unread.
 | `raspberry-pi:cmio` | BSD-3-Clause | `README.txt` in the design package, which carries the three clauses without naming them |
 | `raspberry-pi:pico` | Permission grant in 0BSD wording | the Pico documentation, which grants use, copying, modification and distribution "for any purpose, with or without fee"; the design package repeats it in `LICENSE.txt` |
 | 10 SparkFun boards | CC BY-SA 4.0 | the design file itself: "Released under the Creative Commons Attribution Share-Alike 4.0 License", on SparkFun's `CREATIVE_COMMONS` drawing frame placed on the schematic and board (Eagle) or as footprint text on the PCB (KiCad). Their READMEs point to a `LICENSE.md` that is not in the repository. |
-| `seeed-studio:oshw-xiao-debug-mate` | CC BY-SA 4.0 (schematic only) | the drawing frame `Seeed_SCH_Open_Source.kicad_wks`, embedded in the root sheet of the KiCad design linked from the official wiki page, prints "CC BY-SA 4.0" in the title block of all seven sheets. The board layout and the housing models carry no licence and are not copied. |
+| `seeed-studio:oshw-xiao-debug-mate` | CC BY-SA 4.0 (schematic only) | the drawing frame `Seeed_SCH_Open_Source.kicad_wks`, embedded in the root sheet of the KiCad design linked from the official wiki page, prints "CC BY-SA 4.0" in the title block of all seven sheets. The board layout, the project file and the housing models carry no licence and are not copied. |
 | 11 BeagleBoard capes | CC BY 4.0 (9), CC BY-SA 4.0 (2) | the `LICENSE` file in each cape's folder of `beagleboard/capes`; each names its own copyright holder, so these statements are marked `notice` and the licence file goes into the board's `ATTRIBUTION.md` |
 
 `beagleboard/capes` holds thirteen capes in one repository, under two licences and several

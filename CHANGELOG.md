@@ -47,7 +47,10 @@ has never run.
   drawing frame Seeed embeds in the design. A licence statement can quote a file that a
   KiCad design embeds in itself (`embedded`), and `mirror.py` copies only the files a
   scoped licence covers, listing the rest in `ATTRIBUTION.md` under "Not covered by the
-  licence": here the board layout and the four housing models.
+  licence": here the board layout, the project file and the four housing models. Gerber,
+  drill and model files are matched to a licence by their content, and a scoped licence does
+  not reach project, library or rule files. `check` fails on a mirrored file its licence no
+  longer covers.
 - The digital domain (issue #27, plan §21 item 5): Verilog sources are read
   by a strict allow-list grammar (`tools/ecad_model/verilog.py`) into the
   engineering model, the adapter (`tools/ecad_model/domains/digital.py`)

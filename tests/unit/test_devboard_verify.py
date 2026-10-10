@@ -754,6 +754,43 @@ class TestLicenceStatements(unittest.TestCase):
         self.assertIn("no embedded file", licences.check_statement(dict(statement, embedded="Other.kicad_wks"),
                                                                    package))
 
+    def test_an_embedded_file_is_refused_where_python_has_no_zstd(self) -> None:
+        from unittest import mock
+        design = b'(kicad_sch\n\t(embedded_files\n\t\t(file\n\t\t\t(name "Vendor_Open_Source.kicad_wks")\n' \
+                 b'\t\t\t(type worksheet)\n\t\t\t(data |KLUv/SAA|)\n\t\t)\n\t)\n)\n'
+        package = _zip({"board/main.kicad_sch": design})
+        statement = self._statement(package, licence="CC BY-SA 4.0", member="board/main.kicad_sch",
+                                    embedded="Vendor_Open_Source.kicad_wks", quotes=["CC BY-SA 4.0"])
+        with mock.patch.dict(sys.modules, {"compression": None, "compression.zstd": None}):
+            problem = licences.check_statement(statement, package)
+        self.assertIn("needs Python 3.14", problem)
+
+    def test_a_notice_from_an_embedded_file_keeps_that_file_not_the_design(self) -> None:
+        from unittest import mock
+        frame = "(kicad_wks\n\t(tbtext \"MIT\")\n\t(tbtext \"Copyright (c) 2026 Example Ltd\")\n)\n"
+        design = b"(kicad_sch (embedded_files (file (name \"Frame.kicad_wks\") (type worksheet) (data |AA|))))\n"
+        package = _zip({"board/main.kicad_sch": design})
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "tools/devboard_cad/records").mkdir(parents=True)
+            record = self._record()
+            record["files"] = {}
+            statement = self._statement(package, licence="MIT", member="board/main.kicad_sch",
+                                        embedded="Frame.kicad_wks", notice=True,
+                                        quotes=["Copyright (c) 2026 Example Ltd"])
+            with mock.patch.object(licences, "kicad_embedded_file", return_value=frame):
+                licences.apply_statement(record, statement)
+                (root / "tools/devboard_cad/records/example__board.json").write_text(json.dumps(record), encoding="utf-8")
+                (root / licences.STATEMENTS_PATH).write_text(json.dumps({"statements": [statement]}), encoding="utf-8")
+
+                class Fetch:
+                    def get(self, url):
+                        return FetchResult(url, 200, package, "application/zip", url, None)
+                written, missing = licences.write_notices(root, Fetch())
+            notices = json.loads((root / licences.NOTICES_PATH).read_text(encoding="utf-8"))["notices"]
+        self.assertEqual((written, missing), (1, []))
+        self.assertEqual(notices["example:board"]["text"], frame)
+
     def test_the_licence_file_is_read_at_the_pinned_commit(self) -> None:
         from unittest import mock
         commit = "a" * 40
