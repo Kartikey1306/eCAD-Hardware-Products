@@ -15,6 +15,7 @@ infrastructure:
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import io
 import json
@@ -732,6 +733,26 @@ class TestLicenceStatements(unittest.TestCase):
         self.assertTrue(licenses["redistribution_allowed"])
         self.assertEqual(licenses["license_url"], "https://example.com/package.zip")
         self.assertFalse(licences.apply_statement(record, statement))
+
+    @staticmethod
+    def _kicad_with_embedded_frame(frame: bytes) -> bytes:
+        from compression import zstd  # type: ignore[import-not-found]
+        data = base64.b64encode(zstd.compress(frame)).decode("ascii")
+        wrapped = "\n\t\t\t\t".join(data[i:i + 76] for i in range(0, len(data), 76))
+        return ('(kicad_sch\n\t(version 20250114)\n\t(embedded_files\n\t\t(file\n'
+                '\t\t\t(name "Vendor_Open_Source.kicad_wks")\n\t\t\t(type worksheet)\n'
+                f'\t\t\t(data |{wrapped}|)\n\t\t)\n\t)\n)\n').encode("ascii")
+
+    @unittest.skipUnless(sys.version_info >= (3, 14), "compression.zstd is in the standard library from 3.14")
+    def test_a_quote_in_a_kicad_embedded_drawing_frame_is_found(self) -> None:
+        design = self._kicad_with_embedded_frame(b'(kicad_wks\n\t(tbtext "CC BY-SA 4.0"\n\t\t(name ""))\n)\n')
+        package = _zip({"board/main.kicad_sch": design})
+        statement = self._statement(package, licence="CC BY-SA 4.0", member="board/main.kicad_sch",
+                                    embedded="Vendor_Open_Source.kicad_wks", quotes=['(tbtext "CC BY-SA 4.0"'])
+        self.assertIsNone(licences.check_statement(statement, package))
+        self.assertIn("quote not found", licences.check_statement(dict(statement, quotes=["CC BY 4.0"]), package))
+        self.assertIn("no embedded file", licences.check_statement(dict(statement, embedded="Other.kicad_wks"),
+                                                                   package))
 
     def test_the_licence_file_is_read_at_the_pinned_commit(self) -> None:
         from unittest import mock

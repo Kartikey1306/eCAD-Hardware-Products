@@ -230,12 +230,38 @@ def _normalise(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def statement_text(payload: bytes, member: Optional[str]) -> str:
-    """The text a statement is quoted from: one member of a ZIP package, or the whole file."""
+def kicad_embedded_file(text: str, name: str) -> str:
+    """The text of the file ``name`` that a KiCad 9 design embeds in itself.
+
+    KiCad keeps an embedded file, such as the drawing frame that prints a licence in every
+    title block, zstd-compressed and base64-encoded, so its words are not in the design's
+    plain text. zstd is in the standard library from Python 3.14; on an older interpreter
+    this raises RuntimeError, and the statement is refused rather than applied unread.
+
+    >>> kicad_embedded_file(design_text, "Seeed_SCH_Open_Source.kicad_wks")[:44]  # doctest: +SKIP
+    '(kicad_wks\\r\\n\\t(version 20231118)\\r\\n\\t(generator'
+    """
+    match = re.search(r'\(name\s+"' + re.escape(name) + r'"\)\s*\(type\s+\w+\)\s*\(data\s+\|([^|]*)\|', text)
+    if match is None:
+        raise KeyError(f"no embedded file {name!r}")
+    try:
+        from compression import zstd  # type: ignore[import-not-found]
+    except ImportError as exc:
+        raise RuntimeError("reading a KiCad embedded file needs Python 3.14 or later") from exc
+    try:
+        return zstd.decompress(base64.b64decode(re.sub(r"\s+", "", match.group(1)))).decode("utf-8", "replace")
+    except (ValueError, zstd.ZstdError) as exc:
+        raise RuntimeError(f"embedded file {name!r} does not decode: {exc}") from exc
+
+
+def statement_text(payload: bytes, member: Optional[str], embedded: Optional[str] = None) -> str:
+    """The text a statement is quoted from: one member of a ZIP package, or the whole file;
+    with ``embedded``, the file of that name embedded in the KiCad design."""
     if member:
         with zipfile.ZipFile(io.BytesIO(payload)) as archive:
             payload = archive.read(member)
-    return payload.decode("utf-8", "replace")
+    text = payload.decode("utf-8", "replace")
+    return kicad_embedded_file(text, embedded) if embedded else text
 
 
 def check_statement(statement: Dict[str, Any], payload: Optional[bytes]) -> Optional[str]:
@@ -252,8 +278,8 @@ def check_statement(statement: Dict[str, Any], payload: Optional[bytes]) -> Opti
     if digest != statement.get("sha256"):
         return f"sha256 {digest[:16]} != reviewed {str(statement.get('sha256'))[:16]}"
     try:
-        text = _normalise(statement_text(payload, statement.get("member")))
-    except (KeyError, zipfile.BadZipFile) as exc:
+        text = _normalise(statement_text(payload, statement.get("member"), statement.get("embedded")))
+    except (KeyError, zipfile.BadZipFile, RuntimeError) as exc:
         return f"member {statement.get('member')!r} not readable: {exc}"
     missing = [q for q in statement.get("quotes", []) if _normalise(q) not in text]
     if not statement.get("quotes") or missing:
