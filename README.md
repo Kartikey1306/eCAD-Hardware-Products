@@ -131,3 +131,8 @@ See [datasets/cad/README.md](datasets/cad/README.md) and
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+One exception: the four EmbeddedOS original boards in [boards/eos](boards/eos), their design
+files and the footprint library drawn for them are Copyright (c) 2026 Kartikeydheer Srivastava,
+all rights reserved, and are not under the MIT licence. The exact files are listed in
+[boards/eos/README.md](boards/eos/README.md#licence).

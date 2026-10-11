@@ -15,6 +15,31 @@ has never run.
 
 ### Added
 
+- `tools/eos_boards`, a board generator, and four original boards built with it under
+  `boards/eos/`: EoS Learn RP2350, EoS Sense Cape for PocketBeagle, EoS Probe S3 and EoS CM5
+  Base. Each board is written in one design file. From it the generator writes the KiCad
+  schematic and board, routes it, checks it, and exports the fabrication outputs. Routing is
+  Freerouting, then a two-layer maze router with local rip-up for anything left open. All four
+  report 0 ERC violations, 0 DRC errors, 0 unconnected items and 0 schematic-parity
+  differences. A build that fails any check writes no outputs. The boards are (c) 2026
+  Kartikeydheer Srivastava, all rights reserved, and not under the repository's MIT licence.
+  Anyone may view them; any other use needs Kartikeydheer Srivastava's written permission.
+  EmbeddedOS (EoS) Research Foundation has a limited, revocable permission
+  (`boards/eos/README.md#licence`). The generator itself stays MIT.
+- Reference reuse at 1 nm resolution: `tools/eos_boards/reference/extract_rpi_minimal.py`
+  takes the RP2350A core layout from Raspberry Pi's MIT-licensed minimal design, which the
+  RP2350 datasheet says the regulator layout must follow. EoS Learn RP2350 places it
+  unchanged. `tests/unit/test_eos_boards.py` checks every reused footprint, track, via and zone
+  corner in integer nanometres. It also checks:
+  - the cape's 72 socket pads against PocketBeagle's header pins, from BeagleBoard.org's board
+    file (CC BY 4.0);
+  - the carrier's 200 connector pads and 4 mounting holes against the CM5 footprint in
+    Raspberry Pi's CM5 IO Board files (facts only);
+  - each board's documented straps, pull-ups, translator directions and power path, read back
+    from the built boards.
+
+  Each reference file records the SHA-256 of its source.
+
 - The dev-board CAD mirror (issue #48): `tools/devboard_cad/mirror.py` copies the CAD
   design of every board whose licence allows redistribution into
   `boards/cad/<vendor>/<board>/cad/`, unmodified, with an `ATTRIBUTION.md` per board;

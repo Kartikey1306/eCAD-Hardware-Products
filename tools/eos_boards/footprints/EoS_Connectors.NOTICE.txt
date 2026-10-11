@@ -1,0 +1,10 @@
+EoS_Connectors.pretty
+
+Copyright (c) 2026 Kartikeydheer Srivastava. All rights reserved.
+
+This footprint library was drawn for EoS CM5 Base. It is not under the repository's MIT
+licence: it is part of that board's design, under the terms in
+boards/eos/eos-cm5-base/LICENSE.txt. See boards/eos/README.md (Licence).
+
+The pad positions of TRXCOM_TRJG0926HENL come from Raspberry Pi's CM5 IO Board design
+(facts only); the drawing is this library's own.

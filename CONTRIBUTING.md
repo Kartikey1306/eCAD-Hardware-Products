@@ -39,3 +39,12 @@ docs: update documentation
 ## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
+
+### Exception: the EmbeddedOS original boards
+
+The four boards in `boards/eos/` are Copyright (c) 2026 Kartikeydheer Srivastava, all rights
+reserved. They are not under the MIT License, and the paragraph above does not apply to them.
+The exact files are listed in [boards/eos/README.md](boards/eos/README.md#licence).
+
+A change to those files is accepted only if its author agrees that Kartikeydheer Srivastava
+may use and relicense the change on any terms. Say so in the pull request.
