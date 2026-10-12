@@ -81,9 +81,10 @@ both LEDs lit.
 | Check | Result |
 |---|---|
 | Schematic ERC | 0 violations |
-| DRC | 0 errors, 0 warnings |
+| DRC errors | 0 |
 | Unconnected items | 0 |
 | Schematic ↔ board parity | 0 differences |
+| DRC warnings | 0 |
 
 ## Fabrication
 

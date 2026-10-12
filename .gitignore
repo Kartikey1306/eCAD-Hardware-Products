@@ -8,3 +8,5 @@ __pycache__/
 target/
 .pytest_cache/
 .DS_Store
+# tools/eos_boards build scratch (DSN, SES, DRC working files)
+boards/eos/*/.build/

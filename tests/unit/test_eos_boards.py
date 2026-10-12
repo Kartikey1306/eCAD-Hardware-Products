@@ -46,7 +46,13 @@ SYMBOLS = """(kicad_symbol_lib (version 20231120) (generator "test")
     (symbol "U_1_1"
       (pin power_in line (at -7.62 2.54 0) (length 2.54) (name "VDD" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
       (pin power_in line (at -7.62 0 0) (length 2.54) (name "VDD" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27)))))
-      (pin bidirectional line (at 7.62 0 180) (length 2.54) (name "IO" (effects (font (size 1.27 1.27)))) (number "3" (effects (font (size 1.27 1.27))))))))
+      (pin bidirectional line (at 7.62 0 180) (length 2.54) (name "IO" (effects (font (size 1.27 1.27)))) (number "3" (effects (font (size 1.27 1.27)))))))
+  (symbol "M" (in_bom yes) (on_board yes)
+    (property "Reference" "U" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "M" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (symbol "M_1_1"
+      (pin power_in line (at -7.62 2.54 0) (length 2.54) (name "GND" (effects (font (size 1.27 1.27)))) (number "[1,3-4]" (effects (font (size 1.27 1.27)))))
+      (pin bidirectional line (at 7.62 0 180) (length 2.54) (name "A/B" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))))))
 """
 
 
@@ -94,6 +100,21 @@ class ResolveTest(_Lib):
         with self.assertRaisesRegex(ValueError, "pins without a net"):
             design.resolve(Part("U1", "T:U", "U", "fp", (0, 0), {"VDD": "+3V3"}), self.lib)
 
+    def test_unconnected_net_names_spell_a_slash_as_kicad_does(self):
+        self.assertEqual(build.kicad_net_text("~{RI}/CLK"), "~{RI}{slash}CLK")      # a CP2102N pin, as KiCad names its net
+        self.assertEqual(build.kicad_net_text("GPIO.3"), "GPIO.3")
+        self.assertEqual(build.unconnected_net("U4", "~{RI}/CLK", "1"), "unconnected-(U4-~{RI}{slash}CLK-Pad1)")
+        self.assertEqual(build.unconnected_net("J2", "", "3"), "unconnected-(J2-Pad3)")   # a barrel jack's unnamed pin
+        self.assertEqual(build.unconnected_net("U2", "~{FLT}", "3"), "unconnected-(U2-~{FLT}-Pad3)")
+
+    def test_stacked_pin_numbers_name_every_pad(self):
+        self.assertEqual(build.pad_numbers("[1,15,38,39]"), ["1", "15", "38", "39"])   # KiCad's ESP32-WROOM-32E GND
+        self.assertEqual(build.pad_numbers("[1-3,7]"), ["1", "2", "3", "7"])
+        self.assertEqual(build.pad_numbers("A5"), ["A5"])
+        for bad in ("[3-1]", "[A1-A3]", "[1,,2]"):                 # never drop a pin's pads silently
+            with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, "cannot read"):
+                build.pad_numbers(bad)
+
     def test_unknown_pin_is_refused(self):
         with self.assertRaisesRegex(KeyError, "no pin named or numbered"):
             design.resolve(Part("R1", "T:R", "1k", "fp", (0, 0), {"1": "A", "2": "B", "9": "C"}), self.lib)
@@ -112,6 +133,30 @@ class SchematicTest(_Lib):
         self.assertIn('"Copyright (c) 2026 Kartikeydheer Srivastava. Licence: MIT"', first)
         self.assertIn('"Core layout (c) 2026 Raspberry Pi Ltd, MIT"', first)
         self.assertIn("(no_connect", first)
+
+
+class SpecTest(_Lib):
+    def test_stacked_pins_and_slashed_no_connects_reach_the_board_spec(self):
+        board = self.board([Part("U1", "T:M", "M", "fp", (50, 50), {"GND": "GND", "A/B": NC})])
+        pads = build.spec_for(board, self.lib, Path(self.tmp.name), [])["parts"][0]["pads"]
+        self.assertEqual(pads, {"1": "/GND", "3": "/GND", "4": "/GND",              # one stacked pin, three pads
+                                "2": "unconnected-(U1-A{slash}B-Pad2)"})            # the net KiCad gives it
+
+
+class ClashTest(unittest.TestCase):
+    def test_clearance_clashes_pick_the_via_then_the_shorter_track_and_leave_pads(self):
+        def item(desc, x):
+            return {"description": desc, "pos": {"x": x, "y": 1.0}}
+        drc = {"violations": [
+            {"type": "clearance", "severity": "error",           # EoS STM32 64, first build
+             "items": [item("Via [/PH0] on F.Cu - B.Cu", 30.09), item("Track [/PA1] on B.Cu, length 5.2445 mm", 30.08)]},
+            {"type": "clearance", "severity": "error",
+             "items": [item("Track [/A] on F.Cu, length 9.0 mm", 1.0), item("Track [/B] on F.Cu, length 0.4 mm", 2.0)]},
+            {"type": "clearance", "severity": "error",           # a pad can't be moved: the build fails instead
+             "items": [item("Pad 3 [/C] of U1 on F.Cu", 3.0), item("Track [/D] on F.Cu, length 1.0 mm", 4.0)]},
+            {"type": "silk_edge_clearance", "severity": "warning", "items": [item("Track [/E] on F.Cu, length 1 mm", 5.0)] * 2},
+        ]}
+        self.assertEqual(build.clearance_clashes(drc), [{"net": "/PH0", "pos": [30.09, 1.0]}, {"net": "/B", "pos": [2.0, 1.0]}])
 
 
 class LicenceTest(_Lib):
@@ -383,6 +428,28 @@ CM4_PCB = REPO_ROOT / "boards" / "eos" / "eos-cm4-base" / "hardware" / "eos-cm4-
 CM4_PINS = REPO_ROOT / "tools" / "eos_boards" / "reference" / "cm4_pins.json"
 
 
+class FigureFourTest(unittest.TestCase):
+    """The carriers' holes and connectors, placed from nothing but the dimensions in Figure 4 of the
+    CM4 and CM5 datasheets (55 x 40 mm module, holes 3.5 mm in, connector centres 3 mm from the long
+    edges and 3.5 + 21.5 mm from the pin-99 edge), land where the footprint facts put them."""
+
+    def test_holes_and_connector_centres_match_the_datasheet_drawing(self):
+        for name in ("eos-cm5-base", "eos-cm4-base"):
+            with self.subTest(board=name):
+                board = importlib.import_module(f"eos_boards.boards.{name.replace('-', '_')}")
+                pcb = loads((REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb").read_text())
+                at = {}
+                for fp in find_all(pcb, "footprint"):
+                    ref = next(str(p[2]) for p in find_all(fp, "property") if str(p[1]) == "Reference")
+                    a = find(fp, "at")
+                    at[ref] = (round(float(a[1]), 4), round(float(a[2]), 4))
+                holes = {at[r] for r in at if r.startswith("H")}
+                drawing = {tuple(round(c, 4) for c in board.from_module(x, y)) for x in (3.5, 51.5) for y in (3.5, 36.5)}
+                self.assertEqual(holes, drawing)
+                self.assertEqual(at["J1"], tuple(round(c, 4) for c in board.from_module(25.0, 3.0)))    # pins 1-100
+                self.assertEqual(at["J2"], tuple(round(c, 4) for c in board.from_module(25.0, 37.0)))   # pins 101-200
+
+
 class CM4FitTest(CM5FitTest):
     """The CM4 carrier: the same connector pads and holes as the CM5's (Figure 4 of both datasheets),
     every pin's net from the CM4 datasheet's own pinout."""
@@ -441,7 +508,8 @@ class BoardIntentTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.boards = {}
-        for name in ("eos-learn-rp2350", "eos-sense-cape", "eos-probe-s3", "eos-cm5-base", "eos-cm4-base"):
+        for name in ("eos-learn-rp2350", "eos-sense-cape", "eos-probe-s3", "eos-cm5-base", "eos-cm4-base", "eos-motion-wing",
+                     "eos-esp32-devkit"):
             path = REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb"
             assert path.is_file(), f"built board missing: {path}"
             cls.boards[name] = _parts(loads(path.read_text()))
@@ -494,6 +562,43 @@ class BoardIntentTest(unittest.TestCase):
                              if ref not in ("J1", "J3")), "the CM5 negotiates USB-C power itself: no CC resistors")
         self.assertEqual(b["U2"][1], {"1": "/USBH_VBUS", "2": "GND", "3": b["U2"][1]["3"], "4": "/VBUS_EN", "5": "+5V"})
 
+    def test_esp32_auto_program_strapping_and_usb(self):
+        b = self.boards["eos-esp32-devkit"]
+        u1 = b["U1"][1]                                                    # ESP32-WROOM-32E
+        self.assertEqual({u1[p] for p in ("1", "15", "38", "39")}, {"GND"})                 # stacked GND pin
+        self.assertEqual((u1["3"], u1["25"], u1["35"], u1["34"]), ("/EN", "/IO0", "/U0TXD", "/U0RXD"))
+        u4 = b["U4"][1]                                                    # CP2102N QFN-24: 20 RXD, 21 TXD, 19 RTS, 23 DTR
+        self.assertEqual((u4["20"], u4["21"]), ("/U0TXD", "/U0RXD"))     # UART crossed over
+        self.assertEqual((u4["19"], u4["23"]), ("/RTS", "/DTR"))
+        # esptool's auto-program pair: Q1 pulls EN low, Q2 pulls IO0 low, never both at once
+        self.assertEqual(b["Q1"][1], {"1": "/QB1", "2": "/RTS", "3": "/EN"})          # B, E, C
+        self.assertEqual(b["Q2"][1], {"1": "/QB2", "2": "/DTR", "3": "/IO0"})
+        self.assertEqual(set(b["R10"][1].values()), {"/DTR", "/QB1"})
+        self.assertEqual(set(b["R11"][1].values()), {"/RTS", "/QB2"})
+        self.assertEqual((b["R4"][0], set(b["R4"][1].values())), ("10k", {"/EN", "+3V3"}))   # EN RC delay
+        self.assertEqual((b["C5"][0], set(b["C5"][1].values())), ("1u", {"/EN", "GND"}))
+        self.assertEqual((b["R5"][0], set(b["R5"][1].values())), ("10k", {"/IO0", "+3V3"}))  # boots from flash
+        straps = {"/IO2", "/IO12", "/IO15", "/IO5"}                        # strapping pins left to their defaults
+        pulled = [r for r, (_, pads) in b.items() if r.startswith("R") and set(pads.values()) & straps]
+        self.assertEqual([r for r in pulled if not set(b[r][1].values()) & {"/LED_USR_A"}], [])
+        self.assertEqual(b["D1"][1], {"1": "+5V", "2": "/VBUS_F"})        # 5V pin cannot back-feed USB
+        self.assertEqual((b["R12"][0], set(b["R12"][1].values())), ("5.1k", {"VBUS", "GND"}))   # VBUS bleed
+
+    def test_motion_wing_straps_addresses_and_pullups(self):
+        b = self.boards["eos-motion-wing"]
+        u1 = b["U1"][1]                                                    # ADXL343 (LGA-14)
+        self.assertEqual((u1["1"], u1["6"], u1["7"]), ("+3V3", "+3V3", "+3V3"))       # VDD I/O, VS, CS high: I2C
+        self.assertEqual((u1["12"], u1["13"], u1["14"]), ("/ACC_SDO", "/I2C_SDA", "/I2C_SCL"))
+        self.assertEqual(b["JP3"][1], {"1": "GND", "2": "/ACC_SDO", "3": "+3V3"})       # ALT ADDRESS: 0x53 as delivered
+        u2 = b["U2"][1]                                                    # ADT7410 (SOIC-8)
+        self.assertEqual((u2["1"], u2["2"], u2["7"], u2["8"]), ("/I2C_SCL", "/I2C_SDA", "GND", "+3V3"))
+        for jp, net in (("JP2", "/TMP_A0"), ("JP4", "/TMP_A1")):          # 0x48 as delivered
+            self.assertEqual(b[jp][1], {"1": "GND", "2": net, "3": "+3V3"}, jp)
+        for r in ("R1", "R2"):                                             # removable I2C pull-ups
+            self.assertEqual(b[r][0], "10k")
+            self.assertIn("/I2C_PU", b[r][1].values())
+        self.assertEqual(set(b["JP1"][1].values()), {"+3V3", "/I2C_PU"})
+
     def test_cm4_usb_switch_power_and_controls(self):
         b = self.boards["eos-cm4-base"]
         u7 = b["U7"][1]                                                    # TS3USB30E (VSSOP pins)
@@ -501,8 +606,11 @@ class BoardIntentTest(unittest.TestCase):
         self.assertEqual((u7["4"], u7["6"]), ("/USB_P", "/USB_N"))                                   # common side: the CM4
         self.assertEqual((u7["2"], u7["8"]), ("/USBH_DP", "/USBH_DM"))   # D1: S low (host jumper fitted) -> USB-A
         self.assertEqual((u7["3"], u7["7"]), ("/USBC_DP", "/USBC_DM"))   # D2: S high (default device) -> USB-C
-        self.assertEqual(b["U2"][0], "TPS2041B")                            # enable active low: on in host mode
-        self.assertEqual(b["U2"][1]["4"], "/OTG_ID")
+        self.assertEqual(b["U2"][0], "TPS2051C")                            # enable active high
+        self.assertEqual(b["U2"][1]["4"], "/USBH_EN")
+        self.assertEqual(b["Q2"][1], {"1": "/OTG_ID", "2": "GND", "3": "/USBH_EN"})   # inverter: OTG_ID high holds it off
+        self.assertEqual((b["R11"][0], set(b["R11"][1].values())), ("10k", {"/USBH_EN", "+3V3"}))   # off when 3.3 V is down
+        self.assertEqual(set(b["C10"][1].values()), {"/USBH_VBUS", "GND"})  # TI's output ceramic
         self.assertEqual(b["J9"][1], {"1": "/NRPIBOOT", "2": "GND", "3": "/EEPROM_NWP", "4": "GND", "5": "/OTG_ID", "6": "GND"})
         for ref, cc in (("R6", "/CC1"), ("R7", "/CC2")):                   # USB-C sink: Rd on each CC
             self.assertEqual((b[ref][0], set(b[ref][1].values())), ("5.1k", {cc, "GND"}), ref)
@@ -650,6 +758,18 @@ class OwnershipTest(unittest.TestCase):
             self.assertEqual((erc, drc, unconnected, parity),
                              (report["erc_violations"], report["drc_errors"], len(drc_json["unconnected_items"]),
                               len(drc_json["schematic_parity"])), name)
+
+    def test_each_readme_states_the_checks_its_build_recorded(self):
+        for name in EOS_BOARDS:
+            with self.subTest(board=name):
+                readme = (EOS_DIR / name / "README.md").read_text()
+                report = json.loads((EOS_DIR / name / "build-report.json").read_text())
+                drc_json = json.loads((EOS_DIR / name / "drc.json").read_text())
+                row = {m.group(1): int(m.group(2)) for m in re.finditer(r"^\| ([^|]+?) \| (\d+)\b", readme, re.M)}
+                self.assertEqual((row["Schematic ERC"], row["DRC errors"], row["Unconnected items"],
+                                  row["Schematic ↔ board parity"], row["DRC warnings"]),
+                                 (report["erc_violations"], report["drc_errors"], len(drc_json["unconnected_items"]),
+                                  len(drc_json["schematic_parity"]), report["drc_warnings"]))
 
     def test_generic_symbols_copied_into_a_board_stay_mit(self):
         licence = (REPO_ROOT / "boards" / "eos" / "eos-cm5-base" / "LICENSE.txt").read_text()

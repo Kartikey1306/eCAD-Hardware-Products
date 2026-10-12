@@ -3676,37 +3676,36 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Power_Management:TPS2041B"
-			(pin_names
-				(offset 1.016)
-			)
+		(symbol "Power_Management:TPS2051CDBV"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
 			(property "Reference" "U"
-				(at 0 10.795 0)
+				(at -7.62 -6.35 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left)
 				)
 			)
-			(property "Value" "TPS2041B"
-				(at 0 8.89 0)
+			(property "Value" "TPS2051CDBV"
+				(at -7.62 6.35 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left)
 				)
 			)
 			(property "Footprint" "Package_TO_SOT_SMD:SOT-23-5"
-				(at 0 12.7 0)
+				(at 1.27 -7.62 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -3714,10 +3713,11 @@
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left)
 				)
 			)
-			(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tps2041.pdf"
-				(at -1.27 7.62 0)
+			(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tps2051c.pdf"
+				(at 1.27 -10.16 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -3725,9 +3725,10 @@
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left)
 				)
 			)
-			(property "Description" "Single power-distribution switcher"
+			(property "Description" "0.5A Current limited power switch, single channel, output discharge, reverse blocking, SOT-23-5"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -3738,7 +3739,7 @@
 					)
 				)
 			)
-			(property "ki_keywords" "1-chanel power-distribution USB"
+			(property "ki_keywords" "Limit USB Active High"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -3760,10 +3761,10 @@
 					)
 				)
 			)
-			(symbol "TPS2041B_0_1"
+			(symbol "TPS2051CDBV_0_1"
 				(rectangle
-					(start -7.62 7.62)
-					(end 7.62 -10.16)
+					(start -7.62 5.08)
+					(end 7.62 -5.08)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -3773,10 +3774,10 @@
 					)
 				)
 			)
-			(symbol "TPS2041B_1_1"
+			(symbol "TPS2051CDBV_1_1"
 				(pin power_out line
-					(at 12.7 0 180)
-					(length 5.08)
+					(at 10.16 2.54 180)
+					(length 2.54)
 					(name "OUT"
 						(effects
 							(font
@@ -3793,8 +3794,8 @@
 					)
 				)
 				(pin power_in line
-					(at 0 -15.24 90)
-					(length 5.08)
+					(at 0 -7.62 90)
+					(length 2.54)
 					(name "GND"
 						(effects
 							(font
@@ -3811,9 +3812,9 @@
 					)
 				)
 				(pin open_collector line
-					(at -12.7 5.08 0)
-					(length 5.08)
-					(name "~{OC}"
+					(at 10.16 -2.54 180)
+					(length 2.54)
+					(name "~{FLT}"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3829,9 +3830,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 -5.08 0)
-					(length 5.08)
-					(name "~{EN}"
+					(at -10.16 -2.54 0)
+					(length 2.54)
+					(name "EN"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3847,8 +3848,8 @@
 					)
 				)
 				(pin power_in line
-					(at 12.7 5.08 180)
-					(length 5.08)
+					(at -10.16 2.54 0)
+					(length 2.54)
 					(name "IN"
 						(effects
 							(font
@@ -3857,6 +3858,339 @@
 						)
 					)
 					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Transistor_FET:2N7002"
+			(property "ki_fp_filters" "SOT?23*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "Q"
+				(at 5.08 1.905 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "2N7002"
+				(at 5.08 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+				(at 5.08 -1.905 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(justify left)
+				)
+			)
+			(property "Datasheet" "https://www.onsemi.com/pub/Collateral/NDS7002A-D.PDF"
+				(at 5.08 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Description" "0.115A Id, 60V Vds, N-Channel MOSFET, SOT-23"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "N-Channel Switching MOSFET"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "2N7002_0_1"
+				(polyline
+					(pts
+						(xy 0.254 1.905)
+						(xy 0.254 -1.905)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.254 0)
+						(xy -2.54 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 2.286)
+						(xy 0.762 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 0.508)
+						(xy 0.762 -0.508)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 -1.27)
+						(xy 0.762 -2.286)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 -1.778)
+						(xy 3.302 -1.778)
+						(xy 3.302 1.778)
+						(xy 0.762 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 0)
+						(xy 2.032 0.381)
+						(xy 2.032 -0.381)
+						(xy 1.016 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 1.651 0)
+					(radius 2.794)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 2.54)
+						(xy 2.54 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.54 1.778)
+					(radius 0.254)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 2.54 -1.778)
+					(radius 0.254)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 -2.54)
+						(xy 2.54 0)
+						(xy 0.762 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.921 0.381)
+						(xy 3.683 0.381)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.302 0.381)
+						(xy 2.921 -0.254)
+						(xy 3.683 -0.254)
+						(xy 3.302 0.381)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "2N7002_1_1"
+				(pin input line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "G"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "S"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "D"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -14351,7 +14685,7 @@
 		(uuid "763050aa-6653-581a-82af-096526bbe5ff")
 	)
 	(symbol
-		(lib_id "Power_Management:TPS2041B")
+		(lib_id "Power_Management:TPS2051CDBV")
 		(at 299.72 100.33 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -14360,15 +14694,15 @@
 		(dnp no)
 		(uuid "d2d0c7c7-5acd-5775-b8c8-4c4c308520e3")
 		(property "Reference" "U2"
-			(at 299.72 88.9 0)
+			(at 292.1 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "TPS2041B"
-			(at 299.72 91.44 0)
+		(property "Value" "TPS2051C"
+			(at 292.1 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14376,7 +14710,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-5"
-			(at 299.72 87.63 0)
+			(at 300.99 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14384,8 +14718,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tps2041.pdf"
-			(at 298.45 92.71 0)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tps2051c.pdf"
+			(at 300.99 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14393,7 +14727,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Single power-distribution switcher"
+		(property "Description" "0.5A Current limited power switch, single channel, output discharge, reverse blocking, SOT-23-5"
 			(at 299.72 100.33 0)
 			(effects
 				(font
@@ -14411,7 +14745,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "TPS2041BDBVR"
+		(property "MPN" "TPS2051CDBVR"
 			(at 299.72 100.33 0)
 			(effects
 				(font
@@ -14420,7 +14754,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "USB power switch 0.5 A, enable active low: on in host mode"
+		(property "Description" "USB power switch 0.5 A, enable active high: on in host mode, with the CM4's 3.3 V up"
 			(at 299.72 100.33 0)
 			(effects
 				(font
@@ -14455,8 +14789,8 @@
 	)
 	(wire
 		(pts
-			(xy 312.42 95.25)
-			(xy 314.96 95.25)
+			(xy 289.56 97.79)
+			(xy 287.02 97.79)
 		)
 		(stroke
 			(width 0)
@@ -14465,20 +14799,20 @@
 		(uuid "f2a0c90b-1e79-5cd5-8abb-e95ee6c898fb")
 	)
 	(label "+5V"
-		(at 314.96 95.25 0)
+		(at 287.02 97.79 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left bottom)
+			(justify right bottom)
 		)
 		(uuid "9f6ad63d-1dd9-521e-8b8f-2e589c4dcf8d")
 	)
 	(wire
 		(pts
-			(xy 312.42 100.33)
-			(xy 314.96 100.33)
+			(xy 309.88 97.79)
+			(xy 312.42 97.79)
 		)
 		(stroke
 			(width 0)
@@ -14487,7 +14821,7 @@
 		(uuid "118e1795-2a63-55f6-b2d0-6f7765723d03")
 	)
 	(label "USBH_VBUS"
-		(at 314.96 100.33 0)
+		(at 312.42 97.79 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -14499,8 +14833,8 @@
 	)
 	(wire
 		(pts
-			(xy 299.72 115.57)
-			(xy 299.72 118.11)
+			(xy 299.72 107.95)
+			(xy 299.72 110.49)
 		)
 		(stroke
 			(width 0)
@@ -14509,7 +14843,7 @@
 		(uuid "61ab5e85-19da-548d-a812-fe89bd144acc")
 	)
 	(label "GND"
-		(at 299.72 118.11 270)
+		(at 299.72 110.49 270)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -14521,8 +14855,8 @@
 	)
 	(wire
 		(pts
-			(xy 287.02 105.41)
-			(xy 284.48 105.41)
+			(xy 289.56 102.87)
+			(xy 287.02 102.87)
 		)
 		(stroke
 			(width 0)
@@ -14530,8 +14864,8 @@
 		)
 		(uuid "fce0dd6c-9de5-5451-9ae6-e75efbf5baec")
 	)
-	(label "OTG_ID"
-		(at 284.48 105.41 180)
+	(label "USBH_EN"
+		(at 287.02 102.87 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -14542,8 +14876,291 @@
 		(uuid "170cecd9-1207-5ed5-a912-22ebcf98ef2f")
 	)
 	(no_connect
-		(at 287.02 95.25)
+		(at 309.88 102.87)
 		(uuid "ed8d1899-0e16-5885-8b37-ebfedf137241")
+	)
+	(symbol
+		(lib_id "Transistor_FET:2N7002")
+		(at 299.72 139.7 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d1a7e94f-05a2-5e67-8feb-6bf0b3b47630")
+		(property "Reference" "Q2"
+			(at 304.8 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "2N7002"
+			(at 304.8 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+			(at 304.8 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.onsemi.com/pub/Collateral/NDS7002A-D.PDF"
+			(at 304.8 143.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "0.115A Id, 60V Vds, N-Channel MOSFET, SOT-23"
+			(at 299.72 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer" "Nexperia"
+			(at 299.72 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "2N7002,215"
+			(at 299.72 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "N-MOSFET inverter: USB_OTG_ID high (device) holds the USB-A switch off"
+			(at 299.72 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2b5f68b1-5485-5ecb-b89d-317ff588c2d7")
+		)
+		(pin "2"
+			(uuid "3b2d07ac-f829-5295-8952-6d220f265317")
+		)
+		(pin "3"
+			(uuid "0db9d098-4563-55f7-9277-66fce73b7438")
+		)
+		(instances
+			(project "eos-cm4-base"
+				(path "/c4877941-ca00-5f4f-b20b-6593e66b9a8a"
+					(reference "Q2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 294.64 139.7)
+			(xy 292.1 139.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "db57c9a1-245a-536e-b675-45b660aef43d")
+	)
+	(label "OTG_ID"
+		(at 292.1 139.7 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "994d5d49-33e8-5d8a-9382-ae14bb84c3b9")
+	)
+	(wire
+		(pts
+			(xy 302.26 144.78)
+			(xy 302.26 147.32)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d976f79e-0403-5d8e-bf57-a68acdcd8460")
+	)
+	(label "GND"
+		(at 302.26 147.32 270)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e43ed605-d3fb-542c-9192-6bafe1c937df")
+	)
+	(wire
+		(pts
+			(xy 302.26 134.62)
+			(xy 302.26 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8cb0d891-4b5e-54fa-a2a4-df4fabe20a92")
+	)
+	(label "USBH_EN"
+		(at 302.26 132.08 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4c8ff724-27e7-5890-a547-f8ee25b36747")
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 284.48 139.7 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "de1b4bb8-3030-5629-9cf3-e876340ef279")
+		(property "Reference" "R11"
+			(at 284.48 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 285.75 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 284.48 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 284.48 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor, small symbol"
+			(at 284.48 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor 10 kohm 1% 0402 (USB-A switch enable pull-up, from the CM4's 3.3 V)"
+			(at 284.48 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1c43fe5b-a859-5f57-a2d0-1246c6bf2499")
+		)
+		(pin "2"
+			(uuid "1a6f6b23-c7f4-5644-83a0-e49775588489")
+		)
+		(instances
+			(project "eos-cm4-base"
+				(path "/c4877941-ca00-5f4f-b20b-6593e66b9a8a"
+					(reference "R11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 284.48 137.16)
+			(xy 284.48 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "61efe0bb-d58e-5b78-9732-211cdf552121")
+	)
+	(label "USBH_EN"
+		(at 284.48 134.62 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e93a4a5e-fd58-579c-96e5-a21085da862a")
+	)
+	(wire
+		(pts
+			(xy 284.48 142.24)
+			(xy 284.48 144.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "61ccb173-6042-53ca-b1ba-4347b887c5cf")
+	)
+	(label "+3V3"
+		(at 284.48 144.78 270)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e7915613-e614-5219-849d-02db16b5f561")
 	)
 	(symbol
 		(lib_id "Device:C_Small")
@@ -14597,7 +15214,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Capacitor 100 nF X7R 0402 (TPS2041B input, 0.01-0.1 uF per TI)"
+		(property "Description" "Capacitor 100 nF X7R 0402 (TPS2051C input, TI application circuit)"
 			(at 279.4 95.25 0)
 			(effects
 				(font
@@ -14717,7 +15334,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Capacitor 10 uF 10 V X5R 0805 (TPS2041B input bulk)"
+		(property "Description" "Capacitor 10 uF 10 V X5R 0805 (TPS2051C input bulk)"
 			(at 279.4 115.57 0)
 			(effects
 				(font
@@ -14784,6 +15401,126 @@
 			(justify right bottom)
 		)
 		(uuid "eee79ef6-60f5-5e41-b86b-0aec9cba7dc6")
+	)
+	(symbol
+		(lib_id "Device:C_Small")
+		(at 320.04 124.46 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4e16e6f1-f784-5311-879b-ef7c720f92f6")
+		(property "Reference" "C10"
+			(at 320.04 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100n"
+			(at 320.04 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 320.04 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 320.04 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 320.04 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Capacitor 100 nF X7R 0402 (TPS2051C output ceramic, TI application circuit)"
+			(at 320.04 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "11253a54-e094-5adf-8c33-775688d73676")
+		)
+		(pin "2"
+			(uuid "f5e43606-9c63-58b1-bbbc-7d98421d7f3c")
+		)
+		(instances
+			(project "eos-cm4-base"
+				(path "/c4877941-ca00-5f4f-b20b-6593e66b9a8a"
+					(reference "C10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 320.04 121.92)
+			(xy 320.04 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "64cd301b-7b4f-51fd-9059-1473af48d2f8")
+	)
+	(label "USBH_VBUS"
+		(at 320.04 119.38 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e9b3c72b-39ff-5231-b42d-adeb86a954bf")
+	)
+	(wire
+		(pts
+			(xy 320.04 127)
+			(xy 320.04 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "594d290e-58c3-592e-adab-c4a869343fdd")
+	)
+	(label "GND"
+		(at 320.04 129.54 270)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "329a5f61-840f-5a5c-b510-cecf37061f76")
 	)
 	(symbol
 		(lib_id "Device:C_Polarized_Small")
@@ -14948,7 +15685,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_USB:USB_A_Molex_67643_Horizontal"
+		(property "Footprint" "Connector_USB:USB_A_Molex_105057_Vertical"
 			(at 363.22 101.6 0)
 			(effects
 				(font
@@ -14984,7 +15721,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "67643-0910"
+		(property "MPN" "105057-0001"
 			(at 359.41 100.33 0)
 			(effects
 				(font
@@ -14993,7 +15730,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "USB-A receptacle, USB 2.0 host"
+		(property "Description" "USB-A receptacle, vertical, USB 2.0 host (on the top edge, by the module's USB pins)"
 			(at 359.41 100.33 0)
 			(effects
 				(font

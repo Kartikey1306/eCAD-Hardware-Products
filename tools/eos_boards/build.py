@@ -22,6 +22,7 @@ import argparse
 import importlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -71,8 +72,8 @@ def licence_text(board, module=""):
             raise SystemExit(f"{board.name}: an all-rights-reserved board needs a contact, its licence terms and its "
                              "design file, or no one can tell what is reserved or whom to ask")
         # the owner's own footprint libraries; a library with a .LICENSE.txt is third-party and listed below
-        libraries = "".join(f"- tools/eos_boards/footprints/{name}.pretty, the footprint library drawn\n"
-                            f"  for it (see {name}.NOTICE.txt);\n" for name in board.local_footprints
+        libraries = "".join(f"- tools/eos_boards/footprints/{name}.pretty, a footprint library drawn\n"
+                            f"  for these boards (see {name}.NOTICE.txt);\n" for name in board.local_footprints
                             if not (HERE / "footprints" / f"{name}.LICENSE.txt").exists())
         # The terms are the owner's, not the generator's: each closed board names its own file.
         text = (HERE / board.licence_terms).read_text(encoding="utf-8").format(
@@ -95,6 +96,26 @@ def licence_text(board, module=""):
     return text
 
 
+def clearance_clashes(drc):
+    """The clearance errors between two pieces of routed copper (track or via), from KiCad's DRC
+    report, as {net, pos}: the via if one is involved, else the shorter track. That is the item to
+    lift and route again. A clash with a pad or a zone is left for the build to fail on."""
+    out = []
+    for v in drc.get("violations", []):
+        items = v.get("items", [])
+        if v.get("type") != "clearance" or v.get("severity") != "error" or len(items) != 2:
+            continue
+        if not all(i["description"].startswith(("Via [", "Track [")) for i in items):
+            continue
+        def length(i):
+            m = re.search(r"length ([0-9.]+) mm", i["description"])
+            return float(m.group(1)) if m else 0.0       # a via has no length: lift it first
+        item = min(items, key=length)
+        out.append({"net": item["description"].split("[", 1)[1].split("]", 1)[0],
+                    "pos": [item["pos"]["x"], item["pos"]["y"]]})
+    return out
+
+
 def check_reference(board, lib, parts):
     """Refuse to build when a part placed from a reference design would have a pad on another net
     than the one the reference copper expects: that copper would short two of our nets."""
@@ -112,13 +133,41 @@ def check_reference(board, lib, parts):
             raise SystemExit(f"{name}: pads on other nets than the reference copper expects (ours, reference): {bad}")
 
 
+def kicad_net_text(text: str) -> str:
+    """Text as KiCad writes it inside a net name: a slash would read as a sheet path, so KiCad
+    spells it {slash}."""
+    return text.replace("/", "{slash}")
+
+
+def unconnected_net(ref: str, pin_name: str, pad: str) -> str:
+    """The net KiCad gives a no-connect pin's pad: unconnected-(U4-~{RI}{slash}CLK-Pad1). A pin with
+    no name ("" or KiCad's "~") leaves the name out: unconnected-(J2-Pad3)."""
+    name = "" if pin_name in ("", "~") else f"-{kicad_net_text(pin_name)}"
+    return f"unconnected-({ref}{name}-Pad{pad})"
+
+
+def pad_numbers(number: str) -> List[str]:
+    """The pads one symbol pin lands on. KiCad's stacked notation, "[1,15,38,39]" or "[1-4,7]", puts
+    several pads on one pin (a module's ground pins, say); any other number names a single pad."""
+    if not (number.startswith("[") and number.endswith("]")):
+        return [number]
+    out = []
+    for item in number[1:-1].split(","):
+        first, _, last = item.strip().partition("-")
+        if not first or (last and not (first.isdigit() and last.isdigit() and int(first) <= int(last))):
+            raise ValueError(f"stacked pin number {number!r}: cannot read {item.strip()!r}")
+        out += [str(n) for n in range(int(first), int(last) + 1)] if last else [first]
+    return out
+
+
 def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[str, Any]]) -> Dict[str, Any]:
     parts, nets = [], set()
     for part in board.parts:
         pads = {}
         for num, (pin, net) in resolve(part, lib).items():
-            # KiCad names a no-connect pin's net after the pin, and gives the pad that net.
-            pads[num] = board_net(board, net) if net != NC else f"unconnected-({part.ref}-{pin.name}-Pad{num})"
+            for pad in pad_numbers(num):
+                # KiCad names a no-connect pin's net after the pin, and gives the pad that net.
+                pads[pad] = board_net(board, net) if net != NC else unconnected_net(part.ref, pin.name, pad)
         nets.update(pads.values())
         symbol = lib.symbol(part.lib_id)
         fields = {str(p[1]): str(p[2]) for p in find_all(symbol, "property")
@@ -282,8 +331,16 @@ def main() -> int:
                 net = items[0]["description"].split("[", 1)[-1].split("]", 1)[0]
                 pairs.append({"net": net, "a": [items[0]["pos"]["x"], items[0]["pos"]["y"]],
                               "b": [items[1]["pos"]["x"], items[1]["pos"]["y"]]})
-        if not pairs or attempt == 5:
+        clashes = clearance_clashes(drc)
+        if not (pairs or clashes) or attempt == 5:
             break
+        if clashes:
+            # the autorouter can leave a via or track inside another net's clearance: lift that
+            # net's copper there, so this round's DRC lists it as open and the repair re-routes it
+            (work / "clashes.json").write_text(json.dumps(clashes, indent=1))
+            r = run([kicad_env.python(), HERE / "pcb_build.py", "ripup", spec, pcb, work / "clashes.json"])
+            print(r.stdout[-1500:])
+            continue
         (work / "open.json").write_text(json.dumps(pairs, indent=1))
         r = run([kicad_env.python(), HERE / "pcb_build.py", "repair", spec, pcb, work / "open.json"])
         print(r.stdout[-1500:])

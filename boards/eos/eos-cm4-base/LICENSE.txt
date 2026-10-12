@@ -14,8 +14,8 @@ eCAD-Hardware-Products repository:
   bill-of-materials, placement, STEP and PDF files, renders and
   documentation;
 - its design file, tools/eos_boards/boards/eos_cm4_base.py;
-- tools/eos_boards/footprints/EoS_Connectors.pretty, the footprint library drawn
-  for it (see EoS_Connectors.NOTICE.txt);
+- tools/eos_boards/footprints/EoS_Connectors.pretty, a footprint library drawn
+  for these boards (see EoS_Connectors.NOTICE.txt);
 - tools/eos_boards/boards/owner.py and
   tools/eos_boards/boards/licence_terms.txt.
 It does not include the material listed at the end, which keeps its own

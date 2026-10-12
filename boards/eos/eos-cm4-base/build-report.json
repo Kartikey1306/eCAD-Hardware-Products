@@ -2,17 +2,18 @@
  "board": "eos-cm4-base",
  "kicad": "10.0.6",
  "erc_violations": 0,
- "repair_rounds": 0,
+ "repair_rounds": 1,
  "drc": {
-  "violations": 6,
+  "violations": 4,
   "unconnected_items": 0,
   "schematic_parity": 0
  },
  "drc_errors": 0,
- "drc_warnings": 6,
+ "drc_warnings": 4,
  "outputs": [
   "LICENSE.txt",
   "README.md",
+  "build-report.json",
   "drc.json",
   "eos-cm4-base-schematic.pdf",
   "erc.json",

@@ -12,6 +12,8 @@ board's schematic, layout, routing, checks and fabrication outputs; see
 | [EoS Probe S3](eos-probe-s3) | ESP32-S3 SWD/JTAG + UART debug probe, 1.65–5.5 V targets | 2 | 0 | 0 | 0 | 0 |
 | [EoS CM5 Base](eos-cm5-base) | Raspberry Pi CM5 carrier: USB-C power, Gigabit Ethernet, USB 2.0 host, microSD, 40-pin GPIO; connectors checked pad for pad against the CM5 | 4 | 0 | 0 | 0 | 0 |
 | [EoS CM4 Base](eos-cm4-base) | Raspberry Pi CM4 carrier: USB-C power, one USB 2.0 port switched between USB-C (device) and USB-A (host), Gigabit Ethernet, microSD, 40-pin GPIO | 4 | 0 | 0 | 0 | 0 |
+| [EoS Motion Wing](eos-motion-wing) | FeatherWing: ADXL343 accelerometer and ADT7410 temperature sensor on I2C, address and interrupt jumpers | 2 | 0 | 0 | 0 | 0 |
+| [EoS ESP32 DevKit](eos-esp32-devkit) | ESP32-WROOM-32E board: USB-C, CP2102N USB-UART with auto-program, 3.3 V 1 A, DevKitC V4 header grid | 2 | 0 | 0 | 0 | 0 |
 
 Each board folder contains:
 

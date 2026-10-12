@@ -106,7 +106,8 @@ def text(board, s, x, y, size, layer=P.F_SilkS, angle=0.0, bold=False, mirror=Fa
     t.SetPosition(v(x, y))
     t.SetLayer(layer)
     t.SetTextSize(v(size, size))
-    t.SetTextThickness(MM(size * (0.2 if bold else 0.15)))
+    # 15 % of the height (20 % bold), never under 0.15 mm, the stroke most fabs print reliably
+    t.SetTextThickness(MM(max(0.15, size * (0.2 if bold else 0.15))))
     t.SetTextAngleDegrees(angle)
     board.Add(t)
 
@@ -116,6 +117,14 @@ def _box(center, half):
 
 
 HOLE_TO_HOLE = 0.25   # mm between drilled holes, of any net: KiCad's default and a common fab minimum
+ROUTER_MARGIN = 0.01   # mm of clearance the router sees beyond the board's rules (see place)
+
+
+def track_width(spec, net):
+    """The width the board's net classes give ``net`` (nm), as the autorouter uses: a pre-route or
+    a repair laid narrower would leave the net below its class, 0.2 mm USB at 0.15 mm, say."""
+    cls = spec.get("net_to_class", {}).get(net.GetNetname())
+    return MM(spec["netclasses"][cls]["track"] if cls else spec["rules"]["track"])
 
 
 def _inside(spec, pos, margin):
@@ -529,7 +538,7 @@ def place(spec, pcb_path, dsn_path):
             # the escape's far end: the end of its chain furthest from the pad it starts at
             ends = [q for t in laid for q in (t.GetStart(), t.GetEnd())]
             start = max(ends, key=lambda q: (q.x - start.x) ** 2 + (q.y - start.y) ** 2)
-        got = maze(board, spec, net, start, pad_b.GetPosition(), MM(spec["rules"]["track"]), join=join)
+        got = maze(board, spec, net, start, pad_b.GetPosition(), track_width(spec, net), join=join)
         if not got:
             raise SystemExit(f"priority route {ra}.{pa} -> {rb}.{pb}: no path")
         for item in laid + got:
@@ -546,6 +555,15 @@ def place(spec, pcb_path, dsn_path):
         P.ZONE_FILLER(board).Fill(board.Zones())
     P.SaveBoard(pcb_path, board)
     # From here on the changes reach the router's input only, never the saved board.
+    # Freerouting works on a grid and can leave a track a fraction of a micrometre inside the
+    # clearance (0.1491 mm against 0.15 mm, on EoS ESP32 DevKit). The router sees a little more
+    # clearance than the board's rules: enough for that rounding plus the 0.005 mm a side that
+    # finish() adds when it widens a 0.09 mm neck to 0.1 mm. DRC checks the board's own rules.
+    ns = board.GetDesignSettings().m_NetSettings
+    classes = ns.GetNetclasses()
+    for nc in [ns.GetDefaultNetclass(), *[classes[name] for name in classes]]:
+        nc.SetClearance(nc.GetClearance() + MM(ROUTER_MARGIN))
+    ns.RecomputeEffectiveNetclasses()
     # Keep-outs: the board's own (under a chip whose underside copper is fixed), and each
     # reference zone. Exported as they are, those zones would reach the router as solid planes
     # over their whole outline, overlapping each other and closing channels their copper leaves open.
@@ -1015,6 +1033,29 @@ def _rejoin(board, spec, lifted, width):
     return True, added
 
 
+def ripup(spec, pcb_path, clashes_path):
+    """Lift one net's routed copper around each clearance clash KiCad's DRC found (the autorouter
+    can leave a via 0.1 mm from another net's track), so the next repair round, which sees those
+    connections open, routes them again with full clearance. Locked (reference) copper stays."""
+    board = P.LoadBoard(pcb_path)
+    clashes = json.loads(Path(clashes_path).read_text())
+    lifted = 0
+    for c in clashes:
+        at = v(*c["pos"])
+        for t in list(board.GetTracks()):
+            if t.IsLocked() or t.GetNetname() != c["net"]:
+                continue
+            box = t.GetBoundingBox()
+            box.Inflate(MM(1.0))
+            if box.Contains(at):
+                board.Remove(t)
+                lifted += 1
+    if lifted:
+        P.ZONE_FILLER(board).Fill(board.Zones())
+    P.SaveBoard(pcb_path, board)
+    print(f"ripped up {lifted} item(s) at {len(clashes)} clearance clash(es)")
+
+
 def repair(spec, pcb_path, pairs_path):
     """Close the connections the autorouter left open, as listed by KiCad's own DRC.
 
@@ -1100,7 +1141,7 @@ def repair(spec, pcb_path, pairs_path):
                 if done:
                     break
         if not done:
-            done = maze(board, spec, net, a, b, MM(r["track"]))
+            done = maze(board, spec, net, a, b, track_width(spec, net))
             if done:
                 print(f"  repair: {pair['net']} joined by the maze router")
         for radius in (1.2, 2.0) if not done else ():
@@ -1110,7 +1151,7 @@ def repair(spec, pcb_path, pairs_path):
             lifted = _lift_near(board, spec, net, [a, b], MM(radius))
             if not lifted:
                 continue
-            got = maze(board, spec, net, a, b, MM(r["track"]))
+            got = maze(board, spec, net, a, b, track_width(spec, net))
             added = [item for item in got if item is not None]
             ok = bool(got)
             if ok:
@@ -1155,6 +1196,16 @@ def finish(spec, pcb_path, ses_path):
     board = P.LoadBoard(pcb_path)
     if not P.ImportSpecctraSES(board, ses_path):
         raise SystemExit("Specctra SES import failed")
+    # Freerouting necks a track down to enter a tight pad and can go below the board's minimum
+    # width (0.09 mm against 0.1 mm, on EoS ESP32 DevKit). Widen such necks to the minimum: the
+    # router kept ROUTER_MARGIN of extra clearance, which leaves room, and DRC checks the result.
+    floor = MM(spec["rules"]["min_track"])
+    necks = [t for t in board.GetTracks()
+             if t.GetClass() != "PCB_VIA" and not t.IsLocked() and t.GetWidth() < floor]   # reference copper stays exact
+    for t in necks:
+        t.SetWidth(floor)
+    if necks:
+        print(f"widened {len(necks)} track neck(s) to the {spec['rules']['min_track']} mm minimum")
     # Nets already complete before routing (joined by reference copper alone) are not the
     # router's: it sees zone-joined pads as open and would add a second, needless path.
     done = set(spec.get("complete_nets", []))
@@ -1192,4 +1243,4 @@ def finish(spec, pcb_path, ses_path):
 if __name__ == "__main__":
     mode, spec_path, pcb, other = sys.argv[1:5]
     spec = json.loads(Path(spec_path).read_text())
-    {"place": place, "finish": finish, "repair": repair}[mode](spec, pcb, other)
+    {"place": place, "finish": finish, "repair": repair, "ripup": ripup}[mode](spec, pcb, other)

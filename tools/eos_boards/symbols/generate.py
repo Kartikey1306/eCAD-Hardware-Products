@@ -7,6 +7,8 @@ passive.
 
 EoS_Parts.kicad_sym: a flow-through TPD4EUSB30 (see its docstring).
 
+EoS_Sensors.kicad_sym: the Analog Devices ADT7410 temperature sensor (SOIC-8), which KiCad doesn't ship.
+
 usage: python3 tools/eos_boards/symbols/generate.py
 """
 
@@ -82,8 +84,37 @@ def tpd4eusb30_flow_through() -> list:
             body]
 
 
+def adt7410() -> list:
+    """Analog Devices ADT7410, SOIC-8: pins as its data sheet (Rev. C, Table 4): 1 SCL, 2 SDA,
+    3 A0, 4 A1, 5 INT (open drain), 6 CT (open drain), 7 GND, 8 VDD."""
+    name = "ADT7410"
+    body = [Sym("symbol"), f"{name}_1_1",
+            [Sym("rectangle"), [Sym("start"), -7.62, 5.08], [Sym("end"), 7.62, -7.62],
+             [Sym("stroke"), [Sym("width"), 0.254], [Sym("type"), Sym("default")]], [Sym("fill"), [Sym("type"), Sym("background")]]]]
+    left = [("1", "SCL", "input", 2.54), ("2", "SDA", "bidirectional", 0.0),
+            ("3", "A0", "input", -2.54), ("4", "A1", "input", -5.08)]
+    right = [("5", "INT", "open_collector", 2.54), ("6", "CT", "open_collector", 0.0)]
+    for number, label, kind, y in left:
+        body.append([Sym("pin"), Sym(kind), Sym("line"), [Sym("at"), -10.16, y, 0], [Sym("length"), 2.54],
+                     [Sym("name"), label, _font()], [Sym("number"), number, _font()]])
+    for number, label, kind, y in right:
+        body.append([Sym("pin"), Sym(kind), Sym("line"), [Sym("at"), 10.16, y, 180], [Sym("length"), 2.54],
+                     [Sym("name"), label, _font()], [Sym("number"), number, _font()]])
+    body.append([Sym("pin"), Sym("power_in"), Sym("line"), [Sym("at"), 0, 7.62, 270], [Sym("length"), 2.54],
+                 [Sym("name"), "VDD", _font()], [Sym("number"), "8", _font()]])
+    body.append([Sym("pin"), Sym("power_in"), Sym("line"), [Sym("at"), 0, -10.16, 90], [Sym("length"), 2.54],
+                 [Sym("name"), "GND", _font()], [Sym("number"), "7", _font()]])
+    return [Sym("symbol"), name, [Sym("exclude_from_sim"), Sym("no")], [Sym("in_bom"), Sym("yes")], [Sym("on_board"), Sym("yes")],
+            _prop("Reference", "U", 0, 10.16), _prop("Value", name, 0, -12.7),
+            _prop("Footprint", "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm", 0, 0, True),
+            _prop("Datasheet", "https://www.analog.com/media/en/technical-documentation/data-sheets/ADT7410.pdf", 0, 0, True),
+            _prop("Description", "16-bit digital I2C temperature sensor, +-0.5 C, SOIC-8", 0, 0, True),
+            body]
+
+
 def main() -> int:
-    for file, symbols in (("EoS_Connectors", [double_row(50)]), ("EoS_Parts", [tpd4eusb30_flow_through()])):
+    for file, symbols in (("EoS_Connectors", [double_row(50)]), ("EoS_Parts", [tpd4eusb30_flow_through()]),
+                          ("EoS_Sensors", [adt7410()])):
         lib = [Sym("kicad_symbol_lib"), [Sym("version"), 20231120], [Sym("generator"), "eos_boards"], *symbols]
         out = HERE / f"{file}.kicad_sym"
         out.write_text(dumps(lib) + "\n")

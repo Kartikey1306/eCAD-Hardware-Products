@@ -18,17 +18,26 @@ paths that `kicad_env.py` and `build.py` use.
 ## What a build does
 
 1. **Schematic** (`schematic.py`). Every pin gets a wire stub and a net label; unused pins get
-   a no-connect flag. `kicad-cli sch erc` must report 0 violations or the build stops.
+   a no-connect flag. `kicad-cli sch erc` must report 0 violations or the build stops. A pin with
+   KiCad's stacked number, such as `[1,15,38,39]` for a module's ground pins, lands on each of
+   those pads.
 2. **Placement** (`pcb_build.py place`). Places footprints and links each one to its symbol.
    Adds the outline, design rules, net classes, inner planes and any reference copper (below).
    Then lays any `priority_routes` (a bus the design routes first, in a set order), and gives each
    plane-net pad a short stub and a via into its plane. Finally writes a Specctra DSN for the router.
-3. **Routing**. Freerouting, headless.
-4. **Finish** (`pcb_build.py finish`). Imports the routes, pours ground on the outer layers,
-   stitches the pours and joins any pour fragments.
-5. **DRC and repair**. Runs `kicad-cli pcb drc --schematic-parity`. Any connection still open
-   goes to `pcb_build.py repair`, which tries, in order (new copper avoids the board outline,
-   the router keep-outs and every other net's copper, and keeps 0.25 mm between drilled holes):
+3. **Routing**. Freerouting, headless. The router is given 0.01 mm more clearance than the board's
+   rules, so its grid rounding never reaches DRC.
+4. **Finish** (`pcb_build.py finish`). Imports the routes, widens any track the router necked
+   below the board's minimum width, pours ground on the outer layers, stitches the pours and
+   joins any pour fragments.
+5. **DRC and repair**. Runs `kicad-cli pcb drc --schematic-parity`.
+   - **Clearance clashes:** if two pieces of routed copper are too close (the autorouter can
+     leave a via inside another net's clearance), `pcb_build.py ripup` lifts one net's copper
+     there, and the next round sees it as open.
+   - **Open connections:** any connection still open goes to `pcb_build.py repair`, which tries
+     the options below in order. Pre-routes and repairs are laid at the net's class width. New
+     copper avoids the board outline, the router keep-outs and every other net's copper, and
+     keeps 0.25 mm between drilled holes:
    - a straight or dog-leg track;
    - a via into the net's plane;
    - a maze search on both outer layers;
@@ -95,7 +104,8 @@ Most boards need only parts, nets and positions. These options cover the rest:
 Local libraries:
 
 - `footprints/` holds footprints KiCad does not ship.
-- `symbols/` holds symbols KiCad does not ship (`symbols/generate.py` writes them): a 2×50
+- `symbols/` holds symbols KiCad does not ship (`symbols/generate.py` writes them): the ADT7410
+  temperature sensor (`EoS_Sensors`), a 2×50
   connector for the CM5, and a flow-through TPD4EUSB30.
 
 A board that uses either gets its own copy beside its KiCad project, with a project library

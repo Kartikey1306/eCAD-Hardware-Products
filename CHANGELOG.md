@@ -15,6 +15,24 @@ has never run.
 
 ### Added
 
+- EoS Motion Wing: a FeatherWing with an ADXL343 accelerometer and an ADT7410 temperature sensor
+  on I2C. It has removable pull-ups and jumpers for the addresses and interrupts. The outline and
+  headers come from Adafruit's published Feather specification. The ADT7410 symbol is new:
+  `EoS_Sensors`, written by `symbols/generate.py`.
+- EoS ESP32 DevKit: an ESP32-WROOM-32E board. It has a USB-C port, a CP2102N USB-UART with the
+  esptool auto-program circuit, and a 1 A 3.3 V regulator. The headers follow Espressif's
+  published DevKitC V4 grid, and the module antenna overhangs the edge.
+- `tools/eos_boards` build fixes, all found while building these boards:
+  - stacked pin numbers (`[1,15,38,39]`) reach every pad;
+  - no-connect net names match KiCad's (`{slash}`, unnamed pins);
+  - pre-routes and repairs use the net class's width;
+  - the router gets a 0.01 mm clearance margin, and necks below the minimum width are widened
+    (locked copper excepted);
+  - a clearance clash between two routed items is ripped up and rerouted;
+  - silkscreen strokes are at least 0.15 mm.
+- Tests: a `spec_for` integration test, a check of the carriers against the datasheets' Figure 4,
+  intent tests for the new boards, and a check that each board README's results table matches
+  its build report.
 - EoS CM4 Base, a carrier for the Raspberry Pi Compute Module 4. It is EoS CM5 Base's layout,
   changed where the CM4 differs:
   - USB-C with 5.1 kohm CC pull-downs, also routed to AnalogIP0/1;

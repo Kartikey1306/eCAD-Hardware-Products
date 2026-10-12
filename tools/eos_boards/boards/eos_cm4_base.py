@@ -12,18 +12,34 @@ the CM4 datasheet's pinout (section 4, reference/cm4_pins.json).
 
 The board is EoS CM5 Base's layout with the CM4's differences:
 
-* Power in on USB-C. VBUS feeds the module's six +5V pins (4.75-5.25 V). The CM4 does not
+* Power in on USB-C, 5 V. VBUS feeds the module's six +5V pins (4.75-5.25 V). The CM4 does not
   negotiate USB-C power, so CC1 and CC2 each have 5.1 kohm to ground (a USB-C sink) and also go
   to AnalogIP1 and AnalogIP0 (pins 94, 96), which the datasheet says are "typically connected to
   CC pin of Type C power connector".
+  - Use a 5 V / 3 A supply. The CM4 draws about 1.4 A when running (section 5.3), plus the
+    USB-A port (0.5 A), the 3.3 V loads and the fan.
+  - A computer's USB port may not power the board.
+  - The header's 5 V pins share this rail with no diode, so a HAT must not feed 5 V while the
+    board is unpowered.
 * One USB 2.0 port, two connectors. The CM4 has a single USB 2.0 port (USB_P/USB_N, pins 105,
-  103). USB_OTG_ID (pin 101) is pulled up inside the CM4, which makes it a USB device; grounded,
-  it becomes a host (datasheet, pin 101). A jumper grounds it. A TI TS3USB30E switch, selected by
-  the same line, routes the port to the USB-C connector in device mode (rpiboot flashing, gadget
-  mode) and to the USB-A connector in host mode (truth table: S low, D = D1; S high, D = D2;
-  OE low enables). The USB-A port's 5 V comes through a TPS2041B, whose enable is active low,
-  so it turns on only in host mode; 0.1 uF at its input and 150 uF at its output, as TI's
-  application circuit gives (USB asks 120 uF per port).
+  103). A jumper (J9 5-6) chooses where it goes. A TI TS3USB30E switch routes it to the USB-C
+  connector with the jumper open (device: rpiboot flashing, gadget mode) and to the USB-A
+  connector with it fitted (host). The truth table: S low, D = D1; S high, D = D2; OE low
+  enables. The same line is USB_OTG_ID (pin 101: "Internally pulled up. When grounded the CM4
+  becomes a USB host but the correct OS driver also needs to be used").
+  - The OS sets the role. Section 2.4: USB is off until otg_mode=1 enables it, and the ID pin
+    is only read in OTG mode.
+  - So set the jumper to match the OS: fitted for host, open for device. rpiboot always needs
+    it open.
+* The USB-A port sits on the top edge, next to the module's USB pins, so the host path is short:
+  TI asks for equal-length lines no longer than 4 in (TS3USB30E section 8.4.1). The lengths
+  are not matched; the generator does not match lengths.
+* The USB-A port's 5 V comes through a TPS2051C (0.5 A, enable active high). A 2N7002 drives the
+  enable: low while USB_OTG_ID is high, high (through 10 kohm to the CM4's 3.3 V) when the jumper
+  grounds it. So the port is powered only in host mode and only while the CM4's 3.3 V rail is up.
+  An enable tied straight to USB_OTG_ID would turn an active-low switch on whenever that rail is
+  down. TI's application circuit: 0.1 uF and 10 uF at the input; 0.1 uF ceramic and 150 uF at the
+  output (USB asks 120 uF per port).
 * Gigabit Ethernet, microSD (CM4 Lite) and the 40-pin header exactly as on EoS CM5 Base: the
   CM4 uses the same pins for them.
 * RUN_PG (pin 92) can be "driven low (via a 220 ohm resistor) to reset the CM4 CPU": a reset
@@ -135,18 +151,25 @@ PARTS = [
     res("R10", "10k", "OTG_ID", "+3V3", (205, 155), "Resistor 10 kohm 1% 0402 (USB_OTG_ID high: device mode by default)"),
 
     # ---- USB-A host -----------------------------------------------------------------------------------
-    Part("U2", "Power_Management:TPS2041B", "TPS2041B", "Package_TO_SOT_SMD:SOT-23-5", (300, 100),
-         {"IN": "+5V", "OUT": "USBH_VBUS", "GND": "GND", "~{EN}": "OTG_ID", "~{OC}": NC},
-         fields={"Manufacturer": "Texas Instruments", "MPN": "TPS2041BDBVR",
-                 "Description": "USB power switch 0.5 A, enable active low: on in host mode"}),
-    cap("C4", "100n", "+5V", "GND", (280, 95), "Capacitor 100 nF X7R 0402 (TPS2041B input, 0.01-0.1 uF per TI)"),
-    cap("C5", "10u", "+5V", "GND", (280, 115), "Capacitor 10 uF 10 V X5R 0805 (TPS2041B input bulk)", C0805),
+    Part("U2", "Power_Management:TPS2051CDBV", "TPS2051C", "Package_TO_SOT_SMD:SOT-23-5", (300, 100),
+         {"IN": "+5V", "OUT": "USBH_VBUS", "GND": "GND", "EN": "USBH_EN", "~{FLT}": NC},
+         fields={"Manufacturer": "Texas Instruments", "MPN": "TPS2051CDBVR",
+                 "Description": "USB power switch 0.5 A, enable active high: on in host mode, with the CM4's 3.3 V up"}),
+    Part("Q2", "Transistor_FET:2N7002", "2N7002", "Package_TO_SOT_SMD:SOT-23", (300, 140),
+         {"G": "OTG_ID", "S": "GND", "D": "USBH_EN"},
+         fields={"Manufacturer": "Nexperia", "MPN": "2N7002,215",
+                 "Description": "N-MOSFET inverter: USB_OTG_ID high (device) holds the USB-A switch off"}),
+    res("R11", "10k", "USBH_EN", "+3V3", (285, 140), "Resistor 10 kohm 1% 0402 (USB-A switch enable pull-up, from the CM4's 3.3 V)"),
+    cap("C4", "100n", "+5V", "GND", (280, 95), "Capacitor 100 nF X7R 0402 (TPS2051C input, TI application circuit)"),
+    cap("C5", "10u", "+5V", "GND", (280, 115), "Capacitor 10 uF 10 V X5R 0805 (TPS2051C input bulk)", C0805),
+    cap("C10", "100n", "USBH_VBUS", "GND", (320, 125), "Capacitor 100 nF X7R 0402 (TPS2051C output ceramic, TI application circuit)"),
     Part("C6", "Device:C_Polarized_Small", "150u", "Capacitor_SMD:CP_Elec_6.3x5.8", (325, 105), {"1": "USBH_VBUS", "2": "GND"},
          fields={"Manufacturer": "Panasonic", "MPN": "EEE-FK1A151P",
                  "Description": "Capacitor 150 uF 10 V aluminium, 6.3 x 5.8 mm (USB host port: 120 uF per TI)"}),
-    Part("J4", "Connector:USB_A", "USB-A", "Connector_USB:USB_A_Molex_67643_Horizontal", (360, 100),
+    Part("J4", "Connector:USB_A", "USB-A", "Connector_USB:USB_A_Molex_105057_Vertical", (360, 100),
          {"VBUS": "USBH_VBUS", "D-": "USBH_DM", "D+": "USBH_DP", "GND": "GND", "Shield": "GND"},
-         fields={"Manufacturer": "Molex", "MPN": "67643-0910", "Description": "USB-A receptacle, USB 2.0 host"}),
+         fields={"Manufacturer": "Molex", "MPN": "105057-0001",
+                 "Description": "USB-A receptacle, vertical, USB 2.0 host (on the top edge, by the module's USB pins)"}),
     Part("U3", "Power_Protection:USBLC6-2SC6", "USBLC6-2SC6", "Package_TO_SOT_SMD:SOT-23-6", (340, 130),
          {"I/O1": "USBH_DP", "I/O2": "USBH_DM", "GND": "GND", "VBUS": "USBH_VBUS"},
          fields={"Manufacturer": "STMicroelectronics", "MPN": "USBLC6-2SC6", "Description": "USB ESD protection (host port)"}),
@@ -239,16 +262,21 @@ HOLES = [from_cm5(h[0] / 1e6, h[1] / 1e6) for h in GEOMETRY["holes"]]
 PLACEMENT = {
     "J1": (*from_cm5(-0.5, -21.5), 0), "J2": (*from_cm5(33.5, -21.5), 0),
     **{f"H{i + 1}": (x, y, 0) for i, (x, y) in enumerate(HOLES)},
-    # top edge: USB-C, its CC resistors and ESD, and the USB switch beside it; 5 V bulk below the module
-    "J3": (24.0, 3.8, 180), "R6": (30.6, 1.6, 0), "R7": (30.6, 3.2, 0), "U1": (33.5, 6.0, 0),
-    "U7": (14.0, 4.6, 0), "C9": (14.0, 7.6, 0), "R10": (9.6, 4.6, 90),
+    # top edge, between the board edge and the module: USB-C near the left corner, its CC resistors
+    # and ESD beside it, clear of the USB pair that leaves the module's USB pins (CM4 pins 103/105,
+    # J2's left end) for the USB switch next to them; the
+    # USB-A port's ESD and the vertical USB-A port to its right, so the host path stays short
+    "J3": (12.0, 3.8, 180), "R6": (20.5, 1.4, 0), "R7": (20.5, 3.0, 0), "U1": (20.5, 6.6, 0),
+    "U7": (32.6, 4.6, 0), "C9": (34.2, 7.8, 0), "R10": (31.0, 7.8, 0),
+    "U3": (37.9, 4.5, 90), "J4": (45.0, 6.8, 0),
     "C1": (40.0, 51.6, 0), "C2": (43.6, 51.6, 0), "C3": (46.6, 51.6, 0),
-    # right edge: USB-A host port and its switch; LEDs, reset button, jumpers, fan
-    "J4": (77.0, 30.0, 90), "U3": (71.0, 26.5, 90), "U2": (68.0, 16.5, 0), "C4": (64.5, 14.0, 90), "C5": (64.5, 19.0, 90),
-    "C6": (68.0, 36.5, 0),
+    # right of the module, at least 10 mm from the antenna: the USB-A power switch, its inverter
+    # and capacitors; LEDs, reset button, jumpers, fan
+    "U2": (68.0, 8.0, 0), "C4": (64.6, 6.0, 90), "C5": (64.6, 10.4, 90), "C10": (71.4, 8.0, 90),
+    "Q2": (68.0, 12.6, 0), "R11": (71.4, 12.6, 90), "C6": (78.4, 15.6, 0),
     "R4": (65.0, 43.5, 0), "D1": (68.6, 43.5, 180), "R5": (65.0, 45.5, 0), "D2": (68.6, 45.5, 180),
     "Q1": (72.6, 43.6, 0), "R9": (72.6, 46.4, 0),
-    "SW1": (84.0, 42.5, 90), "R8": (80.4, 42.5, 90), "J9": (64.6, 3.6, 270), "J8": (78.0, 4.0, 0),
+    "SW1": (84.0, 42.5, 90), "R8": (80.4, 42.5, 90), "J9": (84.5, 22.0, 0), "J8": (78.0, 4.0, 0),
     # right edge, lower: microSD and its supply switch
     "J6": (82.0, 62.0, 90), "U6": (72.0, 56.0, 0), "R3": (72.0, 52.6, 0), "C8": (72.0, 59.4, 0),
     # bottom left: the MagJack by the Ethernet pins, its ESD, centre-tap capacitor, LED resistors
@@ -271,8 +299,15 @@ PRIORITY = [r for cm, jack in _ETH for esd, inner, outer in [_FLOW[jack]]
             for r in ((("J1", cm), (esd, inner)), ((esd, inner), (esd, outer)), ((esd, outer), ("J5", jack)))]
 # The USB pair from the module to the switch. Both leave the connector's inner row next to its
 # pin-101 end and wrap round that end, so the line nearer the end goes first, as with Ethernet.
+# Then the host pair from the switch through its ESD part (in on one pad, out on the other of the
+# same line) to the USB-A port.
 PRIORITY += [(("J2", "3"), ("U7", "6")),       # USB_N (CM4 pin 103) to D-
-             (("J2", "5"), ("U7", "4"))]       # USB_P (CM4 pin 105) to D+
+             (("J2", "5"), ("U7", "4")),       # USB_P (CM4 pin 105) to D+
+             (("U7", "8"), ("U3", "3")), (("U3", "4"), ("J4", "2")),     # USBH_DM: D1- through I/O2
+             (("U7", "2"), ("U3", "1")), (("U3", "6"), ("J4", "3")),     # USBH_DP: D1+ through I/O1
+             # ~OE (pin 9, tied low) sits between signal pads with no room for a ground via: join it
+             # under the package to the switch's own GND pin 5
+             (("U7", "9"), ("U7", "5"), "join")]
 # Three microSD lines run first, shortest first, so they nest inside one another on the top layer:
 # DAT1, DAT0 and CLK leave the connector's outer row in the order they reach the socket. CMD (from
 # the inner row), DAT3 and DAT2 must cross them; the autorouter, which plans crossings for the
