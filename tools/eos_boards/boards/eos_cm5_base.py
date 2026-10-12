@@ -37,6 +37,12 @@ What is on it, and why:
   unless jumpered, as the datasheet allows). Power LED (LED_nPWR, pin 95) and activity LED
   (LED_nACT, pin 21) each through 1 kohm from 3.3 V, as on CM5IO.
 
+* No copper on any layer under the module's PCB antenna. The CM5 datasheet (section 4.1.2) says
+  "Don't place any metal, including ground planes, directly beneath the antenna" and asks for a
+  ground-plane cut-out of at least 6.5 x 11 mm, ideally 8 x 15 mm. Its Figure 4 puts the
+  6.5 x 11 mm cut-out at the module's pin-99 edge, 18.5 mm up from the pin-200 edge. The board
+  keeps the larger 8 x 15 mm clear, on every layer, around that spot.
+
 Not on this board: HDMI, PCIe, USB 3.0 SuperSpeed, and the camera and display (MIPI)
 interfaces. Each needs controlled-impedance, length-matched differential pairs, which this
 generator does not route or verify.
@@ -206,6 +212,21 @@ def from_cm5(fx, fy):
 
 
 CM5_HOLES = [from_cm5(h[0] / 1e6, h[1] / 1e6) for h in CM5["holes"]]
+
+
+def from_module(x, y):
+    """A point in the CM5 datasheet's Figure 4 (top view, mm from the module's top-left corner,
+    pins 99/100 at the top left) on this board: MH1 sits 3.5 mm in from that corner."""
+    return from_cm5(y - 3.5, 3.5 - x)
+
+
+# Antenna cut-out (datasheet section 4.1.2 and Figure 4): 6.5 mm in from the pin-99 edge, 11 mm
+# tall, its lower side 18.5 mm up from the 40 mm module's bottom edge, so 10.5-21.5 mm down from
+# the top. The board keeps the datasheet's ideal 8 x 15 mm clear around it: 1.5 mm past the
+# module edge and 2 mm above and below.
+ANTENNA_CUTOUT = (0.0, 10.5, 6.5, 21.5)          # Figure 4, module frame: x0, y0, x1, y1
+_a, _b = from_module(-1.5, 8.5), from_module(6.5, 23.5)
+ANTENNA_KEEPOUT = (min(_a[0], _b[0]), min(_a[1], _b[1]), max(_a[0], _b[0]), max(_a[1], _b[1]))
 PLACEMENT = {
     "J1": (*from_cm5(-0.5, -21.5), 0), "J2": (*from_cm5(33.5, -21.5), 0),
     **{f"H{i + 1}": (x, y, 0) for i, (x, y) in enumerate(CM5_HOLES)},
@@ -246,10 +267,15 @@ _FLOW = {"9": ("U5", "7", "4"), "10": ("U5", "6", "5"), "8": ("U5", "9", "2"), "
 PRIORITY = [r for cm5, jack in _ETH for esd, inner, outer in [_FLOW[jack]]
             for r in ((("J1", cm5), (esd, inner)), ((esd, inner), (esd, outer)), ((esd, outer), ("J5", jack)))]
 # The USB host pair passes through its ESD part (in on one pad, out on the other of the same
-# line), nearer the connector's right end first, and SD_CLK, the microSD's fastest line, runs direct.
+# line), nearer the connector's right end first.
 PRIORITY += [(("J2", "36"), ("U3", "3")), (("U3", "4"), ("J4", "2")),     # USBH_DM (CM5 pin 136)
-             (("J2", "34"), ("U3", "1")), (("U3", "6"), ("J4", "3")),     # USBH_DP (CM5 pin 134)
-             (("J1", "57"), ("J6", "5"))]                                 # SD_CLK
+             (("J2", "34"), ("U3", "1")), (("U3", "6"), ("J4", "3"))]     # USBH_DP (CM5 pin 134)
+# Three microSD lines run first, shortest first, so they nest inside one another on the top layer:
+# DAT1, DAT0 and CLK leave the connector's outer row in the order they reach the socket. CMD (from
+# the inner row), DAT3 and DAT2 must cross them; the autorouter, which plans crossings for the
+# whole board at once, takes those. Routed one by one, the crossing lines box each other in.
+SD_BUS = [(("J1", "67"), ("J6", "8")), (("J1", "63"), ("J6", "7")), (("J1", "57"), ("J6", "5"))]
+PRIORITY += SD_BUS
 TEXTS = [
     {"text": "EoS CM5 Base  rev A", "x": 45.0, "y": 66.0, "size": 1.2, "bold": True},
     {"text": "EoS CM5 Base  rev A", "x": 62.0, "y": 60.0, "size": 1.0, "layer": "B_SilkS", "bold": True, "mirror": True},
@@ -278,6 +304,7 @@ BOARD = Board(
     layers=4,
     planes=[("GND", "In1.Cu"), ("+5V", "In2.Cu")],
     local_footprints=["EoS_Connectors"],
+    copper_keepouts=[ANTENNA_KEEPOUT],
     priority_routes=PRIORITY,
     escape_footprints=["J1", "J2"],
     # Under the module there is room to wrap round the connector ends on the top layer, where

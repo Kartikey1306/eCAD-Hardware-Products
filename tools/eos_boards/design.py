@@ -68,6 +68,7 @@ class Board:
     reference_copper: Dict[str, object] = field(default_factory=dict)   # {file, origin}: copper from a reference design
     local_footprints: List[str] = field(default_factory=list)          # footprint libraries shipped in tools/eos_boards/footprints
     router_keepouts: List[Tuple[float, float, float, float]] = field(default_factory=list)  # x0, y0, x1, y1: top-layer areas the autorouter may not enter
+    copper_keepouts: List[Tuple[float, float, float, float]] = field(default_factory=list)  # x0, y0, x1, y1: no copper on any layer (an antenna cut-out)
     credits: List[str] = field(default_factory=list)                   # notices third-party licences require (one line each)
     contact: str = ""                                                   # whom to ask for permission; an all-rights-reserved board needs it
     licence_terms: str = ""                                             # an all-rights-reserved board's terms file, relative to tools/eos_boards

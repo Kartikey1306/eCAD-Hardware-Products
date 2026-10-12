@@ -120,11 +120,15 @@ HOLE_TO_HOLE = 0.25   # mm between drilled holes, of any net: KiCad's default an
 
 def _inside(spec, pos, margin):
     """True when ``pos`` (nm) lies inside the board's rounded-rectangle outline by at least
-    ``margin`` (nm), corners included: a rectangle test alone lets copper into a cut-away corner."""
+    ``margin`` (nm), corners included, and at least ``margin`` from every copper keep-out (an
+    antenna cut-out): a rectangle test alone lets copper into a cut-away corner."""
     w, h, r = MM(spec["width"]), MM(spec["height"]), MM(spec["corner_radius"])
     x, y = pos.x, pos.y
     if not (margin <= x <= w - margin and margin <= y <= h - margin):
         return False
+    for x_0, y_0, x_1, y_1 in spec.get("copper_keepouts", []):
+        if MM(x_0) - margin < x < MM(x_1) + margin and MM(y_0) - margin < y < MM(y_1) + margin:
+            return False
     cx = r if x < r else w - r if x > w - r else None
     cy = r if y < r else h - r if y > h - r else None
     if cx is None or cy is None:
@@ -285,6 +289,25 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
 
 
 REFERENCE_ZONE = "eos-reference"
+
+
+def copper_keepout(board, points):
+    """A rule area on every copper layer that no track, via, pad or pour may enter: an antenna
+    cut-out. It stays on the saved board, so zone fills, DRC and the router's DSN all honour it."""
+    area = P.ZONE(board)
+    area.SetIsRuleArea(True)
+    area.SetLayerSet(P.LSET.AllCuMask(board.GetCopperLayerCount()))
+    area.SetZoneName("eos-copper-keepout")
+    area.SetDoNotAllowTracks(True)
+    area.SetDoNotAllowVias(True)
+    area.SetDoNotAllowPads(True)
+    area.SetDoNotAllowZoneFills(True)
+    area.SetDoNotAllowFootprints(False)
+    o = area.Outline()
+    o.NewOutline()
+    for x, y in points:
+        o.Append(x, y)
+    board.Add(area)
 
 
 def _keepout(board, layer, points):
@@ -517,6 +540,8 @@ def place(spec, pcb_path, dsn_path):
     if spec.get("planes"):
         placed, left = fanout(board, spec, exclude=early)
         print(f"plane fan-out: {placed} vias, {left} pads left to the router")
+    for x0, y0, x1, y1 in spec.get("copper_keepouts", []):
+        copper_keepout(board, [(MM(x0), MM(y0)), (MM(x1), MM(y0)), (MM(x1), MM(y1)), (MM(x0), MM(y1))])
     if board.Zones():
         P.ZONE_FILLER(board).Fill(board.Zones())
     P.SaveBoard(pcb_path, board)

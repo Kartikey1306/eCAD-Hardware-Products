@@ -452,6 +452,70 @@ class BoardIntentTest(unittest.TestCase):
         self.assertEqual(b["U2"][1], {"1": "/USBH_VBUS", "2": "GND", "3": b["U2"][1]["3"], "4": "/VBUS_EN", "5": "+5V"})
 
 
+
+def _segment_meets_box(a, b, box):
+    """True when segment a-b touches the axis-aligned box (x0, y0, x1, y1): Liang-Barsky clipping."""
+    (x0, y0, x1, y1), (ax, ay), (bx, by) = box, a, b
+    t0, t1, dx, dy = 0.0, 1.0, bx - ax, by - ay
+    for p, q in ((-dx, ax - x0), (dx, x1 - ax), (-dy, ay - y0), (dy, y1 - ay)):
+        if p == 0:
+            if q < 0:
+                return False
+            continue
+        t = q / p
+        if p < 0:
+            t0 = max(t0, t)
+        else:
+            t1 = min(t1, t)
+        if t0 > t1:
+            return False
+    return True
+
+
+def _point_in_polygon(x, y, pts):
+    inside = False
+    for (xa, ya), (xb, yb) in zip(pts, pts[1:] + pts[:1]):
+        if (ya > y) != (yb > y) and x < xa + (y - ya) * (xb - xa) / (yb - ya):
+            inside = not inside
+    return inside
+
+
+class AntennaKeepoutTest(unittest.TestCase):
+    """The CM5 datasheet (section 4.1.2) forbids metal, ground planes included, under the module's
+    PCB antenna. The carrier keeps a rule area there on every copper layer, and nothing is in it."""
+
+    def test_no_copper_under_the_cm5_antenna(self):
+        module = importlib.import_module("eos_boards.boards.eos_cm5_base")
+        pcb = loads((REPO_ROOT / "boards" / "eos" / "eos-cm5-base" / "hardware" / "eos-cm5-base.kicad_pcb").read_text())
+        x0, y0, x1, y1 = module.ANTENNA_KEEPOUT
+        corners = [module.from_module(x, y) for x, y in ((0.0, 10.5), (6.5, 21.5))]      # Figure 4's cut-out
+        self.assertTrue(all(x0 <= x <= x1 and y0 <= y <= y1 for x, y in corners), (module.ANTENNA_KEEPOUT, corners))
+        self.assertGreaterEqual((x1 - x0, y1 - y0), (8.0, 15.0))                          # the datasheet's ideal size
+        areas = [z for z in find_all(pcb, "zone") if find(z, "name") and str(find(z, "name")[1]) == "eos-copper-keepout"]
+        self.assertEqual(len(areas), 1)
+        rules = {str(item[0]): str(item[1]) for item in find(areas[0], "keepout")[1:]}
+        self.assertEqual(rules, {"tracks": "not_allowed", "vias": "not_allowed", "pads": "not_allowed",
+                                 "copperpour": "not_allowed", "footprints": "allowed"})
+        layers = [str(x) for x in find(areas[0], "layers")[1:]]
+        self.assertTrue(layers == ["*.Cu"] or set(layers) == {"F.Cu", "In1.Cu", "In2.Cu", "B.Cu"}, layers)
+        outline = [(float(p[1]), float(p[2])) for p in find_all(find(find(areas[0], "polygon"), "pts"), "xy")]
+        self.assertEqual((min(x for x, _ in outline), min(y for _, y in outline), max(x for x, _ in outline),
+                          max(y for _, y in outline)), (x0, y0, x1, y1))
+        for seg in find_all(pcb, "segment"):
+            a, b = find(seg, "start"), find(seg, "end")
+            self.assertFalse(_segment_meets_box((float(a[1]), float(a[2])), (float(b[1]), float(b[2])), (x0, y0, x1, y1)),
+                             f"track in the antenna keep-out: {a} {b}")
+        for via in find_all(pcb, "via"):
+            at, r = find(via, "at"), float(find(via, "size")[1]) / 2
+            self.assertFalse(x0 - r < float(at[1]) < x1 + r and y0 - r < float(at[2]) < y1 + r, f"via in the keep-out: {at}")
+        probes = [(x0 + (x1 - x0) * i / 8, y0 + (y1 - y0) * j / 8) for i in range(1, 8) for j in range(1, 8)]
+        for z in find_all(pcb, "zone"):
+            for fill in find_all(z, "filled_polygon"):
+                pts = [(float(p[1]), float(p[2])) for p in find_all(find(fill, "pts"), "xy")]
+                hits = [q for q in probes if _point_in_polygon(*q, pts)]
+                self.assertFalse(hits, f"{str(find(fill, 'layer')[1])} pour under the antenna at {hits[:3]}")
+
+
 EOS_BOARDS = {"eos-learn-rp2350": "eos_learn_rp2350", "eos-sense-cape": "eos_sense_cape",
               "eos-probe-s3": "eos_probe_s3", "eos-cm5-base": "eos_cm5_base"}
 
@@ -469,7 +533,8 @@ class OwnershipTest(unittest.TestCase):
                 folder = REPO_ROOT / "boards" / "eos" / name
                 licence = (folder / "LICENSE.txt").read_text()
                 self.assertEqual(licence, build.licence_text(board, module))     # what the build writes
-                self.assertEqual("tools/eos_boards/footprints/EoS_Connectors.pretty" in licence, name == "eos-cm5-base")
+                self.assertEqual("tools/eos_boards/footprints/EoS_Connectors.pretty" in licence,
+                                 "EoS_Connectors" in board.local_footprints)        # the owner's own library, where used
                 self.assertIn("To ask,\n   write to kartikeydheer@gmail.com.", licence)
                 self.assertIn(f"tools/eos_boards/boards/{module}.py", licence)
                 sch = (folder / "hardware" / f"{name}.kicad_sch").read_text()

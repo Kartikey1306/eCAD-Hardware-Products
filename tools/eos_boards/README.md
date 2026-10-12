@@ -88,6 +88,8 @@ Most boards need only parts, nets and positions. These options cover the rest:
 - `escape_footprints`: fine-pitch connectors whose pads keep a clear way out. The channel
   between the pad rows is closed, and each pad keeps a 1 mm corridor for its own net.
 - `maze_via_cost_mm`: how much track the maze router will lay to avoid one via.
+- `copper_keepouts`: rectangles with no copper on any layer, no track, via, pad or pour, kept
+  on the saved board as a rule area. This is for a module's antenna cut-out.
 - `router_keepouts`, `reference_copper`, `local_footprints`, `rules`, `credits`.
 
 Local libraries:

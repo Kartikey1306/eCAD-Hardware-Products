@@ -151,6 +151,7 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
                                  if board.reference_copper else None),
             "local_footprints": {lib: str(HERE / "footprints" / f"{lib}.pretty") for lib in board.local_footprints},
             "router_keepouts": [list(k) for k in board.router_keepouts],
+            "copper_keepouts": [list(k) for k in board.copper_keepouts],
             "priority_routes": [[list(r[0]), list(r[1]), *r[2:]] for r in board.priority_routes],
             "escape_footprints": board.escape_footprints,
             "maze_via_cost_mm": board.maze_via_cost_mm,

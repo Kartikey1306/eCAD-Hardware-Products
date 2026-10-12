@@ -40,6 +40,7 @@ circuit follows Raspberry Pi's own CM5 IO Board.
 | microSD (CM5 Lite) | Direct to SD_CLK, SD_CMD and SD_DAT0-3. The card's 3.3 V comes through an RT9742GGJ5 switch enabled by SD_PWR_ON (10 kΩ pull-up), with 10 µF after it, as on CM5IO. |
 | 40-pin GPIO | The standard Raspberry Pi header. GPIO_VREF is tied to CM5_3.3V for 3.3 V GPIO, as the datasheet requires. |
 | Also | Fan connector (5 V, PWM, GND, tacho), RTC coin cell on VBAT, power button, jumpers for nRPIBOOT and EEPROM write protect, power and activity LEDs (1 kΩ from 3.3 V, as on CM5IO). |
+| Antenna | No copper on any layer under the module's PCB antenna. The CM5 datasheet (section 4.1.2) says "Don't place any metal, including ground planes, directly beneath the antenna" and asks for a ground-plane cut-out of at least 6.5 × 11 mm, ideally 8 × 15 mm. The board keeps the larger 8 × 15 mm clear on every layer, where the datasheet's Figure 4 puts the antenna (the module's pin-99 edge, 18.5 mm up from the pin-200 edge). A test checks that no track, via or pour enters it. |
 
 ## Not on this board
 
@@ -68,7 +69,8 @@ The numbers below are from `build-report.json` and `drc.json` in this folder.
   connector.
 - **Tracks:** 0.15 mm, narrowing at fine-pitch pins; 0.5 mm on 5 V.
 - **Coin-cell holder:** on the bottom side, under the module. Everything else is on top.
-- **Under the module:** nothing on the top side, because 1.5 mm stacking leaves no room.
+- **Under the module:** nothing on the top side, because 1.5 mm stacking leaves no room. There is
+  no copper at all under the antenna.
 
 The connector's ground pads drop their vias into the channel between its two pad rows, as on
 CM5IO, so the signals keep the outward side. The Ethernet pairs, the USB host pair, SD_CLK and
