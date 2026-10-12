@@ -36,6 +36,12 @@ class Part:
 
 ALL_RIGHTS_RESERVED = "All rights reserved"   # a closed board: its owner's terms file, see Board.licence_terms
 
+# HRO TYPE-C-31-M-12 (KiCad's USB_C_Receptacle_HRO_TYPE-C-31-M-12), placed facing a board edge: HRO's
+# "RECOMMEND P.C.B LAYOUT" puts the PCB edge 5.79 mm from the locating pegs, which sit 2.60 mm behind
+# the footprint's origin. So the origin goes 3.19 mm from the edge, and the shell stands about
+# 0.46 mm proud of it: a plug's overmold then meets the shell, not the board, and seats fully.
+USB_C_EDGE = 3.19
+
 
 @dataclass
 class Board:

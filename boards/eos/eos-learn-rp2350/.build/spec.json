@@ -1,0 +1,1746 @@
+{
+ "name": "eos-learn-rp2350",
+ "width": 52.6,
+ "height": 51.6,
+ "thickness": 1.6,
+ "corner_radius": 1.0,
+ "layers": 4,
+ "rules": {
+  "track": 0.15,
+  "clearance": 0.15,
+  "via": 0.6,
+  "drill": 0.3,
+  "min_track": 0.09,
+  "min_clearance": 0.1,
+  "min_via": 0.5,
+  "min_drill": 0.25,
+  "edge_clearance": 0.3,
+  "hole_clearance": 0.25
+ },
+ "netclasses": {
+  "Power": {
+   "track": 0.5,
+   "clearance": 0.15
+  },
+  "PowerFine": {
+   "track": 0.2,
+   "clearance": 0.15
+  },
+  "USB": {
+   "track": 0.2,
+   "clearance": 0.15
+  }
+ },
+ "net_to_class": {
+  "VBUS": "Power",
+  "/VBUS_F": "Power",
+  "+5V": "Power",
+  "+3V3": "PowerFine",
+  "+1V1": "PowerFine",
+  "/VREG_LX": "PowerFine",
+  "/USB_D+": "USB",
+  "/USB_D-": "USB",
+  "/RP_USB_DP": "USB",
+  "/RP_USB_DM": "USB"
+ },
+ "parts": [
+  {
+   "ref": "J1",
+   "value": "USB-C",
+   "footprint": "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12",
+   "x": 26.3,
+   "y": 3.19,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "A4": "VBUS",
+    "A9": "VBUS",
+    "B4": "VBUS",
+    "B9": "VBUS",
+    "A1": "GND",
+    "A12": "GND",
+    "B1": "GND",
+    "B12": "GND",
+    "A5": "/CC1",
+    "B5": "/CC2",
+    "A6": "/USB_D+",
+    "B6": "/USB_D+",
+    "A7": "/USB_D-",
+    "B7": "/USB_D-",
+    "A8": "unconnected-(J1-SBU1-PadA8)",
+    "B8": "unconnected-(J1-SBU2-PadB8)",
+    "SH": "GND"
+   },
+   "uuid": "c911809d-8bb3-5061-8659-1a434084bbc6",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.usb.org/sites/default/files/documents/usb_type-c.zip",
+    "Description": "USB-C 2.0 receptacle, 16 pins, mid-mount",
+    "Manufacturer": "Korean Hroparts",
+    "MPN": "TYPE-C-31-M-12"
+   },
+   "model": null
+  },
+  {
+   "ref": "R1",
+   "value": "5.1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 21.4,
+   "y": 10.6,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/CC1",
+    "2": "GND"
+   },
+   "uuid": "de61e5b8-daef-5e13-a98a-983c7304d001",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 5.1k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "R2",
+   "value": "5.1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 31.2,
+   "y": 10.6,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/CC2",
+    "2": "GND"
+   },
+   "uuid": "f8c80e2c-c69d-522b-aada-fe31f54ac3a5",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 5.1k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "U2",
+   "value": "USBLC6-2SC6",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 26.3,
+   "y": 11.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/USB_D+",
+    "6": "/USB_D+",
+    "3": "/USB_D-",
+    "4": "/USB_D-",
+    "2": "GND",
+    "5": "VBUS"
+   },
+   "uuid": "48ef5a64-0eb1-5c6a-9e08-ec8ed8547bfa",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.st.com/resource/en/datasheet/usblc6-2.pdf",
+    "Description": "USB ESD protection",
+    "Manufacturer": "STMicroelectronics",
+    "MPN": "USBLC6-2SC6"
+   },
+   "model": null
+  },
+  {
+   "ref": "F1",
+   "value": "500mA",
+   "footprint": "Fuse:Fuse_1206_3216Metric",
+   "x": 34.0,
+   "y": 7.8,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "VBUS",
+    "2": "/VBUS_F"
+   },
+   "uuid": "b8b9e70c-7d6a-5fb3-9a45-cdad56f09122",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "PTC resettable fuse 500 mA hold, 1206",
+    "Manufacturer": "Littelfuse",
+    "MPN": "1206L050YR"
+   },
+   "model": null
+  },
+  {
+   "ref": "D1",
+   "value": "MBR120VLSFT1G",
+   "footprint": "Diode_SMD:D_SOD-123F",
+   "x": 31.6,
+   "y": 14.2,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "2": "/VBUS_F",
+    "1": "+5V"
+   },
+   "uuid": "4895fe3f-83c2-5d60-982c-4c515026af7a",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Schottky 20 V 1 A, SOD-123FL: 5 V fed into the header cannot reach the USB host",
+    "Manufacturer": "onsemi",
+    "MPN": "MBR120VLSFT1G"
+   },
+   "model": null
+  },
+  {
+   "ref": "U3",
+   "value": "AP7361C-33",
+   "footprint": "Package_TO_SOT_SMD:SOT-223-3_TabPin2",
+   "x": 37.6,
+   "y": 14.8,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "3": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "9705bbce-7970-50d2-ac45-8274ceed6f23",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.diodes.com/assets/Datasheets/AP7361C.pdf",
+    "Description": "LDO 3.3 V 1 A, SOT-223, stable with ceramic capacitors of 2.2 uF or more",
+    "Manufacturer": "Diodes Incorporated",
+    "MPN": "AP7361C-33E-13"
+   },
+   "model": null
+  },
+  {
+   "ref": "C1",
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 39.0,
+   "y": 9.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "uuid": "166ead09-293a-53c5-80a1-85bbbeabd65e",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 10 uF 10 V X5R 0805 (LDO input)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C2",
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 37.6,
+   "y": 19.9,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "35139311-9ab5-5ecb-a0e1-897109fc37eb",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 10 uF 10 V X5R 0805 (LDO output)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R5",
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 42.6,
+   "y": 22.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "/LED_PWR_A"
+   },
+   "uuid": "2174aa6c-7156-53e7-9fc1-2eec5be5a8ed",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 1k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "D2",
+   "value": "PWR",
+   "footprint": "LED_SMD:LED_0603_1608Metric",
+   "x": 45.2,
+   "y": 22.0,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "2": "/LED_PWR_A",
+    "1": "GND"
+   },
+   "uuid": "9b2c9e2e-64a9-5a2e-bcfd-e15dab3c1021",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "LED red 0603",
+    "Sim.Pins": "1=K 2=A",
+    "Manufacturer": "Kingbright",
+    "MPN": "APTD1608LSURCK"
+   },
+   "model": null
+  },
+  {
+   "ref": "U1",
+   "value": "RP2350A",
+   "footprint": "EoS_RPi_Reference:rpi_rp2350a_vias",
+   "x": 26.3,
+   "y": 30.3,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "11": "+3V3",
+    "20": "+3V3",
+    "30": "+3V3",
+    "38": "+3V3",
+    "45": "+3V3",
+    "6": "+1V1",
+    "39": "+1V1",
+    "23": "+1V1",
+    "49": "+3V3",
+    "48": "/VREG_LX",
+    "47": "GND",
+    "46": "/VREG_AVDD",
+    "50": "+1V1",
+    "53": "+3V3",
+    "44": "+3V3",
+    "54": "+3V3",
+    "61": "GND",
+    "21": "/XIN",
+    "22": "/XOUT",
+    "24": "/SWCLK",
+    "25": "/SWDIO",
+    "26": "/RUN",
+    "51": "/RP_USB_DM",
+    "52": "/RP_USB_DP",
+    "57": "/QSPI_SD0",
+    "59": "/QSPI_SD1",
+    "58": "/QSPI_SD2",
+    "55": "/QSPI_SD3",
+    "56": "/QSPI_SCLK",
+    "60": "/QSPI_SS",
+    "2": "/GPIO0",
+    "3": "/GPIO1",
+    "4": "/GPIO2",
+    "5": "/GPIO3",
+    "7": "/GPIO4",
+    "8": "/GPIO5",
+    "9": "/GPIO6",
+    "10": "/GPIO7",
+    "12": "/GPIO8",
+    "13": "/GPIO9",
+    "14": "/GPIO10",
+    "15": "/GPIO11",
+    "16": "/GPIO12",
+    "17": "/GPIO13",
+    "18": "/GPIO14",
+    "19": "/GPIO15",
+    "27": "/GPIO16",
+    "28": "/GPIO17",
+    "29": "/GPIO18",
+    "31": "/GPIO19",
+    "32": "/GPIO20",
+    "33": "/GPIO21",
+    "34": "/GPIO22",
+    "35": "/GPIO23",
+    "36": "/GPIO24",
+    "37": "/GPIO25",
+    "40": "/GPIO26_ADC0",
+    "41": "/GPIO27_ADC1",
+    "42": "/GPIO28_ADC2",
+    "43": "/GPIO29_ADC3"
+   },
+   "uuid": "ec36dd56-1610-53bd-9c9f-da4c0ccfb439",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf",
+    "Description": "Dual Cortex-M33 / Hazard3 microcontroller, QFN-60",
+    "Manufacturer": "Raspberry Pi",
+    "MPN": "RP2350A0A2"
+   },
+   "model": null
+  },
+  {
+   "ref": "L1",
+   "value": "3.3u",
+   "footprint": "EoS_RPi_Reference:abracon_aota-b201610s3r3-101-t",
+   "x": 28.3,
+   "y": 23.1,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "+1V1",
+    "2": "/VREG_LX"
+   },
+   "uuid": "b444f92d-9938-5d62-ab90-da81d249b3b9",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Inductor 3.3 uH 2016, polarity-marked; fitted as Raspberry Pi's reference footprint orients it",
+    "Manufacturer": "Abracon",
+    "MPN": "AOTA-B201610S3R3-101-T"
+   },
+   "model": null
+  },
+  {
+   "ref": "C6",
+   "value": "4.7u",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50_wide",
+   "x": 28.3,
+   "y": 25.69,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "3031d77f-17e8-5ace-b693-721824e409b9",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 4.7 uF X5R 0402 (VREG_VIN)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C7",
+   "value": "4.7u",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50_wide",
+   "x": 28.3,
+   "y": 24.75,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "+1V1",
+    "2": "GND"
+   },
+   "uuid": "ef4961e0-b7ed-50b8-a8d5-a440db65d5ff",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 4.7 uF X5R 0402 (VREG output)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R6",
+   "value": "33",
+   "footprint": "EoS_RPi_Reference:generic_resc1005x35",
+   "x": 30.5,
+   "y": 23.4,
+   "rot": 270.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "/VREG_AVDD"
+   },
+   "uuid": "e55457cf-8af1-54c9-8988-f849bda302ac",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 33 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "C9",
+   "value": "4.7u",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 30.5,
+   "y": 25.25,
+   "rot": 270.0,
+   "side": "F",
+   "pads": {
+    "1": "/VREG_AVDD",
+    "2": "GND"
+   },
+   "uuid": "ba04be2d-7102-5914-a98b-42ce189143f4",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 4.7 uF X5R 0402 (VREG_AVDD filter)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C10",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 19.815,
+   "y": 26.9,
+   "rot": 180.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "ad8e941e-367f-5624-9941-03d758a9d8fe",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C11",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 19.815,
+   "y": 31.7,
+   "rot": 180.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "48aef456-dcfe-5e84-bd3a-2e5fbc74075f",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C12",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 24.5,
+   "y": 36.38,
+   "rot": 270.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "a9b7bee3-bb3a-50f2-90a0-e56627f6a398",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C13",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 31.985,
+   "y": 34.3,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "d2e28949-7cab-586a-ac69-9171a791ac40",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C14",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 33.385,
+   "y": 30.7,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "e2565064-ce70-5cca-9ee8-adef9a07d57f",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C15",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 32.785,
+   "y": 27.3,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "3a830e30-58a1-5bc9-8494-1f740c331d51",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C16",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 24.2,
+   "y": 22.9,
+   "rot": 90.0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "5b6bea86-8e30-571a-9439-ae6342b19930",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C17",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 32.78,
+   "y": 26.3,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "7ea66b50-915c-5244-9c27-2ff86c3fc4a9",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C18",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 19.82,
+   "y": 29.3,
+   "rot": 180.0,
+   "side": "F",
+   "pads": {
+    "1": "+1V1",
+    "2": "GND"
+   },
+   "uuid": "ecf6cb29-8829-5e2c-b442-163bc9af8791",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C19",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 27.1,
+   "y": 37.18,
+   "rot": 270.0,
+   "side": "F",
+   "pads": {
+    "1": "+1V1",
+    "2": "GND"
+   },
+   "uuid": "9a3cbc05-e5cd-5135-8c98-2e518751e3da",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C20",
+   "value": "100n",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 33.38,
+   "y": 29.7,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "+1V1",
+    "2": "GND"
+   },
+   "uuid": "04e51375-2f1a-5175-bc13-7197dd6d5e5b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (decoupling)"
+   },
+   "model": null
+  },
+  {
+   "ref": "U4",
+   "value": "W25Q128JVS",
+   "footprint": "EoS_RPi_Reference:generic_soic127p790x195-8",
+   "x": 19.35,
+   "y": 17.575,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "/QSPI_SS",
+    "2": "/QSPI_SD1",
+    "3": "/QSPI_SD2",
+    "4": "GND",
+    "5": "/QSPI_SD0",
+    "6": "/QSPI_SCLK",
+    "7": "/QSPI_SD3",
+    "8": "+3V3"
+   },
+   "uuid": "7e4bd8ef-0e83-5e7e-bed5-da96bb551bba",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.winbond.com/resource-files/w25q128jv_dtr%20revc%2003272018%20plus.pdf",
+    "Description": "128 Mbit QSPI NOR flash, SOIC-8 208 mil",
+    "Manufacturer": "Winbond",
+    "MPN": "W25Q128JVSIQ"
+   },
+   "model": null
+  },
+  {
+   "ref": "C21",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 22.49,
+   "y": 13.13,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "a5250e84-1d8a-5f1c-842f-507782feb683",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (flash)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R7",
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 19.3,
+   "y": 12.5,
+   "rot": 270,
+   "side": "F",
+   "pads": {
+    "1": "/QSPI_SS",
+    "2": "+3V3"
+   },
+   "uuid": "622cfbe1-05f5-5ad6-8537-e62bd411d96c",
+   "dnp": true,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 10k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "R8",
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 15.2,
+   "y": 11.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/QSPI_SS",
+    "2": "/BOOTSEL"
+   },
+   "uuid": "1065f5a5-3e84-5ae0-8640-48a95ff8d20d",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 1k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "SW1",
+   "value": "BOOTSEL",
+   "footprint": "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KMR2",
+   "x": 18.0,
+   "y": 7.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/BOOTSEL",
+    "2": "GND"
+   },
+   "uuid": "c2751645-21ec-54d3-8936-7fd795380bc8",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Tactile switch, BOOTSEL",
+    "Manufacturer": "C&K",
+    "MPN": "KMR221G LFS"
+   },
+   "model": null
+  },
+  {
+   "ref": "Y1",
+   "value": "12MHz",
+   "footprint": "EoS_RPi_Reference:generic_xtalcc320x250x80-4",
+   "x": 26.3,
+   "y": 42.7,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "/XIN",
+    "3": "/XTAL_OUT",
+    "2": "GND",
+    "4": "GND"
+   },
+   "uuid": "f2542fd9-fb10-57d9-b6ff-3b409c385c7c",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Crystal 12 MHz 10 pF 30 ppm, 3225",
+    "Manufacturer": "Abracon",
+    "MPN": "ABM8-272-T3"
+   },
+   "model": null
+  },
+  {
+   "ref": "C3",
+   "value": "15p",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 24.9,
+   "y": 39.3,
+   "rot": 180.0,
+   "side": "F",
+   "pads": {
+    "1": "/XIN",
+    "2": "GND"
+   },
+   "uuid": "ab7c93a2-bf1b-5ec4-9468-99bf1a760ae0",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 15 pF C0G 0402 (crystal load)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C4",
+   "value": "15p",
+   "footprint": "EoS_RPi_Reference:generic_capc1005x50",
+   "x": 27.88,
+   "y": 39.3,
+   "rot": 0.0,
+   "side": "F",
+   "pads": {
+    "1": "/XTAL_OUT",
+    "2": "GND"
+   },
+   "uuid": "55e820c9-e1e2-5603-88dd-b2d5f5e6adf2",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 15 pF C0G 0402 (crystal load)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R10",
+   "value": "1k",
+   "footprint": "EoS_RPi_Reference:generic_resc1005x35",
+   "x": 25.9,
+   "y": 37.2,
+   "rot": 270.0,
+   "side": "F",
+   "pads": {
+    "1": "/XOUT",
+    "2": "/XTAL_OUT"
+   },
+   "uuid": "9f6a4e0f-9837-5df6-afee-b2f5033ad979",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 1k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "SW2",
+   "value": "RUN",
+   "footprint": "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KMR2",
+   "x": 38.1,
+   "y": 37.8,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "1": "/RUN",
+    "2": "GND"
+   },
+   "uuid": "9c3f6f50-0481-54d3-8703-c34070f63795",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Tactile switch, RUN (reset)",
+    "Manufacturer": "C&K",
+    "MPN": "KMR221G LFS"
+   },
+   "model": null
+  },
+  {
+   "ref": "R9",
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 41.7,
+   "y": 39.4,
+   "rot": 270,
+   "side": "F",
+   "pads": {
+    "1": "/RUN",
+    "2": "+3V3"
+   },
+   "uuid": "cd2d5f96-c5ce-5645-a610-831733db105d",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 10k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "R3",
+   "value": "27",
+   "footprint": "EoS_RPi_Reference:generic_resc1005x35",
+   "x": 25.2,
+   "y": 22.9,
+   "rot": 270.0,
+   "side": "F",
+   "pads": {
+    "1": "/USB_D+",
+    "2": "/RP_USB_DP"
+   },
+   "uuid": "60f7cd2a-d646-5d0f-8421-d9fc33748ca8",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 27 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "R4",
+   "value": "27",
+   "footprint": "EoS_RPi_Reference:generic_resc1005x35",
+   "x": 26.2,
+   "y": 22.9,
+   "rot": 270.0,
+   "side": "F",
+   "pads": {
+    "1": "/USB_D-",
+    "2": "/RP_USB_DM"
+   },
+   "uuid": "50449bee-4b2f-57a1-a805-afaf4473d6a8",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 27 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "R11",
+   "value": "470",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 42.6,
+   "y": 24.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/GPIO25",
+    "2": "/LED_USR_A"
+   },
+   "uuid": "de2419aa-00fb-598f-8a91-89a8778f807f",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 470 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "D3",
+   "value": "GP25",
+   "footprint": "LED_SMD:LED_0603_1608Metric",
+   "x": 45.2,
+   "y": 24.6,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "2": "/LED_USR_A",
+    "1": "GND"
+   },
+   "uuid": "fc778d79-756e-5b0e-803a-bc9d9fcf244c",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "LED green 570 nm 0603, about 1.9 V at 2 mA",
+    "Sim.Pins": "1=K 2=A",
+    "Manufacturer": "Kingbright",
+    "MPN": "APTD1608LCGCK"
+   },
+   "model": null
+  },
+  {
+   "ref": "J4",
+   "value": "SWD",
+   "footprint": "Connector_JST:JST_SH_SM03B-SRSS-TB_1x03-1MP_P1.00mm_Horizontal",
+   "x": 33.9,
+   "y": 45.7,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/SWCLK",
+    "2": "GND",
+    "3": "/SWDIO"
+   },
+   "uuid": "46451360-e4f9-5c37-9781-2d4745638d77",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "SWD: Raspberry Pi Debug Probe pinout",
+    "Manufacturer": "JST",
+    "MPN": "SM03B-SRSS-TB"
+   },
+   "model": null
+  },
+  {
+   "ref": "J5",
+   "value": "Qwiic",
+   "footprint": "Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
+   "x": 13.0,
+   "y": 40.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "GND",
+    "2": "+3V3",
+    "3": "/GPIO4",
+    "4": "/GPIO5"
+   },
+   "uuid": "c87b3f27-ddab-5388-8f5c-a540a22e18b4",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Qwiic / STEMMA QT I2C0: SDA GPIO4, SCL GPIO5",
+    "Manufacturer": "JST",
+    "MPN": "SM04B-SRSS-TB"
+   },
+   "model": null
+  },
+  {
+   "ref": "R12",
+   "value": "4.7k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 18.0,
+   "y": 39.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/GPIO4",
+    "2": "+3V3"
+   },
+   "uuid": "23745a8c-f55c-5c0a-bd0a-52963a5bb64b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 4.7k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "R13",
+   "value": "4.7k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 19.2,
+   "y": 39.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/GPIO5",
+    "2": "+3V3"
+   },
+   "uuid": "19f6eed6-1b73-584b-a6b1-6aea7124a9d8",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 4.7k 1% 0402"
+   },
+   "model": null
+  },
+  {
+   "ref": "J2",
+   "value": "GPIO 0-15",
+   "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x20_P2.54mm_Vertical",
+   "x": 3.44,
+   "y": 1.7,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "/GPIO0",
+    "3": "/GPIO1",
+    "4": "GND",
+    "5": "/GPIO2",
+    "6": "/GPIO3",
+    "7": "/GPIO4",
+    "8": "/GPIO5",
+    "9": "GND",
+    "10": "/GPIO6",
+    "11": "/GPIO7",
+    "12": "/GPIO8",
+    "13": "/GPIO9",
+    "14": "GND",
+    "15": "/GPIO10",
+    "16": "/GPIO11",
+    "17": "/GPIO12",
+    "18": "/GPIO13",
+    "19": "/GPIO14",
+    "20": "/GPIO15"
+   },
+   "uuid": "76f85b94-a5e7-5439-8bee-bd4156be271a",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Pin header 1x20 2.54 mm"
+   },
+   "model": null
+  },
+  {
+   "ref": "J3",
+   "value": "Power, GPIO 16-29",
+   "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x20_P2.54mm_Vertical",
+   "x": 49.160000000000004,
+   "y": 1.7,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "GND",
+    "3": "/GPIO29_ADC3",
+    "4": "/GPIO28_ADC2",
+    "5": "/GPIO27_ADC1",
+    "6": "/GPIO26_ADC0",
+    "7": "GND",
+    "8": "/GPIO25",
+    "9": "/GPIO24",
+    "10": "/GPIO23",
+    "11": "/GPIO22",
+    "12": "/GPIO21",
+    "13": "/GPIO20",
+    "14": "/GPIO19",
+    "15": "/GPIO18",
+    "16": "/GPIO17",
+    "17": "/GPIO16",
+    "18": "GND",
+    "19": "/RUN",
+    "20": "+3V3"
+   },
+   "uuid": "b5db072f-cefb-55d7-98e9-f1bf93edf5b3",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Pin header 1x20 2.54 mm"
+   },
+   "model": null
+  },
+  {
+   "ref": "H1",
+   "value": "M2",
+   "footprint": "MountingHole:MountingHole_2.2mm_M2_Pad_Via",
+   "x": 12.33,
+   "y": 4.3,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "GND"
+   },
+   "uuid": "84b7f4bc-240b-571f-8a58-f12e767ed1cd",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Mounting hole M2, grounded"
+   },
+   "model": null
+  },
+  {
+   "ref": "H2",
+   "value": "M2",
+   "footprint": "MountingHole:MountingHole_2.2mm_M2_Pad_Via",
+   "x": 40.27,
+   "y": 4.3,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "GND"
+   },
+   "uuid": "1dec815a-9ec4-529f-9cc0-0f7b3abf6ce0",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Mounting hole M2, grounded"
+   },
+   "model": null
+  },
+  {
+   "ref": "H3",
+   "value": "M2",
+   "footprint": "MountingHole:MountingHole_2.2mm_M2_Pad_Via",
+   "x": 12.33,
+   "y": 47.480000000000004,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "GND"
+   },
+   "uuid": "03c16cb6-8828-553c-b3f8-09d7b9fee93b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Mounting hole M2, grounded"
+   },
+   "model": null
+  },
+  {
+   "ref": "H4",
+   "value": "M2",
+   "footprint": "MountingHole:MountingHole_2.2mm_M2_Pad_Via",
+   "x": 40.27,
+   "y": 47.480000000000004,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "GND"
+   },
+   "uuid": "365d1392-8aee-5e54-88a5-1b11d7d4dad8",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Mounting hole M2, grounded"
+   },
+   "model": null
+  }
+ ],
+ "nets": [
+  "+1V1",
+  "+3V3",
+  "+5V",
+  "/BOOTSEL",
+  "/CC1",
+  "/CC2",
+  "/GPIO0",
+  "/GPIO1",
+  "/GPIO10",
+  "/GPIO11",
+  "/GPIO12",
+  "/GPIO13",
+  "/GPIO14",
+  "/GPIO15",
+  "/GPIO16",
+  "/GPIO17",
+  "/GPIO18",
+  "/GPIO19",
+  "/GPIO2",
+  "/GPIO20",
+  "/GPIO21",
+  "/GPIO22",
+  "/GPIO23",
+  "/GPIO24",
+  "/GPIO25",
+  "/GPIO26_ADC0",
+  "/GPIO27_ADC1",
+  "/GPIO28_ADC2",
+  "/GPIO29_ADC3",
+  "/GPIO3",
+  "/GPIO4",
+  "/GPIO5",
+  "/GPIO6",
+  "/GPIO7",
+  "/GPIO8",
+  "/GPIO9",
+  "/LED_PWR_A",
+  "/LED_USR_A",
+  "/QSPI_SCLK",
+  "/QSPI_SD0",
+  "/QSPI_SD1",
+  "/QSPI_SD2",
+  "/QSPI_SD3",
+  "/QSPI_SS",
+  "/RP_USB_DM",
+  "/RP_USB_DP",
+  "/RUN",
+  "/SWCLK",
+  "/SWDIO",
+  "/USB_D+",
+  "/USB_D-",
+  "/VBUS_F",
+  "/VREG_AVDD",
+  "/VREG_LX",
+  "/XIN",
+  "/XOUT",
+  "/XTAL_OUT",
+  "GND",
+  "VBUS",
+  "unconnected-(J1-SBU1-PadA8)",
+  "unconnected-(J1-SBU2-PadB8)"
+ ],
+ "footprint_dir": "/Users/kartikey/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints",
+ "planes": [
+  {
+   "net": "GND",
+   "layer": "In1.Cu"
+  },
+  {
+   "net": "+3V3",
+   "layer": "In2.Cu"
+  }
+ ],
+ "fanout_avoid": [
+  [
+   26.3,
+   30.3
+  ]
+ ],
+ "no_fanout": [
+  "U1",
+  "L1",
+  "C6",
+  "C7",
+  "C9",
+  "R6",
+  "R3",
+  "R4"
+ ],
+ "fanout_pads": {},
+ "preroutes": [],
+ "reference_copper": {
+  "file": "/private/tmp/claude-501/-Users-kartikey-Desktop-task/976907d0-9b6c-4cb9-9098-77aa58ceb1c8/scratchpad/wt-pr54/tools/eos_boards/reference/rp2350a_minimal_r4_core.json",
+  "origin": [
+   26.3,
+   30.3
+  ]
+ },
+ "local_footprints": {
+  "EoS_RPi_Reference": "/private/tmp/claude-501/-Users-kartikey-Desktop-task/976907d0-9b6c-4cb9-9098-77aa58ceb1c8/scratchpad/wt-pr54/tools/eos_boards/footprints/EoS_RPi_Reference.pretty"
+ },
+ "router_keepouts": [
+  [
+   23.3,
+   27.3,
+   29.3,
+   33.3
+  ]
+ ],
+ "copper_keepouts": [],
+ "priority_routes": [
+  [
+   [
+    "U1",
+    "2"
+   ],
+   [
+    "J2",
+    "2"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "3"
+   ],
+   [
+    "J2",
+    "3"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "4"
+   ],
+   [
+    "J2",
+    "5"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "5"
+   ],
+   [
+    "J2",
+    "6"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "7"
+   ],
+   [
+    "J2",
+    "7"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "8"
+   ],
+   [
+    "J2",
+    "8"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "9"
+   ],
+   [
+    "J2",
+    "10"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "10"
+   ],
+   [
+    "J2",
+    "11"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "12"
+   ],
+   [
+    "J2",
+    "12"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "13"
+   ],
+   [
+    "J2",
+    "13"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "15"
+   ],
+   [
+    "J2",
+    "16"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "14"
+   ],
+   [
+    "J2",
+    "15"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "16"
+   ],
+   [
+    "J2",
+    "17"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "17"
+   ],
+   [
+    "J2",
+    "18"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "18"
+   ],
+   [
+    "J2",
+    "19"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "19"
+   ],
+   [
+    "J2",
+    "20"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "43"
+   ],
+   [
+    "J3",
+    "3"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "42"
+   ],
+   [
+    "J3",
+    "4"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "41"
+   ],
+   [
+    "J3",
+    "5"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "40"
+   ],
+   [
+    "J3",
+    "6"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "37"
+   ],
+   [
+    "J3",
+    "8"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "36"
+   ],
+   [
+    "J3",
+    "9"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "35"
+   ],
+   [
+    "J3",
+    "10"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "34"
+   ],
+   [
+    "J3",
+    "11"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "33"
+   ],
+   [
+    "J3",
+    "12"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "32"
+   ],
+   [
+    "J3",
+    "13"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "31"
+   ],
+   [
+    "J3",
+    "14"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "29"
+   ],
+   [
+    "J3",
+    "15"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "28"
+   ],
+   [
+    "J3",
+    "16"
+   ]
+  ],
+  [
+   [
+    "U1",
+    "27"
+   ],
+   [
+    "J3",
+    "17"
+   ]
+  ],
+  [
+   [
+    "R11",
+    "1"
+   ],
+   [
+    "J3",
+    "8"
+   ]
+  ]
+ ],
+ "escape_footprints": [],
+ "maze_via_cost_mm": 1.2,
+ "zones": [
+  {
+   "net": "GND",
+   "layers": [
+    "F.Cu",
+    "B.Cu"
+   ]
+  }
+ ],
+ "texts": [
+  {
+   "text": "EoS Learn RP2350  rev A",
+   "x": 26.3,
+   "y": 13.6,
+   "size": 1.0,
+   "layer": "B_SilkS",
+   "bold": true,
+   "mirror": true
+  },
+  {
+   "text": "(c) 2026 Kartikeydheer Srivastava",
+   "x": 26.3,
+   "y": 15.4,
+   "size": 0.8,
+   "layer": "B_SilkS",
+   "mirror": true
+  },
+  {
+   "text": "All rights reserved",
+   "x": 26.3,
+   "y": 16.8,
+   "size": 0.8,
+   "layer": "B_SilkS",
+   "mirror": true
+  },
+  {
+   "text": "Core layout (c) 2026 Raspberry Pi Ltd  MIT",
+   "x": 26.3,
+   "y": 44.4,
+   "size": 0.8,
+   "layer": "B_SilkS",
+   "mirror": true
+  }
+ ],
+ "complete_nets": [
+  "+1V1",
+  "/QSPI_SCLK",
+  "/QSPI_SD0",
+  "/QSPI_SD1",
+  "/QSPI_SD2",
+  "/QSPI_SD3",
+  "/RP_USB_DM",
+  "/RP_USB_DP",
+  "/VREG_AVDD",
+  "/VREG_LX",
+  "/XIN",
+  "/XOUT",
+  "/XTAL_OUT"
+ ]
+}

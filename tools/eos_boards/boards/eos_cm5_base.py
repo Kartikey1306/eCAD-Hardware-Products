@@ -53,7 +53,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ..design import NC, Board, Part
+from ..design import NC, Board, Part, USB_C_EDGE
 from .owner import CONTACT, LICENCE, LICENCE_TERMS, OWNER
 
 R0402 = "Resistor_SMD:R_0402_1005Metric"
@@ -231,7 +231,7 @@ PLACEMENT = {
     "J1": (*from_cm5(-0.5, -21.5), 0), "J2": (*from_cm5(33.5, -21.5), 0),
     **{f"H{i + 1}": (x, y, 0) for i, (x, y) in enumerate(CM5_HOLES)},
     # top edge: USB-C and its ESD; 5 V bulk capacitors below the module, by the 5 V pins
-    "J3": (24.0, 3.8, 180), "U1": (33.5, 4.0, 0),
+    "J3": (24.0, USB_C_EDGE, 180), "U1": (33.5, 4.0, 0),
     "C1": (40.0, 51.6, 0), "C2": (43.6, 51.6, 0), "C3": (46.6, 51.6, 0),
     # right edge: USB-A host port and its switch; LEDs, power button, boot jumpers, fan
     "J4": (77.0, 30.0, 90), "U3": (71.0, 26.5, 90), "U2": (68.0, 16.5, 0), "C4": (64.5, 14.0, 90), "C5": (64.5, 19.0, 90),
@@ -276,6 +276,11 @@ PRIORITY += [(("J2", "36"), ("U3", "3")), (("U3", "4"), ("J4", "2")),     # USBH
 # whole board at once, takes those. Routed one by one, the crossing lines box each other in.
 SD_BUS = [(("J1", "67"), ("J6", "8")), (("J1", "63"), ("J6", "7")), (("J1", "57"), ("J6", "5"))]
 PRIORITY += SD_BUS
+# GPIO2 (SDA, CM5 pin 58) to the header next: it sits between GPIO3 and a ground pad, and left to the
+# autorouter its way out of the connector can be closed by the lines that cross just above the pad
+# row. GPIO3 stays with the autorouter: laid one after the other by the maze, either line boxes the
+# other in at the pad row.
+PRIORITY += [(("J1", "58"), ("J7", "3"))]
 TEXTS = [
     {"text": "EoS CM5 Base  rev A", "x": 45.0, "y": 66.0, "size": 1.2, "bold": True},
     {"text": "EoS CM5 Base  rev A", "x": 62.0, "y": 60.0, "size": 1.0, "layer": "B_SilkS", "bold": True, "mirror": True},

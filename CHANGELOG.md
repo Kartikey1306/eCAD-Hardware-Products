@@ -139,6 +139,14 @@ has never run.
 
 ### Fixed
 
+- EmbeddedOS boards: each USB-C receptacle (HRO TYPE-C-31-M-12) now sits where HRO's recommended
+  layout puts it, its footprint origin 3.19 mm from the board edge (`design.USB_C_EDGE`; HRO
+  draws the PCB edge 5.79 mm from the locating pegs). At the old 3.8 mm the shell's face was
+  0.15 mm behind the edge, so a plug's overmold could meet the board before the plug seated. It
+  now stands about 0.46 mm proud. EoS Learn RP2350, EoS Probe S3 and EoS CM5 Base are rebuilt,
+  and a test checks every board's receptacles. The review of a later board found it. On EoS CM5
+  Base, GPIO2 (the header's SDA) is now routed before the autorouter: after the move the router
+  boxed in its pad on the CM5 connector twice.
 - `read_licenses.py` finds the licence file whatever its case. It asked GitHub
   for fixed spellings (`LICENSE.md`, `LICENSE`, ...), and GitHub paths are
   case-sensitive, so SparkFun's `license.md` and `License.md` were never read:

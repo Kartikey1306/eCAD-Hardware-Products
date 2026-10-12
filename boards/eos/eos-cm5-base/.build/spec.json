@@ -1,0 +1,1670 @@
+{
+ "name": "eos-cm5-base",
+ "width": 90.0,
+ "height": 80.0,
+ "thickness": 1.6,
+ "corner_radius": 3.0,
+ "layers": 4,
+ "rules": {
+  "track": 0.15,
+  "clearance": 0.15,
+  "via": 0.45,
+  "drill": 0.2,
+  "min_track": 0.09,
+  "min_clearance": 0.15,
+  "min_via": 0.45,
+  "min_drill": 0.2,
+  "edge_clearance": 0.3,
+  "hole_clearance": 0.25
+ },
+ "netclasses": {
+  "Power": {
+   "track": 0.5,
+   "clearance": 0.15
+  },
+  "USB": {
+   "track": 0.2,
+   "clearance": 0.15
+  },
+  "Ethernet": {
+   "track": 0.2,
+   "clearance": 0.15
+  }
+ },
+ "net_to_class": {
+  "+5V": "Power",
+  "/USBH_VBUS": "Power",
+  "/USB_P": "USB",
+  "/USB_N": "USB",
+  "/USBH_DP": "USB",
+  "/USBH_DM": "USB",
+  "/ETH_A_P": "Ethernet",
+  "/ETH_A_N": "Ethernet",
+  "/ETH_B_P": "Ethernet",
+  "/ETH_B_N": "Ethernet",
+  "/ETH_C_P": "Ethernet",
+  "/ETH_C_N": "Ethernet",
+  "/ETH_D_P": "Ethernet",
+  "/ETH_D_N": "Ethernet"
+ },
+ "parts": [
+  {
+   "ref": "J1",
+   "value": "CM5 1-100",
+   "footprint": "Connector_Hirose_DF40:Hirose_DF40C-100DS-0.4V_2x50_P0.4mm",
+   "x": 36.5,
+   "y": 46.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "GND",
+    "2": "GND",
+    "3": "/ETH_D_P",
+    "4": "/ETH_B_P",
+    "5": "/ETH_D_N",
+    "6": "/ETH_B_N",
+    "7": "GND",
+    "8": "GND",
+    "9": "/ETH_C_N",
+    "10": "/ETH_A_N",
+    "11": "/ETH_C_P",
+    "12": "/ETH_A_P",
+    "13": "GND",
+    "14": "GND",
+    "15": "/ETH_NLED_ACT",
+    "16": "/FAN_TACHO",
+    "17": "/ETH_NLED_SPD",
+    "18": "unconnected-(J1-Pin_18-Pad18)",
+    "19": "/FAN_PWM",
+    "20": "/EEPROM_NWP",
+    "21": "/LED_NACT",
+    "22": "GND",
+    "23": "GND",
+    "24": "/GPIO26",
+    "25": "/GPIO21",
+    "26": "/GPIO19",
+    "27": "/GPIO20",
+    "28": "/GPIO13",
+    "29": "/GPIO16",
+    "30": "/GPIO6",
+    "31": "/GPIO12",
+    "32": "GND",
+    "33": "GND",
+    "34": "/GPIO5",
+    "35": "/ID_SC",
+    "36": "/ID_SD",
+    "37": "/GPIO7",
+    "38": "/GPIO11",
+    "39": "/GPIO8",
+    "40": "/GPIO9",
+    "41": "/GPIO25",
+    "42": "GND",
+    "43": "GND",
+    "44": "/GPIO10",
+    "45": "/GPIO24",
+    "46": "/GPIO22",
+    "47": "/GPIO23",
+    "48": "/GPIO27",
+    "49": "/GPIO18",
+    "50": "/GPIO17",
+    "51": "/GPIO15",
+    "52": "GND",
+    "53": "GND",
+    "54": "/GPIO4",
+    "55": "/GPIO14",
+    "56": "/GPIO3",
+    "57": "/SD_CLK",
+    "58": "/GPIO2",
+    "59": "GND",
+    "60": "GND",
+    "61": "/SD_DAT3",
+    "62": "/SD_CMD",
+    "63": "/SD_DAT0",
+    "64": "unconnected-(J1-Pin_64-Pad64)",
+    "65": "GND",
+    "66": "GND",
+    "67": "/SD_DAT1",
+    "68": "unconnected-(J1-Pin_68-Pad68)",
+    "69": "/SD_DAT2",
+    "70": "unconnected-(J1-Pin_70-Pad70)",
+    "71": "GND",
+    "72": "unconnected-(J1-Pin_72-Pad72)",
+    "73": "unconnected-(J1-Pin_73-Pad73)",
+    "74": "GND",
+    "75": "/SD_PWR_ON",
+    "76": "/VBAT",
+    "77": "+5V",
+    "78": "+3V3",
+    "79": "+5V",
+    "80": "unconnected-(J1-Pin_80-Pad80)",
+    "81": "+5V",
+    "82": "unconnected-(J1-Pin_82-Pad82)",
+    "83": "+5V",
+    "84": "+3V3",
+    "85": "+5V",
+    "86": "+3V3",
+    "87": "+5V",
+    "88": "unconnected-(J1-Pin_88-Pad88)",
+    "89": "unconnected-(J1-Pin_89-Pad89)",
+    "90": "unconnected-(J1-Pin_90-Pad90)",
+    "91": "unconnected-(J1-Pin_91-Pad91)",
+    "92": "/PWR_BUTTON",
+    "93": "/NRPIBOOT",
+    "94": "/CC1",
+    "95": "/LED_NPWR",
+    "96": "/CC2",
+    "97": "unconnected-(J1-Pin_97-Pad97)",
+    "98": "GND",
+    "99": "unconnected-(J1-Pin_99-Pad99)",
+    "100": "unconnected-(J1-Pin_100-Pad100)"
+   },
+   "uuid": "990306fc-3719-5490-bad8-52859913f525",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "CM5 connector, pins 1-100, 1.5 mm stacking",
+    "Manufacturer": "Amphenol",
+    "MPN": "10164227-1001A1RLF"
+   },
+   "model": null
+  },
+  {
+   "ref": "J2",
+   "value": "CM5 101-200",
+   "footprint": "Connector_Hirose_DF40:Hirose_DF40C-100DS-0.4V_2x50_P0.4mm",
+   "x": 36.5,
+   "y": 12.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "unconnected-(J2-Pin_1-Pad1)",
+    "2": "unconnected-(J2-Pin_2-Pad2)",
+    "3": "/USB_N",
+    "4": "unconnected-(J2-Pin_4-Pad4)",
+    "5": "/USB_P",
+    "6": "unconnected-(J2-Pin_6-Pad6)",
+    "7": "GND",
+    "8": "GND",
+    "9": "unconnected-(J2-Pin_9-Pad9)",
+    "10": "unconnected-(J2-Pin_10-Pad10)",
+    "11": "/VBUS_EN",
+    "12": "unconnected-(J2-Pin_12-Pad12)",
+    "13": "GND",
+    "14": "GND",
+    "15": "unconnected-(J2-Pin_15-Pad15)",
+    "16": "unconnected-(J2-Pin_16-Pad16)",
+    "17": "unconnected-(J2-Pin_17-Pad17)",
+    "18": "unconnected-(J2-Pin_18-Pad18)",
+    "19": "GND",
+    "20": "GND",
+    "21": "unconnected-(J2-Pin_21-Pad21)",
+    "22": "unconnected-(J2-Pin_22-Pad22)",
+    "23": "unconnected-(J2-Pin_23-Pad23)",
+    "24": "unconnected-(J2-Pin_24-Pad24)",
+    "25": "GND",
+    "26": "GND",
+    "27": "unconnected-(J2-Pin_27-Pad27)",
+    "28": "unconnected-(J2-Pin_28-Pad28)",
+    "29": "unconnected-(J2-Pin_29-Pad29)",
+    "30": "unconnected-(J2-Pin_30-Pad30)",
+    "31": "GND",
+    "32": "GND",
+    "33": "unconnected-(J2-Pin_33-Pad33)",
+    "34": "/USBH_DP",
+    "35": "unconnected-(J2-Pin_35-Pad35)",
+    "36": "/USBH_DM",
+    "37": "GND",
+    "38": "GND",
+    "39": "unconnected-(J2-Pin_39-Pad39)",
+    "40": "unconnected-(J2-Pin_40-Pad40)",
+    "41": "unconnected-(J2-Pin_41-Pad41)",
+    "42": "unconnected-(J2-Pin_42-Pad42)",
+    "43": "unconnected-(J2-Pin_43-Pad43)",
+    "44": "GND",
+    "45": "unconnected-(J2-Pin_45-Pad45)",
+    "46": "unconnected-(J2-Pin_46-Pad46)",
+    "47": "unconnected-(J2-Pin_47-Pad47)",
+    "48": "unconnected-(J2-Pin_48-Pad48)",
+    "49": "unconnected-(J2-Pin_49-Pad49)",
+    "50": "GND",
+    "51": "unconnected-(J2-Pin_51-Pad51)",
+    "52": "unconnected-(J2-Pin_52-Pad52)",
+    "53": "unconnected-(J2-Pin_53-Pad53)",
+    "54": "unconnected-(J2-Pin_54-Pad54)",
+    "55": "GND",
+    "56": "GND",
+    "57": "unconnected-(J2-Pin_57-Pad57)",
+    "58": "unconnected-(J2-Pin_58-Pad58)",
+    "59": "unconnected-(J2-Pin_59-Pad59)",
+    "60": "unconnected-(J2-Pin_60-Pad60)",
+    "61": "GND",
+    "62": "GND",
+    "63": "unconnected-(J2-Pin_63-Pad63)",
+    "64": "unconnected-(J2-Pin_64-Pad64)",
+    "65": "unconnected-(J2-Pin_65-Pad65)",
+    "66": "unconnected-(J2-Pin_66-Pad66)",
+    "67": "GND",
+    "68": "GND",
+    "69": "unconnected-(J2-Pin_69-Pad69)",
+    "70": "unconnected-(J2-Pin_70-Pad70)",
+    "71": "unconnected-(J2-Pin_71-Pad71)",
+    "72": "unconnected-(J2-Pin_72-Pad72)",
+    "73": "GND",
+    "74": "GND",
+    "75": "unconnected-(J2-Pin_75-Pad75)",
+    "76": "unconnected-(J2-Pin_76-Pad76)",
+    "77": "unconnected-(J2-Pin_77-Pad77)",
+    "78": "unconnected-(J2-Pin_78-Pad78)",
+    "79": "GND",
+    "80": "GND",
+    "81": "unconnected-(J2-Pin_81-Pad81)",
+    "82": "unconnected-(J2-Pin_82-Pad82)",
+    "83": "unconnected-(J2-Pin_83-Pad83)",
+    "84": "unconnected-(J2-Pin_84-Pad84)",
+    "85": "GND",
+    "86": "GND",
+    "87": "unconnected-(J2-Pin_87-Pad87)",
+    "88": "unconnected-(J2-Pin_88-Pad88)",
+    "89": "unconnected-(J2-Pin_89-Pad89)",
+    "90": "unconnected-(J2-Pin_90-Pad90)",
+    "91": "GND",
+    "92": "GND",
+    "93": "unconnected-(J2-Pin_93-Pad93)",
+    "94": "unconnected-(J2-Pin_94-Pad94)",
+    "95": "unconnected-(J2-Pin_95-Pad95)",
+    "96": "unconnected-(J2-Pin_96-Pad96)",
+    "97": "GND",
+    "98": "GND",
+    "99": "unconnected-(J2-Pin_99-Pad99)",
+    "100": "unconnected-(J2-Pin_100-Pad100)"
+   },
+   "uuid": "f482f9e2-ca05-5846-8119-164ca9d03586",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "CM5 connector, pins 101-200, 1.5 mm stacking",
+    "Manufacturer": "Amphenol",
+    "MPN": "10164227-1001A1RLF"
+   },
+   "model": null
+  },
+  {
+   "ref": "J3",
+   "value": "USB-C",
+   "footprint": "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12",
+   "x": 24.0,
+   "y": 3.19,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "A4": "+5V",
+    "A9": "+5V",
+    "B4": "+5V",
+    "B9": "+5V",
+    "A1": "GND",
+    "A12": "GND",
+    "B1": "GND",
+    "B12": "GND",
+    "A5": "/CC1",
+    "B5": "/CC2",
+    "A6": "/USB_P",
+    "B6": "/USB_P",
+    "A7": "/USB_N",
+    "B7": "/USB_N",
+    "A8": "unconnected-(J3-SBU1-PadA8)",
+    "B8": "unconnected-(J3-SBU2-PadB8)",
+    "SH": "GND"
+   },
+   "uuid": "494ae4d8-84a5-594e-b7c1-61d030fbd610",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.usb.org/sites/default/files/documents/usb_type-c.zip",
+    "Description": "USB-C 2.0 receptacle (power in, USB device)",
+    "Manufacturer": "Korean Hroparts",
+    "MPN": "TYPE-C-31-M-12"
+   },
+   "model": null
+  },
+  {
+   "ref": "U1",
+   "value": "USBLC6-2SC6",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 33.5,
+   "y": 4.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/USB_P",
+    "6": "/USB_P",
+    "3": "/USB_N",
+    "4": "/USB_N",
+    "2": "GND",
+    "5": "+5V"
+   },
+   "uuid": "e98b1a0f-67f1-5aaf-b544-ab63e4d6f412",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.st.com/resource/en/datasheet/usblc6-2.pdf",
+    "Description": "USB ESD protection",
+    "Manufacturer": "STMicroelectronics",
+    "MPN": "USBLC6-2SC6"
+   },
+   "model": null
+  },
+  {
+   "ref": "C1",
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 40.0,
+   "y": 51.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "uuid": "4949ca0c-bc4d-5ace-994a-e4a0d3b4a78a",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 10 uF 10 V X5R 0805 (5 V at the module)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C2",
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 43.6,
+   "y": 51.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "uuid": "be186fb4-08d1-582f-9022-9d9cf399f93a",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 10 uF 10 V X5R 0805 (5 V at the module)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C3",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 46.6,
+   "y": 51.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "uuid": "00a48a6a-a3c9-5949-bdb9-c8785ee90e22",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (5 V at the module)"
+   },
+   "model": null
+  },
+  {
+   "ref": "U2",
+   "value": "TPS2051C",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+   "x": 68.0,
+   "y": 16.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "5": "+5V",
+    "1": "/USBH_VBUS",
+    "2": "GND",
+    "4": "/VBUS_EN",
+    "3": "unconnected-(U2-~{FLT}-Pad3)"
+   },
+   "uuid": "f26a9d08-9a90-53d2-b260-619b5375d2f8",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.ti.com/lit/ds/symlink/tps2051c.pdf",
+    "Description": "USB power switch 0.5 A, enable high",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "TPS2051CDBVR"
+   },
+   "model": null
+  },
+  {
+   "ref": "C4",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 64.5,
+   "y": 14.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "uuid": "e16c3857-014d-54a4-a861-71f434f4ed7b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (TPS2051C input, as TI specifies)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C5",
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 64.5,
+   "y": 19.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "uuid": "809b97dd-8ce5-5b9a-a120-130251fe47e5",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 10 uF 10 V X5R 0805 (TPS2051C input, 1-22 uF per TI)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C6",
+   "value": "150u",
+   "footprint": "Capacitor_SMD:CP_Elec_6.3x5.8",
+   "x": 68.0,
+   "y": 36.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/USBH_VBUS",
+    "2": "GND"
+   },
+   "uuid": "5d6bce0c-8458-5f70-90dd-11e00c34f607",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 150 uF 10 V aluminium, 6.3 x 5.8 mm (USB host port: 120 uF minimum per TI)",
+    "Manufacturer": "Panasonic",
+    "MPN": "EEE-FK1A151P"
+   },
+   "model": null
+  },
+  {
+   "ref": "J4",
+   "value": "USB-A",
+   "footprint": "Connector_USB:USB_A_Molex_67643_Horizontal",
+   "x": 77.0,
+   "y": 30.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/USBH_VBUS",
+    "2": "/USBH_DM",
+    "3": "/USBH_DP",
+    "4": "GND",
+    "SH": "GND"
+   },
+   "uuid": "3bb1b3ab-a35a-55bd-a322-2d3aab34d28b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "USB-A receptacle, USB 2.0 host",
+    "Manufacturer": "Molex",
+    "MPN": "67643-0910"
+   },
+   "model": null
+  },
+  {
+   "ref": "U3",
+   "value": "USBLC6-2SC6",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 71.0,
+   "y": 26.5,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/USBH_DP",
+    "6": "/USBH_DP",
+    "3": "/USBH_DM",
+    "4": "/USBH_DM",
+    "2": "GND",
+    "5": "/USBH_VBUS"
+   },
+   "uuid": "3e4b950d-9788-596d-925e-0d3d2eb271cb",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.st.com/resource/en/datasheet/usblc6-2.pdf",
+    "Description": "USB ESD protection (host port)",
+    "Manufacturer": "STMicroelectronics",
+    "MPN": "USBLC6-2SC6"
+   },
+   "model": null
+  },
+  {
+   "ref": "J5",
+   "value": "TRJG0926HENL",
+   "footprint": "EoS_Connectors:TRXCOM_TRJG0926HENL",
+   "x": 10.75,
+   "y": 60.0,
+   "rot": 270,
+   "side": "F",
+   "pads": {
+    "1": "/ETH_A_P",
+    "2": "/ETH_A_N",
+    "3": "/ETH_B_P",
+    "6": "/ETH_B_N",
+    "7": "/ETH_C_P",
+    "8": "/ETH_C_N",
+    "9": "/ETH_D_P",
+    "10": "/ETH_D_N",
+    "4": "/ETH_CT",
+    "5": "/ETH_CT",
+    "11": "unconnected-(J5-Pin_11-Pad11)",
+    "12": "unconnected-(J5-Pin_12-Pad12)",
+    "13": "unconnected-(J5-Pin_13-Pad13)",
+    "14": "unconnected-(J5-Pin_14-Pad14)",
+    "15": "+3V3",
+    "16": "/ETH_LEDY_K",
+    "17": "+3V3",
+    "18": "/ETH_LEDG_K",
+    "19": "GND",
+    "20": "GND"
+   },
+   "uuid": "38a5bd41-7fe7-519a-8274-2f2dad3f57fe",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "RJ45 MagJack 10/100/1000, LEDs (pins as on Raspberry Pi's CM5IO)",
+    "Manufacturer": "TRXCOM",
+    "MPN": "TRJG0926HENL"
+   },
+   "model": null
+  },
+  {
+   "ref": "C7",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 29.0,
+   "y": 53.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/ETH_CT",
+    "2": "GND"
+   },
+   "uuid": "9eed3e23-7fb4-5eef-9229-f9bc1a48db77",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (MagJack centre tap, as CM5IO)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R1",
+   "value": "470",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 25.5,
+   "y": 59.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/ETH_LEDY_K",
+    "2": "/ETH_NLED_SPD"
+   },
+   "uuid": "11a0ed82-6ee2-5561-bf75-46989837877e",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 470 ohm 1% 0402 (yellow LED, speed)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R2",
+   "value": "470",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 25.5,
+   "y": 61.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/ETH_LEDG_K",
+    "2": "/ETH_NLED_ACT"
+   },
+   "uuid": "0c84e62e-3659-58b5-a1a7-7b80dd784c56",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 470 ohm 1% 0402 (green LED, activity)"
+   },
+   "model": null
+  },
+  {
+   "ref": "U4",
+   "value": "TPD4EUSB30",
+   "footprint": "Package_SON:USON-10_2.5x1.0mm_P0.5mm",
+   "x": 23.0,
+   "y": 55.4,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/ETH_A_P",
+    "10": "/ETH_A_P",
+    "2": "/ETH_A_N",
+    "9": "/ETH_A_N",
+    "4": "/ETH_B_P",
+    "7": "/ETH_B_P",
+    "5": "/ETH_B_N",
+    "6": "/ETH_B_N",
+    "3": "GND",
+    "8": "GND"
+   },
+   "uuid": "55ab2795-c9ec-5899-bc79-d838f102f91a",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.ti.com/lit/ds/symlink/tpd4eusb30.pdf",
+    "Description": "ESD protection, Ethernet pairs A and B, flow-through as TI lays it out",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "TPD4EUSB30DQAR"
+   },
+   "model": null
+  },
+  {
+   "ref": "U5",
+   "value": "TPD4EUSB30",
+   "footprint": "Package_SON:USON-10_2.5x1.0mm_P0.5mm",
+   "x": 23.0,
+   "y": 62.4,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/ETH_C_P",
+    "10": "/ETH_C_P",
+    "2": "/ETH_C_N",
+    "9": "/ETH_C_N",
+    "4": "/ETH_D_P",
+    "7": "/ETH_D_P",
+    "5": "/ETH_D_N",
+    "6": "/ETH_D_N",
+    "3": "GND",
+    "8": "GND"
+   },
+   "uuid": "42da9a7c-08cc-5a97-83bb-eccdb5dbce85",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.ti.com/lit/ds/symlink/tpd4eusb30.pdf",
+    "Description": "ESD protection, Ethernet pairs C and D, flow-through as TI lays it out",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "TPD4EUSB30DQAR"
+   },
+   "model": null
+  },
+  {
+   "ref": "J6",
+   "value": "microSD",
+   "footprint": "Connector_Card:microSD_HC_Molex_104031-0811",
+   "x": 82.0,
+   "y": 62.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/SD_DAT2",
+    "2": "/SD_DAT3",
+    "3": "/SD_CMD",
+    "4": "/SD_VDD",
+    "5": "/SD_CLK",
+    "6": "GND",
+    "7": "/SD_DAT0",
+    "8": "/SD_DAT1",
+    "SH": "GND"
+   },
+   "uuid": "45566176-272b-571b-b8f3-c3ea941fefbe",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.we-online.com/components/products/datasheet/693072010801.pdf",
+    "Description": "microSD socket (CM5 Lite)",
+    "Manufacturer": "Molex",
+    "MPN": "104031-0811"
+   },
+   "model": null
+  },
+  {
+   "ref": "U6",
+   "value": "RT9742GGJ5",
+   "footprint": "Package_TO_SOT_SMD:TSOT-23-5",
+   "x": 72.0,
+   "y": 56.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "5": "+3V3",
+    "2": "GND",
+    "3": "unconnected-(U6-~{FLG}-Pad3)",
+    "4": "/SD_PWR_ON",
+    "1": "/SD_VDD"
+   },
+   "uuid": "7d20a05d-7a16-56e2-b36c-e8c2b9bff00e",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.richtek.com/assets/product_file/RT9742/DS9742-10.pdf",
+    "Description": "Load switch for the microSD supply, enable high (as CM5IO)",
+    "Manufacturer": "Richtek",
+    "MPN": "RT9742GGJ5"
+   },
+   "model": null
+  },
+  {
+   "ref": "R3",
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 72.0,
+   "y": 52.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/SD_PWR_ON",
+    "2": "+3V3"
+   },
+   "uuid": "a3d8fb86-d8fa-55f0-968a-c1c2a5ae2e25",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 10 kohm 1% 0402 (SD_PWR_ON pull-up, as CM5IO)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C8",
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 72.0,
+   "y": 59.4,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/SD_VDD",
+    "2": "GND"
+   },
+   "uuid": "55107fe4-bb06-59a6-8477-aee419a40d8d",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 10 uF 10 V X5R 0805 (microSD supply, as CM5IO)"
+   },
+   "model": null
+  },
+  {
+   "ref": "J7",
+   "value": "GPIO",
+   "footprint": "Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical",
+   "x": 24.5,
+   "y": 76.5,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "+5V",
+    "3": "/GPIO2",
+    "4": "+5V",
+    "5": "/GPIO3",
+    "6": "GND",
+    "7": "/GPIO4",
+    "8": "/GPIO14",
+    "9": "GND",
+    "10": "/GPIO15",
+    "11": "/GPIO17",
+    "12": "/GPIO18",
+    "13": "/GPIO27",
+    "14": "GND",
+    "15": "/GPIO22",
+    "16": "/GPIO23",
+    "17": "+3V3",
+    "18": "/GPIO24",
+    "19": "/GPIO10",
+    "20": "GND",
+    "21": "/GPIO9",
+    "22": "/GPIO25",
+    "23": "/GPIO11",
+    "24": "/GPIO8",
+    "25": "GND",
+    "26": "/GPIO7",
+    "27": "/ID_SD",
+    "28": "/ID_SC",
+    "29": "/GPIO5",
+    "30": "GND",
+    "31": "/GPIO6",
+    "32": "/GPIO12",
+    "33": "/GPIO13",
+    "34": "GND",
+    "35": "/GPIO19",
+    "36": "/GPIO16",
+    "37": "/GPIO26",
+    "38": "/GPIO20",
+    "39": "GND",
+    "40": "/GPIO21"
+   },
+   "uuid": "5d060d2c-a078-5045-b690-5896e156f97a",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Raspberry Pi 40-pin GPIO header"
+   },
+   "model": null
+  },
+  {
+   "ref": "J8",
+   "value": "FAN",
+   "footprint": "Connector_JST:JST_SH_BM04B-SRSS-TB_1x04-1MP_P1.00mm_Vertical",
+   "x": 76.0,
+   "y": 5.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "/FAN_PWM",
+    "3": "GND",
+    "4": "/FAN_TACHO"
+   },
+   "uuid": "75998cf1-b4b5-5a9b-8d87-2424180c020d",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Fan: 1 5 V, 2 PWM, 3 GND, 4 tacho",
+    "Manufacturer": "JST",
+    "MPN": "BM04B-SRSS-TB"
+   },
+   "model": null
+  },
+  {
+   "ref": "BT1",
+   "value": "CR2032",
+   "footprint": "Battery:BatteryHolder_Keystone_3034_1x20mm",
+   "x": 34.0,
+   "y": 30.0,
+   "rot": 0,
+   "side": "B",
+   "pads": {
+    "1": "/VBAT",
+    "2": "GND"
+   },
+   "uuid": "ddeb704c-d975-5335-ac70-39bd71c7434b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Coin cell holder, RTC (VBAT); keep RTC charging off with a CR2032",
+    "Sim.Device": "V",
+    "Sim.Type": "DC",
+    "Sim.Pins": "1=+ 2=-",
+    "Manufacturer": "Keystone",
+    "MPN": "3034"
+   },
+   "model": null
+  },
+  {
+   "ref": "SW1",
+   "value": "POWER",
+   "footprint": "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KMR2",
+   "x": 84.0,
+   "y": 42.5,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/PWR_BUTTON",
+    "2": "GND"
+   },
+   "uuid": "e8771d68-1f06-5315-894c-f28d1fedfa5f",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Power button (PWR_Button)",
+    "Manufacturer": "C&K",
+    "MPN": "KMR221G LFS"
+   },
+   "model": null
+  },
+  {
+   "ref": "J9",
+   "value": "BOOT",
+   "footprint": "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical",
+   "x": 64.6,
+   "y": 5.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/NRPIBOOT",
+    "2": "GND",
+    "3": "/EEPROM_NWP",
+    "4": "GND"
+   },
+   "uuid": "f68a1387-d5ca-5630-ae78-73ee477a9b24",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Jumpers: 1-2 nRPIBOOT (USB boot), 3-4 EEPROM write protect"
+   },
+   "model": null
+  },
+  {
+   "ref": "R4",
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 65.0,
+   "y": 43.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "/LED_PWR_A"
+   },
+   "uuid": "44a5968f-99a8-5db1-be34-36c50cf6dcf9",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 1 kohm 1% 0402 (power LED, as CM5IO)"
+   },
+   "model": null
+  },
+  {
+   "ref": "D1",
+   "value": "PWR",
+   "footprint": "LED_SMD:LED_0603_1608Metric",
+   "x": 68.6,
+   "y": 43.5,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "2": "/LED_PWR_A",
+    "1": "/LED_NPWR"
+   },
+   "uuid": "0f0dd610-cbad-5d8d-8124-9fcff7368b3b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "LED red 0603, power (LED_nPWR)",
+    "Sim.Pins": "1=K 2=A",
+    "Manufacturer": "Kingbright",
+    "MPN": "APTD1608LSURCK"
+   },
+   "model": null
+  },
+  {
+   "ref": "R5",
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 65.0,
+   "y": 45.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "/LED_ACT_A"
+   },
+   "uuid": "4e155598-cbdf-5eee-9322-daf4194e6a55",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 1 kohm 1% 0402 (activity LED, as CM5IO)"
+   },
+   "model": null
+  },
+  {
+   "ref": "D2",
+   "value": "ACT",
+   "footprint": "LED_SMD:LED_0603_1608Metric",
+   "x": 68.6,
+   "y": 45.5,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "2": "/LED_ACT_A",
+    "1": "/LED_NACT"
+   },
+   "uuid": "41931d60-94aa-547b-b29a-b90648ec1acf",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "LED green 570 nm 0603, activity (LED_nACT)",
+    "Sim.Pins": "1=K 2=A",
+    "Manufacturer": "Kingbright",
+    "MPN": "APTD1608LCGCK"
+   },
+   "model": null
+  },
+  {
+   "ref": "H1",
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "x": 10.0,
+   "y": 46.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {},
+   "uuid": "49f27479-deeb-5e36-8050-03b0176c1fa6",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "CM5 mounting hole, M2.5"
+   },
+   "model": null
+  },
+  {
+   "ref": "H2",
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "x": 58.0,
+   "y": 46.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {},
+   "uuid": "60fe4749-a050-54d2-ad0c-484e2a006b71",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "CM5 mounting hole, M2.5"
+   },
+   "model": null
+  },
+  {
+   "ref": "H3",
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "x": 10.0,
+   "y": 13.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {},
+   "uuid": "df96b2b9-c742-5896-a43a-40ff0f4584d7",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "CM5 mounting hole, M2.5"
+   },
+   "model": null
+  },
+  {
+   "ref": "H4",
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "x": 58.0,
+   "y": 13.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {},
+   "uuid": "e413aa04-2e41-5332-b243-3325669f445d",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "CM5 mounting hole, M2.5"
+   },
+   "model": null
+  }
+ ],
+ "nets": [
+  "+3V3",
+  "+5V",
+  "/CC1",
+  "/CC2",
+  "/EEPROM_NWP",
+  "/ETH_A_N",
+  "/ETH_A_P",
+  "/ETH_B_N",
+  "/ETH_B_P",
+  "/ETH_CT",
+  "/ETH_C_N",
+  "/ETH_C_P",
+  "/ETH_D_N",
+  "/ETH_D_P",
+  "/ETH_LEDG_K",
+  "/ETH_LEDY_K",
+  "/ETH_NLED_ACT",
+  "/ETH_NLED_SPD",
+  "/FAN_PWM",
+  "/FAN_TACHO",
+  "/GPIO10",
+  "/GPIO11",
+  "/GPIO12",
+  "/GPIO13",
+  "/GPIO14",
+  "/GPIO15",
+  "/GPIO16",
+  "/GPIO17",
+  "/GPIO18",
+  "/GPIO19",
+  "/GPIO2",
+  "/GPIO20",
+  "/GPIO21",
+  "/GPIO22",
+  "/GPIO23",
+  "/GPIO24",
+  "/GPIO25",
+  "/GPIO26",
+  "/GPIO27",
+  "/GPIO3",
+  "/GPIO4",
+  "/GPIO5",
+  "/GPIO6",
+  "/GPIO7",
+  "/GPIO8",
+  "/GPIO9",
+  "/ID_SC",
+  "/ID_SD",
+  "/LED_ACT_A",
+  "/LED_NACT",
+  "/LED_NPWR",
+  "/LED_PWR_A",
+  "/NRPIBOOT",
+  "/PWR_BUTTON",
+  "/SD_CLK",
+  "/SD_CMD",
+  "/SD_DAT0",
+  "/SD_DAT1",
+  "/SD_DAT2",
+  "/SD_DAT3",
+  "/SD_PWR_ON",
+  "/SD_VDD",
+  "/USBH_DM",
+  "/USBH_DP",
+  "/USBH_VBUS",
+  "/USB_N",
+  "/USB_P",
+  "/VBAT",
+  "/VBUS_EN",
+  "GND",
+  "unconnected-(J1-Pin_100-Pad100)",
+  "unconnected-(J1-Pin_18-Pad18)",
+  "unconnected-(J1-Pin_64-Pad64)",
+  "unconnected-(J1-Pin_68-Pad68)",
+  "unconnected-(J1-Pin_70-Pad70)",
+  "unconnected-(J1-Pin_72-Pad72)",
+  "unconnected-(J1-Pin_73-Pad73)",
+  "unconnected-(J1-Pin_80-Pad80)",
+  "unconnected-(J1-Pin_82-Pad82)",
+  "unconnected-(J1-Pin_88-Pad88)",
+  "unconnected-(J1-Pin_89-Pad89)",
+  "unconnected-(J1-Pin_90-Pad90)",
+  "unconnected-(J1-Pin_91-Pad91)",
+  "unconnected-(J1-Pin_97-Pad97)",
+  "unconnected-(J1-Pin_99-Pad99)",
+  "unconnected-(J2-Pin_1-Pad1)",
+  "unconnected-(J2-Pin_10-Pad10)",
+  "unconnected-(J2-Pin_100-Pad100)",
+  "unconnected-(J2-Pin_12-Pad12)",
+  "unconnected-(J2-Pin_15-Pad15)",
+  "unconnected-(J2-Pin_16-Pad16)",
+  "unconnected-(J2-Pin_17-Pad17)",
+  "unconnected-(J2-Pin_18-Pad18)",
+  "unconnected-(J2-Pin_2-Pad2)",
+  "unconnected-(J2-Pin_21-Pad21)",
+  "unconnected-(J2-Pin_22-Pad22)",
+  "unconnected-(J2-Pin_23-Pad23)",
+  "unconnected-(J2-Pin_24-Pad24)",
+  "unconnected-(J2-Pin_27-Pad27)",
+  "unconnected-(J2-Pin_28-Pad28)",
+  "unconnected-(J2-Pin_29-Pad29)",
+  "unconnected-(J2-Pin_30-Pad30)",
+  "unconnected-(J2-Pin_33-Pad33)",
+  "unconnected-(J2-Pin_35-Pad35)",
+  "unconnected-(J2-Pin_39-Pad39)",
+  "unconnected-(J2-Pin_4-Pad4)",
+  "unconnected-(J2-Pin_40-Pad40)",
+  "unconnected-(J2-Pin_41-Pad41)",
+  "unconnected-(J2-Pin_42-Pad42)",
+  "unconnected-(J2-Pin_43-Pad43)",
+  "unconnected-(J2-Pin_45-Pad45)",
+  "unconnected-(J2-Pin_46-Pad46)",
+  "unconnected-(J2-Pin_47-Pad47)",
+  "unconnected-(J2-Pin_48-Pad48)",
+  "unconnected-(J2-Pin_49-Pad49)",
+  "unconnected-(J2-Pin_51-Pad51)",
+  "unconnected-(J2-Pin_52-Pad52)",
+  "unconnected-(J2-Pin_53-Pad53)",
+  "unconnected-(J2-Pin_54-Pad54)",
+  "unconnected-(J2-Pin_57-Pad57)",
+  "unconnected-(J2-Pin_58-Pad58)",
+  "unconnected-(J2-Pin_59-Pad59)",
+  "unconnected-(J2-Pin_6-Pad6)",
+  "unconnected-(J2-Pin_60-Pad60)",
+  "unconnected-(J2-Pin_63-Pad63)",
+  "unconnected-(J2-Pin_64-Pad64)",
+  "unconnected-(J2-Pin_65-Pad65)",
+  "unconnected-(J2-Pin_66-Pad66)",
+  "unconnected-(J2-Pin_69-Pad69)",
+  "unconnected-(J2-Pin_70-Pad70)",
+  "unconnected-(J2-Pin_71-Pad71)",
+  "unconnected-(J2-Pin_72-Pad72)",
+  "unconnected-(J2-Pin_75-Pad75)",
+  "unconnected-(J2-Pin_76-Pad76)",
+  "unconnected-(J2-Pin_77-Pad77)",
+  "unconnected-(J2-Pin_78-Pad78)",
+  "unconnected-(J2-Pin_81-Pad81)",
+  "unconnected-(J2-Pin_82-Pad82)",
+  "unconnected-(J2-Pin_83-Pad83)",
+  "unconnected-(J2-Pin_84-Pad84)",
+  "unconnected-(J2-Pin_87-Pad87)",
+  "unconnected-(J2-Pin_88-Pad88)",
+  "unconnected-(J2-Pin_89-Pad89)",
+  "unconnected-(J2-Pin_9-Pad9)",
+  "unconnected-(J2-Pin_90-Pad90)",
+  "unconnected-(J2-Pin_93-Pad93)",
+  "unconnected-(J2-Pin_94-Pad94)",
+  "unconnected-(J2-Pin_95-Pad95)",
+  "unconnected-(J2-Pin_96-Pad96)",
+  "unconnected-(J2-Pin_99-Pad99)",
+  "unconnected-(J3-SBU1-PadA8)",
+  "unconnected-(J3-SBU2-PadB8)",
+  "unconnected-(J5-Pin_11-Pad11)",
+  "unconnected-(J5-Pin_12-Pad12)",
+  "unconnected-(J5-Pin_13-Pad13)",
+  "unconnected-(J5-Pin_14-Pad14)",
+  "unconnected-(U2-~{FLT}-Pad3)",
+  "unconnected-(U6-~{FLG}-Pad3)"
+ ],
+ "footprint_dir": "/Users/kartikey/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints",
+ "planes": [
+  {
+   "net": "GND",
+   "layer": "In1.Cu"
+  },
+  {
+   "net": "+5V",
+   "layer": "In2.Cu"
+  }
+ ],
+ "fanout_avoid": [],
+ "no_fanout": [],
+ "fanout_pads": {},
+ "preroutes": [],
+ "reference_copper": null,
+ "local_footprints": {
+  "EoS_Connectors": "/private/tmp/claude-501/-Users-kartikey-Desktop-task/976907d0-9b6c-4cb9-9098-77aa58ceb1c8/scratchpad/wt-pr54/tools/eos_boards/footprints/EoS_Connectors.pretty"
+ },
+ "router_keepouts": [],
+ "copper_keepouts": [
+  [
+   55.0,
+   26.0,
+   63.0,
+   41.0
+  ]
+ ],
+ "priority_routes": [
+  [
+   [
+    "J1",
+    "3"
+   ],
+   [
+    "U5",
+    "7"
+   ]
+  ],
+  [
+   [
+    "U5",
+    "7"
+   ],
+   [
+    "U5",
+    "4"
+   ]
+  ],
+  [
+   [
+    "U5",
+    "4"
+   ],
+   [
+    "J5",
+    "9"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "5"
+   ],
+   [
+    "U5",
+    "6"
+   ]
+  ],
+  [
+   [
+    "U5",
+    "6"
+   ],
+   [
+    "U5",
+    "5"
+   ]
+  ],
+  [
+   [
+    "U5",
+    "5"
+   ],
+   [
+    "J5",
+    "10"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "9"
+   ],
+   [
+    "U5",
+    "9"
+   ]
+  ],
+  [
+   [
+    "U5",
+    "9"
+   ],
+   [
+    "U5",
+    "2"
+   ]
+  ],
+  [
+   [
+    "U5",
+    "2"
+   ],
+   [
+    "J5",
+    "8"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "11"
+   ],
+   [
+    "U5",
+    "10"
+   ]
+  ],
+  [
+   [
+    "U5",
+    "10"
+   ],
+   [
+    "U5",
+    "1"
+   ]
+  ],
+  [
+   [
+    "U5",
+    "1"
+   ],
+   [
+    "J5",
+    "7"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "4"
+   ],
+   [
+    "U4",
+    "7"
+   ]
+  ],
+  [
+   [
+    "U4",
+    "7"
+   ],
+   [
+    "U4",
+    "4"
+   ]
+  ],
+  [
+   [
+    "U4",
+    "4"
+   ],
+   [
+    "J5",
+    "3"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "6"
+   ],
+   [
+    "U4",
+    "6"
+   ]
+  ],
+  [
+   [
+    "U4",
+    "6"
+   ],
+   [
+    "U4",
+    "5"
+   ]
+  ],
+  [
+   [
+    "U4",
+    "5"
+   ],
+   [
+    "J5",
+    "6"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "10"
+   ],
+   [
+    "U4",
+    "9"
+   ]
+  ],
+  [
+   [
+    "U4",
+    "9"
+   ],
+   [
+    "U4",
+    "2"
+   ]
+  ],
+  [
+   [
+    "U4",
+    "2"
+   ],
+   [
+    "J5",
+    "2"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "12"
+   ],
+   [
+    "U4",
+    "10"
+   ]
+  ],
+  [
+   [
+    "U4",
+    "10"
+   ],
+   [
+    "U4",
+    "1"
+   ]
+  ],
+  [
+   [
+    "U4",
+    "1"
+   ],
+   [
+    "J5",
+    "1"
+   ]
+  ],
+  [
+   [
+    "J2",
+    "36"
+   ],
+   [
+    "U3",
+    "3"
+   ]
+  ],
+  [
+   [
+    "U3",
+    "4"
+   ],
+   [
+    "J4",
+    "2"
+   ]
+  ],
+  [
+   [
+    "J2",
+    "34"
+   ],
+   [
+    "U3",
+    "1"
+   ]
+  ],
+  [
+   [
+    "U3",
+    "6"
+   ],
+   [
+    "J4",
+    "3"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "67"
+   ],
+   [
+    "J6",
+    "8"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "63"
+   ],
+   [
+    "J6",
+    "7"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "57"
+   ],
+   [
+    "J6",
+    "5"
+   ]
+  ],
+  [
+   [
+    "J1",
+    "58"
+   ],
+   [
+    "J7",
+    "3"
+   ]
+  ]
+ ],
+ "escape_footprints": [
+  "J1",
+  "J2"
+ ],
+ "maze_via_cost_mm": 8.0,
+ "zones": [
+  {
+   "net": "GND",
+   "layers": [
+    "F.Cu",
+    "B.Cu"
+   ]
+  }
+ ],
+ "texts": [
+  {
+   "text": "EoS CM5 Base  rev A",
+   "x": 45.0,
+   "y": 66.0,
+   "size": 1.2,
+   "bold": true
+  },
+  {
+   "text": "EoS CM5 Base  rev A",
+   "x": 62.0,
+   "y": 60.0,
+   "size": 1.0,
+   "layer": "B_SilkS",
+   "bold": true,
+   "mirror": true
+  },
+  {
+   "text": "(c) 2026 Kartikeydheer Srivastava",
+   "x": 62.0,
+   "y": 62.0,
+   "size": 0.8,
+   "layer": "B_SilkS",
+   "mirror": true
+  },
+  {
+   "text": "All rights reserved",
+   "x": 62.0,
+   "y": 63.4,
+   "size": 0.8,
+   "layer": "B_SilkS",
+   "mirror": true
+  }
+ ]
+}

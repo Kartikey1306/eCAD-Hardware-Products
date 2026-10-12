@@ -34,7 +34,7 @@ polyfuse. Target connector: the Arm 10-pin Cortex Debug header (1.27 mm). Target
 
 from __future__ import annotations
 
-from ..design import NC, Board, Part
+from ..design import NC, Board, Part, USB_C_EDGE
 from .owner import CONTACT, LICENCE, LICENCE_TERMS, OWNER
 
 R0402 = "Resistor_SMD:R_0402_1005Metric"
@@ -160,7 +160,7 @@ MODULE = (W - 6.75, H / 2)       # module origin: its antenna starts 6.75 mm out
 PLACEMENT = {
     "U3": (MODULE[0], MODULE[1], 270),
     # USB-C, ESD and the 3.3 V supply on the left; the LDO and its capacitors bottom left
-    "J1": (3.8, 16.0, 270), "U1": (11.8, 16.0, 90), "R1": (9.5, 10.0, 0), "R2": (9.5, 22.0, 0),
+    "J1": (USB_C_EDGE, 16.0, 270), "U1": (11.8, 16.0, 90), "R1": (9.5, 10.0, 0), "R2": (9.5, 22.0, 0),
     "F1": (15.0, 8.0, 90), "U2": (16.4, 24.0, 0), "C1": (9.8, 27.8, 0), "C2": (24.2, 27.8, 0),
     "R3": (28.0, 27.8, 0), "D1": (31.0, 27.8, 180),
     # beside the module's 3V3 and EN pins (top right): decoupling, EN delay, reset button

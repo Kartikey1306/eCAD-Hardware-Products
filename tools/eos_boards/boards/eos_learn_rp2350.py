@@ -22,7 +22,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ..design import NC, Board, Part
+from ..design import NC, Board, Part, USB_C_EDGE
 from .owner import CONTACT, LICENCE, LICENCE_TERMS, OWNER
 
 R0402 = "Resistor_SMD:R_0402_1005Metric"
@@ -175,7 +175,7 @@ PLACEMENT = {
     "J2": (3.44, 1.7, 0), "J3": (W - 3.44, 1.7, 0),
     "H1": (12.33, 4.3, 0), "H2": (W - 12.33, 4.3, 0), "H3": (12.33, H - 4.12, 0), "H4": (W - 12.33, H - 4.12, 0),
     # USB-C at the top edge, protection and CC pull-downs below it, fuse and LDO to the right
-    "J1": (MCU[0], 3.8, 180), "U2": (MCU[0], 11.0, 0), "R1": (21.4, 10.6, 90), "R2": (31.2, 10.6, 90),
+    "J1": (MCU[0], USB_C_EDGE, 180), "U2": (MCU[0], 11.0, 0), "R1": (21.4, 10.6, 90), "R2": (31.2, 10.6, 90),
     "F1": (34.0, 7.8, 0), "D1": (31.6, 14.2, 90), "C1": (39.0, 9.6, 0), "U3": (37.6, 14.8, 180), "C2": (37.6, 19.9, 0),
     # RP2350A, its regulator, decoupling, crystal and USB resistors: see REFERENCE below
     "C17": (32.78, 26.3, 0),                                                              # ADC_AVDD (pin 44)

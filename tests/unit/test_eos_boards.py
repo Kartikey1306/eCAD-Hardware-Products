@@ -520,6 +520,26 @@ EOS_BOARDS = {"eos-learn-rp2350": "eos_learn_rp2350", "eos-sense-cape": "eos_sen
               "eos-probe-s3": "eos_probe_s3", "eos-cm5-base": "eos_cm5_base"}
 
 
+class UsbCEdgeTest(unittest.TestCase):
+    """Every HRO TYPE-C-31-M-12 faces a board edge at the distance HRO's recommended layout gives
+    (design.USB_C_EDGE), so the shell stands proud of the edge and a plug seats fully."""
+
+    def test_each_usb_c_receptacle_sits_at_hros_edge_distance(self):
+        seen = 0
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            board = importlib.import_module(f"eos_boards.boards.{path.stem}").BOARD
+            for part in board.parts:
+                if not part.footprint.endswith(":USB_C_Receptacle_HRO_TYPE-C-31-M-12"):
+                    continue
+                x, y, rot = part.pcb
+                # the mating face is the footprint's +y side; rotated, it faces one board edge
+                to_edge = {0: board.height - y, 90: board.width - x, 180: y, 270: x}[round(rot) % 360]
+                with self.subTest(board=path.stem, part=part.ref):
+                    self.assertAlmostEqual(to_edge, design.USB_C_EDGE, delta=0.05)   # HRO's layout tolerance
+                seen += 1
+        self.assertGreater(seen, 0)
+
+
 class OwnershipTest(unittest.TestCase):
     """The four boards are Kartikeydheer Srivastava's, all rights reserved. Everywhere a reader or a
     fab sees the licence says so, and nothing still gives the boards themselves the MIT licence."""
