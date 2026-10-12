@@ -11,6 +11,7 @@ board's schematic, layout, routing, checks and fabrication outputs; see
 | [EoS Sense Cape](eos-sense-cape) | Sensor cape for PocketBeagle; fit checked pin for pin against PocketBeagle's board file | 2 | 0 | 0 | 0 | 0 |
 | [EoS Probe S3](eos-probe-s3) | ESP32-S3 SWD/JTAG + UART debug probe, 1.65–5.5 V targets | 2 | 0 | 0 | 0 | 0 |
 | [EoS CM5 Base](eos-cm5-base) | Raspberry Pi CM5 carrier: USB-C power, Gigabit Ethernet, USB 2.0 host, microSD, 40-pin GPIO; connectors checked pad for pad against the CM5 | 4 | 0 | 0 | 0 | 0 |
+| [EoS CM4 Base](eos-cm4-base) | Raspberry Pi CM4 carrier: USB-C power, one USB 2.0 port switched between USB-C (device) and USB-A (host), Gigabit Ethernet, microSD, 40-pin GPIO | 4 | 0 | 0 | 0 | 0 |
 
 Each board folder contains:
 
@@ -30,7 +31,7 @@ checked and what was not.
 
 ## Licence
 
-These four boards are **not open source**, and they are **not** under the MIT licence that
+These boards are **not open source**, and they are **not** under the MIT licence that
 covers this repository's own code. They are Copyright (c) 2026 Kartikeydheer Srivastava, all
 rights reserved. Each board's `LICENSE.txt` has the full terms. In short:
 
@@ -49,12 +50,11 @@ rights reserved. Each board's `LICENSE.txt` has the full terms. In short:
 
 What the licence covers:
 
-- the four board folders here (`eos-learn-rp2350/`, `eos-sense-cape/`, `eos-probe-s3/`,
-  `eos-cm5-base/`), except the two generic symbol libraries copied into
-  `eos-cm5-base/hardware/symbols/`, which are MIT like the generator that writes them;
+- every board folder here, except the generic symbol libraries copied into a board's
+  `hardware/symbols/`, which are MIT like the generator that writes them;
 - in `tools/eos_boards`: the boards' design files `boards/eos_*.py`, `boards/owner.py`, the
-  licence terms `boards/licence_terms.txt`, and the footprint library drawn for the CM5
-  carrier, `footprints/EoS_Connectors.pretty`.
+  licence terms `boards/licence_terms.txt`, and the footprint library drawn for the module
+  carriers, `footprints/EoS_Connectors.pretty`.
 
 The rest of `tools/eos_boards` (the generator, the reference extractors and `symbols/`) and
 its tests stay under the repository's MIT licence.

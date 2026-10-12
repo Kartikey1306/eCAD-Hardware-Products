@@ -37,9 +37,9 @@ def nm(value: float) -> int:
     return round(value * 1_000_000)
 
 
-def pinout(text: str) -> dict:
+def pinout(text: str, heading: str = "4.2. Pinout") -> dict:
     lines = text.splitlines()
-    start = next(i for i, line in enumerate(lines) if line.strip() == "4.2. Pinout")   # the heading, not the contents line
+    start = next(i for i, line in enumerate(lines) if line.strip() == heading)   # the heading, not the contents line
     pins = {}
     for line in lines[start:start + 420]:
         m = re.match(r"^\s{0,3}(\d{1,3})\s+(\S+(?: \((?:Input|Output)\))?)\s{2,}", line)

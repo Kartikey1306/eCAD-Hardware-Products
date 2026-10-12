@@ -42,7 +42,7 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ### Exception: the EmbeddedOS original boards
 
-The four boards in `boards/eos/` are Copyright (c) 2026 Kartikeydheer Srivastava, all rights
+The EmbeddedOS original boards in `boards/eos/` are Copyright (c) 2026 Kartikeydheer Srivastava, all rights
 reserved. They are not under the MIT License, and the paragraph above does not apply to them.
 The exact files are listed in [boards/eos/README.md](boards/eos/README.md#licence).
 

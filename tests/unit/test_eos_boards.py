@@ -11,6 +11,7 @@ from __future__ import annotations
 import importlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -378,6 +379,48 @@ class CM5FitTest(unittest.TestCase):
         self.assertEqual(nets[96], "/CC2")
 
 
+CM4_PCB = REPO_ROOT / "boards" / "eos" / "eos-cm4-base" / "hardware" / "eos-cm4-base.kicad_pcb"
+CM4_PINS = REPO_ROOT / "tools" / "eos_boards" / "reference" / "cm4_pins.json"
+
+
+class CM4FitTest(CM5FitTest):
+    """The CM4 carrier: the same connector pads and holes as the CM5's (Figure 4 of both datasheets),
+    every pin's net from the CM4 datasheet's own pinout."""
+
+    @classmethod
+    def setUpClass(cls):
+        assert CM4_PCB.is_file(), f"built board missing: {CM4_PCB}"
+        from eos_boards.boards import eos_cm4_base as board
+        cls.board = board
+        cls.ref = json.loads(CM5_REF.read_text())
+        cls.pins = json.loads(CM4_PINS.read_text())["pins"]
+        cls.pcb = loads(CM4_PCB.read_text())
+
+    def test_connector_nets_follow_the_datasheet(self):
+        nets = {}
+        for fp in find_all(self.pcb, "footprint"):
+            ref = next(str(p[2]) for p in find_all(fp, "property") if str(p[1]) == "Reference")
+            if ref in ("J1", "J2"):
+                for pad in find_all(fp, "pad"):
+                    n = find(pad, "net")
+                    nets[int(str(pad[1])) + (100 if ref == "J2" else 0)] = str(n[-1]) if n else None
+        self.assertEqual(len(self.pins), 200)
+        for pin, name in self.pins.items():
+            got = nets[int(pin)]
+            if name == "GND":
+                self.assertEqual(got, "GND", f"pin {pin}")
+            elif name == "+5V":
+                self.assertEqual(got, "+5V", f"pin {pin}")
+            elif name in ("CM4_3.3V", "GPIO_VREF"):
+                self.assertEqual(got, "+3V3", f"pin {pin}")
+            elif name.startswith("GPIO") and name[4:].isdigit():
+                self.assertEqual(got, f"/{name}", f"pin {pin}")
+            elif name in ("CM4_1.8V", "Reserved") or name.startswith(("HDMI", "CAM", "DSI", "PCIe")):
+                self.assertTrue(got is None or got.startswith("unconnected-"), f"pin {pin} ({name}) carries {got}")
+        self.assertEqual((nets[94], nets[96]), ("/CC1", "/CC2"))          # AnalogIP1/0: the USB-C CC lines
+        self.assertEqual((nets[101], nets[103], nets[105]), ("/OTG_ID", "/USB_N", "/USB_P"))
+        self.assertEqual(nets[92], "/RUN_PG")
+
 
 def _parts(pcb):
     """{reference: (value, {pad number: net})} from a built board."""
@@ -398,7 +441,7 @@ class BoardIntentTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.boards = {}
-        for name in ("eos-learn-rp2350", "eos-sense-cape", "eos-probe-s3", "eos-cm5-base"):
+        for name in ("eos-learn-rp2350", "eos-sense-cape", "eos-probe-s3", "eos-cm5-base", "eos-cm4-base"):
             path = REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb"
             assert path.is_file(), f"built board missing: {path}"
             cls.boards[name] = _parts(loads(path.read_text()))
@@ -451,6 +494,22 @@ class BoardIntentTest(unittest.TestCase):
                              if ref not in ("J1", "J3")), "the CM5 negotiates USB-C power itself: no CC resistors")
         self.assertEqual(b["U2"][1], {"1": "/USBH_VBUS", "2": "GND", "3": b["U2"][1]["3"], "4": "/VBUS_EN", "5": "+5V"})
 
+    def test_cm4_usb_switch_power_and_controls(self):
+        b = self.boards["eos-cm4-base"]
+        u7 = b["U7"][1]                                                    # TS3USB30E (VSSOP pins)
+        self.assertEqual((u7["1"], u7["9"], u7["10"], u7["5"]), ("/OTG_ID", "GND", "+3V3", "GND"))   # S, ~OE, VCC, GND
+        self.assertEqual((u7["4"], u7["6"]), ("/USB_P", "/USB_N"))                                   # common side: the CM4
+        self.assertEqual((u7["2"], u7["8"]), ("/USBH_DP", "/USBH_DM"))   # D1: S low (host jumper fitted) -> USB-A
+        self.assertEqual((u7["3"], u7["7"]), ("/USBC_DP", "/USBC_DM"))   # D2: S high (default device) -> USB-C
+        self.assertEqual(b["U2"][0], "TPS2041B")                            # enable active low: on in host mode
+        self.assertEqual(b["U2"][1]["4"], "/OTG_ID")
+        self.assertEqual(b["J9"][1], {"1": "/NRPIBOOT", "2": "GND", "3": "/EEPROM_NWP", "4": "GND", "5": "/OTG_ID", "6": "GND"})
+        for ref, cc in (("R6", "/CC1"), ("R7", "/CC2")):                   # USB-C sink: Rd on each CC
+            self.assertEqual((b[ref][0], set(b[ref][1].values())), ("5.1k", {cc, "GND"}), ref)
+        self.assertEqual((b["R8"][0], set(b["R8"][1].values())), ("220", {"/RUN_PG", "/RUN_RST"}))
+        self.assertEqual(b["Q1"][1]["1"], "/PI_LED_NPWR")                  # BSS84 gate: the buffered power LED
+        self.assertNotIn("BT1", b)                                          # the CM4 has no RTC battery input
+
 
 
 def _segment_meets_box(a, b, box):
@@ -484,9 +543,14 @@ class AntennaKeepoutTest(unittest.TestCase):
     """The CM5 datasheet (section 4.1.2) forbids metal, ground planes included, under the module's
     PCB antenna. The carrier keeps a rule area there on every copper layer, and nothing is in it."""
 
-    def test_no_copper_under_the_cm5_antenna(self):
-        module = importlib.import_module("eos_boards.boards.eos_cm5_base")
-        pcb = loads((REPO_ROOT / "boards" / "eos" / "eos-cm5-base" / "hardware" / "eos-cm5-base.kicad_pcb").read_text())
+    def test_no_copper_under_the_module_antenna(self):
+        for name in ("eos-cm5-base", "eos-cm4-base"):
+            with self.subTest(board=name):
+                self._check(name)
+
+    def _check(self, name):
+        module = importlib.import_module(f"eos_boards.boards.{name.replace('-', '_')}")
+        pcb = loads((REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb").read_text())
         x0, y0, x1, y1 = module.ANTENNA_KEEPOUT
         corners = [module.from_module(x, y) for x, y in ((0.0, 10.5), (6.5, 21.5))]      # Figure 4's cut-out
         self.assertTrue(all(x0 <= x <= x1 and y0 <= y <= y1 for x, y in corners), (module.ANTENNA_KEEPOUT, corners))
@@ -516,8 +580,8 @@ class AntennaKeepoutTest(unittest.TestCase):
                 self.assertFalse(hits, f"{str(find(fill, 'layer')[1])} pour under the antenna at {hits[:3]}")
 
 
-EOS_BOARDS = {"eos-learn-rp2350": "eos_learn_rp2350", "eos-sense-cape": "eos_sense_cape",
-              "eos-probe-s3": "eos_probe_s3", "eos-cm5-base": "eos_cm5_base"}
+EOS_DIR = REPO_ROOT / "boards" / "eos"
+EOS_BOARDS = {d.name: d.name.replace("-", "_") for d in sorted(EOS_DIR.iterdir()) if (d / "README.md").is_file()}
 
 
 class UsbCEdgeTest(unittest.TestCase):
@@ -541,7 +605,7 @@ class UsbCEdgeTest(unittest.TestCase):
 
 
 class OwnershipTest(unittest.TestCase):
-    """The four boards are Kartikeydheer Srivastava's, all rights reserved. Everywhere a reader or a
+    """The boards are Kartikeydheer Srivastava's, all rights reserved. Everywhere a reader or a
     fab sees the licence says so, and nothing still gives the boards themselves the MIT licence."""
 
     def test_each_board_carries_the_all_rights_reserved_licence(self):
@@ -567,6 +631,25 @@ class OwnershipTest(unittest.TestCase):
                 readme = (folder / "README.md").read_text()
                 self.assertIn("All rights reserved: not open source", readme)
                 self.assertNotIn("MIT licence (see", readme)
+
+    def test_every_design_file_has_a_built_board_and_the_other_way_round(self):
+        designs = {p.stem for p in (REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")}
+        self.assertEqual(designs, set(EOS_BOARDS.values()))
+
+    def test_index_lists_every_board_with_its_recorded_checks(self):
+        rows = {}
+        for line in (EOS_DIR / "README.md").read_text().splitlines():
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            link = re.match(r"\[[^\]]+\]\(([^)/]+)\)$", cells[0]) if len(cells) == 7 else None
+            if link:
+                rows[link.group(1)] = tuple(int(c) for c in cells[3:7])
+        self.assertEqual(set(rows), set(EOS_BOARDS))
+        for name, (erc, drc, unconnected, parity) in rows.items():
+            report = json.loads((EOS_DIR / name / "build-report.json").read_text())
+            drc_json = json.loads((EOS_DIR / name / "drc.json").read_text())
+            self.assertEqual((erc, drc, unconnected, parity),
+                             (report["erc_violations"], report["drc_errors"], len(drc_json["unconnected_items"]),
+                              len(drc_json["schematic_parity"])), name)
 
     def test_generic_symbols_copied_into_a_board_stay_mit(self):
         licence = (REPO_ROOT / "boards" / "eos" / "eos-cm5-base" / "LICENSE.txt").read_text()

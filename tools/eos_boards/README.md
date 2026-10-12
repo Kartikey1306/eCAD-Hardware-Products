@@ -107,6 +107,9 @@ table.
   header pins, from BeagleBoard.org's board file (CC BY 4.0).
 - `reference/cm5_carrier.json` (`extract_cm5.py`): the CM5's 200-pin list from its datasheet, and
   its connector pads and mounting holes from the CM5 footprint in Raspberry Pi's CM5 IO Board files.
+- `reference/cm4_pins.json` (`extract_cm4.py`): the CM4's 200-pin list from its datasheet. Figure 4
+  of the CM4 and CM5 datasheets shows the same outline, holes, connector offsets and wireless
+  cut-out, so a CM4 carrier uses `cm5_carrier.json`'s pads and holes.
 
 Only positions and pin names are taken; no file from either source is copied into this
 repository. The tests check the cape's sockets and the carrier's connectors and holes against
@@ -114,7 +117,7 @@ these files, pad by pad.
 
 ## Licence
 
-Everything in this folder is under the repository's MIT licence except the four EmbeddedOS
+Everything in this folder is under the repository's MIT licence except the EmbeddedOS
 boards' own files: their design files (`boards/eos_*.py`, `boards/owner.py`), their licence
 terms (`boards/licence_terms.txt`) and the footprint library drawn for them
 (`footprints/EoS_Connectors.pretty`). Those, and the boards' folders in `boards/eos/`, are

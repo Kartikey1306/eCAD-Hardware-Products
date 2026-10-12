@@ -15,6 +15,18 @@ has never run.
 
 ### Added
 
+- EoS CM4 Base, a carrier for the Raspberry Pi Compute Module 4. It is EoS CM5 Base's layout,
+  changed where the CM4 differs:
+  - USB-C with 5.1 kohm CC pull-downs, also routed to AnalogIP0/1;
+  - one USB 2.0 port that a TS3USB30E switches between USB-C (device) and USB-A (host),
+    by USB_OTG_ID;
+  - a reset button on RUN_PG through 220 ohm, and a buffered power LED;
+  - no copper under the CM4's antenna (`copper_keepouts`), as its datasheet requires.
+  Every pin's net comes from the CM4 datasheet. `reference/cm4_pins.json` is written by
+  `extract_cm4.py`. The tests check the connector pads and holes at 1 nm and every pin's net.
+  Like the other EmbeddedOS boards, it is all rights reserved, not MIT.
+- The board index and the tests take the list of boards from `boards/eos/` itself. A test
+  checks that every index row matches its board's build report.
 - `copper_keepouts` in `tools/eos_boards`: no copper on any layer inside a rectangle, kept as a
   rule area that zone fills, the router and DRC all honour. EoS CM5 Base keeps the CM5's
   antenna cut-out clear with it, as the CM5 datasheet requires (section 4.1.2).
