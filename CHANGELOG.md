@@ -45,6 +45,10 @@ has never run.
   Like the other EmbeddedOS boards, it is all rights reserved, not MIT.
 - EoS CM4 Base and EoS ESP32 DevKit place their USB-C receptacles at `design.USB_C_EDGE`, like
   the first four boards (see Fixed), and are rebuilt.
+- `tools/eos_boards`: on a two-layer board, a chip's exposed ground pad now gets the same 2 × 2
+  vias as on a four-layer one, into the bottom pour. EoS ESP32 DevKit's CP2102N centre pad had none
+  and reached ground through one track; the board is rebuilt. A footprint that brings its own
+  thermal vias (the RP2350A's, the ESP32-S3 module's) gets none added. A test checks every board.
 - The board index and the tests take the list of boards from `boards/eos/` itself. A test
   checks that every index row matches its board's build report.
 - `copper_keepouts` in `tools/eos_boards`: no copper on any layer inside a rectangle, kept as a

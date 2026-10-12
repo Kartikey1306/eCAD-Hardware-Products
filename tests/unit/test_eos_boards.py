@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import importlib
 import json
+import math
 import os
 import re
 import subprocess
@@ -721,6 +722,38 @@ class UsbCEdgeTest(unittest.TestCase):
                     self.assertAlmostEqual(to_edge, design.USB_C_EDGE, delta=0.05)   # HRO's layout tolerance
                 seen += 1
         self.assertGreater(seen, 0)
+
+
+class ExposedPadTest(unittest.TestCase):
+    """A chip's exposed ground pad is joined to ground through the board, not by a lone track:
+    the generator puts vias in it (or its footprint brings through-hole thermal vias)."""
+
+    def test_every_exposed_ground_pad_has_a_via_in_it(self):
+        for folder in sorted((REPO_ROOT / "boards" / "eos").iterdir()):
+            pcb_path = folder / "hardware" / f"{folder.name}.kicad_pcb"
+            if not pcb_path.is_file():
+                continue
+            pcb = loads(pcb_path.read_text(encoding="utf-8"))
+            vias = [(float(find(v, "at")[1]), float(find(v, "at")[2])) for v in find_all(pcb, "via")
+                    if str(find(v, "net")[-1]) == "GND"]
+            for fp in find_all(pcb, "footprint"):
+                ref = next(str(p[2]) for p in find_all(fp, "property") if str(p[1]) == "Reference")
+                at = find(fp, "at")
+                fx, fy, rot = float(at[1]), float(at[2]), math.radians(float(at[3]) if len(at) > 3 else 0)
+                pads = find_all(fp, "pad")
+                for pad in pads:
+                    net = find(pad, "net")
+                    w, h = (float(v) for v in find(pad, "size")[1:3])
+                    if str(pad[2]) != "smd" or net is None or str(net[-1]) != "GND" or min(w, h) <= 2.0:
+                        continue
+                    with self.subTest(board=folder.name, pad=f"{ref}.{pad[1]}"):
+                        if any(str(q[1]) == str(pad[1]) and str(q[2]) == "thru_hole" for q in pads):
+                            continue                     # the footprint's own thermal vias
+                        px, py = (float(v) for v in find(pad, "at")[1:3])
+                        cx = fx + px * math.cos(rot) + py * math.sin(rot)
+                        cy = fy - px * math.sin(rot) + py * math.cos(rot)
+                        inside = [v for v in vias if abs(v[0] - cx) < w / 2 and abs(v[1] - cy) < h / 2]
+                        self.assertTrue(inside, "no via in the exposed pad")
 
 
 class OwnershipTest(unittest.TestCase):

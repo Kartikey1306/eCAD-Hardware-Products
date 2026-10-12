@@ -172,11 +172,16 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
     gets a short track and a via, placed outward from its part, on the first side that is
     clear of every other pad and via. An exposed pad gets a 2 x 2 array of vias in the pad.
     The autorouter is then left with the signals; a pad that finds no clear spot is left to it.
+    On a board with no inner plane, an exposed pad on a net poured on both outer layers still
+    gets its 2 x 2 vias, into the bottom pour: a QFN's centre pad is its ground, and without
+    them it hangs on whatever track the router leaves it.
     Returns (vias placed, pads left to the router).
     """
     r = spec["rules"]
     plane_nets = {pl["net"] for pl in spec.get("planes", [])}
-    if not plane_nets:
+    ep_nets = set() if plane_nets else {z["net"] for z in spec.get("zones", [])
+                                        if {"F.Cu", "B.Cu"} <= set(z["layers"])}
+    if not plane_nets and not ep_nets:
         return 0, 0
     via_r = MM(r["via"] / 2)
     keep = via_r + MM(r["clearance"] + 0.02)
@@ -221,12 +226,18 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
         centre = fp.GetPosition()
         for pad in fp.Pads():
             net = pad.GetNet()
-            if net is None or net.GetNetname() not in plane_nets or pad.GetAttribute() != P.PAD_ATTRIB_SMD:
+            if net is None or net.GetNetname() not in plane_nets | ep_nets or pad.GetAttribute() != P.PAD_ATTRIB_SMD:
                 continue
             if fp.GetReference() in skip and pad.GetNumber() not in spec.get("fanout_pads", {}).get(fp.GetReference(), []):
                 continue
             size = pad.GetBoundingBox()
-            if min(size.GetWidth(), size.GetHeight()) > MM(2.0):        # exposed pad: vias in the pad
+            exposed = min(size.GetWidth(), size.GetHeight()) > MM(2.0)
+            if not exposed and net.GetNetname() not in plane_nets:
+                continue                                                 # two layers: exposed pads only
+            if exposed and any(q.GetNumber() == pad.GetNumber() and q.GetAttribute() == P.PAD_ATTRIB_PTH
+                               for q in fp.Pads()):
+                continue                                                 # its footprint has thermal vias
+            if exposed:                                                  # exposed pad: vias in the pad
                 c = pad.GetPosition()
                 off = MM(0.6)
                 for dx, dy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
@@ -549,8 +560,8 @@ def place(spec, pcb_path, dsn_path):
                 item.SetLocked(True)
         print(f"priority route {ra}.{pa} -> {rb}.{pb} ({net.GetNetname()}): "
               f"{len(laid)} escape segment(s) from the reference, then {len(got)} item(s)")
-    if spec.get("planes"):
-        placed, left = fanout(board, spec, exclude=early)
+    placed, left = fanout(board, spec, exclude=early)      # two layers: the exposed pads' vias only
+    if placed or left:
         print(f"plane fan-out: {placed} vias, {left} pads left to the router")
     for x0, y0, x1, y1 in spec.get("copper_keepouts", []):
         copper_keepout(board, [(MM(x0), MM(y0)), (MM(x1), MM(y0)), (MM(x1), MM(y1)), (MM(x0), MM(y1))])

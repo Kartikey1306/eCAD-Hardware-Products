@@ -24,7 +24,9 @@ paths that `kicad_env.py` and `build.py` use.
 2. **Placement** (`pcb_build.py place`). Places footprints and links each one to its symbol.
    Adds the outline, design rules, net classes, inner planes and any reference copper (below).
    Then lays any `priority_routes` (a bus the design routes first, in a set order), and gives each
-   plane-net pad a short stub and a via into its plane. Finally writes a Specctra DSN for the router.
+   plane-net pad a short stub and a via into its plane. An exposed pad gets a 2 × 2 array of vias
+   in the pad, on a two-layer board too, into the bottom pour, unless its footprint brings its own
+   thermal vias. Finally writes a Specctra DSN for the router.
 3. **Routing**. Freerouting, headless. The router is given 0.01 mm more clearance than the board's
    rules, so its grid rounding never reaches DRC.
 4. **Finish** (`pcb_build.py finish`). Imports the routes, widens any track the router necked
