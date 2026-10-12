@@ -15,6 +15,9 @@ has never run.
 
 ### Added
 
+- `copper_keepouts` in `tools/eos_boards`: no copper on any layer inside a rectangle, kept as a
+  rule area that zone fills, the router and DRC all honour. EoS CM5 Base keeps the CM5's
+  antenna cut-out clear with it, as the CM5 datasheet requires (section 4.1.2).
 - `tools/eos_boards`, a board generator, and four original boards built with it under
   `boards/eos/`: EoS Learn RP2350, EoS Sense Cape for PocketBeagle, EoS Probe S3 and EoS CM5
   Base. Each board is written in one design file. From it the generator writes the KiCad
