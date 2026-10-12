@@ -142,6 +142,17 @@ class SpecTest(_Lib):
         self.assertEqual(pads, {"1": "/GND", "3": "/GND", "4": "/GND",              # one stacked pin, three pads
                                 "2": "unconnected-(U1-A{slash}B-Pad2)"})            # the net KiCad gives it
 
+    def test_a_footprint_follows_its_symbols_bom_flag(self):
+        # a library test point: the symbol says (in_bom no) or yes, and the footprint must agree,
+        # or KiCad's parity check reports "Exclude from bill of materials settings differ"
+        Path(self.tmp.name, "T.kicad_sym").write_text(SYMBOLS.replace('(symbol "R" (pin_names (offset 0)) (in_bom yes)',
+                                                                      '(symbol "R" (pin_names (offset 0)) (in_bom no)'))
+        lib = Library(Path(self.tmp.name))
+        board = self.board([Part("TP1", "T:R", "TP", "fp", (50, 50), {"1": "A", "2": NC}),
+                            Part("U1", "T:M", "M", "fp", (80, 50), {"GND": "GND", "A/B": NC})])
+        flags = {p["ref"]: p["in_bom"] for p in build.spec_for(board, lib, Path(self.tmp.name), [])["parts"]}
+        self.assertEqual(flags, {"TP1": False, "U1": True})
+
 
 class ClashTest(unittest.TestCase):
     def test_clearance_clashes_pick_the_via_then_the_shorter_track_and_leave_pads(self):

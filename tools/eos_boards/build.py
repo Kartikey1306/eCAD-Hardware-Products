@@ -35,7 +35,7 @@ sys.path.insert(0, str(HERE.parent))
 from eos_boards import kicad_env, schematic  # noqa: E402
 from eos_boards.design import ALL_RIGHTS_RESERVED, NC, Board, resolve  # noqa: E402
 from eos_boards.kicad_lib import Library  # noqa: E402
-from eos_boards.sexpr import find_all  # noqa: E402
+from eos_boards.sexpr import find, find_all  # noqa: E402
 
 RULES = {"track": 0.15, "clearance": 0.15, "via": 0.6, "drill": 0.3, "min_track": 0.1,
          "min_clearance": 0.15, "min_via": 0.5, "min_drill": 0.25, "edge_clearance": 0.3,
@@ -174,7 +174,9 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
                   if str(p[1]) not in ("Reference", "Value", "Footprint", "private")
                   and not str(p[1]).startswith("ki_")}
         fields.update(part.fields)
-        parts.append({"ref": part.ref, "value": part.value, "footprint": part.footprint,
+        flag = find(symbol, "in_bom")
+        in_bom = not (flag is not None and str(flag[1]) == "no")      # as the schematic writes it
+        parts.append({"ref": part.ref, "value": part.value, "footprint": part.footprint, "in_bom": in_bom,
                       "x": part.pcb[0], "y": part.pcb[1], "rot": part.pcb[2], "side": part.side,
                       "pads": pads, "uuid": schematic._u(f"{board.name}/sym/{part.ref}"), "dnp": part.dnp,
                       "fields": fields, "model": list(part.model) if part.model else None})

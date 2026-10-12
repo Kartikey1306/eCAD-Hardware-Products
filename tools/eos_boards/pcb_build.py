@@ -475,6 +475,9 @@ def place(spec, pcb_path, dsn_path):
             fp.Flip(fp.GetPosition(), P.FLIP_DIRECTION_LEFT_RIGHT)
         if part.get("dnp"):
             fp.SetDNP(True)
+        # the footprint follows its symbol, as KiCad's own Update PCB from Schematic does: a library
+        # test point excludes itself from the BOM while its symbol counts it, a parity difference
+        fp.SetExcludedFromBOM(not part.get("in_bom", True))
         for key, val in part.get("fields", {}).items():
             fp.SetField(key, val)
             field = fp.GetField(key)

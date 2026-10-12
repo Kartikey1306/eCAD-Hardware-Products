@@ -21,6 +21,6 @@
 "SW1","EN","Button_Switch_SMD:SW_Push_1P1T_NO_CK_KMR2","C&K","KMR221G LFS","Tactile switch, EN (reset)","1",""
 "SW2","BOOT","Button_Switch_SMD:SW_Push_1P1T_NO_CK_KMR2","C&K","KMR221G LFS","Tactile switch, BOOT (IO0 low: download mode)","1",""
 "U1","ESP32-WROOM-32E-N4","RF_Module:ESP32-WROOM-32E","Espressif","ESP32-WROOM-32E-N4","ESP32 module, 4 MB flash, no PSRAM, PCB antenna (pins 17-22 and 32 NC, datasheet v2.1 Table 3)","1",""
-"U2","USBLC6-2SC6","Package_TO_SOT_SMD:SOT-23-6","STMicroelectronics","USBLC6-2SC6","USB ESD protection, D+/D- and VBUS (ST DS4260 Rev. 7)","1",""
+"U2","SP0503BAHTG","Package_TO_SOT_SMD:SOT-143","Littelfuse","SP0503BAHTG","USB ESD protection, three diodes to GND on D+, D- and VBUS, no path between them (CP2102N data sheet Figure 2.5)","1",""
 "U3","AP7361C-33","Package_TO_SOT_SMD:SOT-223-3_TabPin2","Diodes Incorporated","AP7361C-33E-13","LDO 3.3 V 1.0 A, SOT-223 (Diodes DS37274 Rev. 5-2); module needs >= 0.5 A","1",""
 "U4","CP2102N-A02-GQFN24","Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm","Silicon Labs","CP2102N-A02-GQFN24R","USB-UART bridge, QFN-24, own regulator unused (Silicon Labs CP2102N data sheet Rev. 1.5 Figure 2.3)","1",""

@@ -64,8 +64,8 @@ Every value follows a datasheet:
   the fuse and Schottky drops) it dissipates 0.20-0.39 W: 22-43 C above ambient at the 110 C/W
   the datasheet gives for SOT-223 on its minimum pad; the board's ground pour only lowers that.
 * USB-C as a 5 V sink, as on the EoS Probe S3: 5.1 kohm Rd on CC1 and CC2 (the Type-C sink
-  termination, TI SLVSFJ9 section 10.3.14.2), USB 2.0 data only, USBLC6-2SC6 ESD
-  protection on D+/D- and VBUS (ST DS4260 Rev. 7), a 500 mA polyfuse (Littelfuse 1206L050:
+  termination, TI SLVSFJ9 section 10.3.14.2), USB 2.0 data only, SP0503BAHTG ESD
+  protection on D+/D- and VBUS (diodes to ground only, CP2102N data sheet Figure 2.5), a 500 mA polyfuse (Littelfuse 1206L050:
   0.50 A hold, 1.00 A trip, 6 V, R1max 0.70 ohm). Then a PMEG6010CEH Schottky (Nexperia product
   data sheet v.4, 1 July 2023: 60 V, 1 A, VF 460 mV typical and 530 mV maximum at 500 mA) to the
   5 V rail, so 5 V fed into the header's 5V pin cannot reach the USB host. It is chosen for its
@@ -165,10 +165,16 @@ PARTS = [
                  "Description": "USB-C 2.0 receptacle, 16 pins (USB 2.0 only)"}),
     res("R1", "5.1k", "CC1", "GND", (80, 95), "Resistor 5.1 kohm 1% 0402 (USB-C sink Rd on CC1, 5.1 kohm per TI SLVSFJ9 section 10.3.14.2)"),
     res("R2", "5.1k", "CC2", "GND", (95, 95), "Resistor 5.1 kohm 1% 0402 (USB-C sink Rd on CC2, 5.1 kohm per TI SLVSFJ9 section 10.3.14.2)"),
-    Part("U2", "Power_Protection:USBLC6-2SC6", "USBLC6-2SC6", "Package_TO_SOT_SMD:SOT-23-6", (130, 110),
-         {"I/O1": "USB_D+", "I/O2": "USB_D-", "GND": "GND", "VBUS": "VBUS"},
-         fields={"Manufacturer": "STMicroelectronics", "MPN": "USBLC6-2SC6",
-                 "Description": "USB ESD protection, D+/D- and VBUS (ST DS4260 Rev. 7)"}),
+    # Diodes to ground only, as Silicon Labs shows on the CP2102N's USB pins (data sheet Figure 2.5).
+    # A USBLC6-style part steers D+ into its VBUS pin: after a host unplugs, the CP2102N's live D+
+    # pull-up would then hold VBUS near 2 V, between the VBUS pin's low and high thresholds, and
+    # the bridge might never see the unplug when the board runs from its 5V pin.
+    Part("U2", "Power_Protection:SP0503BAHT", "SP0503BAHTG", "Package_TO_SOT_SMD:SOT-143", (130, 110),
+         {"1": "GND", "2": "USB_D-", "3": "USB_D+", "4": "VBUS"},       # the diodes are alike: D- on the pad nearer the
+                                                                        # connector, so the pair reaches U4 (D+ above D-) uncrossed
+         fields={"Manufacturer": "Littelfuse", "MPN": "SP0503BAHTG",
+                 "Description": "USB ESD protection, three diodes to GND on D+, D- and VBUS, no path between them "
+                                "(CP2102N data sheet Figure 2.5)"}),
     Part("F1", "Device:Polyfuse_Small", "500mA", "Fuse:Fuse_1206_3216Metric", (165, 95), {"1": "VBUS", "2": "VBUS_F"},
          fields={"Manufacturer": "Littelfuse", "MPN": "1206L050YR",
                  "Description": "PTC resettable fuse 0.50 A hold, 1.00 A trip, 6 V, 1206 (Littelfuse 1206L datasheet)"}),
@@ -337,7 +343,7 @@ BOARD = Board(
                        "Copyright (c) 2026 Kartikeydheer Srivastava. All rights reserved; see LICENSE.txt.\n"
                        "Values from Espressif's ESP32-WROOM-32E datasheet v2.1 (sections 6 and 9) and ESP32 Hardware\n"
                        "Design Guidelines, the esptool docs (automatic bootloader), Silicon Labs CP2102N Rev. 1.5,\n"
-                       "Diodes AP7361C DS37274, onsemi MMBT3904, Nexperia PMEG6010CEH, ST USBLC6-2, Littelfuse 1206L, Kingbright.\n"
+                       "Diodes AP7361C DS37274, onsemi MMBT3904, Nexperia PMEG6010CEH, Littelfuse SP0503BAHTG, Littelfuse 1206L, Kingbright.\n"
                        "U1: KiCad's ESP32-WROOM-32E symbol; its stacked GND pin [1,15,38,39] is expanded to the four pads.\n"
                        "R12 (5.1 kohm) bleeds D1's reverse leakage off VBUS, so a 5V-pin supply does not fake a USB host.\n"
                        "GPIO6-11 are the module's internal flash pins and are not led out: J2 16-18, J3 17-19 are NC.\n"

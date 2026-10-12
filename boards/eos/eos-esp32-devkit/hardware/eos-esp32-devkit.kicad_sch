@@ -878,7 +878,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Power_Protection:USBLC6-2SC6"
+		(symbol "Power_Protection:SP0503BAHT"
 			(pin_names
 				(hide yes)
 			)
@@ -887,8 +887,8 @@
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "U"
-				(at 0.635 5.715 0)
+			(property "Reference" "D"
+				(at 5.715 2.54 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -898,8 +898,8 @@
 					(justify left)
 				)
 			)
-			(property "Value" "USBLC6-2SC6"
-				(at 0.635 3.81 0)
+			(property "Value" "SP0503BAHT"
+				(at 5.715 0.635 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -909,21 +909,8 @@
 					(justify left)
 				)
 			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
-				(at 1.27 -6.35 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-						(italic yes)
-					)
-					(justify left)
-				)
-			)
-			(property "Datasheet" "https://www.st.com/resource/en/datasheet/usblc6-2.pdf"
-				(at 1.27 -8.255 0)
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-143"
+				(at 5.715 -1.27 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -934,7 +921,18 @@
 					(justify left)
 				)
 			)
-			(property "Description" "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6"
+			(property "Datasheet" "http://www.littelfuse.com/~/media/files/littelfuse/technical%20resources/documents/data%20sheets/sp05xxba.pdf"
+				(at 3.175 3.175 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "TVS Diode Array, 5.5V Standoff, 3 Channels, SOT-143 package"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -945,7 +943,7 @@
 					)
 				)
 			)
-			(property "ki_keywords" "usb ethernet video"
+			(property "ki_keywords" "usb esd protection suppression transient"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -956,7 +954,7 @@
 					)
 				)
 			)
-			(property "ki_fp_filters" "SOT?23*"
+			(property "ki_fp_filters" "SOT?143*"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -967,308 +965,11 @@
 					)
 				)
 			)
-			(symbol "USBLC6-2SC6_0_0"
-				(circle
-					(center -1.524 0)
-					(radius 0.0001)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center -0.508 2.032)
-					(radius 0.0001)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center -0.508 -4.572)
-					(radius 0.0001)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0.508 2.032)
-					(radius 0.0001)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0.508 -4.572)
-					(radius 0.0001)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 1.524 -2.54)
-					(radius 0.0001)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "USBLC6-2SC6_0_1"
-				(polyline
-					(pts
-						(xy -2.54 0)
-						(xy 2.54 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 -2.54)
-						(xy 2.54 -2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.032 0.508)
-						(xy -1.016 0.508)
-						(xy -1.524 1.524)
-						(xy -2.032 0.508)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.032 -3.048)
-						(xy -1.016 -3.048)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.016 1.524)
-						(xy -2.032 1.524)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.016 -4.064)
-						(xy -2.032 -4.064)
-						(xy -1.524 -3.048)
-						(xy -1.016 -4.064)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.508 -1.143)
-						(xy -0.508 -0.762)
-						(xy 0.508 -0.762)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 2.54)
-						(xy -0.508 2.032)
-						(xy 0.508 2.032)
-						(xy 0 1.524)
-						(xy 0 -4.064)
-						(xy -0.508 -4.572)
-						(xy 0.508 -4.572)
-						(xy 0 -5.08)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.508 -1.778)
-						(xy -0.508 -1.778)
-						(xy 0 -0.762)
-						(xy 0.508 -1.778)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.016 1.524)
-						(xy 2.032 1.524)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.016 -3.048)
-						(xy 2.032 -3.048)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.032 0.508)
-						(xy 1.016 0.508)
-						(xy 1.524 1.524)
-						(xy 2.032 0.508)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.032 -4.064)
-						(xy 1.016 -4.064)
-						(xy 1.524 -3.048)
-						(xy 2.032 -4.064)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "USBLC6-2SC6_1_1"
-				(rectangle
-					(start -2.54 2.794)
-					(end 2.54 -5.334)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.508 2.032)
-						(xy -1.524 2.032)
-						(xy -1.524 -4.572)
-						(xy -0.508 -4.572)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.508 -4.572)
-						(xy 1.524 -4.572)
-						(xy 1.524 2.032)
-						(xy 0.508 2.032)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
+			(symbol "SP0503BAHT_0_0"
 				(pin passive line
-					(at -5.08 0 0)
+					(at 0 -5.08 90)
 					(length 2.54)
-					(name "I/O1"
+					(name "A"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1283,10 +984,218 @@
 						)
 					)
 				)
+			)
+			(symbol "SP0503BAHT_0_1"
+				(rectangle
+					(start -4.445 2.54)
+					(end 4.445 -2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.302 1.016)
+						(xy -3.302 1.27)
+						(xy -1.905 1.27)
+						(xy -1.778 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 2.54)
+						(xy -2.54 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 1.27)
+						(xy -2.54 -1.27)
+						(xy 2.54 -1.27)
+						(xy 2.54 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 1.27)
+						(xy -1.905 0)
+						(xy -3.175 0)
+						(xy -2.54 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54)
+						(xy 0 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -1.27)
+						(xy 0 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -1.27)
+						(xy 0 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 -1.27)
+					(radius 0.254)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 1.27)
+						(xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 1.27)
+						(xy -0.762 1.27)
+						(xy -0.762 1.016)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 0)
+						(xy -0.635 0)
+						(xy 0 1.27)
+						(xy 0.635 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.778 1.016)
+						(xy 1.778 1.27)
+						(xy 3.175 1.27)
+						(xy 3.302 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 2.54)
+						(xy 2.54 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 1.27)
+						(xy 1.905 0)
+						(xy 3.175 0)
+						(xy 2.54 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SP0503BAHT_1_1"
 				(pin passive line
-					(at 0 -7.62 90)
+					(at -2.54 5.08 270)
 					(length 2.54)
-					(name "GND"
+					(name "K"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1302,9 +1211,9 @@
 					)
 				)
 				(pin passive line
-					(at -5.08 -2.54 0)
+					(at 0 5.08 270)
 					(length 2.54)
-					(name "I/O2"
+					(name "K"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1320,9 +1229,9 @@
 					)
 				)
 				(pin passive line
-					(at 5.08 -2.54 180)
+					(at 2.54 5.08 270)
 					(length 2.54)
-					(name "I/O2"
+					(name "K"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1330,42 +1239,6 @@
 						)
 					)
 					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 5.08 270)
-					(length 2.54)
-					(name "VBUS"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "I/O1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -6123,7 +5996,7 @@
 		(uuid "c14ecc31-a4ad-5655-86b4-78d73f2e4e05")
 	)
 	(symbol
-		(lib_id "Power_Protection:USBLC6-2SC6")
+		(lib_id "Power_Protection:SP0503BAHT")
 		(at 129.54 110.49 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -6132,32 +6005,23 @@
 		(dnp no)
 		(uuid "c8756de4-f76a-54e0-a477-6150829bfb37")
 		(property "Reference" "U2"
-			(at 129.54 104.14 0)
+			(at 134.62 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "USBLC6-2SC6"
-			(at 129.54 106.68 0)
+		(property "Value" "SP0503BAHTG"
+			(at 134.62 109.22 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
-			(at 130.81 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.st.com/resource/en/datasheet/usblc6-2.pdf"
-			(at 130.81 118.11 0)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-143"
+			(at 134.62 111.76 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6165,7 +6029,16 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6"
+		(property "Datasheet" "http://www.littelfuse.com/~/media/files/littelfuse/technical%20resources/documents/data%20sheets/sp05xxba.pdf"
+			(at 132.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "TVS Diode Array, 5.5V Standoff, 3 Channels, SOT-143 package"
 			(at 129.54 110.49 0)
 			(effects
 				(font
@@ -6174,7 +6047,7 @@
 				(hide yes)
 			)
 		)
-		(property "Manufacturer" "STMicroelectronics"
+		(property "Manufacturer" "Littelfuse"
 			(at 129.54 110.49 0)
 			(effects
 				(font
@@ -6183,7 +6056,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "USBLC6-2SC6"
+		(property "MPN" "SP0503BAHTG"
 			(at 129.54 110.49 0)
 			(effects
 				(font
@@ -6192,7 +6065,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "USB ESD protection, D+/D- and VBUS (ST DS4260 Rev. 7)"
+		(property "Description" "USB ESD protection, three diodes to GND on D+, D- and VBUS, no path between them (CP2102N data sheet Figure 2.5)"
 			(at 129.54 110.49 0)
 			(effects
 				(font
@@ -6213,12 +6086,6 @@
 		(pin "4"
 			(uuid "b2265daf-1c9b-5529-b9f7-82620fcae767")
 		)
-		(pin "5"
-			(uuid "f2cda0b5-2086-59a4-8a8f-ce845eac85ea")
-		)
-		(pin "6"
-			(uuid "4af6b35c-3104-5789-8cd3-c7fedb20c2d9")
-		)
 		(instances
 			(project "eos-esp32-devkit"
 				(path "/48668220-2145-500a-85e8-09e9afb3b3f0"
@@ -6230,8 +6097,8 @@
 	)
 	(wire
 		(pts
-			(xy 124.46 110.49)
-			(xy 121.92 110.49)
+			(xy 129.54 115.57)
+			(xy 129.54 118.11)
 		)
 		(stroke
 			(width 0)
@@ -6239,8 +6106,8 @@
 		)
 		(uuid "189463c8-dfbf-5f88-b37b-14fd11e90ff7")
 	)
-	(label "USB_D+"
-		(at 121.92 110.49 180)
+	(label "GND"
+		(at 129.54 118.11 270)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6252,74 +6119,8 @@
 	)
 	(wire
 		(pts
-			(xy 134.62 110.49)
-			(xy 137.16 110.49)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "202f4e38-8b0b-53cb-a8b4-e54a39886be4")
-	)
-	(label "USB_D+"
-		(at 137.16 110.49 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "232589a5-59a4-563b-8149-7a3b60d0a4b8")
-	)
-	(wire
-		(pts
-			(xy 124.46 113.03)
-			(xy 121.92 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "505fbac0-66b6-5901-b52b-dc43064f5b8f")
-	)
-	(label "USB_D-"
-		(at 121.92 113.03 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "8e152388-3293-5c5c-a2ff-675d965e2c29")
-	)
-	(wire
-		(pts
-			(xy 134.62 113.03)
-			(xy 137.16 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "75d01e54-3ebf-5a12-92c4-e39361b10138")
-	)
-	(label "USB_D-"
-		(at 137.16 113.03 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "f19abd43-be96-533e-b664-f24059e7dca9")
-	)
-	(wire
-		(pts
-			(xy 129.54 118.11)
-			(xy 129.54 120.65)
+			(xy 127 105.41)
+			(xy 127 102.87)
 		)
 		(stroke
 			(width 0)
@@ -6327,14 +6128,14 @@
 		)
 		(uuid "9446a5e1-6f09-5d90-be44-2e316323d5c5")
 	)
-	(label "GND"
-		(at 129.54 120.65 270)
+	(label "USB_D-"
+		(at 127 102.87 90)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right bottom)
+			(justify left bottom)
 		)
 		(uuid "5d49c900-4ab8-5764-b9cf-ebc0f6f47535")
 	)
@@ -6347,9 +6148,9 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "1c04064a-587c-5919-ba54-f70df3bef22a")
+		(uuid "505fbac0-66b6-5901-b52b-dc43064f5b8f")
 	)
-	(label "VBUS"
+	(label "USB_D+"
 		(at 129.54 102.87 90)
 		(fields_autoplaced yes)
 		(effects
@@ -6358,7 +6159,29 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "f8b2e365-2ef3-5177-9936-6aa8668d954c")
+		(uuid "8e152388-3293-5c5c-a2ff-675d965e2c29")
+	)
+	(wire
+		(pts
+			(xy 132.08 105.41)
+			(xy 132.08 102.87)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "75d01e54-3ebf-5a12-92c4-e39361b10138")
+	)
+	(label "VBUS"
+		(at 132.08 102.87 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f19abd43-be96-533e-b664-f24059e7dca9")
 	)
 	(symbol
 		(lib_id "Device:Polyfuse_Small")
@@ -13052,7 +12875,7 @@
 		)
 		(uuid "63708754-18a7-5952-86ce-806d5cab6413")
 	)
-	(text "EoS ESP32 DevKit, rev A. Designed by Kartikeydheer Srivastava.\nCopyright (c) 2026 Kartikeydheer Srivastava. All rights reserved; see LICENSE.txt.\nValues from Espressif's ESP32-WROOM-32E datasheet v2.1 (sections 6 and 9) and ESP32 Hardware\nDesign Guidelines, the esptool docs (automatic bootloader), Silicon Labs CP2102N Rev. 1.5,\nDiodes AP7361C DS37274, onsemi MMBT3904, Nexperia PMEG6010CEH, ST USBLC6-2, Littelfuse 1206L, Kingbright.\nU1: KiCad's ESP32-WROOM-32E symbol; its stacked GND pin [1,15,38,39] is expanded to the four pads.\nR12 (5.1 kohm) bleeds D1's reverse leakage off VBUS, so a 5V-pin supply does not fake a USB host.\nGPIO6-11 are the module's internal flash pins and are not led out: J2 16-18, J3 17-19 are NC.\nHeader grid and pinout from Espressif's DevKitC V4 user guide (positions and names only)."
+	(text "EoS ESP32 DevKit, rev A. Designed by Kartikeydheer Srivastava.\nCopyright (c) 2026 Kartikeydheer Srivastava. All rights reserved; see LICENSE.txt.\nValues from Espressif's ESP32-WROOM-32E datasheet v2.1 (sections 6 and 9) and ESP32 Hardware\nDesign Guidelines, the esptool docs (automatic bootloader), Silicon Labs CP2102N Rev. 1.5,\nDiodes AP7361C DS37274, onsemi MMBT3904, Nexperia PMEG6010CEH, Littelfuse SP0503BAHTG, Littelfuse 1206L, Kingbright.\nU1: KiCad's ESP32-WROOM-32E symbol; its stacked GND pin [1,15,38,39] is expanded to the four pads.\nR12 (5.1 kohm) bleeds D1's reverse leakage off VBUS, so a 5V-pin supply does not fake a USB host.\nGPIO6-11 are the module's internal flash pins and are not led out: J2 16-18, J3 17-19 are NC.\nHeader grid and pinout from Espressif's DevKitC V4 user guide (positions and names only)."
 		(exclude_from_sim no)
 		(at 330 330 0)
 		(effects
