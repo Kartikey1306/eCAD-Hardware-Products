@@ -61,7 +61,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ..design import NC, Board, Part
+from ..design import NC, Board, Part, USB_C_EDGE
 from .owner import CONTACT, LICENCE, LICENCE_TERMS, OWNER
 
 R0402 = "Resistor_SMD:R_0402_1005Metric"
@@ -266,7 +266,7 @@ PLACEMENT = {
     # and ESD beside it, clear of the USB pair that leaves the module's USB pins (CM4 pins 103/105,
     # J2's left end) for the USB switch next to them; the
     # USB-A port's ESD and the vertical USB-A port to its right, so the host path stays short
-    "J3": (12.0, 3.8, 180), "R6": (20.5, 1.4, 0), "R7": (20.5, 3.0, 0), "U1": (20.5, 6.6, 0),
+    "J3": (12.0, USB_C_EDGE, 180), "R6": (20.5, 1.4, 0), "R7": (20.5, 3.0, 0), "U1": (20.5, 6.6, 0),
     "U7": (32.6, 4.6, 0), "C9": (34.2, 7.8, 0), "R10": (31.0, 7.8, 0),
     "U3": (37.9, 4.5, 90), "J4": (45.0, 6.8, 0),
     "C1": (40.0, 51.6, 0), "C2": (43.6, 51.6, 0), "C3": (46.6, 51.6, 0),

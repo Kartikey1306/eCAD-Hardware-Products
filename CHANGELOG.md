@@ -43,6 +43,8 @@ has never run.
   Every pin's net comes from the CM4 datasheet. `reference/cm4_pins.json` is written by
   `extract_cm4.py`. The tests check the connector pads and holes at 1 nm and every pin's net.
   Like the other EmbeddedOS boards, it is all rights reserved, not MIT.
+- EoS CM4 Base and EoS ESP32 DevKit place their USB-C receptacles at `design.USB_C_EDGE`, like
+  the first four boards (see Fixed), and are rebuilt.
 - The board index and the tests take the list of boards from `boards/eos/` itself. A test
   checks that every index row matches its board's build report.
 - `copper_keepouts` in `tools/eos_boards`: no copper on any layer inside a rectangle, kept as a

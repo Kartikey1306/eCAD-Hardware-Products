@@ -109,7 +109,7 @@ Schematic symbol: KiCad's own ESP32-WROOM-32E. Its four ground pins are one stac
 
 from __future__ import annotations
 
-from ..design import NC, Board, Part
+from ..design import NC, Board, Part, USB_C_EDGE
 from .owner import CONTACT, LICENCE, LICENCE_TERMS, OWNER
 
 R0402 = "Resistor_SMD:R_0402_1005Metric"
@@ -279,7 +279,7 @@ PLACEMENT = {
     "R7": (19.75, 33.40, 0), "R8": (19.75, 34.60, 0), "R9": (19.75, 35.80, 0),
     "SW2": (22.70, 36.50, 90),
     # USB-C on the bottom edge, ESD and CC resistors above it
-    "J1": (15.00, H - 3.80, 0), "U2": (13.50, 37.40, 90), "R1": (11.00, 38.50, 90), "R2": (16.40, 38.50, 90),
+    "J1": (15.00, H - USB_C_EDGE, 0), "U2": (13.50, 37.40, 90), "R1": (11.00, 38.50, 90), "R2": (16.40, 38.50, 90),
     # fuse and Schottky left of the connector, LEDs right of it
     "F1": (5.70, 43.60, 270), "D1": (8.20, 43.60, 270), "R12": (7.00, 38.20, 0),
     "R3": (20.95, 41.60, 90), "D2": (22.40, 41.60, 90), "R6": (20.95, 45.00, 90), "D3": (22.40, 45.00, 90),
