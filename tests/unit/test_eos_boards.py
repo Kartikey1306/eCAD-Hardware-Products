@@ -261,7 +261,7 @@ class ExtractorTest(unittest.TestCase):
         self.assertEqual(find(find(node, "pad"), "at")[1:], [-0.5, 0])   # the footprint's 90 degrees taken out
 
     def test_reference_file_records_its_source(self):
-        data = json.loads(CORE.read_text())
+        data = json.loads(CORE.read_text(encoding="utf-8"))
         self.assertEqual(set(data["footprints"]), set(extract.PARTS.values()))
         self.assertRegex(data["source_sha256"], r"^[0-9a-f]{64}$")
         self.assertIn("MIT", data["source"])
@@ -276,7 +276,7 @@ class ExtractorTest(unittest.TestCase):
             subprocess.run([sys.executable, "-I", str(REPO_ROOT / "tools/eos_boards/reference/extract_rpi_minimal.py"),
                             str(source), "--footprints", str(Path(tmp) / "fp.pretty"), "--out", str(Path(tmp) / "core.json")],
                            check=True, capture_output=True)
-            self.assertEqual(json.loads(Path(tmp, "core.json").read_text()), json.loads(CORE.read_text()))
+            self.assertEqual(json.loads(Path(tmp, "core.json").read_text(encoding="utf-8")), json.loads(CORE.read_text(encoding="utf-8")))
 
 
 class ReferenceExactnessTest(unittest.TestCase):
@@ -286,8 +286,8 @@ class ReferenceExactnessTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         assert PCB.is_file(), f"built board missing: {PCB}"
-        cls.pcb = loads(PCB.read_text())
-        cls.ref = json.loads(CORE.read_text())
+        cls.pcb = loads(PCB.read_text(encoding="utf-8"))
+        cls.ref = json.loads(CORE.read_text(encoding="utf-8"))
         cls.ox, cls.oy = MCU
 
     def _at(self, x, y):
@@ -367,8 +367,8 @@ class CapeFitTest(unittest.TestCase):
 
     def test_every_socket_pad_on_its_pocketbeagle_pin(self):
         self.assertTrue(CAPE_PCB.is_file(), f"built board missing: {CAPE_PCB}")
-        pins = json.loads(PB_HEADERS.read_text())["pins"]
-        pads = _pad_positions(loads(CAPE_PCB.read_text()), {"J1", "J2"})
+        pins = json.loads(PB_HEADERS.read_text(encoding="utf-8"))["pins"]
+        pads = _pad_positions(loads(CAPE_PCB.read_text(encoding="utf-8")), {"J1", "J2"})
         self.assertEqual(len(pins), 72)
         for name, (x, y) in pins.items():
             header, number = name.split(".")
@@ -389,8 +389,8 @@ class CM5FitTest(unittest.TestCase):
         assert CM5_PCB.is_file(), f"built board missing: {CM5_PCB}"
         from eos_boards.boards import eos_cm5_base as board
         cls.board = board
-        cls.ref = json.loads(CM5_REF.read_text())
-        cls.pcb = loads(CM5_PCB.read_text())
+        cls.ref = json.loads(CM5_REF.read_text(encoding="utf-8"))
+        cls.pcb = loads(CM5_PCB.read_text(encoding="utf-8"))
 
     def _on_board(self, fx_nm, fy_nm):
         x, y = self.board.from_cm5(fx_nm / 1e6, fy_nm / 1e6)
@@ -448,7 +448,7 @@ class FigureFourTest(unittest.TestCase):
         for name in ("eos-cm5-base", "eos-cm4-base"):
             with self.subTest(board=name):
                 board = importlib.import_module(f"eos_boards.boards.{name.replace('-', '_')}")
-                pcb = loads((REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb").read_text())
+                pcb = loads((REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
                 at = {}
                 for fp in find_all(pcb, "footprint"):
                     ref = next(str(p[2]) for p in find_all(fp, "property") if str(p[1]) == "Reference")
@@ -470,9 +470,9 @@ class CM4FitTest(CM5FitTest):
         assert CM4_PCB.is_file(), f"built board missing: {CM4_PCB}"
         from eos_boards.boards import eos_cm4_base as board
         cls.board = board
-        cls.ref = json.loads(CM5_REF.read_text())
-        cls.pins = json.loads(CM4_PINS.read_text())["pins"]
-        cls.pcb = loads(CM4_PCB.read_text())
+        cls.ref = json.loads(CM5_REF.read_text(encoding="utf-8"))
+        cls.pins = json.loads(CM4_PINS.read_text(encoding="utf-8"))["pins"]
+        cls.pcb = loads(CM4_PCB.read_text(encoding="utf-8"))
 
     def test_connector_nets_follow_the_datasheet(self):
         nets = {}
@@ -523,7 +523,7 @@ class BoardIntentTest(unittest.TestCase):
                      "eos-esp32-devkit"):
             path = REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb"
             assert path.is_file(), f"built board missing: {path}"
-            cls.boards[name] = _parts(loads(path.read_text()))
+            cls.boards[name] = _parts(loads(path.read_text(encoding="utf-8")))
 
     def test_rp2350_power_path_and_usb(self):
         b = self.boards["eos-learn-rp2350"]
@@ -669,7 +669,7 @@ class AntennaKeepoutTest(unittest.TestCase):
 
     def _check(self, name):
         module = importlib.import_module(f"eos_boards.boards.{name.replace('-', '_')}")
-        pcb = loads((REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb").read_text())
+        pcb = loads((REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
         x0, y0, x1, y1 = module.ANTENNA_KEEPOUT
         corners = [module.from_module(x, y) for x, y in ((0.0, 10.5), (6.5, 21.5))]      # Figure 4's cut-out
         self.assertTrue(all(x0 <= x <= x1 and y0 <= y <= y1 for x, y in corners), (module.ANTENNA_KEEPOUT, corners))
@@ -734,20 +734,20 @@ class OwnershipTest(unittest.TestCase):
                 self.assertEqual((board.company, board.licence, board.contact),
                                  ("Kartikeydheer Srivastava", design.ALL_RIGHTS_RESERVED, "kartikeydheer@gmail.com"))
                 folder = REPO_ROOT / "boards" / "eos" / name
-                licence = (folder / "LICENSE.txt").read_text()
+                licence = (folder / "LICENSE.txt").read_text(encoding="utf-8")
                 self.assertEqual(licence, build.licence_text(board, module))     # what the build writes
                 self.assertEqual("tools/eos_boards/footprints/EoS_Connectors.pretty" in licence,
                                  "EoS_Connectors" in board.local_footprints)        # the owner's own library, where used
                 self.assertIn("To ask,\n   write to kartikeydheer@gmail.com.", licence)
                 self.assertIn(f"tools/eos_boards/boards/{module}.py", licence)
-                sch = (folder / "hardware" / f"{name}.kicad_sch").read_text()
+                sch = (folder / "hardware" / f"{name}.kicad_sch").read_text(encoding="utf-8")
                 self.assertIn('(comment 1 "Copyright (c) 2026 Kartikeydheer Srivastava. Licence: All rights reserved")', sch)
-                pcb = loads((folder / "hardware" / f"{name}.kicad_pcb").read_text())
+                pcb = loads((folder / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
                 silk = [str(t[1]) for t in find_all(pcb, "gr_text") if str(find(t, "layer")[1]) == "B.SilkS"]
                 self.assertIn("(c) 2026 Kartikeydheer Srivastava", silk)
                 self.assertIn("All rights reserved", silk)
                 self.assertFalse([s for s in silk if "Srivastava" in s and "MIT" in s], silk)
-                readme = (folder / "README.md").read_text()
+                readme = (folder / "README.md").read_text(encoding="utf-8")
                 self.assertIn("All rights reserved: not open source", readme)
                 self.assertNotIn("MIT licence (see", readme)
 
@@ -757,15 +757,15 @@ class OwnershipTest(unittest.TestCase):
 
     def test_index_lists_every_board_with_its_recorded_checks(self):
         rows = {}
-        for line in (EOS_DIR / "README.md").read_text().splitlines():
+        for line in (EOS_DIR / "README.md").read_text(encoding="utf-8").splitlines():
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             link = re.match(r"\[[^\]]+\]\(([^)/]+)\)$", cells[0]) if len(cells) == 7 else None
             if link:
                 rows[link.group(1)] = tuple(int(c) for c in cells[3:7])
         self.assertEqual(set(rows), set(EOS_BOARDS))
         for name, (erc, drc, unconnected, parity) in rows.items():
-            report = json.loads((EOS_DIR / name / "build-report.json").read_text())
-            drc_json = json.loads((EOS_DIR / name / "drc.json").read_text())
+            report = json.loads((EOS_DIR / name / "build-report.json").read_text(encoding="utf-8"))
+            drc_json = json.loads((EOS_DIR / name / "drc.json").read_text(encoding="utf-8"))
             self.assertEqual((erc, drc, unconnected, parity),
                              (report["erc_violations"], report["drc_errors"], len(drc_json["unconnected_items"]),
                               len(drc_json["schematic_parity"])), name)
@@ -773,9 +773,9 @@ class OwnershipTest(unittest.TestCase):
     def test_each_readme_states_the_checks_its_build_recorded(self):
         for name in EOS_BOARDS:
             with self.subTest(board=name):
-                readme = (EOS_DIR / name / "README.md").read_text()
-                report = json.loads((EOS_DIR / name / "build-report.json").read_text())
-                drc_json = json.loads((EOS_DIR / name / "drc.json").read_text())
+                readme = (EOS_DIR / name / "README.md").read_text(encoding="utf-8")
+                report = json.loads((EOS_DIR / name / "build-report.json").read_text(encoding="utf-8"))
+                drc_json = json.loads((EOS_DIR / name / "drc.json").read_text(encoding="utf-8"))
                 row = {m.group(1): int(m.group(2)) for m in re.finditer(r"^\| ([^|]+?) \| (\d+)\b", readme, re.M)}
                 self.assertEqual((row["Schematic ERC"], row["DRC errors"], row["Unconnected items"],
                                   row["Schematic ↔ board parity"], row["DRC warnings"]),
@@ -783,17 +783,17 @@ class OwnershipTest(unittest.TestCase):
                                   len(drc_json["schematic_parity"]), report["drc_warnings"]))
 
     def test_generic_symbols_copied_into_a_board_stay_mit(self):
-        licence = (REPO_ROOT / "boards" / "eos" / "eos-cm5-base" / "LICENSE.txt").read_text()
+        licence = (REPO_ROOT / "boards" / "eos" / "eos-cm5-base" / "LICENSE.txt").read_text(encoding="utf-8")
         self.assertIn("Schematic symbols in hardware/symbols (EoS_Connectors.kicad_sym, EoS_Parts.kicad_sym): "
                       "written by this repository's generator, tools/eos_boards/symbols, MIT licence", licence)
 
     def test_repository_docs_state_the_exception(self):
-        contributing = (REPO_ROOT / "CONTRIBUTING.md").read_text()
+        contributing = (REPO_ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
         self.assertIn("### Exception: the EmbeddedOS original boards", contributing)
         self.assertIn("may use and relicense the change on any terms", contributing)
-        self.assertIn("all rights reserved, and are not under the MIT licence", (REPO_ROOT / "README.md").read_text())
+        self.assertIn("all rights reserved, and are not under the MIT licence", (REPO_ROOT / "README.md").read_text(encoding="utf-8"))
         notice = REPO_ROOT / "tools" / "eos_boards" / "footprints" / "EoS_Connectors.NOTICE.txt"
-        self.assertIn("All rights reserved", notice.read_text())
+        self.assertIn("All rights reserved", notice.read_text(encoding="utf-8"))
         self.assertFalse((notice.parent / "EoS_Connectors.LICENSE.txt").exists())   # would be listed as third-party
 
 if __name__ == "__main__":
