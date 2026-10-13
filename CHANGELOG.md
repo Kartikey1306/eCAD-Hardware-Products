@@ -15,6 +15,104 @@ has never run.
 
 ### Added
 
+- Eight more original EmbeddedOS boards (batch 2), all rights reserved like the others. Each was
+  built with `tools/eos_boards` at ERC 0, DRC errors 0, unconnected 0 and schematic parity 0. Each
+  had an independent review, its findings were fixed, and then a second reviewer checked the
+  fixes. On every board the USB pairs, crystal lines and decoupling are laid as priority routes.
+  - EoS ATmega328P Board: fits Uno R3 shields; CH340C USB-UART with Ioff buffers and an open-drain
+    auto-reset; ICSP header.
+  - EoS MSP430G2 Board: an MSP430G2553 in a DIP-20 socket; takes 20-pin BoosterPacks; CP2102N
+    USB-UART; Spy-Bi-Wire header.
+  - EoS TM4C123 Board: takes 40-pin BoosterPacks; the chip's own USB device port, a CP2102N
+    USB-UART and SWD.
+  - EoS KL25 Board: an NXP KL25Z board that fits Uno R3 shields, with its USB device port, an
+    accelerometer and SWD.
+  - EoS STM32 64: an STM32F411RE in the 64-pin Nucleo format, with morpho and Uno headers, a 7–12 V
+    buck and SWD.
+  - EoS LPC55S69 Board: four layers; fits Uno R3 shields; two USB-C ports with a TPS2116 power mux
+    and a TPS7A91 LDO.
+  - EoS KE16Z Board: an NXP KE16Z board that fits Uno R3 shields; CP2102N USB-UART; the CAN pins on
+    a header.
+  - EoS RA2E1 Board: a Renesas RA2E1 board that fits Uno R3 shields; two Pmod headers; a CP2102N on
+    the chip's boot UART.
+
+  Each vendor board's on-board debug probe runs proprietary firmware. These boards have a standard
+  SWD or Spy-Bi-Wire header instead.
+- Generic libraries (MIT, like the generator):
+  - `EoS_MCU` symbols for the TM4C123GH6PM, LPC55S69JBD100 and R7FA2E1A92DFM, each checked pin
+    for pin against its data sheet;
+  - `footprints/generate.py`, which writes `EoS_Packages.pretty`: NXP's HLQFP-100 (SOT1570-3) from
+    the LPC55S6x data sheet's land pattern.
+
+  A board that ships a copy of them credits them as MIT in its `LICENSE.txt`, not as the owner's.
+- `tools/eos_boards`:
+  - an exposed pad is now recognised as the biggest pad of a part with four or more pads, over
+    1.5 mm across. A QFN-20's 1.8 mm centre pad counts; a two-pad part or a lone test pad doesn't.
+  - the four vias move in on a small pad.
+- EoS Motion Wing: a FeatherWing with an ADXL343 accelerometer and an ADT7410 temperature sensor
+  on I2C. It has removable pull-ups and jumpers for the addresses and interrupts. The outline and
+  headers come from Adafruit's published Feather specification. The ADT7410 symbol is new:
+  `EoS_Sensors`, written by `symbols/generate.py`.
+- EoS ESP32 DevKit: an ESP32-WROOM-32E board. It has a USB-C port, a CP2102N USB-UART with the
+  esptool auto-program circuit, and a 1 A 3.3 V regulator. The headers follow Espressif's
+  published DevKitC V4 grid, and the module antenna overhangs the edge.
+- `tools/eos_boards` build fixes, all found while building these boards:
+  - stacked pin numbers (`[1,15,38,39]`) reach every pad;
+  - no-connect net names match KiCad's (`{slash}`, unnamed pins);
+  - pre-routes and repairs use the net class's width;
+  - the router gets a 0.01 mm clearance margin, and necks below the minimum width are widened
+    (locked copper excepted);
+  - a clearance clash between two routed items is ripped up and rerouted;
+  - silkscreen strokes are at least 0.15 mm.
+- Tests: a `spec_for` integration test, a check of the carriers against the datasheets' Figure 4,
+  intent tests for the new boards, and a check that each board README's results table matches
+  its build report.
+- EoS CM4 Base, a carrier for the Raspberry Pi Compute Module 4. It is EoS CM5 Base's layout,
+  changed where the CM4 differs:
+  - USB-C with 5.1 kohm CC pull-downs, also routed to AnalogIP0/1;
+  - one USB 2.0 port that a TS3USB30E switches between USB-C (device) and USB-A (host),
+    by USB_OTG_ID;
+  - a reset button on RUN_PG through 220 ohm, and a buffered power LED;
+  - no copper under the CM4's antenna (`copper_keepouts`), as its datasheet requires.
+  Every pin's net comes from the CM4 datasheet. `reference/cm4_pins.json` is written by
+  `extract_cm4.py`. The tests check the connector pads and holes at 1 nm and every pin's net.
+  Like the other EmbeddedOS boards, it is all rights reserved, not MIT.
+- EoS CM4 Base and EoS ESP32 DevKit place their USB-C receptacles at `design.USB_C_EDGE`, like
+  the first four boards (see Fixed), and are rebuilt.
+- `tools/eos_boards`: on a two-layer board, a chip's exposed ground pad now gets the same 2 × 2
+  vias as on a four-layer one, into the bottom pour. EoS ESP32 DevKit's CP2102N centre pad had none
+  and reached ground through one track; the board is rebuilt. A footprint that brings its own
+  thermal vias (the RP2350A's, the ESP32-S3 module's) gets none added. A test checks every board.
+- The board index and the tests take the list of boards from `boards/eos/` itself. A test
+  checks that every index row matches its board's build report.
+- `copper_keepouts` in `tools/eos_boards`: no copper on any layer inside a rectangle, kept as a
+  rule area that zone fills, the router and DRC all honour. EoS CM5 Base keeps the CM5's
+  antenna cut-out clear with it, as the CM5 datasheet requires (section 4.1.2).
+- `tools/eos_boards`, a board generator, and four original boards built with it under
+  `boards/eos/`: EoS Learn RP2350, EoS Sense Cape for PocketBeagle, EoS Probe S3 and EoS CM5
+  Base. Each board is written in one design file. From it the generator writes the KiCad
+  schematic and board, routes it, checks it, and exports the fabrication outputs. Routing is
+  Freerouting, then a two-layer maze router with local rip-up for anything left open. All four
+  report 0 ERC violations, 0 DRC errors, 0 unconnected items and 0 schematic-parity
+  differences. A build that fails any check writes no outputs. The boards are (c) 2026
+  Kartikeydheer Srivastava, all rights reserved, and not under the repository's MIT licence.
+  Anyone may view them; any other use needs Kartikeydheer Srivastava's written permission.
+  EmbeddedOS (EoS) Research Foundation has a limited, revocable permission
+  (`boards/eos/README.md#licence`). The generator itself stays MIT.
+- Reference reuse at 1 nm resolution: `tools/eos_boards/reference/extract_rpi_minimal.py`
+  takes the RP2350A core layout from Raspberry Pi's MIT-licensed minimal design, which the
+  RP2350 datasheet says the regulator layout must follow. EoS Learn RP2350 places it
+  unchanged. `tests/unit/test_eos_boards.py` checks every reused footprint, track, via and zone
+  corner in integer nanometres. It also checks:
+  - the cape's 72 socket pads against PocketBeagle's header pins, from BeagleBoard.org's board
+    file (CC BY 4.0);
+  - the carrier's 200 connector pads and 4 mounting holes against the CM5 footprint in
+    Raspberry Pi's CM5 IO Board files (facts only);
+  - each board's documented straps, pull-ups, translator directions and power path, read back
+    from the built boards.
+
+  Each reference file records the SHA-256 of its source.
+
 - The dev-board CAD mirror (issue #48): `tools/devboard_cad/mirror.py` copies the CAD
   design of every board whose licence allows redistribution into
   `boards/cad/<vendor>/<board>/cad/`, unmodified, with an `ATTRIBUTION.md` per board;
@@ -111,6 +209,14 @@ has never run.
 
 ### Fixed
 
+- EmbeddedOS boards: each USB-C receptacle (HRO TYPE-C-31-M-12) now sits where HRO's recommended
+  layout puts it, its footprint origin 3.19 mm from the board edge (`design.USB_C_EDGE`; HRO
+  draws the PCB edge 5.79 mm from the locating pegs). At the old 3.8 mm the shell's face was
+  0.15 mm behind the edge, so a plug's overmold could meet the board before the plug seated. It
+  now stands about 0.46 mm proud. EoS Learn RP2350, EoS Probe S3 and EoS CM5 Base are rebuilt,
+  and a test checks every board's receptacles. The review of a later board found it. On EoS CM5
+  Base, GPIO2 (the header's SDA) is now routed before the autorouter: after the move the router
+  boxed in its pad on the CM5 connector twice.
 - `read_licenses.py` finds the licence file whatever its case. It asked GitHub
   for fixed spellings (`LICENSE.md`, `LICENSE`, ...), and GitHub paths are
   case-sensitive, so SparkFun's `license.md` and `License.md` were never read:

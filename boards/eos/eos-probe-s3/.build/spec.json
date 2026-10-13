@@ -1,0 +1,1442 @@
+{
+ "name": "eos-probe-s3",
+ "width": 62.0,
+ "height": 30.0,
+ "thickness": 1.6,
+ "corner_radius": 1.5,
+ "layers": 2,
+ "rules": {
+  "track": 0.15,
+  "clearance": 0.15,
+  "via": 0.6,
+  "drill": 0.3,
+  "min_track": 0.1,
+  "min_clearance": 0.15,
+  "min_via": 0.5,
+  "min_drill": 0.2,
+  "edge_clearance": 0.3,
+  "hole_clearance": 0.25
+ },
+ "netclasses": {
+  "Power": {
+   "track": 0.4,
+   "clearance": 0.15
+  },
+  "USB": {
+   "track": 0.2,
+   "clearance": 0.15
+  }
+ },
+ "net_to_class": {
+  "VBUS": "Power",
+  "+5V": "Power",
+  "+3V3": "Power",
+  "/USB_D+": "USB",
+  "/USB_D-": "USB",
+  "/ESP_D+": "USB",
+  "/ESP_D-": "USB"
+ },
+ "parts": [
+  {
+   "ref": "J1",
+   "value": "USB-C",
+   "footprint": "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12",
+   "x": 3.19,
+   "y": 16.0,
+   "rot": 270,
+   "side": "F",
+   "pads": {
+    "A4": "VBUS",
+    "A9": "VBUS",
+    "B4": "VBUS",
+    "B9": "VBUS",
+    "A1": "GND",
+    "A12": "GND",
+    "B1": "GND",
+    "B12": "GND",
+    "A5": "/CC1",
+    "B5": "/CC2",
+    "A6": "/USB_D+",
+    "B6": "/USB_D+",
+    "A7": "/USB_D-",
+    "B7": "/USB_D-",
+    "A8": "unconnected-(J1-SBU1-PadA8)",
+    "B8": "unconnected-(J1-SBU2-PadB8)",
+    "SH": "GND"
+   },
+   "uuid": "94d7d26b-5aff-5259-a5c6-4b1a00a4b194",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.usb.org/sites/default/files/documents/usb_type-c.zip",
+    "Description": "USB-C 2.0 receptacle, 16 pins",
+    "Manufacturer": "Korean Hroparts",
+    "MPN": "TYPE-C-31-M-12"
+   },
+   "model": null
+  },
+  {
+   "ref": "R1",
+   "value": "5.1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 9.5,
+   "y": 10.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/CC1",
+    "2": "GND"
+   },
+   "uuid": "3f92c718-3b9d-5204-ba75-c3fe256528f3",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 5.1 kohm 1% 0402 (USB-C sink, CC1)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R2",
+   "value": "5.1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 9.5,
+   "y": 22.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/CC2",
+    "2": "GND"
+   },
+   "uuid": "db50b613-23c5-55ef-bf39-7afb0c5f2460",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 5.1 kohm 1% 0402 (USB-C sink, CC2)"
+   },
+   "model": null
+  },
+  {
+   "ref": "U1",
+   "value": "USBLC6-2SC6",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 11.8,
+   "y": 16.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/USB_D+",
+    "6": "/USB_D+",
+    "3": "/USB_D-",
+    "4": "/USB_D-",
+    "2": "GND",
+    "5": "VBUS"
+   },
+   "uuid": "fe0b1a77-c638-5a8e-a9c0-cdacf72cb28f",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.st.com/resource/en/datasheet/usblc6-2.pdf",
+    "Description": "USB ESD protection",
+    "Manufacturer": "STMicroelectronics",
+    "MPN": "USBLC6-2SC6"
+   },
+   "model": null
+  },
+  {
+   "ref": "F1",
+   "value": "500mA",
+   "footprint": "Fuse:Fuse_1206_3216Metric",
+   "x": 15.0,
+   "y": 8.0,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "VBUS",
+    "2": "+5V"
+   },
+   "uuid": "37252568-e145-5e9d-8aad-024866c1eb5c",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "PTC resettable fuse 500 mA hold, 1206",
+    "Manufacturer": "Littelfuse",
+    "MPN": "1206L050YR"
+   },
+   "model": null
+  },
+  {
+   "ref": "U2",
+   "value": "AP7361C-33",
+   "footprint": "Package_TO_SOT_SMD:SOT-223-3_TabPin2",
+   "x": 16.4,
+   "y": 24.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "3": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "d12e3846-2cba-548b-a770-10a877426ba7",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.diodes.com/assets/Datasheets/AP7361C.pdf",
+    "Description": "LDO 3.3 V 1 A, SOT-223",
+    "Manufacturer": "Diodes Incorporated",
+    "MPN": "AP7361C-33E-13"
+   },
+   "model": null
+  },
+  {
+   "ref": "C1",
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 9.8,
+   "y": 27.8,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "uuid": "7ef4ec62-79f6-500b-b9d4-42a6f1e5a085",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 4.7 uF 10 V X5R 0805 (LDO input)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C2",
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 24.2,
+   "y": 27.8,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "9a4336ea-90a9-56ed-b289-14031d0ce481",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 4.7 uF 10 V X5R 0805 (LDO output)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R3",
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 28.0,
+   "y": 27.8,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "/LED_PWR_A"
+   },
+   "uuid": "407fd81b-7162-55c0-9f27-1def34126e1b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 1 kohm 1% 0402 (power LED)"
+   },
+   "model": null
+  },
+  {
+   "ref": "D1",
+   "value": "PWR",
+   "footprint": "LED_SMD:LED_0603_1608Metric",
+   "x": 31.0,
+   "y": 27.8,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "2": "/LED_PWR_A",
+    "1": "GND"
+   },
+   "uuid": "81dd80ab-c7df-5b18-ad82-bbbef221249c",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "LED red 0603, power",
+    "Sim.Pins": "1=K 2=A",
+    "Manufacturer": "Kingbright",
+    "MPN": "APTD1608LSURCK"
+   },
+   "model": null
+  },
+  {
+   "ref": "U3",
+   "value": "ESP32-S3-WROOM-1-N8R2",
+   "footprint": "RF_Module:ESP32-S3-WROOM-1",
+   "x": 55.25,
+   "y": 15.0,
+   "rot": 270,
+   "side": "F",
+   "pads": {
+    "1": "GND",
+    "40": "GND",
+    "41": "GND",
+    "2": "+3V3",
+    "3": "/EN",
+    "27": "/BOOT",
+    "13": "/ESP_D-",
+    "14": "/ESP_D+",
+    "39": "/VTREF_SENSE",
+    "17": "/SWO_A",
+    "18": "/SWDIO_DIR",
+    "19": "/SWDIO_A",
+    "20": "/SWCLK_A",
+    "21": "/TDI_A",
+    "22": "/NRESET_G",
+    "8": "/LED_STAT",
+    "9": "/LED_ACT",
+    "10": "/UART_TX_A",
+    "11": "/UART_RX_A",
+    "38": "unconnected-(U3-IO2-Pad38)",
+    "15": "unconnected-(U3-IO3-Pad15)",
+    "4": "unconnected-(U3-IO4-Pad4)",
+    "5": "unconnected-(U3-IO5-Pad5)",
+    "6": "unconnected-(U3-IO6-Pad6)",
+    "7": "unconnected-(U3-IO7-Pad7)",
+    "12": "unconnected-(U3-IO8-Pad12)",
+    "23": "unconnected-(U3-IO21-Pad23)",
+    "28": "unconnected-(U3-IO35-Pad28)",
+    "29": "unconnected-(U3-IO36-Pad29)",
+    "30": "unconnected-(U3-IO37-Pad30)",
+    "31": "unconnected-(U3-IO38-Pad31)",
+    "32": "unconnected-(U3-IO39-Pad32)",
+    "33": "unconnected-(U3-IO40-Pad33)",
+    "34": "unconnected-(U3-IO41-Pad34)",
+    "35": "unconnected-(U3-IO42-Pad35)",
+    "26": "unconnected-(U3-IO45-Pad26)",
+    "16": "unconnected-(U3-IO46-Pad16)",
+    "24": "unconnected-(U3-IO47-Pad24)",
+    "25": "unconnected-(U3-IO48-Pad25)",
+    "36": "unconnected-(U3-RXD0-Pad36)",
+    "37": "unconnected-(U3-TXD0-Pad37)"
+   },
+   "uuid": "58c76529-069e-54ed-9b7a-cd9cff448b9e",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf",
+    "Description": "ESP32-S3 module, 8 MB flash, 2 MB PSRAM, PCB antenna",
+    "Manufacturer": "Espressif",
+    "MPN": "ESP32-S3-WROOM-1-N8R2"
+   },
+   "model": null
+  },
+  {
+   "ref": "C3",
+   "value": "22u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "x": 56.5,
+   "y": 3.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "747f6a08-5230-593f-8ef2-2d6a5eb69a4b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 22 uF 10 V X5R 0805 (module 3V3, Espressif C1)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C4",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 59.5,
+   "y": 3.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "98c422a5-0c32-52e0-b25c-a9eaef529da7",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (module 3V3, Espressif C3)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R4",
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 53.5,
+   "y": 3.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/EN",
+    "2": "+3V3"
+   },
+   "uuid": "28083d09-1c16-5cdf-934d-9aea540d52ed",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 10 kohm 1% 0402 (EN RC delay, Espressif)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C5",
+   "value": "1u",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 51.5,
+   "y": 3.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/EN",
+    "2": "GND"
+   },
+   "uuid": "91d484c2-e351-532e-a7c2-101fccfb7a8d",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 1 uF X7R 0402 (EN RC delay, Espressif)"
+   },
+   "model": null
+  },
+  {
+   "ref": "SW1",
+   "value": "RESET",
+   "footprint": "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KMR2",
+   "x": 47.0,
+   "y": 2.8,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/EN",
+    "2": "GND"
+   },
+   "uuid": "823afd3e-2c0c-552f-96de-4c57d8bfd87e",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Tactile switch, reset (EN)",
+    "Manufacturer": "C&K",
+    "MPN": "KMR221G LFS"
+   },
+   "model": null
+  },
+  {
+   "ref": "SW2",
+   "value": "BOOT",
+   "footprint": "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KMR2",
+   "x": 40.5,
+   "y": 27.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/BOOT",
+    "2": "GND"
+   },
+   "uuid": "c968a57a-ca30-52ea-a76d-acde8314aa11",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Tactile switch, boot (IO0)",
+    "Manufacturer": "C&K",
+    "MPN": "KMR221G LFS"
+   },
+   "model": null
+  },
+  {
+   "ref": "R5",
+   "value": "0",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 40.2,
+   "y": 9.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/USB_D-",
+    "2": "/ESP_D-"
+   },
+   "uuid": "05f5274e-6457-59b8-985d-0617f32bdc7b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 0 ohm 0402 (USB D-, Espressif R6 position)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R6",
+   "value": "0",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 40.2,
+   "y": 10.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/USB_D+",
+    "2": "/ESP_D+"
+   },
+   "uuid": "106b63eb-8d5f-52dc-b85a-74d4036b1738",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 0 ohm 0402 (USB D+, Espressif R4 position)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R7",
+   "value": "470",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 33.5,
+   "y": 22.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/LED_STAT",
+    "2": "/LED_STAT_A"
+   },
+   "uuid": "2ebd6527-3d3d-5858-a79e-ea96ddac82f3",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 470 ohm 1% 0402 (status LED)"
+   },
+   "model": null
+  },
+  {
+   "ref": "D2",
+   "value": "STAT",
+   "footprint": "LED_SMD:LED_0603_1608Metric",
+   "x": 36.5,
+   "y": 22.6,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "2": "/LED_STAT_A",
+    "1": "GND"
+   },
+   "uuid": "20fc2f56-a662-5ab6-9732-b2d16207ad3f",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "LED yellow 0603, status (IO15)",
+    "Sim.Pins": "1=K 2=A",
+    "Manufacturer": "Kingbright",
+    "MPN": "APTD1608LSYCK"
+   },
+   "model": null
+  },
+  {
+   "ref": "R8",
+   "value": "470",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 33.5,
+   "y": 24.3,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/LED_ACT",
+    "2": "/LED_ACT_A"
+   },
+   "uuid": "c491245e-d936-585e-89af-dc8249ba73c1",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 470 ohm 1% 0402 (activity LED)"
+   },
+   "model": null
+  },
+  {
+   "ref": "D3",
+   "value": "ACT",
+   "footprint": "LED_SMD:LED_0603_1608Metric",
+   "x": 36.5,
+   "y": 24.3,
+   "rot": 180,
+   "side": "F",
+   "pads": {
+    "2": "/LED_ACT_A",
+    "1": "GND"
+   },
+   "uuid": "205e6cff-ebaf-54e2-8aa5-e06b05b25d9d",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "LED red 0603, activity (IO16)",
+    "Sim.Pins": "1=K 2=A",
+    "Manufacturer": "Kingbright",
+    "MPN": "APTD1608LSURCK"
+   },
+   "model": null
+  },
+  {
+   "ref": "U4",
+   "value": "SN74LVC1T45",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 23.0,
+   "y": 12.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "6": "/VTREF",
+    "2": "GND",
+    "3": "/SWCLK_A",
+    "4": "/T_SWCLK",
+    "5": "+3V3"
+   },
+   "uuid": "82c9b353-a693-5b85-bb6e-bd45aa694ff0",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "http://www.ti.com/lit/ds/symlink/sn74lvc1t45.pdf",
+    "Description": "Level translator, SWCLK/TCK, probe to target",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "SN74LVC1T45DBVR"
+   },
+   "model": null
+  },
+  {
+   "ref": "U5",
+   "value": "SN74LVC1T45",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 23.0,
+   "y": 15.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "6": "/VTREF",
+    "2": "GND",
+    "3": "/SWDIO_A",
+    "4": "/T_SWDIO",
+    "5": "/SWDIO_DIR"
+   },
+   "uuid": "e941c43b-7777-5979-960d-68cc451598d9",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "http://www.ti.com/lit/ds/symlink/sn74lvc1t45.pdf",
+    "Description": "Level translator, SWDIO/TMS, both ways (IO10 sets the direction)",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "SN74LVC1T45DBVR"
+   },
+   "model": null
+  },
+  {
+   "ref": "U6",
+   "value": "SN74LVC1T45",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 23.0,
+   "y": 19.2,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "6": "/VTREF",
+    "2": "GND",
+    "3": "/SWO_A",
+    "4": "/T_SWO",
+    "5": "GND"
+   },
+   "uuid": "6b5f7113-c9e1-5004-83d9-eb8072e12fcd",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "http://www.ti.com/lit/ds/symlink/sn74lvc1t45.pdf",
+    "Description": "Level translator, SWO/TDO, target to probe",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "SN74LVC1T45DBVR"
+   },
+   "model": null
+  },
+  {
+   "ref": "U7",
+   "value": "SN74LVC1T45",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 33.0,
+   "y": 12.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "6": "/VTREF",
+    "2": "GND",
+    "3": "/TDI_A",
+    "4": "/T_TDI",
+    "5": "+3V3"
+   },
+   "uuid": "c79f76e6-25b5-57e2-9d16-a0b5775f3466",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "http://www.ti.com/lit/ds/symlink/sn74lvc1t45.pdf",
+    "Description": "Level translator, TDI, probe to target",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "SN74LVC1T45DBVR"
+   },
+   "model": null
+  },
+  {
+   "ref": "U8",
+   "value": "SN74LVC1T45",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 33.0,
+   "y": 15.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "6": "/VTREF",
+    "2": "GND",
+    "3": "/UART_TX_A",
+    "4": "/T_UART_TX",
+    "5": "+3V3"
+   },
+   "uuid": "f0b4e257-1cb2-53ab-8717-bf6b9b66ca5c",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "http://www.ti.com/lit/ds/symlink/sn74lvc1t45.pdf",
+    "Description": "Level translator, UART, probe TX to target RX",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "SN74LVC1T45DBVR"
+   },
+   "model": null
+  },
+  {
+   "ref": "U9",
+   "value": "SN74LVC1T45",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+   "x": 33.0,
+   "y": 19.2,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "6": "/VTREF",
+    "2": "GND",
+    "3": "/UART_RX_A",
+    "4": "/T_UART_RX",
+    "5": "GND"
+   },
+   "uuid": "e6be1acb-3c72-5e6d-a84a-9e112a0fdc09",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "http://www.ti.com/lit/ds/symlink/sn74lvc1t45.pdf",
+    "Description": "Level translator, UART, target TX to probe RX",
+    "Manufacturer": "Texas Instruments",
+    "MPN": "SN74LVC1T45DBVR"
+   },
+   "model": null
+  },
+  {
+   "ref": "C6",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 20.4,
+   "y": 11.2,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "11a32f69-9849-5bf1-b1f2-571ef6e250e4",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U4 VCCA)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C7",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 20.4,
+   "y": 14.799999999999999,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "22f90a93-b0c3-52d7-a79c-71e1bcf3e5f6",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U5 VCCA)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C8",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 20.4,
+   "y": 18.4,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "45eba758-8b50-5933-a4bd-cad96821c310",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U6 VCCA)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C9",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 30.4,
+   "y": 11.2,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "1882d65b-249c-5b0b-8869-544f6ac1bb24",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U7 VCCA)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C10",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 30.4,
+   "y": 14.799999999999999,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "9732fd60-8a27-537f-a393-6dd5659b81e2",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U8 VCCA)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C11",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 30.4,
+   "y": 18.4,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "+3V3",
+    "2": "GND"
+   },
+   "uuid": "e6e1a923-49b9-5df5-bc50-5697405804c4",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U9 VCCA)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C12",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 25.6,
+   "y": 11.2,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "GND"
+   },
+   "uuid": "5e54abb6-bd2f-593a-ba68-2ed929aee3e8",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U4 VCCB)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C13",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 25.6,
+   "y": 14.799999999999999,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "GND"
+   },
+   "uuid": "9fde6079-6eb3-5a11-9b54-75b31711596c",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U5 VCCB)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C14",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 25.6,
+   "y": 18.4,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "GND"
+   },
+   "uuid": "c13bda58-1ca1-5568-9890-bda7a096af39",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U6 VCCB)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C15",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 35.6,
+   "y": 11.2,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "GND"
+   },
+   "uuid": "817510af-92ef-562e-9495-f5adc92efc90",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U7 VCCB)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C16",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 35.6,
+   "y": 14.799999999999999,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "GND"
+   },
+   "uuid": "8f5ecd0f-19d8-5330-a7d5-f370c42de6f5",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U8 VCCB)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C17",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 35.6,
+   "y": 18.4,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "GND"
+   },
+   "uuid": "c1b6931f-8e9a-5a49-9765-ec993243f3e8",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (U9 VCCB)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R9",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 17.5,
+   "y": 12.8,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/SWCLK_A",
+    "2": "GND"
+   },
+   "uuid": "57a4c3cc-1460-548b-a609-700dbeb62b97",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (SWCLK idles low)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R10",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 17.5,
+   "y": 16.4,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/SWDIO_DIR",
+    "2": "GND"
+   },
+   "uuid": "deea6db5-e764-59e6-988b-a7405bc84294",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (SWDIO reads by default)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R11",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 17.5,
+   "y": 17.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/SWDIO_A",
+    "2": "+3V3"
+   },
+   "uuid": "fd332f57-0cc7-509e-8bfd-84245b801c99",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (SWDIO idles high)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R12",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 38.5,
+   "y": 12.8,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/TDI_A",
+    "2": "+3V3"
+   },
+   "uuid": "89fc3d9a-3872-5e79-922d-b1f22db96002",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (TDI idles high)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R13",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 38.5,
+   "y": 16.4,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/UART_TX_A",
+    "2": "+3V3"
+   },
+   "uuid": "c08cfab2-501a-57c2-b15b-f164f06250e9",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (UART idles high)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R14",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 28.0,
+   "y": 15.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/T_SWDIO",
+    "2": "/VTREF"
+   },
+   "uuid": "353faa04-f998-55a1-845f-15e5f34087fa",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (target SWDIO idles high)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R15",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 28.0,
+   "y": 19.2,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/T_SWO",
+    "2": "/VTREF"
+   },
+   "uuid": "6d68b630-0973-52e6-b7b0-5bd901d11eac",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (target SWO idles high)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R16",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 38.5,
+   "y": 19.4,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/T_UART_RX",
+    "2": "/VTREF"
+   },
+   "uuid": "175e61f1-4a2a-5f03-9771-4d42c0c9c6ee",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (target UART idles high)"
+   },
+   "model": null
+  },
+  {
+   "ref": "Q1",
+   "value": "2N7002",
+   "footprint": "Package_TO_SOT_SMD:SOT-23",
+   "x": 38.5,
+   "y": 4.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/NRESET_G",
+    "2": "GND",
+    "3": "/T_NRESET"
+   },
+   "uuid": "491ae1bd-e0f4-5956-9448-3f5c215e8a71",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "https://www.onsemi.com/pub/Collateral/NDS7002A-D.PDF",
+    "Description": "N-MOSFET, target nRESET (open drain)",
+    "Manufacturer": "Nexperia",
+    "MPN": "2N7002,215"
+   },
+   "model": null
+  },
+  {
+   "ref": "R17",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 38.5,
+   "y": 6.6,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/NRESET_G",
+    "2": "GND"
+   },
+   "uuid": "1e023f3e-c639-509a-86a9-03a67f105105",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (nRESET switch off at power-up)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R18",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 23.6,
+   "y": 8.6,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "/VTREF_SENSE"
+   },
+   "uuid": "80c58562-f9d7-516e-8eec-092b20145b55",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (VTref divider)"
+   },
+   "model": null
+  },
+  {
+   "ref": "R19",
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0402_1005Metric",
+   "x": 25.0,
+   "y": 8.6,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF_SENSE",
+    "2": "GND"
+   },
+   "uuid": "0976b999-e9ed-5423-b2d0-b96ffa2c0d1d",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Resistor 100 kohm 1% 0402 (VTref divider)"
+   },
+   "model": null
+  },
+  {
+   "ref": "C18",
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "x": 26.4,
+   "y": 8.6,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF_SENSE",
+    "2": "GND"
+   },
+   "uuid": "e63a0e0f-58a9-5ce8-b6f5-6ab81e5c7a21",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Capacitor 100 nF X7R 0402 (VTref sense filter)"
+   },
+   "model": null
+  },
+  {
+   "ref": "J2",
+   "value": "Cortex Debug",
+   "footprint": "Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD",
+   "x": 32.0,
+   "y": 4.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "/T_SWDIO",
+    "3": "GND",
+    "5": "GND",
+    "4": "/T_SWCLK",
+    "6": "/T_SWO",
+    "7": "unconnected-(J2-KEY-Pad7)",
+    "8": "/T_TDI",
+    "9": "GND",
+    "10": "/T_NRESET"
+   },
+   "uuid": "a0e847b4-d6f2-5836-a807-ff932f8a30c3",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresight_components_trm.pdf",
+    "Description": "Arm Cortex Debug 10-pin, 1.27 mm",
+    "Manufacturer": "Samtec",
+    "MPN": "FTSH-105-01-L-DV"
+   },
+   "model": null
+  },
+  {
+   "ref": "J3",
+   "value": "Target UART",
+   "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+   "x": 16.0,
+   "y": 2.6,
+   "rot": 90,
+   "side": "F",
+   "pads": {
+    "1": "/VTREF",
+    "2": "/T_UART_TX",
+    "3": "/T_UART_RX",
+    "4": "GND"
+   },
+   "uuid": "8ebf61ef-9354-5818-823f-f0a617a98718",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Target UART: 1 VTref, 2 TX (probe out), 3 RX (probe in), 4 GND"
+   },
+   "model": null
+  },
+  {
+   "ref": "H1",
+   "value": "M2",
+   "footprint": "MountingHole:MountingHole_2.2mm_M2_Pad_Via",
+   "x": 4.0,
+   "y": 4.0,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "GND"
+   },
+   "uuid": "ea010471-1bf0-5f36-916f-758456cca60b",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Mounting hole M2, grounded"
+   },
+   "model": null
+  },
+  {
+   "ref": "H2",
+   "value": "M2",
+   "footprint": "MountingHole:MountingHole_2.2mm_M2_Pad_Via",
+   "x": 4.0,
+   "y": 26.5,
+   "rot": 0,
+   "side": "F",
+   "pads": {
+    "1": "GND"
+   },
+   "uuid": "c0988524-fc8e-5a21-b0f7-7a2914120f63",
+   "dnp": false,
+   "fields": {
+    "Datasheet": "",
+    "Description": "Mounting hole M2, grounded"
+   },
+   "model": null
+  }
+ ],
+ "nets": [
+  "+3V3",
+  "+5V",
+  "/BOOT",
+  "/CC1",
+  "/CC2",
+  "/EN",
+  "/ESP_D+",
+  "/ESP_D-",
+  "/LED_ACT",
+  "/LED_ACT_A",
+  "/LED_PWR_A",
+  "/LED_STAT",
+  "/LED_STAT_A",
+  "/NRESET_G",
+  "/SWCLK_A",
+  "/SWDIO_A",
+  "/SWDIO_DIR",
+  "/SWO_A",
+  "/TDI_A",
+  "/T_NRESET",
+  "/T_SWCLK",
+  "/T_SWDIO",
+  "/T_SWO",
+  "/T_TDI",
+  "/T_UART_RX",
+  "/T_UART_TX",
+  "/UART_RX_A",
+  "/UART_TX_A",
+  "/USB_D+",
+  "/USB_D-",
+  "/VTREF",
+  "/VTREF_SENSE",
+  "GND",
+  "VBUS",
+  "unconnected-(J1-SBU1-PadA8)",
+  "unconnected-(J1-SBU2-PadB8)",
+  "unconnected-(J2-KEY-Pad7)",
+  "unconnected-(U3-IO2-Pad38)",
+  "unconnected-(U3-IO21-Pad23)",
+  "unconnected-(U3-IO3-Pad15)",
+  "unconnected-(U3-IO35-Pad28)",
+  "unconnected-(U3-IO36-Pad29)",
+  "unconnected-(U3-IO37-Pad30)",
+  "unconnected-(U3-IO38-Pad31)",
+  "unconnected-(U3-IO39-Pad32)",
+  "unconnected-(U3-IO4-Pad4)",
+  "unconnected-(U3-IO40-Pad33)",
+  "unconnected-(U3-IO41-Pad34)",
+  "unconnected-(U3-IO42-Pad35)",
+  "unconnected-(U3-IO45-Pad26)",
+  "unconnected-(U3-IO46-Pad16)",
+  "unconnected-(U3-IO47-Pad24)",
+  "unconnected-(U3-IO48-Pad25)",
+  "unconnected-(U3-IO5-Pad5)",
+  "unconnected-(U3-IO6-Pad6)",
+  "unconnected-(U3-IO7-Pad7)",
+  "unconnected-(U3-IO8-Pad12)",
+  "unconnected-(U3-RXD0-Pad36)",
+  "unconnected-(U3-TXD0-Pad37)"
+ ],
+ "footprint_dir": "/Users/kartikey/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints",
+ "planes": [],
+ "fanout_avoid": [],
+ "no_fanout": [],
+ "fanout_pads": {},
+ "preroutes": [],
+ "reference_copper": null,
+ "local_footprints": {},
+ "router_keepouts": [],
+ "copper_keepouts": [],
+ "priority_routes": [],
+ "escape_footprints": [],
+ "maze_via_cost_mm": 1.2,
+ "zones": [
+  {
+   "net": "GND",
+   "layers": [
+    "F.Cu",
+    "B.Cu"
+   ]
+  }
+ ],
+ "texts": [
+  {
+   "text": "EoS Probe S3  rev A",
+   "x": 20.0,
+   "y": 15.0,
+   "size": 1.0,
+   "layer": "B_SilkS",
+   "bold": true,
+   "mirror": true
+  },
+  {
+   "text": "(c) 2026 Kartikeydheer Srivastava",
+   "x": 20.0,
+   "y": 17.0,
+   "size": 0.8,
+   "layer": "B_SilkS",
+   "mirror": true
+  },
+  {
+   "text": "All rights reserved",
+   "x": 20.0,
+   "y": 18.4,
+   "size": 0.8,
+   "layer": "B_SilkS",
+   "mirror": true
+  }
+ ]
+}
