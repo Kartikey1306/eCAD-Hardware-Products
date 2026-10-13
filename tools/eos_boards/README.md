@@ -26,7 +26,9 @@ paths that `kicad_env.py` and `build.py` use.
    Then lays any `priority_routes` (a bus the design routes first, in a set order), and gives each
    plane-net pad a short stub and a via into its plane. An exposed pad gets a 2 × 2 array of vias
    in the pad, on a two-layer board too, into the bottom pour, unless its footprint brings its own
-   thermal vias. Finally writes a Specctra DSN for the router.
+   thermal vias. They sit in the pad's paste openings, as the vias in Raspberry Pi's RP2350A pad
+   do; order them tented or plugged where solder wicking matters. Finally writes a Specctra DSN
+   for the router.
 3. **Routing**. Freerouting, headless. The router is given 0.01 mm more clearance than the board's
    rules, so its grid rounding never reaches DRC.
 4. **Finish** (`pcb_build.py finish`). Imports the routes, widens any track the router necked
@@ -51,8 +53,10 @@ paths that `kicad_env.py` and `build.py` use.
    DRC counts.
 
 Outputs are written only when every check passes: 0 ERC violations, 0 DRC errors, 0
-unconnected items and 0 parity problems. A failed build stops before step 6 and leaves the
-previous outputs untouched.
+unconnected items and 0 parity problems. A failed build stops before step 6: the previous
+fabrication outputs, `LICENSE.txt` and `build-report.json` stay as they were, while `hardware/`,
+`erc.json` and `drc.json` hold the failed attempt, so it can be inspected. Rebuild until it
+passes before committing a board.
 
 ## Reusing a reference design's layout exactly
 
@@ -105,9 +109,12 @@ Most boards need only parts, nets and positions. These options cover the rest:
 
 Local libraries:
 
-- `footprints/` holds footprints KiCad does not ship.
+- `footprints/` holds footprints KiCad does not ship. `footprints/generate.py` writes
+  `EoS_Packages.pretty`: NXP's HLQFP-100 (SOT1570-3) with its exposed pad, from the LPC55S6x
+  data sheet's land pattern.
 - `symbols/` holds symbols KiCad does not ship (`symbols/generate.py` writes them): the ADT7410
-  temperature sensor (`EoS_Sensors`), a 2×50
+  temperature sensor (`EoS_Sensors`), the TM4C123GH6PM, LPC55S69JBD100 and R7FA2E1A92DFM
+  (`EoS_MCU`), a 2×50
   connector for the CM5, and a flow-through TPD4EUSB30.
 
 A board that uses either gets its own copy beside its KiCad project, with a project library
@@ -134,7 +141,9 @@ boards' own files: their design files (`boards/eos_*.py`, `boards/owner.py`), th
 terms (`boards/licence_terms.txt`) and the footprint library drawn for them
 (`footprints/EoS_Connectors.pretty`). Those, and the boards' folders in `boards/eos/`, are
 Kartikeydheer Srivastava's, all rights reserved. See
-[boards/eos/README.md](../../boards/eos/README.md#licence).
+[boards/eos/README.md](../../boards/eos/README.md#licence). The generic libraries
+(`symbols/`, and `footprints/EoS_Packages.pretty` with `footprints/generate.py`) stay MIT, also
+when a board ships a copy of them.
 
 A board's `licence` is `"MIT"` or `design.ALL_RIGHTS_RESERVED`. The second needs two more
 fields, and a build refuses the board without them:
@@ -142,7 +151,7 @@ fields, and a build refuses the board without them:
 - `contact`: whom to ask for permission;
 - `licence_terms`: the terms file, relative to this folder. The build fills in its `{year}`,
   `{owner}`, `{contact}`, `{title}`, `{revision}`, `{name}`, `{module}` (the design file it
-  loaded) and `{libraries}` (the board's own footprint libraries) fields. The terms
+  loaded) and `{libraries}` (the owner's footprint libraries the board uses) fields. The terms
   belong to the board's owner, not to the generator, so a board brings its own.
 
 Each board states its designer and licence in its design file. These appear in the schematic

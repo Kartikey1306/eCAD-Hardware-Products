@@ -231,7 +231,12 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
             if fp.GetReference() in skip and pad.GetNumber() not in spec.get("fanout_pads", {}).get(fp.GetReference(), []):
                 continue
             size = pad.GetBoundingBox()
-            exposed = min(size.GetWidth(), size.GetHeight()) > MM(2.0)
+            # a chip's exposed pad: the biggest pad of a part with at least four, over 1.5 mm across (a
+            # QFN-20's is 1.8 mm); a two-pad part's pad or a lone test pad is not one
+            numbers = {q.GetNumber() for q in fp.Pads()}
+            biggest = max(q.GetBoundingBox().GetArea() for q in fp.Pads())
+            exposed = (min(size.GetWidth(), size.GetHeight()) > MM(1.5) and len(numbers) >= 4
+                       and size.GetArea() >= biggest)
             if not exposed and net.GetNetname() not in plane_nets:
                 continue                                                 # two layers: exposed pads only
             if exposed and any(q.GetNumber() == pad.GetNumber() and q.GetAttribute() == P.PAD_ATTRIB_PTH
@@ -239,7 +244,8 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
                 continue                                                 # its footprint has thermal vias
             if exposed:                                                  # exposed pad: vias in the pad
                 c = pad.GetPosition()
-                off = MM(0.6)
+                # the four vias sit inside the pad: 0.6 mm off centre, or less on a small pad
+                off = min(MM(0.6), min(size.GetWidth(), size.GetHeight()) // 2 - via_r - MM(0.05))
                 for dx, dy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
                     add_via(P.VECTOR2I(c.x + dx * off, c.y + dy * off), net)
                     placed += 1

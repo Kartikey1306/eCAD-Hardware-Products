@@ -14,6 +14,14 @@ board's schematic, layout, routing, checks and fabrication outputs; see
 | [EoS CM4 Base](eos-cm4-base) | Raspberry Pi CM4 carrier: USB-C power, one USB 2.0 port switched between USB-C (device) and USB-A (host), Gigabit Ethernet, microSD, 40-pin GPIO | 4 | 0 | 0 | 0 | 0 |
 | [EoS Motion Wing](eos-motion-wing) | FeatherWing: ADXL343 accelerometer and ADT7410 temperature sensor on I2C, address and interrupt jumpers | 2 | 0 | 0 | 0 | 0 |
 | [EoS ESP32 DevKit](eos-esp32-devkit) | ESP32-WROOM-32E board: USB-C, CP2102N USB-UART with auto-program, 3.3 V 1 A, DevKitC V4 header grid | 2 | 0 | 0 | 0 | 0 |
+| [EoS ATmega328P Board](eos-atmega328p-board) | ATmega328P board that fits Uno R3 shields: USB-C, CH340C USB-UART with Ioff buffers, ICSP header | 2 | 0 | 0 | 0 | 0 |
+| [EoS MSP430G2 Board](eos-msp430g2-board) | MSP430G2553 (DIP-20, socketed) board that takes 20-pin BoosterPacks; Spy-Bi-Wire header | 2 | 0 | 0 | 0 | 0 |
+| [EoS TM4C123 Board](eos-tm4c123-board) | TM4C123GH6PM board that takes 40-pin BoosterPacks: USB device port, CP2102N USB-UART, SWD | 2 | 0 | 0 | 0 | 0 |
+| [EoS KL25 Board](eos-kl25-board) | NXP KL25Z (MKL25Z128VLK4) board that fits Uno R3 shields: USB device port, accelerometer, SWD | 2 | 0 | 0 | 0 | 0 |
+| [EoS STM32 64](eos-stm32-64) | STM32F411RE board in the 64-pin Nucleo format: morpho and Uno headers, 7-12 V buck, SWD | 2 | 0 | 0 | 0 | 0 |
+| [EoS LPC55S69 Board](eos-lpc55s69-board) | NXP LPC55S69 (dual Cortex-M33) board that fits Uno R3 shields: two USB-C ports, power mux, SWD | 4 | 0 | 0 | 0 | 0 |
+| [EoS KE16Z Board](eos-ke16z-board) | NXP KE16Z (MKE16Z64VLF4) board that fits Uno R3 shields: CP2102N USB-UART, CAN pins, SWD | 2 | 0 | 0 | 0 | 0 |
+| [EoS RA2E1 Board](eos-ra2e1-board) | Renesas RA2E1 board that fits Uno R3 shields: two Pmod headers, CP2102N on the boot UART, SWD | 2 | 0 | 0 | 0 | 0 |
 
 Each board folder contains:
 
@@ -52,11 +60,13 @@ rights reserved. Each board's `LICENSE.txt` has the full terms. In short:
 
 What the licence covers:
 
-- every board folder here, except the generic symbol libraries copied into a board's
-  `hardware/symbols/`, which are MIT like the generator that writes them;
+- every board folder here, except the generic libraries copied into a board's
+  `hardware/symbols/` and `hardware/footprints/EoS_Packages.pretty`, which are MIT like the
+  generator that writes them;
 - in `tools/eos_boards`: the boards' design files `boards/eos_*.py`, `boards/owner.py`, the
   licence terms `boards/licence_terms.txt`, and the footprint library drawn for the module
   carriers, `footprints/EoS_Connectors.pretty`.
 
-The rest of `tools/eos_boards` (the generator, the reference extractors and `symbols/`) and
-its tests stay under the repository's MIT licence.
+The rest of `tools/eos_boards` (the generator, the reference extractors, `symbols/` and
+`footprints/generate.py` with the `EoS_Packages.pretty` it writes) and its tests stay under the
+repository's MIT licence.

@@ -741,10 +741,14 @@ class ExposedPadTest(unittest.TestCase):
                 at = find(fp, "at")
                 fx, fy, rot = float(at[1]), float(at[2]), math.radians(float(at[3]) if len(at) > 3 else 0)
                 pads = find_all(fp, "pad")
+                if len({str(q[1]) for q in pads}) < 4:
+                    continue                             # a chip has four pads or more; a test pad has one
+                biggest = max(float(find(q, "size")[1]) * float(find(q, "size")[2]) for q in pads)
                 for pad in pads:
                     net = find(pad, "net")
                     w, h = (float(v) for v in find(pad, "size")[1:3])
-                    if str(pad[2]) != "smd" or net is None or str(net[-1]) != "GND" or min(w, h) <= 2.0:
+                    if str(pad[2]) != "smd" or net is None or str(net[-1]) != "GND" or min(w, h) <= 1.5 \
+                            or w * h < biggest:
                         continue
                     with self.subTest(board=folder.name, pad=f"{ref}.{pad[1]}"):
                         if any(str(q[1]) == str(pad[1]) and str(q[2]) == "thru_hole" for q in pads):
@@ -819,6 +823,24 @@ class OwnershipTest(unittest.TestCase):
         licence = (REPO_ROOT / "boards" / "eos" / "eos-cm5-base" / "LICENSE.txt").read_text(encoding="utf-8")
         self.assertIn("Schematic symbols in hardware/symbols (EoS_Connectors.kicad_sym, EoS_Parts.kicad_sym): "
                       "written by this repository's generator, tools/eos_boards/symbols, MIT licence", licence)
+
+    def test_each_footprint_library_is_the_owners_third_party_or_generic(self):
+        folder = REPO_ROOT / "tools" / "eos_boards" / "footprints"
+        for lib in sorted(folder.glob("*.pretty")):
+            with self.subTest(library=lib.stem):
+                kinds = [(folder / f"{lib.stem}.NOTICE.txt").exists(), (folder / f"{lib.stem}.LICENSE.txt").exists(),
+                         lib.stem in build.GENERIC_FOOTPRINTS]
+                self.assertEqual(sum(kinds), 1, kinds)        # all rights reserved, its own licence, or MIT
+
+    def test_generic_footprints_are_what_the_generator_writes_and_stay_mit(self):
+        fp = importlib.import_module("eos_boards.footprints.generate")
+        committed = REPO_ROOT / "tools" / "eos_boards" / "footprints" / "EoS_Packages.pretty" / f"{fp.NAME}.kicad_mod"
+        self.assertEqual(dumps(fp.footprint()) + "\n", committed.read_text(encoding="utf-8"))
+        board = importlib.import_module("eos_boards.boards.eos_lpc55s69_board").BOARD
+        licence = build.licence_text(board, "eos_lpc55s69_board")
+        self.assertIn("Footprint libraries in hardware/footprints (EoS_Packages.pretty): written by this "
+                      "repository's generator, tools/eos_boards/footprints, MIT licence", licence)
+        self.assertNotIn("tools/eos_boards/footprints/EoS_Packages.pretty, a footprint library drawn", licence)
 
     def test_repository_docs_state_the_exception(self):
         contributing = (REPO_ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")

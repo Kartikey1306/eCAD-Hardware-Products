@@ -53,6 +53,7 @@ def board_net(board: Board, net: str) -> str:
     return net if net in board.power_nets else f"/{net}"
 
 
+GENERIC_FOOTPRINTS = {"EoS_Packages"}   # footprints/generate.py writes them; MIT like the generator
 KICAD_LIBRARIES = ("Footprints, symbols and 3D models from KiCad's libraries: CC BY-SA 4.0, with the KiCad "
                    "libraries' exception for designs that use them and files generated from those designs "
                    "(kicad.org/libraries/license)")
@@ -74,7 +75,8 @@ def licence_text(board, module=""):
         # the owner's own footprint libraries; a library with a .LICENSE.txt is third-party and listed below
         libraries = "".join(f"- tools/eos_boards/footprints/{name}.pretty, a footprint library drawn\n"
                             f"  for these boards (see {name}.NOTICE.txt);\n" for name in board.local_footprints
-                            if not (HERE / "footprints" / f"{name}.LICENSE.txt").exists())
+                            if not (HERE / "footprints" / f"{name}.LICENSE.txt").exists()
+                            and name not in GENERIC_FOOTPRINTS)
         # The terms are the owner's, not the generator's: each closed board names its own file.
         text = (HERE / board.licence_terms).read_text(encoding="utf-8").format(
             year=board.date[:4], owner=board.company, contact=board.contact.strip(), title=board.title,
@@ -83,6 +85,10 @@ def licence_text(board, module=""):
         if ours:   # copied into hardware/symbols by the build: the generator's MIT symbols, not the owner's
             credits.append("Schematic symbols in hardware/symbols (" + ", ".join(f"{s}.kicad_sym" for s in ours)
                            + "): written by this repository's generator, tools/eos_boards/symbols, MIT licence")
+        generic = sorted(set(board.local_footprints) & GENERIC_FOOTPRINTS)
+        if generic:   # written by footprints/generate.py, part of the MIT generator
+            credits.append("Footprint libraries in hardware/footprints (" + ", ".join(f"{g}.pretty" for g in generic)
+                           + "): written by this repository's generator, tools/eos_boards/footprints, MIT licence")
         credits.append(KICAD_LIBRARIES)   # the libraries' exception is what lets a design that uses them stay closed
         heading = "Material on this board that this licence does not cover (section 4):"
     else:
@@ -354,7 +360,8 @@ def main() -> int:
         # a failed build must not overwrite fabrication files from a good one
         (work / "build-report.json").write_text(json.dumps(report, indent=1) + "\n")
         print(json.dumps({k: report[k] for k in ("erc_violations", "drc", "drc_errors", "drc_warnings")}, indent=1))
-        raise SystemExit(f"DRC failed; outputs left as they were. See {out / 'drc.json'} and {work / 'build-report.json'}")
+        raise SystemExit(f"DRC failed; fabrication outputs left as they were, hardware/ holds this attempt. "
+                         f"See {out / 'drc.json'} and {work / 'build-report.json'}")
 
     # 6. outputs
     gerbers = fab / "gerbers"

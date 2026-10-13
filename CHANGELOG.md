@@ -15,6 +15,40 @@ has never run.
 
 ### Added
 
+- Eight more original EmbeddedOS boards (batch 2), all rights reserved like the others. Each was
+  built with `tools/eos_boards` at ERC 0, DRC errors 0, unconnected 0 and schematic parity 0. Each
+  had an independent review, its findings were fixed, and then a second reviewer checked the
+  fixes. On every board the USB pairs, crystal lines and decoupling are laid as priority routes.
+  - EoS ATmega328P Board: fits Uno R3 shields; CH340C USB-UART with Ioff buffers and an open-drain
+    auto-reset; ICSP header.
+  - EoS MSP430G2 Board: an MSP430G2553 in a DIP-20 socket; takes 20-pin BoosterPacks; CP2102N
+    USB-UART; Spy-Bi-Wire header.
+  - EoS TM4C123 Board: takes 40-pin BoosterPacks; the chip's own USB device port, a CP2102N
+    USB-UART and SWD.
+  - EoS KL25 Board: an NXP KL25Z board that fits Uno R3 shields, with its USB device port, an
+    accelerometer and SWD.
+  - EoS STM32 64: an STM32F411RE in the 64-pin Nucleo format, with morpho and Uno headers, a 7–12 V
+    buck and SWD.
+  - EoS LPC55S69 Board: four layers; fits Uno R3 shields; two USB-C ports with a TPS2116 power mux
+    and a TPS7A91 LDO.
+  - EoS KE16Z Board: an NXP KE16Z board that fits Uno R3 shields; CP2102N USB-UART; the CAN pins on
+    a header.
+  - EoS RA2E1 Board: a Renesas RA2E1 board that fits Uno R3 shields; two Pmod headers; a CP2102N on
+    the chip's boot UART.
+
+  Each vendor board's on-board debug probe runs proprietary firmware. These boards have a standard
+  SWD or Spy-Bi-Wire header instead.
+- Generic libraries (MIT, like the generator):
+  - `EoS_MCU` symbols for the TM4C123GH6PM, LPC55S69JBD100 and R7FA2E1A92DFM, each checked pin
+    for pin against its data sheet;
+  - `footprints/generate.py`, which writes `EoS_Packages.pretty`: NXP's HLQFP-100 (SOT1570-3) from
+    the LPC55S6x data sheet's land pattern.
+
+  A board that ships a copy of them credits them as MIT in its `LICENSE.txt`, not as the owner's.
+- `tools/eos_boards`:
+  - an exposed pad is now recognised as the biggest pad of a part with four or more pads, over
+    1.5 mm across. A QFN-20's 1.8 mm centre pad counts; a two-pad part or a lone test pad doesn't.
+  - the four vias move in on a small pad.
 - EoS Motion Wing: a FeatherWing with an ADXL343 accelerometer and an ADT7410 temperature sensor
   on I2C. It has removable pull-ups and jumpers for the addresses and interrupts. The outline and
   headers come from Adafruit's published Feather specification. The ADT7410 symbol is new:
