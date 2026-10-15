@@ -69,6 +69,8 @@ minimal until datasheet review.
 | NuMaker-IoT-MA35D0-A2 "Chili Pro" | Nuvoton | MA35D0 | Dual Cortex-A35 650MHz + Cortex-M4 180MHz; 45×45mm heterogeneous Linux+MCU eval board |
 | M5Stack Stamp LoRa-1262 / Module13.2 | M5Stack | ESP32-S3 | SX1262, 868–923MHz LoRa; pairs with the eNet LoRaWAN study |
 | 8devices 8Sight T100 | 8devices | STM32N657 | Cortex-M55 800MHz + 600-GOPS Neural-ART NPU + HW ISP; Lynred LWIR, 320×240@60fps fully offline — NPU-vision reference design |
+| AIM-M-H10 | Geniatech | Hailo-10 | M.2 2280 M-Key AI accelerator card: Hailo-10 at up to 40 TOPS, up to 16GB on-module LPDDR4/4X, PCIe host link, ~12W — the M.2-keyed accelerator pattern for M.2-bearing watchlist hosts; vendor figures per the Geniatech product page, pending datasheet review |
+| AIM-M-R28 | Geniatech | Rockchip RK1828 | M.2 2280 M-Key AI accelerator card: RK1828 coprocessor at 20 TOPS INT8 with 5GB in-package DRAM, PCIe 2.1 x1, 20W TDP, -25..85°C — local LLM/VLM inference aimed at Rockchip hosts (RK3568/3576/3588); vendor figures per the Geniatech product page, pending datasheet review |
 | Raspberry Pi Smart Display Module | Raspberry Pi | Compute Module 5 carrier (Intel SDM-L) | $30 CM5 carrier in the Intel SDM-L form factor, built for digital signage and kiosks: HDMI 2.0 out, GbE, M.2 M-key (NVMe or an AI accelerator), MIPI DSI/CSI-2; vendor lifecycle "available until at least January 2036". The commercial CM5-carrier counterpart to the org's original [eos-cm5-base](eos/eos-cm5-base/README.md) — not a mirror candidate (no redistributable CAD published), recorded here as the signage/kiosk reference |
 
 ## Design files
