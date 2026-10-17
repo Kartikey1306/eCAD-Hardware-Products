@@ -1,0 +1,27 @@
+# eCAD-Hardware-Products
+
+> llms.txt for the eCAD-Hardware-Products repository (embeddedos-org/eCAD-Hardware-Products).
+> Status: the hardware-design repository of EmbeddedOS —
+> board designs, datasheets and EE documentation, with the
+> devboard CAD database and dataset-engineering docs as the
+> primary corpus. The multi-domain dataset plan
+> (ECAD_MULTI_DOMAIN_DATASET_PLAN.md, ~155 KB) is linked from
+> the README and deliberately not duplicated into llms-full.txt.
+
+eCAD-Hardware-Products is where the EmbeddedOS ecosystem's
+physical layer lives: the designs EoS, eBoot and eFirmware
+run on, the devboard CAD database, and the validation
+contract hardware must meet.
+
+## Docs
+
+- [Development-Board CAD Database (issue #28)](docs/devboard-cad-database.md)
+- [CAD dataset and engineering model v1](docs/cad-dataset-engineering-model-v1.md)
+- [Hardware validation contract v1](docs/hardware-validation-contract-v1.md)
+- [Digital / FPGA domain design (final): `uart_loopback_001` on Icarus Verilog](docs/design/digital-domain-design.md)
+- [Electrical domain design (final): `servo_supply_001` on ngspice](docs/design/electrical-domain-design.md)
+
+## Machine-readable
+
+- [llms.txt](llms.txt) — this file
+- [llms-full.txt](llms-full.txt) — the docs above concatenated as one document
