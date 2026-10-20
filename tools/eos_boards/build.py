@@ -186,6 +186,16 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
                       "x": part.pcb[0], "y": part.pcb[1], "rot": part.pcb[2], "side": part.side,
                       "pads": pads, "uuid": schematic._u(f"{board.name}/sym/{part.ref}"), "dnp": part.dnp,
                       "fields": fields, "model": list(part.model) if part.model else None})
+    for k in board.router_keepouts:
+        if len(k) not in (4, 5) or (len(k) == 5 and k[4] not in ("F.Cu", "B.Cu")) or not (k[0] < k[2] and k[1] < k[3]):
+            raise SystemExit(f'{board.name}: router keep-out {k!r}: x0 < x1, y0 < y1, then optionally "F.Cu" or "B.Cu"')
+    for k in board.pour_keepouts:
+        if len(k) != 5 or k[4] not in ("F.Cu", "B.Cu") or not (k[0] < k[2] and k[1] < k[3]):
+            raise SystemExit(f'{board.name}: pour keep-out {k!r}: x0 < x1, y0 < y1, then "F.Cu" or "B.Cu"')
+    for option in ("ground_vias", "fanout_first"):
+        unknown = sorted(set(getattr(board, option)) - {p.ref for p in board.parts})
+        if unknown:
+            raise SystemExit(f"{board.name}: {option} names parts the board does not have: {unknown}")
     if board.reference_copper:
         check_reference(board, lib, parts)
     rules = dict(RULES)
@@ -203,12 +213,15 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
             "nets": sorted(nets), "footprint_dir": str(footprint_dir),
             "planes": [{"net": board_net(board, n), "layer": layer} for n, layer in board.planes],
             "fanout_avoid": board.fanout_avoid, "no_fanout": board.no_fanout, "fanout_pads": board.fanout_pads,
+            "ground_vias": board.ground_vias,
+            "fanout_first": board.fanout_first,
             "preroutes": [{"a": list(a), "b": list(b), "width": w} for a, b, w in board.preroutes],
             "reference_copper": ({"file": str(HERE / board.reference_copper["file"]), "origin": list(board.reference_copper["origin"])}
                                  if board.reference_copper else None),
             "local_footprints": {lib: str(HERE / "footprints" / f"{lib}.pretty") for lib in board.local_footprints},
             "router_keepouts": [list(k) for k in board.router_keepouts],
             "copper_keepouts": [list(k) for k in board.copper_keepouts],
+            "pour_keepouts": [list(k) for k in board.pour_keepouts],
             "priority_routes": [[list(r[0]), list(r[1]), *r[2:]] for r in board.priority_routes],
             "escape_footprints": board.escape_footprints,
             "maze_via_cost_mm": board.maze_via_cost_mm,

@@ -117,6 +117,9 @@ def _box(center, half):
 
 
 HOLE_TO_HOLE = 0.25   # mm between drilled holes, of any net: KiCad's default and a common fab minimum
+# A via keeps this far (mm) from a surface pad of its own net: a solder-mask web between the
+# two tents the via, so the pad's solder cannot run into its barrel.
+VIA_PAD_GAP = 0.1
 ROUTER_MARGIN = 0.01   # mm of clearance the router sees beyond the board's rules (see place)
 
 
@@ -165,6 +168,27 @@ def _hole_free(holes, pos, drill):
     return True
 
 
+def _in_bottom_keepout(spec, pos, margin):
+    """True when ``pos`` (nm) lies within ``margin`` of a "B.Cu" router keep-out: an area whose
+    bottom pour is kept solid (under a crystal, say)."""
+    for k in spec.get("router_keepouts", []):
+        if len(k) > 4 and k[4] == "B.Cu" and \
+                MM(k[0]) - margin < pos.x < MM(k[2]) + margin and MM(k[1]) - margin < pos.y < MM(k[3]) + margin:
+            return True
+    return False
+
+
+def _exposed_pad(fp, pad):
+    """A chip's exposed pad: the biggest pad of a part with at least four, over 1.5 mm across (a
+    QFN-20's is 1.8 mm). A two-pad part's pad or a lone test pad is not one."""
+    size = pad.GetBoundingBox()
+    if min(size.GetWidth(), size.GetHeight()) <= MM(1.5):
+        return False
+    pads = list(fp.Pads())
+    return (len({q.GetNumber() for q in pads}) >= 4
+            and size.GetArea() >= max(q.GetBoundingBox().GetArea() for q in pads))
+
+
 def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
     """Join plane-net pads to their inner plane before routing, as a designer would.
 
@@ -175,6 +199,8 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
     On a board with no inner plane, an exposed pad on a net poured on both outer layers still
     gets its 2 x 2 vias, into the bottom pour: a QFN's centre pad is its ground, and without
     them it hangs on whatever track the router leaves it.
+    A part listed in ``ground_vias`` gets the plane treatment there too: a via beside each of
+    its pads on such a net.
     Returns (vias placed, pads left to the router).
     """
     r = spec["rules"]
@@ -206,6 +232,17 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
     edge = MM(r["edge_clearance"] + r["via"] / 2 + 0.1)
     w, h = MM(spec["width"]), MM(spec["height"])
     skip = set(spec.get("no_fanout", []))
+    # two layers: the parts named here (decoupling capacitors, say) also get a via beside each
+    # pad on a pour that covers both layers, so their ground loop closes through the bottom pour
+    dogbone = set(spec.get("ground_vias", []))
+    bottom_pours = {z["net"] for z in spec.get("zones", []) if "B.Cu" in z["layers"]}
+    # every net's surface pads, the exposed ones aside: a via keeps VIA_PAD_GAP from each
+    smd_shapes = {}
+    for f in board.GetFootprints():
+        for q in f.Pads():
+            if q.GetAttribute() == P.PAD_ATTRIB_SMD and not _exposed_pad(f, q):
+                smd_shapes.setdefault(q.GetNetCode(), []).append(
+                    q.GetEffectiveShape(P.F_Cu if q.IsOnLayer(P.F_Cu) else P.B_Cu))
     placed = left = 0
 
     holes = _holes(board)
@@ -231,13 +268,8 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
             if fp.GetReference() in skip and pad.GetNumber() not in spec.get("fanout_pads", {}).get(fp.GetReference(), []):
                 continue
             size = pad.GetBoundingBox()
-            # a chip's exposed pad: the biggest pad of a part with at least four, over 1.5 mm across (a
-            # QFN-20's is 1.8 mm); a two-pad part's pad or a lone test pad is not one
-            numbers = {q.GetNumber() for q in fp.Pads()}
-            biggest = max(q.GetBoundingBox().GetArea() for q in fp.Pads())
-            exposed = (min(size.GetWidth(), size.GetHeight()) > MM(1.5) and len(numbers) >= 4
-                       and size.GetArea() >= biggest)
-            if not exposed and net.GetNetname() not in plane_nets:
+            exposed = _exposed_pad(fp, pad)
+            if not exposed and net.GetNetname() not in plane_nets and fp.GetReference() not in dogbone:
                 continue                                                 # two layers: exposed pads only
             if exposed and any(q.GetNumber() == pad.GetNumber() and q.GetAttribute() == P.PAD_ATTRIB_PTH
                                for q in fp.Pads()):
@@ -274,12 +306,21 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
             reach = max(size.GetWidth(), size.GetHeight()) / 2 + via_r + MM(0.2) + beyond
             # the stub is no wider than the pad, so it fits between fine-pitch neighbours
             stub = min(MM(0.3), min(size.GetWidth(), size.GetHeight()))
+            own = smd_shapes.get(net.GetNetCode(), [])   # its own pad and its net's others
             done = False
             for dx, dy in dirs:
-                for extra in (0, MM(0.3), MM(0.6), MM(0.9), MM(1.2)):   # staggered when neighbours crowd it
+                # staggered when neighbours crowd it; the small first steps let a diagonal clear
+                # its pad's corner by VIA_PAD_GAP
+                for extra in (0, MM(0.1), MM(0.2), MM(0.3), MM(0.6), MM(0.9), MM(1.2)):
                     pos = P.VECTOR2I(int(c.x + dx * (reach + extra)), int(c.y + dy * (reach + extra)))
                     if not _inside(spec, pos, edge):
                         continue
+                    if any(sh.Collide(pos, via_r + MM(VIA_PAD_GAP)) for sh in own):
+                        continue                                 # a diagonal step can clip a pad's corner
+                    if net.GetNetname() not in bottom_pours and _in_bottom_keepout(spec, pos, keep):
+                        continue                                 # only the bottom pour's own vias go there
+                    if _in_pour_keepout(spec, pos, keep):
+                        continue                                 # no pour there for the via to join
                     vb = _box(pos, keep)
                     if any(ob.Intersects(vb) and code != net.GetNetCode() for ob, code in obstacles):
                         continue
@@ -334,6 +375,36 @@ def copper_keepout(board, points):
     for x, y in points:
         o.Append(x, y)
     board.Add(area)
+
+
+POUR_KEEPOUT = "eos-pour-keepout"
+
+
+def pour_keepout(board, layer, points):
+    """A rule area on one copper layer that no pour may fill, though tracks, vias and pads may
+    enter it: under an RL78's crystal, whose manual forbids a ground pattern beneath the X1/X2
+    wiring and the resonator. It stays on the saved board, so the zone fill and DRC honour it."""
+    area = P.ZONE(board)
+    area.SetIsRuleArea(True)
+    area.SetLayer(layer)
+    area.SetZoneName(POUR_KEEPOUT)
+    area.SetDoNotAllowTracks(False)
+    area.SetDoNotAllowVias(False)
+    area.SetDoNotAllowPads(False)
+    area.SetDoNotAllowZoneFills(True)
+    area.SetDoNotAllowFootprints(False)
+    o = area.Outline()
+    o.NewOutline()
+    for x, y in points:
+        o.Append(x, y)
+    board.Add(area)
+
+
+def _in_pour_keepout(spec, pos, margin):
+    """True when ``pos`` (nm) lies within ``margin`` of a pour keep-out on either layer: a via
+    there joins no pour on that layer."""
+    return any(MM(k[0]) - margin < pos.x < MM(k[2]) + margin and MM(k[1]) - margin < pos.y < MM(k[3]) + margin
+               for k in spec.get("pour_keepouts", []))
 
 
 def _keepout(board, layer, points):
@@ -532,6 +603,12 @@ def place(spec, pcb_path, dsn_path):
         # side stays free for the signal pads' escapes (see maze)
         placed, left = fanout(board, spec, only=early, inward=True)
         print(f"plane fan-out at {sorted(early)}: {placed} vias, {left} pads left to the router")
+    # Parts named in fanout_first get their plane vias before the priority routes, which then go
+    # round them: a supply route laid first can box a decoupling capacitor's via spots in.
+    first = set(spec.get("fanout_first", [])) - early      # an escape footprint is fanned out once, inward
+    if first:
+        placed, left = fanout(board, spec, only=first)
+        print(f"plane fan-out first at {sorted(first)}: {placed} vias, {left} pads left to the router")
     # A line with an escape in the reference copper leaves the chip on that escape first.
     escapes = {}
     if spec.get("reference_copper"):
@@ -566,11 +643,14 @@ def place(spec, pcb_path, dsn_path):
                 item.SetLocked(True)
         print(f"priority route {ra}.{pa} -> {rb}.{pb} ({net.GetNetname()}): "
               f"{len(laid)} escape segment(s) from the reference, then {len(got)} item(s)")
-    placed, left = fanout(board, spec, exclude=early)      # two layers: the exposed pads' vias only
+    placed, left = fanout(board, spec, exclude=early | first)   # two layers: the exposed pads' vias only
     if placed or left:
         print(f"plane fan-out: {placed} vias, {left} pads left to the router")
     for x0, y0, x1, y1 in spec.get("copper_keepouts", []):
         copper_keepout(board, [(MM(x0), MM(y0)), (MM(x1), MM(y0)), (MM(x1), MM(y1)), (MM(x0), MM(y1))])
+    for x0, y0, x1, y1, layer in spec.get("pour_keepouts", []):
+        pour_keepout(board, getattr(P, layer.replace(".", "_")),
+                     [(MM(x0), MM(y0)), (MM(x1), MM(y0)), (MM(x1), MM(y1)), (MM(x0), MM(y1))])
     if board.Zones():
         P.ZONE_FILLER(board).Fill(board.Zones())
     P.SaveBoard(pcb_path, board)
@@ -587,14 +667,25 @@ def place(spec, pcb_path, dsn_path):
     # Keep-outs: the board's own (under a chip whose underside copper is fixed), and each
     # reference zone. Exported as they are, those zones would reach the router as solid planes
     # over their whole outline, overlapping each other and closing channels their copper leaves open.
-    for x0, y0, x1, y1 in spec.get("router_keepouts", []):
-        _keepout(board, P.F_Cu, [(MM(x0), MM(y0)), (MM(x1), MM(y0)), (MM(x1), MM(y1)), (MM(x0), MM(y1))])
+    for k in spec.get("router_keepouts", []):
+        x0, y0, x1, y1 = k[:4]
+        layer = P.B_Cu if len(k) > 4 and k[4] == "B.Cu" else P.F_Cu
+        _keepout(board, layer, [(MM(x0), MM(y0)), (MM(x1), MM(y0)), (MM(x1), MM(y1)), (MM(x0), MM(y1))])
+    for z in [z for z in board.Zones() if z.GetZoneName() == POUR_KEEPOUT]:
+        board.Remove(z)                  # KiCad would export a fill-only rule area as a full keep-out
     for z in [z for z in board.Zones() if z.GetZoneName() == REFERENCE_ZONE]:
         o = z.Outline()
         _keepout(board, z.GetLayer(), [(o.CVertex(i).x, o.CVertex(i).y) for i in range(o.TotalVertices())])
         board.Remove(z)
     if not P.ExportSpecctraDSN(board, dsn_path):
         raise SystemExit("Specctra DSN export failed")
+    # Freerouting may not put a via on a surface pad: 2.4.1's default, stated here so that a
+    # later default cannot change it (the Specctra control rule)
+    dsn = Path(dsn_path).read_text()
+    if "(via_at_smd" not in dsn:
+        if dsn.count("(structure") != 1:
+            raise SystemExit("unexpected DSN layout: no single (structure scope")
+        Path(dsn_path).write_text(dsn.replace("(structure", "(structure\n    (control\n      (via_at_smd off)\n    )", 1))
     print(f"placed {len(spec['parts'])} footprints, {len(spec['nets'])} nets -> {pcb_path}, {dsn_path}")
 
 
@@ -609,11 +700,14 @@ def stitch(board, net, spec, pitch=2.54, margin=1.2):
             obstacles.append(t.GetBoundingBox())
     for fp in board.GetFootprints():
         for pad in fp.Pads():
-            if pad.GetNetCode() != net.GetNetCode() or pad.GetAttribute() == P.PAD_ATTRIB_NPTH:
+            # a surface pad of any net, its own included: no via in a pad (a bottom-side part
+            # has no front courtyard to keep the grid off it)
+            if pad.GetNetCode() != net.GetNetCode() or pad.GetAttribute() in (P.PAD_ATTRIB_NPTH, P.PAD_ATTRIB_SMD):
                 obstacles.append(pad.GetBoundingBox())
-        cy = fp.GetCourtyard(P.F_CrtYd)
-        if cy.OutlineCount():
-            obstacles.append(cy.BBox())
+        for side in (P.F_CrtYd, P.B_CrtYd):
+            cy = fp.GetCourtyard(side)
+            if cy.OutlineCount():
+                obstacles.append(cy.BBox())
     placed = 0
     holes = _holes(board)
     w, h = spec["width"], spec["height"]
@@ -623,7 +717,7 @@ def stitch(board, net, spec, pitch=2.54, margin=1.2):
         while x <= w - margin:
             c = v(x, y)
             box = P.BOX2I(P.VECTOR2I(c.x - keep, c.y - keep), P.VECTOR2I(2 * keep, 2 * keep))
-            if not _inside(spec, c, MM(r["edge_clearance"] + r["via"] / 2 + 0.1)):
+            if not _inside(spec, c, MM(r["edge_clearance"] + r["via"] / 2 + 0.1)) or _in_pour_keepout(spec, c, keep):
                 x += pitch
                 continue
             if not any(o.Intersects(box) for o in obstacles) and _hole_free(holes, c, MM(r["drill"])):
@@ -649,12 +743,14 @@ def join_fragments(board, net, spec):
     radius = MM(r["via"] / 2 + 0.05)
     anchors = [t.GetPosition() for t in board.GetTracks()
                if t.GetClass() == "PCB_VIA" and t.GetNetCode() == net.GetNetCode()]
-    pads = []
+    pads, smd = [], []
     for fp in board.GetFootprints():
         for pad in fp.Pads():
             if pad.GetNetCode() == net.GetNetCode() and pad.GetAttribute() == P.PAD_ATTRIB_PTH:
                 anchors.append(pad.GetPosition())
             pads.append(pad.GetBoundingBox())
+            if pad.GetAttribute() == P.PAD_ATTRIB_SMD and not _exposed_pad(fp, pad):
+                smd.append(pad.GetEffectiveShape(P.F_Cu if pad.IsOnLayer(P.F_Cu) else P.B_Cu))
     added = 0
     holes = _holes(board)
     reach = MM(r["via"] / 2 + r["clearance"])
@@ -694,7 +790,8 @@ def join_fragments(board, net, spec):
                     vb = P.BOX2I(P.VECTOR2I(c.x - radius, c.y - radius), P.VECTOR2I(2 * radius, 2 * radius))
                     if outline.PointInside(c) and all(outline.PointInside(q) for q in ring) \
                             and not any(pb.Intersects(vb) for pb in pads) and _hole_free(holes, c, MM(r["drill"])) \
-                            and clear_of_others(c):
+                            and not _in_pour_keepout(spec, c, radius) and clear_of_others(c) \
+                            and not any(sh.Collide(c, MM(r["via"] / 2 + VIA_PAD_GAP)) for sh in smd):
                         holes.append((c, MM(r["drill"]) // 2))
                         via = P.PCB_VIA(board)
                         via.SetPosition(c)
@@ -786,6 +883,20 @@ def maze(board, spec, net, a, b, width, join=False):
     for fp in board.GetFootprints():
         for pad in fp.Pads():
             if pad.GetNetCode() == code and code > 0:
+                # its own net's pad: a track may join it, but no via may sit in a surface pad,
+                # since solder wicks down an open barrel and starves the joint. A chip's exposed
+                # pad is the exception: it takes vias by design (fanout).
+                if pad.GetAttribute() == P.PAD_ATTRIB_SMD and not _exposed_pad(fp, pad):
+                    layer = P.F_Cu if pad.IsOnLayer(P.F_Cu) else P.B_Cu
+                    sh = pad.GetEffectiveShape(layer)
+                    pb = pad.GetBoundingBox()   # not b: that is the route's far end
+                    gap = via_r + MM(VIA_PAD_GAP) + margin
+                    grown = P.BOX2I(P.VECTOR2I(pb.GetX() - gap, pb.GetY() - gap),
+                                    P.VECTOR2I(pb.GetWidth() + 2 * gap, pb.GetHeight() + 2 * gap))
+                    if grown.Intersects(search):
+                        for i, j, pt in cells(grown):
+                            if sh.Collide(pt, gap):
+                                via_block[j * nx + i] = 1
                 continue
             for li, layer in enumerate(layers):
                 if pad.IsOnLayer(layer):
@@ -868,10 +979,12 @@ def maze(board, spec, net, a, b, width, join=False):
         for i, j, pt in cells(_box(c, reach_h)):
             if (pt.x - c.x) ** 2 + (pt.y - c.y) ** 2 < reach_h * reach_h:
                 via_block[j * nx + i] = 1
-    for x_0, y_0, x_1, y_1 in spec.get("router_keepouts", []):
+    for k in spec.get("router_keepouts", []):
+        x_0, y_0, x_1, y_1 = k[:4]
+        li = 1 if len(k) > 4 and k[4] == "B.Cu" else 0
         box = P.BOX2I(v(x_0, y_0), P.VECTOR2I(MM(x_1 - x_0), MM(y_1 - y_0)))
         for i, j, pt in cells(box):
-            track_block[0][j * nx + i] = 1
+            track_block[li][j * nx + i] = 1
             via_block[j * nx + i] = 1
 
     def cell(pt):
@@ -1127,6 +1240,10 @@ def repair(spec, pcb_path, pairs_path):
         if not done and pair["net"] in plane_nets:
             via_r = MM(r["via"] / 2)
             vkeep = via_r + MM(r["clearance"] + 0.02)
+            own_pads = [pad.GetEffectiveShape(P.F_Cu if pad.IsOnLayer(P.F_Cu) else P.B_Cu)
+                        for fp in board.GetFootprints() for pad in fp.Pads()
+                        if pad.GetNetCode() == net.GetNetCode() and pad.GetAttribute() == P.PAD_ATTRIB_SMD
+                        and not _exposed_pad(fp, pad)]
             for end in (a, b):
                 for rad in (0.6, 0.9, 1.2, 1.5):
                     for ang in range(0, 360, 30):
@@ -1137,6 +1254,8 @@ def repair(spec, pcb_path, pairs_path):
                             continue
                         if any(ob.Intersects(_box(pos, vkeep)) and code != net.GetNetCode() for ob, code in others):
                             continue
+                        if any(sh.Collide(pos, via_r + MM(VIA_PAD_GAP)) for sh in own_pads):
+                            continue                     # no via in a surface pad, its own net's included
                         if not _hole_free(_holes(board), pos, MM(r["drill"])):
                             continue
                         if not clear(end, pos):
@@ -1196,6 +1315,114 @@ def repair(spec, pcb_path, pairs_path):
     print(f"repaired {fixed} of {len(pairs)} open connection(s)")
 
 
+def ease_vias(board, spec):
+    """Step each router via off a surface pad of its own net. Freerouting keeps its vias out of
+    a pad (via_at_smd off) but may set one at the pad's very edge, leaving the solder mask no web
+    between them. Such a via moves away from the pad, 0.05 mm at a time up to 0.5 mm, with the
+    ends of its tracks, to the first spot where it keeps VIA_PAD_GAP from every pad of its net and
+    it and its moved tracks clear every other net's copper and every hole. Locked vias (priority
+    routes, which the maze router already keeps clear) stay. Returns (moved, left)."""
+    r = spec["rules"]
+    gap = MM(VIA_PAD_GAP)
+    # the widest clearance any net class asks for, so a moved via clears every class
+    widest = max([r["clearance"]] + [c.get("clearance", 0) for c in spec.get("netclasses", {}).values()])
+    clear = MM(widest + ROUTER_MARGIN)
+    edge = MM(r["edge_clearance"] + r["via"] / 2)
+    bottom_pours = {z["net"] for z in spec.get("zones", []) if "B.Cu" in z["layers"]}
+    drill = MM(r["drill"])
+    layers = [P.F_Cu, P.B_Cu] + [getattr(P, f"In{i}_Cu") for i in range(1, spec.get("layers", 2) - 1)]
+    smd = [pad for fp in board.GetFootprints() for pad in fp.Pads()
+           if pad.GetAttribute() == P.PAD_ATTRIB_SMD and not _exposed_pad(fp, pad)]
+
+    def pad_layer(pad):
+        return P.F_Cu if pad.IsOnLayer(P.F_Cu) else P.B_Cu
+
+    moved = left = 0
+    for via in [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA" and not t.IsLocked()]:
+        code, pos, via_r = via.GetNetCode(), via.GetPosition(), via.GetWidth(P.F_Cu) // 2
+
+        def near(q):
+            return [pad for pad in smd if pad.GetNetCode() == code
+                    and pad.GetEffectiveShape(pad_layer(pad)).Collide(q, via_r + gap)]
+
+        bad = near(pos)
+        if not bad:
+            continue
+        # tracks that end anywhere on the via, not only at its centre: each end moves with it
+        def on_via(e):
+            return (e.x - pos.x) ** 2 + (e.y - pos.y) ** 2 <= via_r * via_r
+        ends = [t for t in board.GetTracks() if t.GetClass() != "PCB_VIA" and t.GetNetCode() == code
+                and (on_via(t.GetStart()) or on_via(t.GetEnd()))]
+        if any(t.IsLocked() for t in ends):
+            left += 1
+            continue
+        # a same-net track that crosses or grazes the via without ending on it would be cut off
+        carried = {e.m_Uuid.AsString() for e in ends}       # by id: each GetTracks() call wraps anew
+        if any(t.GetClass() != "PCB_VIA" and t.GetNetCode() == code and t.m_Uuid.AsString() not in carried
+               and t.GetEffectiveShape(t.GetLayer()).Collide(pos, via_r) for t in board.GetTracks()):
+            left += 1
+            continue
+        reach = int(MM(0.5) + via_r + clear + max([t.GetLength() for t in ends] + [0]))
+        zone_box = P.BOX2I(P.VECTOR2I(pos.x - reach, pos.y - reach), P.VECTOR2I(2 * reach, 2 * reach))
+        others = []                               # (shape, layer) of other nets' copper nearby
+        for t in board.GetTracks():
+            if t.GetNetCode() != code and t.GetBoundingBox().Intersects(zone_box):
+                for layer in (layers if t.GetClass() == "PCB_VIA" else [t.GetLayer()]):
+                    others.append((t.GetEffectiveShape(layer), layer))
+        for fp in board.GetFootprints():
+            for pad in fp.Pads():
+                if pad.GetNetCode() != code and pad.GetBoundingBox().Intersects(zone_box):
+                    for layer in layers:
+                        if pad.IsOnLayer(layer):
+                            others.append((pad.GetEffectiveShape(layer), layer))
+        holes = [(c, rad) for c, rad in _holes(board) if c != pos]
+        c = bad[0].GetPosition()
+        ax, ay = pos.x - c.x, pos.y - c.y
+        norm = max(1.0, (ax * ax + ay * ay) ** 0.5)
+        dirs = [(ax / norm, ay / norm)] + [(1, 0), (-1, 0), (0, 1), (0, -1), (0.7071, 0.7071),
+                                           (-0.7071, 0.7071), (0.7071, -0.7071), (-0.7071, -0.7071)]
+        done = False
+        for step in range(1, 11):
+            for ux, uy in dirs:
+                q = P.VECTOR2I(int(pos.x + ux * step * MM(0.05)), int(pos.y + uy * step * MM(0.05)))
+                if near(q) or not _inside(spec, q, edge) or not _hole_free(holes, q, drill):
+                    continue
+                if via.GetNetname() not in bottom_pours and _in_bottom_keepout(spec, q, via_r):
+                    continue
+                if any(sh.Collide(q, via_r + clear) for sh, _ in others):
+                    continue
+                dx, dy = q.x - pos.x, q.y - pos.y
+                ok = True
+                for t in ends:
+                    near_end = t.GetStart() if on_via(t.GetStart()) else t.GetEnd()
+                    far = t.GetEnd() if on_via(t.GetStart()) else t.GetStart()
+                    new = P.VECTOR2I(near_end.x + dx, near_end.y + dy)
+                    n = max(2, int(((new.x - far.x) ** 2 + (new.y - far.y) ** 2) ** 0.5 / MM(0.02)))
+                    pts = [P.VECTOR2I(int(far.x + (new.x - far.x) * k / n), int(far.y + (new.y - far.y) * k / n))
+                           for k in range(n + 1)]
+                    if not all(_inside(spec, pt, MM(r["edge_clearance"]) + t.GetWidth() // 2) for pt in pts) or any(
+                            layer == t.GetLayer() and sh.Collide(pt, t.GetWidth() // 2 + clear)
+                            for pt in pts for sh, layer in others):
+                        ok = False
+                        break
+                if not ok:
+                    continue
+                for t in ends:
+                    if on_via(t.GetStart()):
+                        t.SetStart(P.VECTOR2I(t.GetStart().x + dx, t.GetStart().y + dy))
+                    else:
+                        t.SetEnd(P.VECTOR2I(t.GetEnd().x + dx, t.GetEnd().y + dy))
+                via.SetPosition(q)
+                moved += 1
+                done = True
+                break
+            if done:
+                break
+        if not done:
+            left += 1
+    return moved, left
+
+
 def prune_dangling(board):
     """Remove the router's vias and track stubs that lead nowhere (connected on one layer, or an
     end touching nothing), until none are left. Locked copper (a reference design's) stays."""
@@ -1226,6 +1453,9 @@ def finish(spec, pcb_path, ses_path):
         t.SetWidth(floor)
     if necks:
         print(f"widened {len(necks)} track neck(s) to the {spec['rules']['min_track']} mm minimum")
+    moved, left = ease_vias(board, spec)
+    if moved or left:
+        print(f"vias stepped off their own net's pads: {moved} moved, {left} left where they were")
     # Nets already complete before routing (joined by reference copper alone) are not the
     # router's: it sees zone-joined pads as open and would add a second, needless path.
     done = set(spec.get("complete_nets", []))

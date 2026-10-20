@@ -15,6 +15,37 @@ has never run.
 
 ### Added
 
+- Three more original EmbeddedOS boards (batch 3), all rights reserved like the others. Each was
+  built with `tools/eos_boards` at ERC 0, DRC errors 0, unconnected 0 and schematic parity 0. Each
+  had an independent review, its findings were fixed, and then a second reviewer checked the
+  fixes against the rebuilt board.
+  - EoS F280049C Board: a TI TMS320F280049C (C2000) board with two 40-pin BoosterPack sites, four
+    layers; CP2102N USB-UART on SCIA; TI's 14-pin JTAG header in place of the on-board XDS110.
+  - EoS RA4M2 Board: a Renesas RA4M2 board that fits Uno R3 shields; SPI and I²C Pmod ports, a
+    40-pin GPIO header, the chip's USB device port, a CP2102N on the boot UART, and SWD.
+  - EoS RL78G13 Board: a Renesas RL78/G13 (R5F100LEAFB) stick, 30 × 100 mm, with two 30-pin
+    headers 25.4 mm apart, a USB-C serial port and an external TOOL0 debug connector.
+
+  The vendor boards' on-board debug probes run proprietary firmware; these boards have a JTAG,
+  SWD or TOOL0 header instead.
+- `EoS_MCU` symbols for the R7FA4M2AD3CFP, R5F100LEAFB and TMS320F280049CPZ, each checked pin for
+  pin against its data sheet (MIT, like the generator).
+- `tools/eos_boards`:
+  - no via in a surface pad, other than the vias a chip's exposed pad takes: every via keeps
+    `VIA_PAD_GAP` (0.1 mm) from the pads of its own net, so the solder mask tents it. The maze
+    router, the fan-out, the repair step, the fragment joins and the stitching keep to it; a new
+    finish step, `ease_vias`, moves a router via that sits closer; the DSN states
+    `via_at_smd off` for Freerouting;
+  - `router_keepouts` takes `"B.Cu"` to keep the bottom layer clear (under a crystal);
+  - `pour_keepouts`: one-layer areas no pour fills (the RL78 manual forbids ground under the
+    X1/X2 wiring and resonator);
+  - `ground_vias`: on two layers, a via beside each ground pad of the named parts;
+  - `fanout_first`: the named parts get their plane vias before the priority routes;
+  - the build refuses a malformed keep-out or an unknown part in these options.
+- Tests: no via in or within `VIA_PAD_GAP` of a surface pad on any board built from now on, with
+  the ten boards built before the rule listed until they are rebuilt; pour keep-outs hold no
+  pour; the new options reach the board spec; the batch-3 symbols' supply and debug pins.
+
 - Eight more original EmbeddedOS boards (batch 2), all rights reserved like the others. Each was
   built with `tools/eos_boards` at ERC 0, DRC errors 0, unconnected 0 and schematic parity 0. Each
   had an independent review, its findings were fixed, and then a second reviewer checked the

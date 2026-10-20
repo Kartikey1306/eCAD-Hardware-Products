@@ -9,6 +9,44 @@ Status is one of: `todo`, `in-progress`, `blocked`, `review`, `done`.
 
 ## Active
 
+### EoS original boards — batch 3 (campaign #55)
+
+Owner: implementation and independent review assigned per board
+Mode: Review
+Status: review
+
+Scope: EoS RA4M2 Board, EoS RL78G13 Board and EoS F280049C Board;
+their generic MCU symbols, generated artifacts, evidence and documentation.
+
+Acceptance criteria (verbatim from the campaign handoff)
+: - "Never open or use a vendor's design files (schematic, layout, Gerbers, BOM)."
+  - "Replace on-board debug probes."
+  - "A board passes only at: ERC 0, DRC errors 0, unconnected 0, schematic parity 0."
+  - "Independent review by a different agent or person: check pins, power, USB, headers, BOM, layout and docs, and grade findings BLOCKER, MAJOR or MINOR."
+  - "Fix the findings, rebuild, then have the fixes verified by another reviewer on the routed board."
+  - "Previews in every PR"
+
+Verification: locked place-only and full builds; both symbol/footprint generators
+with byte comparisons of existing output; board tests in normal and non-UTF-8
+locales; product evidence bundle and verification; repository suite; independent
+review; PR preview URLs and CI. Run one KiCad job at a time.
+
+Observed starting state (2026-10-15): branch `feat/eos-boards-batch-3` at
+`68f1c13`; only the RA4M2 design is untracked. The board test baseline reports
+one failure because that draft has no built board yet (53 tests, one skipped).
+Existing drafts and build evidence are preserved in `../eos-campaign-handoff`.
+
+State (2026-10-20): all three boards build at ERC 0, DRC errors 0, unconnected 0
+and parity 0. F280049C and RL78G13 passed their independent fix verification on
+2026-10-19. RA4M2 needed a second fix round: its build-9 fixes left VSS 12 and
+the oscillator ground on one 0.15 mm track; build 12 joins VSS 12 under the MCU
+(10.7–16.0 mm to the other VSS pins) and passed an independent verification and
+README re-check, with its remaining minors documented in the board README. Board
+tests pass in normal and ISO8859-1 locales (59 run, 1 skipped); the evidence
+bundle validates and verifies; the full suite's one error is the existing
+`pytest` import in `tests/unit/test_validation_schemas.py`. Remaining: PR, previews
+and CI.
+
 | ID | Task | Owner | Mode | Status | Depends on |
 |----|------|-------|------|--------|------------|
 | T-002 | Author catalogs for the 260 remaining product directories | — | build | todo | T-001 |

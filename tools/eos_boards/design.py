@@ -70,11 +70,14 @@ class Board:
     fanout_avoid: List[Tuple[float, float]] = field(default_factory=list)  # points fan-out vias move away from
     no_fanout: List[str] = field(default_factory=list)                    # parts whose pads the router joins
     fanout_pads: Dict[str, List[str]] = field(default_factory=dict)        # ...except these pads (an exposed pad)
+    ground_vias: List[str] = field(default_factory=list)                   # two layers: parts whose pads on a two-sided pour get a via beside them
+    fanout_first: List[str] = field(default_factory=list)                  # parts whose plane vias go in before the priority routes
     preroutes: List[Tuple[Tuple[str, str], Tuple[str, str], float]] = field(default_factory=list)  # (ref, pad), (ref, pad), width
     reference_copper: Dict[str, object] = field(default_factory=dict)   # {file, origin}: copper from a reference design
     local_footprints: List[str] = field(default_factory=list)          # footprint libraries shipped in tools/eos_boards/footprints
-    router_keepouts: List[Tuple[float, float, float, float]] = field(default_factory=list)  # x0, y0, x1, y1: top-layer areas the autorouter may not enter
+    router_keepouts: List[tuple] = field(default_factory=list)  # (x0, y0, x1, y1[, "B.Cu"]): areas the routers may not enter, top layer unless "B.Cu" is named
     copper_keepouts: List[Tuple[float, float, float, float]] = field(default_factory=list)  # x0, y0, x1, y1: no copper on any layer (an antenna cut-out)
+    pour_keepouts: List[tuple] = field(default_factory=list)  # (x0, y0, x1, y1, "F.Cu"|"B.Cu"): no pour on that layer (under an RL78 crystal)
     credits: List[str] = field(default_factory=list)                   # notices third-party licences require (one line each)
     contact: str = ""                                                   # whom to ask for permission; an all-rights-reserved board needs it
     licence_terms: str = ""                                             # an all-rights-reserved board's terms file, relative to tools/eos_boards

@@ -22,6 +22,9 @@ board's schematic, layout, routing, checks and fabrication outputs; see
 | [EoS LPC55S69 Board](eos-lpc55s69-board) | NXP LPC55S69 (dual Cortex-M33) board that fits Uno R3 shields: two USB-C ports, power mux, SWD | 4 | 0 | 0 | 0 | 0 |
 | [EoS KE16Z Board](eos-ke16z-board) | NXP KE16Z (MKE16Z64VLF4) board that fits Uno R3 shields: CP2102N USB-UART, CAN pins, SWD | 2 | 0 | 0 | 0 | 0 |
 | [EoS RA2E1 Board](eos-ra2e1-board) | Renesas RA2E1 board that fits Uno R3 shields: two Pmod headers, CP2102N on the boot UART, SWD | 2 | 0 | 0 | 0 | 0 |
+| [EoS F280049C Board](eos-f280049c-board) | TI TMS320F280049C (C2000) board with two 40-pin BoosterPack sites, four layers: CP2102N USB-UART, JTAG | 4 | 0 | 0 | 0 | 0 |
+| [EoS RA4M2 Board](eos-ra4m2-board) | Renesas RA4M2 board that fits Uno R3 shields: SPI and I2C Pmod ports, 40-pin GPIO header, USB device, CP2102N, SWD | 2 | 0 | 0 | 0 | 0 |
+| [EoS RL78G13 Board](eos-rl78g13-board) | Renesas RL78/G13 (R5F100LEAFB) stick board: two 30-pin headers 25.4 mm apart, USB-C serial port, TOOL0 debug | 2 | 0 | 0 | 0 | 0 |
 
 Each board folder contains:
 

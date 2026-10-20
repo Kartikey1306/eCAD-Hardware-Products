@@ -27,13 +27,20 @@ paths that `kicad_env.py` and `build.py` use.
    plane-net pad a short stub and a via into its plane. An exposed pad gets a 2 × 2 array of vias
    in the pad, on a two-layer board too, into the bottom pour, unless its footprint brings its own
    thermal vias. They sit in the pad's paste openings, as the vias in Raspberry Pi's RP2350A pad
-   do; order them tented or plugged where solder wicking matters. Finally writes a Specctra DSN
-   for the router.
+   do; order them tented or plugged where solder wicking matters. No other via may sit in a
+   surface pad: solder wicks down an open barrel and starves the joint. The maze router (priority
+   routes and repairs), the fan-out, the repair step's plane vias and the ground stitching all keep
+   their vias off every surface pad, their own net's included, by `VIA_PAD_GAP` (0.1 mm): a
+   solder-mask web between the two tents the via. Freerouting 2.4.1 already does by
+   default; the DSN states it (`via_at_smd off`) so that a later default cannot change it.
+   Finally writes a Specctra DSN for the router.
 3. **Routing**. Freerouting, headless. The router is given 0.01 mm more clearance than the board's
    rules, so its grid rounding never reaches DRC.
 4. **Finish** (`pcb_build.py finish`). Imports the routes, widens any track the router necked
-   below the board's minimum width, pours ground on the outer layers, stitches the pours and
-   joins any pour fragments.
+   below the board's minimum width, steps any router via that sits within `VIA_PAD_GAP` of a pad
+   of its own net away from it (up to 0.5 mm, its tracks following, only where it still clears
+   every other net), pours ground on the outer layers, stitches the pours and joins any pour
+   fragments.
 5. **DRC and repair**. Runs `kicad-cli pcb drc --schematic-parity`.
    - **Clearance clashes:** if two pieces of routed copper are too close (the autorouter can
      leave a via inside another net's clearance), `pcb_build.py ripup` lifts one net's copper
@@ -97,6 +104,13 @@ python3 tools/eos_boards/reference/extract_rpi_minimal.py RPI-RP2350A-MINIMAL_R4
 Most boards need only parts, nets and positions. These options cover the rest:
 
 - `planes`: inner layers given over to one net each (ground, a supply).
+- `ground_vias`: on a two-layer board, parts whose pads on a net poured on both layers get a via
+  beside each such pad (never in it), as a plane net's pads do: a decoupling capacitor's ground
+  end then closes its loop through the bottom pour.
+- `fanout_first`: parts whose plane-net pads get their vias before the priority routes, which
+  then go round them. A supply route laid first can otherwise box in a decoupling capacitor's
+  via spots (EoS F280049C's C11, after VIA_PAD_GAP moved the /VDD4 route). A pad that finds no
+  spot then is not tried again after the priority routes: the autorouter joins it.
 - `priority_routes`: lines routed before the autorouter, in the order given. Add `"join"` to end
   a route at any copper the net already has; that suits a branch such as an ESD part's pad.
   Lines that start at a reference design's pin follow its escape first.
@@ -105,7 +119,16 @@ Most boards need only parts, nets and positions. These options cover the rest:
 - `maze_via_cost_mm`: how much track the maze router will lay to avoid one via.
 - `copper_keepouts`: rectangles with no copper on any layer, no track, via, pad or pour, kept
   on the saved board as a rule area. This is for a module's antenna cut-out.
-- `router_keepouts`, `reference_copper`, `local_footprints`, `rules`, `credits`.
+- `router_keepouts`: rectangles `(x0, y0, x1, y1)` that Freerouting and the maze router may not
+  enter, on the top layer; add `"B.Cu"` as a fifth item to keep the bottom layer clear instead,
+  e.g. under a crystal whose own lines are laid on top. The pours still fill a keep-out. In a
+  `"B.Cu"` keep-out the generator's own vias (fan-out, stitching) may join the bottom pour, and a
+  fan-out via of any other net stays out; a top keep-out binds the routers only.
+- `pour_keepouts`: rectangles `(x0, y0, x1, y1, layer)` that no pour fills on that one layer, though
+  tracks and pads may enter. They stay on the saved board as rule areas, and no stitching via goes
+  in one. Renesas's RL78 manual forbids a ground pattern under the X1/X2 wiring and the resonator
+  (R01UH0146 Figure 5-13(d)); its RA parts want the opposite, a bottom ground (R01AN7202 §6.1.3).
+- `reference_copper`, `local_footprints`, `rules`, `credits`.
 
 Local libraries:
 
