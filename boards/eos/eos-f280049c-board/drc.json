@@ -1,0 +1,84 @@
+{
+    "$schema": "https://schemas.kicad.org/drc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-10-19T07:08:01",
+    "ignored_checks": [
+        {
+            "description": "Footprint has no courtyard defined",
+            "key": "missing_courtyard"
+        },
+        {
+            "description": "Track endpoint not centered on via",
+            "key": "track_not_centered_on_via"
+        },
+        {
+            "description": "Tuning profile track geometries",
+            "key": "tuning_profile_track_geometries"
+        },
+        {
+            "description": "Footprint doesn't match symbol's footprint filters",
+            "key": "footprint_filters_mismatch"
+        },
+        {
+            "description": "Footprint component type doesn't match footprint pads",
+            "key": "footprint_type_mismatch"
+        }
+    ],
+    "included_severities": [
+        "error",
+        "warning",
+        "exclusion"
+    ],
+    "kicad_version": "10.0.6",
+    "schematic_parity": [],
+    "source": "eos-f280049c-board.kicad_pcb",
+    "unconnected_items": [],
+    "violations": [
+        {
+            "description": "Silkscreen clipped by board edge",
+            "items": [
+                {
+                    "description": "Segment on Edge.Cuts",
+                    "pos": {
+                        "x": 1.27,
+                        "y": 0.0
+                    },
+                    "uuid": "c1f08e02-c052-4a81-8200-d87ca8a5a009"
+                },
+                {
+                    "description": "Segment of J9 on F.Silkscreen",
+                    "pos": {
+                        "x": 29.11,
+                        "y": 1.19
+                    },
+                    "uuid": "3d79b02e-17fb-47a6-86ee-443ea63b6d94"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_edge_clearance"
+        },
+        {
+            "description": "Silkscreen clipped by board edge",
+            "items": [
+                {
+                    "description": "Segment on Edge.Cuts",
+                    "pos": {
+                        "x": 1.27,
+                        "y": 0.0
+                    },
+                    "uuid": "c1f08e02-c052-4a81-8200-d87ca8a5a009"
+                },
+                {
+                    "description": "Segment of J9 on F.Silkscreen",
+                    "pos": {
+                        "x": 38.51,
+                        "y": 1.19
+                    },
+                    "uuid": "35ed4dad-f20d-47f3-aa58-d2645ac1b4b7"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_edge_clearance"
+        }
+    ]
+}

@@ -24,7 +24,7 @@ sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 from eos_boards import build, design, schematic  # noqa: E402
 from eos_boards.design import NC, Board, Part  # noqa: E402
-from eos_boards.kicad_lib import Library  # noqa: E402
+from eos_boards.kicad_lib import Library, pins  # noqa: E402
 from eos_boards.reference import extract_rpi_minimal as extract  # noqa: E402
 from eos_boards.sexpr import Sym, dumps, find, find_all, loads  # noqa: E402
 
@@ -91,6 +91,42 @@ class SexprTest(unittest.TestCase):
         self.assertIsNone(find(node, "z"))
 
 
+class Batch3SymbolTest(unittest.TestCase):
+    """Critical package pins from the manufacturer pin tables, read from the shipped symbols."""
+
+    def test_supply_and_debug_pin_numbers(self):
+        # Renesas R01DS0367 Table 1.17, R01DS0131 section 1.3.11;
+        # TI SPRS945H Table 5-1, 100 PZ column. A shifted supply pin can damage hardware.
+        expected = {
+            "R7FA4M2AD3CFP": (100, {
+                "9": ("VCL", "power_out"), "15": ("VCC", "power_in"),
+                "26": ("VSS_USB", "power_in"), "29": ("VCC_USB", "power_in"),
+                "38": ("~{RES}", "input"), "88": ("AVCC0", "power_in"),
+                "89": ("AVSS0/VREFL", "power_in"), "90": ("VREFL0", "power_in"),
+            }),
+            "R5F100LEAFB": (64, {
+                "5": ("P40/TOOL0", "bidirectional"), "6": ("~{RESET}", "input"),
+                "12": ("REGC", "power_out"), "13": ("VSS", "power_in"),
+                "14": ("EVSS0", "power_in"), "15": ("VDD", "power_in"),
+                "16": ("EVDD0", "power_in"),
+            }),
+            "TMS320F280049CPZ": (100, {
+                "2": ("~{XRS}", "open_collector"), "4": ("VDD", "power_in"),
+                "46": ("VDD", "power_in"), "69": ("X1", "bidirectional"),
+                "71": ("VDD", "power_in"), "73": ("VREGENZ", "input"),
+                "80": ("VDDIO_SW", "power_in"), "82": ("VSS_SW", "power_in"),
+                "87": ("VDD", "power_in"),
+            }),
+        }
+        library = Library(REPO_ROOT / "tools" / "eos_boards" / "symbols")
+        for name, (count, critical) in expected.items():
+            with self.subTest(symbol=name):
+                actual = pins(library.symbol(f"EoS_MCU:{name}"))
+                self.assertEqual(sorted(int(p.number) for p in actual), list(range(1, count + 1)))
+                by_number = {p.number: (p.name, p.etype) for p in actual}
+                self.assertEqual({n: by_number[n] for n in critical}, critical)
+
+
 class ResolveTest(_Lib):
     def test_pins_by_number_and_by_shared_name(self):
         part = Part("U1", "T:U", "U", "fp", (0, 0), {"VDD": "+3V3", "3": "SIG"})
@@ -153,6 +189,26 @@ class SpecTest(_Lib):
                             Part("U1", "T:M", "M", "fp", (80, 50), {"GND": "GND", "A/B": NC})])
         flags = {p["ref"]: p["in_bom"] for p in build.spec_for(board, lib, Path(self.tmp.name), [])["parts"]}
         self.assertEqual(flags, {"TP1": False, "U1": True})
+
+    def test_layered_keepouts_and_ground_vias_reach_the_board_spec(self):
+        board = self.board([Part("U1", "T:M", "M", "fp", (5, 5), {"GND": "GND", "A/B": NC})],
+                           router_keepouts=[(1, 1, 2, 2), (3, 3, 4, 4, "B.Cu")], ground_vias=["U1"])
+        spec = build.spec_for(board, self.lib, Path(self.tmp.name), [])
+        self.assertEqual(spec["router_keepouts"], [[1, 1, 2, 2], [3, 3, 4, 4, "B.Cu"]])
+        self.assertEqual(spec["ground_vias"], ["U1"])
+        board = self.board([Part("U1", "T:M", "M", "fp", (5, 5), {"GND": "GND", "A/B": NC})],
+                           pour_keepouts=[(3, 3, 4, 4, "B.Cu")])
+        self.assertEqual(build.spec_for(board, self.lib, Path(self.tmp.name), [])["pour_keepouts"], [[3, 3, 4, 4, "B.Cu"]])
+
+    def test_a_mistyped_keepout_layer_or_ground_via_part_is_refused(self):
+        # "B_Cu" is how the same file names silk layers ("B_SilkS"): taken silently, it would
+        # keep the top layer clear instead of the bottom
+        parts = [Part("U1", "T:M", "M", "fp", (5, 5), {"GND": "GND", "A/B": NC})]
+        for kw in ({"router_keepouts": [(3, 3, 4, 4, "B_Cu")]}, {"router_keepouts": [(4, 3, 3, 4)]},
+                   {"ground_vias": ["C99"]}, {"fanout_first": ["C99"]}, {"pour_keepouts": [(3, 3, 4, 4)]},
+                   {"pour_keepouts": [(3, 3, 4, 4, "In1.Cu")]}):
+            with self.subTest(**{k: str(v) for k, v in kw.items()}), self.assertRaises(SystemExit):
+                build.spec_for(self.board(parts, **kw), self.lib, Path(self.tmp.name), [])
 
 
 class ClashTest(unittest.TestCase):
@@ -758,6 +814,104 @@ class ExposedPadTest(unittest.TestCase):
                         cy = fy - px * math.sin(rot) + py * math.cos(rot)
                         inside = [v for v in vias if abs(v[0] - cx) < w / 2 and abs(v[1] - cy) < h / 2]
                         self.assertTrue(inside, "no via in the exposed pad")
+
+
+VIA_PAD_GAP = 0.1   # mm of solder mask between a via and a surface pad (pcb_build.VIA_PAD_GAP)
+
+
+def _vias_in_pads(pcb):
+    """The surface pads, other than a chip's exposed pad, that some via's copper overlaps or comes
+    within VIA_PAD_GAP of."""
+    vias = [(float(find(v, "at")[1]), float(find(v, "at")[2]), float(find(v, "size")[1]) / 2)
+            for v in find_all(pcb, "via")]
+    hits = set()
+    for fp in find_all(pcb, "footprint"):
+        ref = next(str(p[2]) for p in find_all(fp, "property") if str(p[1]) == "Reference")
+        at = find(fp, "at")
+        fx, fy, rot = float(at[1]), float(at[2]), math.radians(float(at[3]) if len(at) > 3 else 0)
+        pads = find_all(fp, "pad")
+        numbers = {str(q[1]) for q in pads}
+        biggest = max(float(find(q, "size")[1]) * float(find(q, "size")[2]) for q in pads) if pads else 0
+        for pad in pads:
+            if str(pad[2]) != "smd" or str(pad[1]) == "":
+                continue                                 # a through-hole pad, or a paste-only opening
+            # a custom pad (a solder jumper's) is checked as its anchor rectangle only
+            w, h = (float(v) for v in find(pad, "size")[1:3])
+            if len(numbers) >= 4 and min(w, h) > 1.5 and w * h >= biggest:
+                continue                                 # the exposed pad, which takes vias on purpose
+            pa = find(pad, "at")
+            px, py = float(pa[1]), float(pa[2])
+            cx = fx + px * math.cos(rot) + py * math.sin(rot)
+            cy = fy - px * math.sin(rot) + py * math.cos(rot)
+            a = math.radians(float(pa[3]) if len(pa) > 3 else 0)   # a pad's angle is written in board space
+            # corner radius: a rounded rectangle's ratio of its short side; a circle or oval is all corner
+            shape = str(pad[3])
+            rratio = find(pad, "roundrect_rratio")
+            corner = {"circle": min(w, h) / 2, "oval": min(w, h) / 2,
+                      "roundrect": float(rratio[1]) * min(w, h) if rratio else 0.0}.get(shape, 0.0)
+            for vx, vy, vr in vias:
+                # the via's disk against the pad's outline, in the pad's own axes
+                # (the inverse of KiCad's rotation: a positive angle turns counter-clockwise on screen)
+                u = abs((vx - cx) * math.cos(a) - (vy - cy) * math.sin(a)) - (w / 2 - corner)
+                s = abs((vx - cx) * math.sin(a) + (vy - cy) * math.cos(a)) - (h / 2 - corner)
+                if math.hypot(max(u, 0), max(s, 0)) - corner < vr + VIA_PAD_GAP - 0.005:
+                    hits.add(f"{ref}.{pad[1]}")
+    return hits
+
+
+class ViaInPadTest(unittest.TestCase):
+    """No via sits in a surface pad, or within VIA_PAD_GAP of one, except the vias a chip's exposed
+    pad takes on purpose: solder wicks down an open barrel and starves the joint. The boards below
+    were built before the generator kept vias off pads; each comes off the list when it is rebuilt."""
+
+    BUILT_BEFORE_THE_RULE = {"eos-atmega328p-board", "eos-cm4-base", "eos-cm5-base", "eos-esp32-devkit",
+                             "eos-ke16z-board", "eos-kl25-board", "eos-learn-rp2350", "eos-lpc55s69-board",
+                             "eos-ra2e1-board", "eos-stm32-64"}
+
+    def test_the_gap_matches_the_generators(self):
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        self.assertIn(f"VIA_PAD_GAP = {VIA_PAD_GAP}\n", source)
+
+    def test_no_via_sits_in_a_surface_pad(self):
+        for folder in sorted((REPO_ROOT / "boards" / "eos").iterdir()):
+            pcb_path = folder / "hardware" / f"{folder.name}.kicad_pcb"
+            if not pcb_path.is_file():
+                continue
+            hits = _vias_in_pads(loads(pcb_path.read_text(encoding="utf-8")))
+            with self.subTest(board=folder.name):
+                if folder.name in self.BUILT_BEFORE_THE_RULE:
+                    self.assertTrue(hits, "rebuilt clean: take it off BUILT_BEFORE_THE_RULE")
+                else:
+                    self.assertFalse(hits, f"vias in {', '.join(sorted(hits))}")
+
+
+
+class PourKeepoutTest(unittest.TestCase):
+    """A board's pour keep-outs hold no pour on their layer: the fill polygons have no corner
+    inside one and do not cover its middle (KiCad saves fills fractured, without holes)."""
+
+    def test_no_pour_fills_a_pour_keepout(self):
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            board = importlib.import_module(f"eos_boards.boards.{path.stem}").BOARD
+            name = path.stem.replace("_", "-")
+            pcb_path = REPO_ROOT / "boards" / "eos" / name / "hardware" / f"{name}.kicad_pcb"
+            if not board.pour_keepouts or not pcb_path.is_file():
+                continue
+            pcb = loads(pcb_path.read_text(encoding="utf-8"))
+            areas = [z for z in find_all(pcb, "zone") if find(z, "name") is not None
+                     and str(find(z, "name")[1]) == "eos-pour-keepout"]
+            for x0, y0, x1, y1, layer in board.pour_keepouts:
+                with self.subTest(board=name, rule_area=(x0, y0, x1, y1, layer)):   # kept on the saved board
+                    self.assertTrue(any(str(find(z, "layer")[1]) == layer for z in areas if find(z, "layer") is not None))
+                cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+                for zone in find_all(pcb, "zone"):
+                    for poly in find_all(zone, "filled_polygon"):
+                        if str(find(poly, "layer")[1]) != layer:
+                            continue
+                        pts = [(float(q[1]), float(q[2])) for q in find_all(find(poly, "pts"), "xy")]
+                        with self.subTest(board=name, keepout=(x0, y0, x1, y1, layer)):
+                            self.assertFalse(any(x0 + 0.01 < x < x1 - 0.01 and y0 + 0.01 < y < y1 - 0.01 for x, y in pts))
+                            self.assertFalse(_point_in_polygon(cx, cy, pts))
 
 
 class OwnershipTest(unittest.TestCase):
