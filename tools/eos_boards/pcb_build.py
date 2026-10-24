@@ -16,6 +16,8 @@ from pathlib import Path
 
 import pcbnew as P
 
+import fabrication   # this folder's own module (the script's directory is on sys.path)
+
 def MM(mm):
     """Millimetres to KiCad's internal nanometres, rounded. pcbnew.FromMM truncates, so 26.3 + 6.0
     (32.29999... in floating point) would land 1 nm short of 32.3 mm."""
@@ -669,6 +671,9 @@ def place(spec, pcb_path, dsn_path):
     if board.Zones():
         P.ZONE_FILLER(board).Fill(board.Zones())
     P.SaveBoard(pcb_path, board)
+    # the fab's stack-up, written into the saved file: KiCad 10's Python does not wrap BOARD_STACKUP
+    saved = Path(pcb_path)
+    saved.write_text(fabrication.insert_stackup(saved.read_text(encoding="utf-8"), spec["stackup"]), encoding="utf-8")
     # From here on the changes reach the router's input only, never the saved board.
     # Freerouting works on a grid and can leave a track a fraction of a micrometre inside the
     # clearance (0.1491 mm against 0.15 mm, on EoS ESP32 DevKit). The router sees a little more

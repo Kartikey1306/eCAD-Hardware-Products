@@ -71,6 +71,27 @@ fabrication outputs, `LICENSE.txt` and `build-report.json` stay as they were, wh
 `erc.json` and `drc.json` hold the failed attempt, so it can be inspected. Rebuild until it
 passes before committing a board.
 
+## Fabrication data in every board
+
+`fabrication.py` holds what a fab reads from the board file itself.
+
+**Stack-up.** Every `.kicad_pcb` carries its layer stack-up in the board setup, and KiCad copies it
+into the Gerber job file (`fab/gerbers/*-job.gbrjob`, `MaterialStackup` and `Finish`). The numbers
+are JLCPCB's published standard stack-ups for 1.6 mm boards, read on 24 October 2026:
+
+| Layers | Stack-up | Source |
+|---|---|---|
+| 2 | copper 0.035 / FR-4 core 1.51, εr 4.5 / copper 0.035 mm | [capabilities](https://jlcpcb.com/capabilities/pcb-capabilities): FR-4 εr "4.5 (2-Layer PCB)", 1 oz outer copper. No two-layer core thickness is published there: 1.51 mm makes copper, core and masks add up to 1.6 mm |
+| 4 | JLC04161H-7628: copper 0.035 / prepreg 7628 0.2104, εr 4.4 / copper 0.0152 / core 1.065, εr 4.6 / copper 0.0152 / prepreg 7628 0.2104 / copper 0.035 mm | [impedance page](https://jlcpcb.com/impedance) |
+| 6 | JLC06161H-7628: copper 0.035 / 7628 0.2104 / 0.0152 / core 0.4 / 0.0152 / 7628 0.2028 / 0.0152 / core 0.4 / 0.0152 / 7628 0.2104 / copper 0.035 mm | [impedance page](https://jlcpcb.com/impedance) |
+
+Solder mask 0.01 mm each side, green; silkscreen white; surface finish ENIG (BENCH-READY A5: ENIG
+wherever a pitch is 0.5 mm or finer or a part is a QFN). The loss tangent is not published there;
+KiCad writes its default, 0.02. A stack-up must add up to the board's thickness within JLCPCB's
+±10 %. KiCad 10's Python does not wrap the board's stack-up object, so `pcb_build.py place` writes
+the node into the saved file, and KiCad keeps it through every later load and save. A board of
+another thickness, or for another fab, gives its own with the `stackup` option.
+
 ## Reusing a reference design's layout exactly
 
 Some layouts should be copied, not redrawn. Raspberry Pi's RP2350 datasheet says the core
@@ -134,6 +155,9 @@ Most boards need only parts, nets and positions. These options cover the rest:
   tracks and pads may enter. They stay on the saved board as rule areas, and no stitching via goes
   in one. Renesas's RL78 manual forbids a ground pattern under the X1/X2 wiring and the resonator
   (R01UH0146 Figure 5-13(d)); its RA parts want the opposite, a bottom ground (R01AN7202 §6.1.3).
+- `stackup`: changes to the fab stack-up: `{"finish": "HAL lead-free"}`, `mask_color`,
+  `silk_color`, `mask_thickness`, or a whole `"layers"` list of copper and dielectric rows with its
+  `"source"` (see Fabrication data in every board).
 - `reference_copper`, `local_footprints`, `rules`, `credits`.
 
 Local libraries:

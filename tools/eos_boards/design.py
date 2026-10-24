@@ -85,6 +85,7 @@ class Board:
     rules: Dict[str, float] = field(default_factory=dict)              # design-rule overrides, e.g. a smaller drill a module footprint needs
     escape_footprints: List[str] = field(default_factory=list)          # fine-pitch connectors whose pads keep a clear way out (maze router)
     maze_via_cost_mm: float = 1.2                                        # maze router: a via costs as much as this much track
+    stackup: Dict[str, object] = field(default_factory=dict)            # overrides of the fab stack-up (fabrication.stackup_for)
 
 
 def resolve(part: Part, lib: Library) -> Dict[str, Tuple[Pin, str]]:

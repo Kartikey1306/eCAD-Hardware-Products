@@ -22,7 +22,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
-from eos_boards import build, design, schematic  # noqa: E402
+from eos_boards import build, design, fabrication, schematic  # noqa: E402
 from eos_boards.design import NC, Board, Part  # noqa: E402
 from eos_boards.kicad_lib import Library, pins  # noqa: E402
 from eos_boards.reference import extract_rpi_minimal as extract  # noqa: E402
@@ -207,6 +207,13 @@ class SpecTest(_Lib):
         board = self.board([Part("U1", "T:M", "M", "fp", (5, 5), {"GND": "GND", "A/B": NC})],
                            pour_keepouts=[(3, 3, 4, 4, "B.Cu")])
         self.assertEqual(build.spec_for(board, self.lib, Path(self.tmp.name), [])["pour_keepouts"], [[3, 3, 4, 4, "B.Cu"]])
+
+    def test_the_spec_carries_the_stackup_and_refuses_a_board_without_one(self):
+        parts = [Part("U1", "T:M", "M", "fp", (5, 5), {"GND": "GND", "A/B": NC})]
+        spec = build.spec_for(self.board(parts), self.lib, Path(self.tmp.name), [])
+        self.assertEqual([r["name"] for r in spec["stackup"]["layers"] if r["type"] == "copper"], ["F.Cu", "B.Cu"])
+        with self.assertRaisesRegex(SystemExit, "t: stack-up: no published standard stack-up for 2 layers at 0.8 mm"):
+            build.spec_for(self.board(parts, thickness=0.8), self.lib, Path(self.tmp.name), [])
 
     def test_a_mistyped_keepout_layer_or_ground_via_part_is_refused(self):
         # "B_Cu" is how the same file names silk layers ("B_SilkS"): taken silently, it would
@@ -1013,6 +1020,89 @@ class OwnershipTest(unittest.TestCase):
         notice = REPO_ROOT / "tools" / "eos_boards" / "footprints" / "EoS_Connectors.NOTICE.txt"
         self.assertIn("All rights reserved", notice.read_text(encoding="utf-8"))
         self.assertFalse((notice.parent / "EoS_Connectors.LICENSE.txt").exists())   # would be listed as third-party
+
+def pcb_stackup(pcb):
+    """(copper layer names of the board's layer table, its stack-up's rows as (name, type, thickness),
+    copper finish) read from a parsed .kicad_pcb; the rows are [] when it has no stack-up."""
+    table = [str(item[1]) for item in find(pcb, "layers")[1:] if isinstance(item, list) and str(item[1]).endswith(".Cu")]
+    stack = find(find(pcb, "setup"), "stackup")
+    if stack is None:
+        return table, [], None
+    rows = [(str(r[1]), str(find(r, "type")[1]), float(find(r, "thickness")[1]) if find(r, "thickness") else None)
+            for r in find_all(stack, "layer")]
+    return table, rows, str(find(stack, "copper_finish")[1])
+
+
+# Boards built before the generator wrote stack-ups (P3 stage 1); P4 rebuilds every board and removes
+# it from this set. The test checks the set too: a listed board that has a stack-up fails it.
+BUILT_BEFORE_STACKUP = {
+    "eos-atmega328p-board", "eos-cm4-base", "eos-cm5-base", "eos-esp32-devkit", "eos-f280049c-board",
+    "eos-feather-rp2040", "eos-ke16z-board", "eos-kl25-board", "eos-learn-rp2350", "eos-lpc55s69-board",
+    "eos-motion-wing", "eos-msp430g2-board", "eos-probe-s3", "eos-ra2e1-board", "eos-ra4m2-board",
+    "eos-rl78g13-board", "eos-sense-cape", "eos-stm32-64", "eos-tm4c123-board", "eos-tm4c1294-board"}
+
+
+class StackupTest(unittest.TestCase):
+    """A1: the board file carries the fab's stack-up (JLCPCB's published 1.6 mm stack-ups)."""
+
+    def test_jlcpcb_numbers_as_published(self):
+        rows = {n: [(r["type"], r["thickness"], r.get("epsilon_r")) for r in fabrication.STACKUPS[n]["layers"]] for n in (2, 4, 6)}
+        cu, inner, p7628, core = ("copper", 0.035, None), ("copper", 0.0152, None), ("prepreg", 0.2104, 4.4), ("core", 1.065, 4.6)
+        self.assertEqual(rows[4], [cu, p7628, inner, core, inner, p7628, cu])                  # JLC04161H-7628
+        self.assertEqual(rows[6], [cu, p7628, inner, ("core", 0.4, 4.6), inner, ("prepreg", 0.2028, 4.4), inner,
+                                   ("core", 0.4, 4.6), inner, p7628, cu])                       # JLC06161H-7628
+        self.assertEqual(rows[2], [cu, ("core", 1.51, 4.5), cu])
+        for n in (2, 4, 6):
+            with self.subTest(layers=n):
+                st = fabrication.stackup_for(n, 1.6)
+                self.assertEqual([r["name"] for r in st["layers"] if r["type"] == "copper"], fabrication.copper_names(n))
+                self.assertAlmostEqual(fabrication.stackup_thickness(st), 1.6, delta=0.16)     # JLCPCB: +-10 %
+                self.assertEqual((st["finish"], st["mask_color"], st["silk_color"]), ("ENIG", "Green", "White"))
+                self.assertIn("jlcpcb.com", st["source"])
+
+    def test_overrides_and_refusals(self):
+        self.assertEqual(fabrication.stackup_for(2, 1.6, {"finish": "HAL lead-free"})["finish"], "HAL lead-free")
+        own = {"source": "Fab X standard 4-layer, read 2026-10-24", "layers": [
+            {"type": "copper", "name": n, "thickness": 0.035} if i % 2 == 0 else
+            {"type": "core", "thickness": 0.5, "material": "FR4", "epsilon_r": 4.3}
+            for i, n in enumerate(["F.Cu", None, "In1.Cu", None, "In2.Cu", None, "B.Cu"])]}
+        self.assertEqual(fabrication.stackup_for(4, 1.6, own)["source"], own["source"])
+        bad = [((2, 1.0, None), "no published standard"), ((4, 1.6, {"layers": own["layers"]}), "needs a source"),
+               ((2, 1.6, own), "copper layers"), ((2, 1.6, {"finish": "Gold"}), "finish"),
+               ((2, 1.6, {"colour": "Red"}), "unknown option"),
+               ((4, 1.6, dict(own, layers=own["layers"][:1] + [own["layers"][1]] * 2 + own["layers"][2:])), "copper layers|alternate")]
+        for args, message in bad:
+            with self.subTest(args=str(args)[:60]), self.assertRaisesRegex(ValueError, message):
+                fabrication.stackup_for(*args)
+
+    def test_inserted_stackup_reads_back_as_kicad_writes_it(self):
+        board = '(kicad_pcb\n\t(version 20260206)\n\t(layers\n\t\t(0 "F.Cu" signal)\n\t\t(4 "In1.Cu" signal)\n' \
+                '\t\t(6 "In2.Cu" signal)\n\t\t(2 "B.Cu" signal)\n\t)\n\t(setup\n\t\t(pad_to_mask_clearance 0)\n\t)\n)\n'
+        text = fabrication.insert_stackup(board, fabrication.stackup_for(4, 1.6))
+        table, rows, finish = pcb_stackup(loads(text))
+        self.assertEqual([n for n, kind, _ in rows if kind == "copper"], table)
+        self.assertEqual(finish, "ENIG")
+        self.assertEqual([t for _, kind, t in rows if kind in ("prepreg", "core")], [0.2104, 1.065, 0.2104])
+        with self.assertRaises(ValueError):                     # never two stack-ups
+            fabrication.insert_stackup(text, fabrication.stackup_for(4, 1.6))
+
+    def test_every_design_gets_a_stackup_for_its_layers(self):
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            board = importlib.import_module(f"eos_boards.boards.{path.stem}").BOARD
+            with self.subTest(board=path.stem):
+                st = fabrication.stackup_for(board.layers, board.thickness, board.stackup)
+                self.assertEqual(len([r for r in st["layers"] if r["type"] == "copper"]), board.layers)
+
+    def test_every_built_board_carries_a_stackup_matching_its_layers(self):
+        for name in EOS_BOARDS:
+            pcb = loads((EOS_DIR / name / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
+            table, rows, _ = pcb_stackup(pcb)
+            with self.subTest(board=name):
+                if name in BUILT_BEFORE_STACKUP:
+                    self.assertEqual(rows, [], "has a stack-up now: take it out of BUILT_BEFORE_STACKUP")
+                else:
+                    self.assertEqual([n for n, kind, _ in rows if kind == "copper"], table)
+
 
 class CrashSafetyTest(unittest.TestCase):
     """Issue #70: KiCad 10's bindings can crash a step when a removed item's proxy is freed, so every

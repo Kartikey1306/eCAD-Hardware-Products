@@ -32,7 +32,7 @@ from typing import Any, Dict, List
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
-from eos_boards import kicad_env, schematic  # noqa: E402
+from eos_boards import fabrication, kicad_env, schematic  # noqa: E402
 from eos_boards.design import ALL_RIGHTS_RESERVED, NC, Board, resolve  # noqa: E402
 from eos_boards.kicad_lib import Library  # noqa: E402
 from eos_boards.sexpr import find, find_all  # noqa: E402
@@ -215,6 +215,10 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
     if board.layers >= 4:
         rules["min_track"] = 0.09      # standard 4-layer capability; the router necks down at fine-pitch pins
     rules.update(board.rules)
+    try:
+        stackup = fabrication.stackup_for(board.layers, board.thickness, board.stackup)
+    except ValueError as e:
+        raise SystemExit(f"{board.name}: {e}")
     if board.reference_copper:
         # Reference footprints can carry their own pad clearance (Raspberry Pi's VREG capacitors
         # use 0.125 mm); the floor drops so it applies. Net classes keep 0.15 mm everywhere else.
@@ -238,7 +242,8 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
             "priority_routes": [[list(r[0]), list(r[1]), *r[2:]] for r in board.priority_routes],
             "escape_footprints": board.escape_footprints,
             "maze_via_cost_mm": board.maze_via_cost_mm,
-            "zones": [{"net": board_net(board, n), "layers": layers} for n, layers in board.pours], "texts": texts}
+            "zones": [{"net": board_net(board, n), "layers": layers} for n, layers in board.pours], "texts": texts,
+            "stackup": stackup}
 
 
 def project_file(name: str) -> str:
