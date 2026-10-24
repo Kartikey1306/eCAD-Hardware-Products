@@ -1241,6 +1241,51 @@ class FiducialTest(_Lib):
                 self.assertNotIn("FID1", bom)
 
 
+# Designs whose SWD header is a Samtec FTSH-105 (by MPN) but still on KiCad's generic 1.27 mm SMD
+# header footprint; each switches to EoS_Packages:Samtec_FTSH-105-... (and lists EoS_Packages in its
+# local_footprints) when P4 rebuilds it, and leaves this set.
+FTSH_TO_SWITCH = {("eos_ke16z_board", "J2"), ("eos_kl25_board", "J7"), ("eos_lpc55s69_board", "J3"),
+                  ("eos_probe_s3", "J2"), ("eos_ra2e1_board", "J2"), ("eos_ra4m2_board", "J9"),
+                  ("eos_stm32_64", "J3"), ("eos_tm4c123_board", "J7"), ("eos_tm4c1294_board", "J9")}
+
+
+class FtshFootprintTest(unittest.TestCase):
+    """Samtec FTSH-105 on Samtec's recommended land pattern (Rev H, Fig 1): pads 0.74 x 2.79 mm,
+    1.27 mm pitch, 6.86 mm across both rows; pad order as KiCad's generic 1.27 mm SMD header."""
+
+    def test_committed_footprints_are_what_the_generator_writes(self):
+        fp = importlib.import_module("eos_boards.footprints.generate")
+        folder = REPO_ROOT / "tools" / "eos_boards" / "footprints" / "EoS_Packages.pretty"
+        for name, node in ((fp.NAME, fp.footprint()), (fp.HEADER_NAME, fp.header_2x49()), (fp.FTSH_NAME, fp.ftsh_105())):
+            with self.subTest(footprint=name):
+                self.assertEqual(dumps(node) + "\n", (folder / f"{name}.kicad_mod").read_text(encoding="utf-8"))
+
+    def test_pads_follow_samtecs_land_pattern(self):
+        fp = importlib.import_module("eos_boards.footprints.generate")
+        node = loads((REPO_ROOT / "tools" / "eos_boards" / "footprints" / "EoS_Packages.pretty"
+                      / f"{fp.FTSH_NAME}.kicad_mod").read_text(encoding="utf-8"))
+        pads = {str(q[1]): (float(find(q, "at")[1]), float(find(q, "at")[2]), float(find(q, "size")[1]), float(find(q, "size")[2]),
+                            [str(x) for x in find(q, "layers")[1:]]) for q in find_all(node, "pad")}
+        self.assertEqual(sorted(pads, key=int), [str(n) for n in range(1, 11)])
+        for n, (x, y, w, h, layers) in pads.items():
+            with self.subTest(pad=n):
+                self.assertEqual((w, h), (2.79, 0.74))                                    # .110 x .029 in
+                self.assertEqual(x, -2.035 if int(n) % 2 else 2.035)                       # odd pads left, as KiCad's header
+                self.assertEqual(y, round(-2.54 + 1.27 * ((int(n) - 1) // 2), 3))           # pad 1 at the top
+                self.assertEqual(layers, ["F.Cu", "F.Mask", "F.Paste"])                    # Fig 2: paste = pad
+        self.assertEqual(round(max(x + w / 2 for x, _, w, _, _ in pads.values()) * 2, 3), 6.86)   # .270 in across
+        self.assertIn("suddendocs.samtec.com", (REPO_ROOT / "tools" / "eos_boards" / "footprints" / "generate.py").read_text(encoding="utf-8"))
+
+    def test_designs_still_to_switch_to_it(self):
+        found = set()
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            board = importlib.import_module(f"eos_boards.boards.{path.stem}").BOARD
+            for part in board.parts:
+                if part.fields.get("MPN", "").startswith("FTSH-105") and not part.footprint.startswith("EoS_Packages:Samtec_FTSH"):
+                    found.add((path.stem, part.ref))
+        self.assertEqual(found, FTSH_TO_SWITCH)
+
+
 class CrashSafetyTest(unittest.TestCase):
     """Issue #70: KiCad 10's bindings can crash a step when a removed item's proxy is freed, so every
     board.Remove() keeps its item referenced, and build.py stops when a pcb_build.py step crashes."""

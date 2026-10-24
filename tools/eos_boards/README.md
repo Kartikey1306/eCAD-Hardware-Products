@@ -185,7 +185,10 @@ Local libraries:
 
 - `footprints/` holds footprints KiCad does not ship. `footprints/generate.py` writes
   `EoS_Packages.pretty`: NXP's HLQFP-100 (SOT1570-3) with its exposed pad, from the LPC55S6x
-  data sheet's land pattern.
+  data sheet's land pattern; a 2 × 49 pin header; and Samtec's FTSH-105 (the 1.27 mm 10-pin Arm
+  Cortex debug header) on Samtec's recommended land pattern (Rev H, 27 Aug 2019: pads 0.74 × 2.79 mm,
+  6.86 mm across both rows), larger than KiCad's generic 1.27 mm SMD header's 2.4 mm pads, with the
+  same pad order and orientation.
 - `symbols/` holds symbols KiCad does not ship (`symbols/generate.py` writes them): the ADT7410
   temperature sensor (`EoS_Sensors`), the TM4C123GH6PM, LPC55S69JBD100 and R7FA2E1A92DFM
   (`EoS_MCU`), a 2×50
