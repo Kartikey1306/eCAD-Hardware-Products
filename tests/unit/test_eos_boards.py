@@ -71,8 +71,10 @@ class _Lib(unittest.TestCase):
         self.tmp.cleanup()
 
     def board(self, parts, **kw):
-        return Board(name="t", title="T", revision="A", date="2026-10-11", company="Kartikeydheer Srivastava",
-                     licence="MIT", width=10, height=10, parts=parts, power_nets={}, flagged_nets=[], **kw)
+        args = dict(name="t", title="T", date="2026-10-11", company="Kartikeydheer Srivastava", licence="MIT",
+                    width=10, height=10, parts=parts, power_nets={}, flagged_nets=[])     # revision: the default, "A"
+        args.update(kw)
+        return Board(**args)
 
 
 class SexprTest(unittest.TestCase):
@@ -1033,9 +1035,10 @@ def pcb_stackup(pcb):
     return table, rows, str(find(stack, "copper_finish")[1])
 
 
-# Boards built before the generator wrote stack-ups (P3 stage 1); P4 rebuilds every board and removes
-# it from this set. The test checks the set too: a listed board that has a stack-up fails it.
-BUILT_BEFORE_STACKUP = {
+# Boards built before the P3 stage 1 generator (stack-up, fiducials, identity line, PCB title block);
+# P4 rebuilds every board and takes it out of this set. The tests check the set too: a listed board
+# that already has a stack-up fails them, so the set cannot go stale.
+BUILT_BEFORE_P3 = {
     "eos-atmega328p-board", "eos-cm4-base", "eos-cm5-base", "eos-esp32-devkit", "eos-f280049c-board",
     "eos-feather-rp2040", "eos-ke16z-board", "eos-kl25-board", "eos-learn-rp2350", "eos-lpc55s69-board",
     "eos-motion-wing", "eos-msp430g2-board", "eos-probe-s3", "eos-ra2e1-board", "eos-ra4m2-board",
@@ -1098,10 +1101,70 @@ class StackupTest(unittest.TestCase):
             pcb = loads((EOS_DIR / name / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
             table, rows, _ = pcb_stackup(pcb)
             with self.subTest(board=name):
-                if name in BUILT_BEFORE_STACKUP:
-                    self.assertEqual(rows, [], "has a stack-up now: take it out of BUILT_BEFORE_STACKUP")
+                if name in BUILT_BEFORE_P3:
+                    self.assertEqual(rows, [], "has a stack-up now: take it out of BUILT_BEFORE_P3")
                 else:
                     self.assertEqual([n for n, kind, _ in rows if kind == "copper"], table)
+
+
+class IdentityTest(_Lib):
+    """A3: the board's name, revision and year on the silkscreen beside its ownership line, and the
+    board file's title block with the owner and the all-rights-reserved notice."""
+
+    OWN = [{"text": "(c) 2026 Kartikeydheer Srivastava", "x": 10.0, "y": 8.0, "size": 0.8, "layer": "B_SilkS", "mirror": True},
+           {"text": "All rights reserved", "x": 10.0, "y": 9.4, "size": 0.8, "layer": "B_SilkS", "mirror": True}]
+
+    def test_every_design_gets_one_identity_line_beside_its_ownership_line(self):
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            module = importlib.import_module(f"eos_boards.boards.{path.stem}")
+            board, texts = module.BOARD, module.TEXTS
+            out = build.identity_texts(board, texts)
+            own = next(t for t in out if t["text"] == "(c) 2026 Kartikeydheer Srivastava")
+            mine = [t for t in out if t["text"] == f"{board.title}  rev {board.revision}  2026"]
+            with self.subTest(board=path.stem):
+                self.assertEqual(len(mine), 1)
+                self.assertEqual((mine[0]["layer"], mine[0].get("mirror")), (own["layer"], own.get("mirror")))
+                self.assertLess(abs(mine[0]["y"] - own["y"]), 2.6)               # beside it: the line above
+                self.assertFalse([t for t in out if t.get("layer") == own["layer"] and t["text"].endswith("rev A")])
+                self.assertEqual(len(out), len(texts))                           # the hand-drawn name line replaced
+
+    def test_identity_line_without_a_name_line_and_refusals(self):
+        board = self.board([], revision="B", date="2027-01-05")
+        board.title = "EoS Test"
+        own = [dict(t, text=t["text"].replace("2026", "2027")) for t in self.OWN]
+        out = build.identity_texts(board, own)
+        self.assertEqual(out[-1], {"text": "EoS Test  rev B  2027", "x": 10.0, "y": 6.0, "size": 1.0, "bold": True,
+                                   "layer": "B_SilkS", "mirror": True})
+        self.assertEqual(self.board([]).revision, "A")                            # the default revision
+        with self.assertRaisesRegex(SystemExit, "needs one ownership line"):
+            build.identity_texts(self.board([]), [])
+        with self.assertRaisesRegex(SystemExit, "2 name lines"):
+            build.identity_texts(self.board([]), self.OWN + [dict(self.OWN[0], text="T  rev A"), dict(self.OWN[0], text="X  rev A")])
+
+    def test_title_block_carries_owner_and_rights(self):
+        board = self.board([], contact="kartikeydheer@gmail.com", licence_terms="boards/licence_terms.txt")
+        board.licence = design.ALL_RIGHTS_RESERVED
+        self.assertEqual(build.title_block(board), {
+            "title": "T", "date": "2026-10-11", "rev": "A", "company": "Kartikeydheer Srivastava",
+            "comments": ["Copyright (c) 2026 Kartikeydheer Srivastava. Licence: All rights reserved",
+                         "Generated by tools/eos_boards from the board's design file",
+                         "All rights reserved: see LICENSE.txt; permission from kartikeydheer@gmail.com"]})
+        self.assertEqual(len(build.title_block(self.board([]))["comments"]), 2)       # an MIT board: no permission line
+        spec = build.spec_for(board, self.lib, Path(self.tmp.name), [])
+        self.assertEqual(spec["title_block"], build.title_block(board))
+
+    def test_every_built_board_carries_its_identity_and_title_block(self):
+        for name, module in EOS_BOARDS.items():
+            if name in BUILT_BEFORE_P3:
+                continue
+            board = importlib.import_module(f"eos_boards.boards.{module}").BOARD
+            pcb = loads((EOS_DIR / name / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
+            with self.subTest(board=name):
+                silk = [str(t[1]) for t in find_all(pcb, "gr_text") if str(find(t, "layer")[1]) == "B.SilkS"]
+                self.assertIn(f"{board.title}  rev {board.revision}  {board.date[:4]}", silk)
+                tb = find(pcb, "title_block")
+                self.assertEqual(str(find(tb, "company")[1]), board.company)
+                self.assertEqual([str(c[2]) for c in find_all(tb, "comment")], build.title_block(board)["comments"])
 
 
 class CrashSafetyTest(unittest.TestCase):

@@ -92,6 +92,14 @@ KiCad writes its default, 0.02. A stack-up must add up to the board's thickness 
 the node into the saved file, and KiCad keeps it through every later load and save. A board of
 another thickness, or for another fab, gives its own with the `stackup` option.
 
+**Board identity.** The silkscreen carries the board's name, revision and year,
+"EoS Motion Wing  rev A  2026", beside its ownership line ("(c) 2026 <owner>"), on the same layer
+and mirrored as it is. A design's own name line there, one ending in "rev <revision>", is replaced
+where it stands; otherwise the line goes 2 mm above the ownership line. A design with no ownership
+line is refused. The revision is the board's `revision` (default "A"). The board file's title block
+says what the schematic's does: title, date, revision, owner, copyright and licence, and for an
+all-rights-reserved board whom to ask for permission.
+
 ## Reusing a reference design's layout exactly
 
 Some layouts should be copied, not redrawn. Raspberry Pi's RP2350 datasheet says the core

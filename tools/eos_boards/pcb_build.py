@@ -598,6 +598,13 @@ def place(spec, pcb_path, dsn_path):
     for t in spec.get("texts", []):
         text(board, t["text"], t["x"], t["y"], t["size"], getattr(P, t.get("layer", "F_SilkS")),
              t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False))
+    tb = board.GetTitleBlock()       # as the schematic's: title, date, revision, owner and licence
+    tb.SetTitle(spec["title_block"]["title"])
+    tb.SetDate(spec["title_block"]["date"])
+    tb.SetRevision(spec["title_block"]["rev"])
+    tb.SetCompany(spec["title_block"]["company"])
+    for i, line in enumerate(spec["title_block"]["comments"]):
+        tb.SetComment(i, line)
     # Inner planes go in before routing: the autorouter then joins each plane net's pads to
     # its plane with a via instead of routing them as tracks.
     for pl in spec.get("planes", []):

@@ -47,7 +47,6 @@ USB_C_EDGE = 3.19
 class Board:
     name: str
     title: str
-    revision: str
     date: str
     company: str
     licence: str
@@ -56,6 +55,7 @@ class Board:
     parts: List[Part]
     power_nets: Dict[str, str]               # net -> power symbol lib_id
     flagged_nets: List[str]                  # nets that need a PWR_FLAG (driven through a passive)
+    revision: str = "A"                      # on the silkscreen identity line, the title blocks and the licence
     notes: List[Tuple[Tuple[float, float], str]] = field(default_factory=list)
     headings: List[Tuple[Tuple[float, float], str]] = field(default_factory=list)
     power_block: Tuple[float, float] = (40.64, 330.2)   # schematic origin of the power symbols
