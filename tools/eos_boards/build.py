@@ -256,6 +256,9 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
         stackup = fabrication.stackup_for(board.layers, board.thickness, board.stackup)
     except ValueError as e:
         raise SystemExit(f"{board.name}: {e}")
+    for side, points in board.fiducials.items():
+        if side not in ("F", "B") or len(points) != 3 or not all(len(p) == 2 for p in points):
+            raise SystemExit(f'{board.name}: fiducials {side!r}: {points!r}; give "F" or "B" and three (x, y) positions')
     if board.reference_copper:
         # Reference footprints can carry their own pad clearance (Raspberry Pi's VREG capacitors
         # use 0.125 mm); the floor drops so it applies. Net classes keep 0.15 mm everywhere else.
@@ -280,7 +283,8 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
             "escape_footprints": board.escape_footprints,
             "maze_via_cost_mm": board.maze_via_cost_mm,
             "zones": [{"net": board_net(board, n), "layers": layers} for n, layers in board.pours], "texts": texts,
-            "stackup": stackup, "title_block": title_block(board)}
+            "stackup": stackup, "title_block": title_block(board),
+            "fiducials": {side: [list(p) for p in points] for side, points in board.fiducials.items()}}
 
 
 def project_file(name: str) -> str:

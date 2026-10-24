@@ -150,12 +150,13 @@ def track_width(spec, net):
 def _inside(spec, pos, margin):
     """True when ``pos`` (nm) lies inside the board's rounded-rectangle outline by at least
     ``margin`` (nm), corners included, and at least ``margin`` from every copper keep-out (an
-    antenna cut-out): a rectangle test alone lets copper into a cut-away corner."""
+    antenna cut-out) and every fiducial's copper-free square: a rectangle test alone lets copper
+    into a cut-away corner."""
     w, h, r = MM(spec["width"]), MM(spec["height"]), MM(spec["corner_radius"])
     x, y = pos.x, pos.y
     if not (margin <= x <= w - margin and margin <= y <= h - margin):
         return False
-    for x_0, y_0, x_1, y_1 in spec.get("copper_keepouts", []):
+    for x_0, y_0, x_1, y_1 in spec.get("copper_keepouts", []) + [k[:4] for k in spec.get("fiducial_keepouts", [])]:
         if MM(x_0) - margin < x < MM(x_1) + margin and MM(y_0) - margin < y < MM(y_1) + margin:
             return False
     cx = r if x < r else w - r if x > w - r else None
@@ -163,6 +164,13 @@ def _inside(spec, pos, margin):
     if cx is None or cy is None:
         return True
     return (x - cx) ** 2 + (y - cy) ** 2 <= (r - margin) ** 2 if r > margin else False
+
+
+def _in_fiducial_keepout(spec, pos, margin):
+    """True when ``pos`` (nm) lies within ``margin`` of a fiducial's copper-free square (any side: the
+    generator keeps its own copper out of both layers there)."""
+    return any(MM(k[0]) - margin < pos.x < MM(k[2]) + margin and MM(k[1]) - margin < pos.y < MM(k[3]) + margin
+               for k in spec.get("fiducial_keepouts", []))
 
 
 def _holes(board):
@@ -349,6 +357,8 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
                     if any(ob.Intersects(_box(q, tkeep)) and code != net.GetNetCode()
                            for q in path for ob, code in obstacles):
                         continue
+                    if any(_in_fiducial_keepout(spec, q, tkeep) for q in path):
+                        continue
                     if any(ob.Intersects(_box(pos, via_r)) and code == net.GetNetCode() and ob != size
                            for ob, code in obstacles):
                         continue
@@ -520,6 +530,8 @@ def preroute(board, spec):
                 box = _box(q, keep)
                 if any(ob.Intersects(box) and code != net.GetNetCode() for ob, code in others):
                     return False
+                if _in_fiducial_keepout(spec, q, keep):
+                    return False
             return True
 
         shapes = [[esc, cb], [esc, P.VECTOR2I(cb.x, esc.y), cb], [esc, P.VECTOR2I(esc.x, cb.y), cb]]
@@ -542,6 +554,107 @@ def preroute(board, spec):
             skipped += 1
             print(f"  preroute {ra}.{pa} -> {rb}.{pb}: no clear path, left to the router")
     return routed, skipped
+
+
+FIDUCIAL_KEEPOUT = "eos-fiducial-keepout"
+
+
+def _fiducial_obstacles(board, spec, side):
+    """What a fiducial on ``side`` ("F" or "B") must keep its copper-free square off, as (x0, y0, x1,
+    y1) mm boxes: the courtyards and silkscreen of that side's parts, every pad on that side and every
+    drilled pad, the side's board texts, copper already laid (reference copper, pre-routes) and the
+    design's keep-outs."""
+    cu, crtyd, silk = (P.F_Cu, P.F_CrtYd, P.F_SilkS) if side == "F" else (P.B_Cu, P.B_CrtYd, P.B_SilkS)
+
+    def mm_box(b):
+        return (P.ToMM(b.GetX()), P.ToMM(b.GetY()), P.ToMM(b.GetRight()), P.ToMM(b.GetBottom()))
+
+    out = []
+    for fp in board.GetFootprints():
+        fp.BuildCourtyardCaches()
+        cy = fp.GetCourtyard(crtyd)
+        if cy.OutlineCount():
+            out.append(mm_box(cy.BBox()))
+        for item in fp.GraphicalItems():
+            if item.GetLayer() == silk:
+                out.append(mm_box(item.GetBoundingBox()))
+        for pad in fp.Pads():
+            if pad.IsOnLayer(cu) or pad.HasHole():
+                out.append(mm_box(pad.GetBoundingBox()))
+    for d in board.GetDrawings():
+        if d.GetLayer() == silk:
+            out.append(mm_box(d.GetBoundingBox()))
+    for t in board.GetTracks():
+        if t.GetClass() == "PCB_VIA" or t.GetLayer() == cu:
+            out.append(mm_box(t.GetBoundingBox()))
+    for z in board.Zones():
+        if not z.GetIsRuleArea() and z.GetLayer() == cu:
+            out.append(mm_box(z.GetBoundingBox()))
+    out += [tuple(k[:4]) for k in spec.get("copper_keepouts", []) + spec.get("router_keepouts", [])
+            + spec.get("pour_keepouts", [])]
+    return out
+
+
+def place_fiducials(board, spec):
+    """Three fiducials on every side that carries surface-mount parts (fabrication.py): positions from
+    the design's ``fiducials`` option for a side it names, else chosen near three corners. Each is a
+    board-only footprint (no schematic symbol, no BOM line, in the placement file) with a rule area
+    round it that no track, via or pour may enter; the square also goes into the spec, so every later
+    step's own copper keeps out. Returns [(reference, side, x, y)]."""
+    sides = [s for s, layer in (("F", P.F_Cu), ("B", P.B_Cu))
+             if any(fp.GetLayer() == layer and any(p.GetAttribute() == P.PAD_ATTRIB_SMD for p in fp.Pads())
+                    for fp in board.GetFootprints())]
+    given = spec.get("fiducials", {})
+    sides += [s for s in given if s not in sides]
+    lib, name = fabrication.FIDUCIAL_FOOTPRINT.split(":")
+    placed = []
+    for side in ("F", "B"):
+        if side not in sides:
+            continue
+        obstacles = _fiducial_obstacles(board, spec, side)
+        args = (spec["width"], spec["height"], spec["corner_radius"])
+        if side in given:
+            points = [tuple(p) for p in given[side]]
+            problems = fabrication.fiducial_problems(points, *args, obstacles)
+            if problems:
+                raise SystemExit(f"fiducials on {side} from the design: " + "; ".join(problems))
+        else:
+            try:
+                points = fabrication.choose_fiducials(*args, obstacles)
+            except ValueError as e:
+                raise SystemExit(f"{side} side: {e}")
+        for x, y in points:
+            fp = P.FootprintLoad(str(Path(spec["footprint_dir"]) / f"{lib}.pretty"), name)
+            fp.SetFPIDAsString(fabrication.FIDUCIAL_FOOTPRINT)
+            ref = f"FID{len(placed) + 1}"
+            fp.SetReference(ref)
+            fp.SetValue("Fiducial")
+            board.Add(fp)
+            fp.SetPosition(v(x, y))
+            if side == "B":
+                fp.Flip(fp.GetPosition(), P.FLIP_DIRECTION_LEFT_RIGHT)
+            fp.SetBoardOnly(True)           # not in the schematic: parity leaves it alone
+            fp.SetExcludedFromBOM(True)     # not a BOM line, but in the placement file
+            fp.Reference().SetLayer(P.B_Fab if side == "B" else P.F_Fab)
+            x0, y0, x1, y1 = fabrication.fiducial_box(x, y)
+            area = P.ZONE(board)
+            area.SetIsRuleArea(True)
+            area.SetLayer(P.F_Cu if side == "F" else P.B_Cu)
+            area.SetZoneName(FIDUCIAL_KEEPOUT)
+            area.SetDoNotAllowTracks(True)
+            area.SetDoNotAllowVias(True)
+            area.SetDoNotAllowZoneFills(True)
+            area.SetDoNotAllowPads(False)
+            area.SetDoNotAllowFootprints(False)
+            o = area.Outline()
+            o.NewOutline()
+            for px, py in ((x0, y0), (x1, y0), (x1, y1), (x0, y1)):
+                o.Append(MM(px), MM(py))
+            board.Add(area)
+            spec.setdefault("fiducial_keepouts", []).append([x0, y0, x1, y1, side])
+            placed.append((ref, side, x, y))
+    spec["fiducials_placed"] = [list(p) for p in placed]
+    return placed
 
 
 def place(spec, pcb_path, dsn_path):
@@ -616,6 +729,9 @@ def place(spec, pcb_path, dsn_path):
     if spec.get("preroutes"):
         done, skipped = preroute(board, spec)
         print(f"pre-routed {done} critical connection(s), {skipped} left to the router")
+    # Fiducials after the reference copper and pre-routes (they keep clear of them) and before the
+    # priority routes and the fan-out, which then keep their copper out of the fiducials' squares.
+    print(f"fiducials: {place_fiducials(board, spec)}")
     # A tight bus is routed first, in the order given, the way a designer lays it by hand: the
     # autorouter, left to pick its own order, can box one of its lines in. Locked, so it stays.
     # Before the plane fan-out, so the fan-out's vias fit around these lines, not across them.
@@ -818,6 +934,7 @@ def join_fragments(board, net, spec):
                     if outline.PointInside(c) and all(outline.PointInside(q) for q in ring) \
                             and not any(pb.Intersects(vb) for pb in pads) and _hole_free(holes, c, MM(r["drill"])) \
                             and not _in_pour_keepout(spec, c, radius) and clear_of_others(c) \
+                            and not _in_fiducial_keepout(spec, c, radius) \
                             and not any(sh.Collide(c, MM(r["via"] / 2 + VIA_PAD_GAP)) for sh in smd):
                         holes.append((c, MM(r["drill"]) // 2))
                         via = P.PCB_VIA(board)
@@ -1247,6 +1364,8 @@ def repair(spec, pcb_path, pairs_path):
                 q = P.VECTOR2I(int(p0.x + (p1.x - p0.x) * k / n), int(p0.y + (p1.y - p0.y) * k / n))
                 if any(ob.Intersects(_box(q, keep)) and code != net.GetNetCode() for ob, code in others):
                     return False
+                if _in_fiducial_keepout(spec, q, keep):
+                    return False
             return True
 
         done = False
@@ -1521,3 +1640,6 @@ if __name__ == "__main__":
     mode, spec_path, pcb, other = sys.argv[1:5]
     spec = json.loads(Path(spec_path).read_text())
     {"place": place, "finish": finish, "repair": repair, "ripup": ripup}[mode](spec, pcb, other)
+    if mode == "place":
+        # the fiducials placed and their copper-free squares, which finish, repair and rip-up honour
+        Path(spec_path).write_text(json.dumps(spec, indent=1))

@@ -1167,6 +1167,80 @@ class IdentityTest(_Lib):
                 self.assertEqual([str(c[2]) for c in find_all(tb, "comment")], build.title_block(board)["comments"])
 
 
+class FiducialTest(_Lib):
+    """A2: three fiducials per side that carries surface-mount parts, near three corners, not in a line,
+    their mask openings 3 mm or more from the edge, their copper-free squares clear of everything."""
+
+    def test_free_board_gets_three_corners(self):
+        points = fabrication.choose_fiducials(30.0, 20.0, 1.0, [])
+        self.assertEqual(points, [(4.0, 4.0), (26.0, 4.0), (4.0, 16.0)])
+        self.assertEqual(fabrication.fiducial_problems(points, 30.0, 20.0, 1.0, []), [])
+
+    def test_blocked_corners_are_avoided(self):
+        # a FeatherWing: headers along both long edges, holes in the corners (motion wing's courtyards)
+        obstacles = [(0, -0.5, 50.8, 3.04), (0, 19.82, 50.8, 23.4), (0, 0, 5.3, 5.3), (45.5, 0, 50.8, 5.3),
+                     (0, 17.5, 5.3, 22.9), (45.5, 17.5, 50.8, 22.9), (3.0, 3.0, 9.0, 9.0)]
+        points = fabrication.choose_fiducials(50.8, 22.86, 2.54, obstacles)
+        self.assertEqual(fabrication.fiducial_problems(points, 50.8, 22.86, 2.54, obstacles), [])
+        self.assertEqual(len({(x < 25.4, y < 11.43) for x, y in points}), 3)          # three different corners
+
+    def test_no_room_is_refused_with_the_way_out(self):
+        with self.assertRaisesRegex(ValueError, "near only 0 corner.*fiducials option"):
+            fabrication.choose_fiducials(30.0, 20.0, 1.0, [(0, 0, 30, 20)])
+        with self.assertRaisesRegex(ValueError, "near only 2 corner"):          # a strip too thin for two rows
+            fabrication.choose_fiducials(40.0, 9.0, 1.0, [(0, 0, 40, 3.5)])
+
+    def test_problems_are_named(self):
+        args = (30.0, 20.0, 1.0)
+        self.assertIn("three are needed", fabrication.fiducial_problems([(5, 5), (25, 5)], *args, [])[0])
+        self.assertIn("under 3.0 mm from the board edge", fabrication.fiducial_problems([(3.5, 5), (25, 5), (5, 15)], *args, [])[0])
+        self.assertIn("meets 1 item", fabrication.fiducial_problems([(5, 5), (25, 5), (5, 15)], *args, [(5.5, 5.5, 7, 7)])[0])
+        self.assertIn("of a line", fabrication.fiducial_problems([(5, 5), (15, 7), (25, 9)], *args, [])[0])
+
+    def test_design_positions_reach_the_spec_and_bad_ones_are_refused(self):
+        parts = [Part("U1", "T:M", "M", "fp", (5, 5), {"GND": "GND", "A/B": NC})]
+        spec = build.spec_for(self.board(parts, fiducials={"B": [(4, 4), (6, 4), (4, 6)]}), self.lib, Path(self.tmp.name), [])
+        self.assertEqual(spec["fiducials"], {"B": [[4, 4], [6, 4], [4, 6]]})
+        for bad in ({"T": [(1, 1)] * 3}, {"F": [(1, 1), (2, 2)]}, {"F": [(1, 1, 0)] * 3}):
+            with self.subTest(bad=bad), self.assertRaisesRegex(SystemExit, "three"):
+                build.spec_for(self.board(parts, fiducials=bad), self.lib, Path(self.tmp.name), [])
+
+    def test_the_placement_step_keeps_generator_copper_out_of_the_squares(self):
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        inside = source[source.index("def _inside("):source.index("def _in_fiducial_keepout(")]
+        self.assertIn('spec.get("fiducial_keepouts", [])', inside)          # fan-out, stitching, maze, repair vias
+        self.assertEqual(source.count("_in_fiducial_keepout(spec, "), 5)    # its definition; fan-out stub, pre-route, repair track, fragment via
+
+    def test_every_built_board_has_fiducials_on_each_assembled_side(self):
+        for name in EOS_BOARDS:
+            if name in BUILT_BEFORE_P3:
+                continue
+            folder = EOS_DIR / name
+            pcb = loads((folder / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
+            board = importlib.import_module(f"eos_boards.boards.{EOS_BOARDS[name]}").BOARD
+            fids, smd_sides = {}, set()
+            for fp in find_all(pcb, "footprint"):
+                side = str(find(fp, "layer")[1])[0]
+                attr = [str(a) for a in find(fp, "attr")[1:]] if find(fp, "attr") else []
+                if str(fp[1]) == fabrication.FIDUCIAL_FOOTPRINT:
+                    self.assertIn("board_only", attr)
+                    self.assertIn("exclude_from_bom", attr)
+                    at = find(fp, "at")
+                    fids.setdefault(side, []).append((float(at[1]), float(at[2])))
+                elif "smd" in attr:
+                    smd_sides.add(side)
+            areas = [z for z in find_all(pcb, "zone") if find(z, "name") and str(find(z, "name")[1]) == "eos-fiducial-keepout"]
+            with self.subTest(board=name):
+                self.assertTrue(smd_sides <= set(fids))
+                for side, points in fids.items():
+                    self.assertEqual(fabrication.fiducial_problems(points, board.width, board.height, board.corner_radius, []), [])
+                self.assertEqual(len(areas), sum(len(p) for p in fids.values()))
+                placement = (folder / "fab" / f"{name}-placement.csv").read_text(encoding="utf-8")
+                bom = (folder / "fab" / f"{name}-bom.csv").read_text(encoding="utf-8")
+                self.assertIn('"FID1"', placement)
+                self.assertNotIn("FID1", bom)
+
+
 class CrashSafetyTest(unittest.TestCase):
     """Issue #70: KiCad 10's bindings can crash a step when a removed item's proxy is freed, so every
     board.Remove() keeps its item referenced, and build.py stops when a pcb_build.py step crashes."""

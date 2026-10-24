@@ -86,6 +86,7 @@ class Board:
     escape_footprints: List[str] = field(default_factory=list)          # fine-pitch connectors whose pads keep a clear way out (maze router)
     maze_via_cost_mm: float = 1.2                                        # maze router: a via costs as much as this much track
     stackup: Dict[str, object] = field(default_factory=dict)            # overrides of the fab stack-up (fabrication.stackup_for)
+    fiducials: Dict[str, List[Tuple[float, float]]] = field(default_factory=dict)  # {"F"|"B": [(x, y) x 3]}: where the automatic choice cannot fit
 
 
 def resolve(part: Part, lib: Library) -> Dict[str, Tuple[Pin, str]]:
