@@ -68,9 +68,13 @@ paths that `kicad_env.py` and `build.py` use.
    do. KiCad 10's bindings can crash when the proxy of an item taken off the board is freed, so
    every removal goes through one helper, `_remove`, which keeps the item referenced until the
    process exits.
+   Then the saved board is read back for what a fab or an assembler would reject
+   (`metrics.fab_problems`): no stack-up, or one whose copper is not the board's, and a side with
+   surface-mount parts but fewer than three fiducials, or fiducials too near the edge or in a line.
+   Any of these stops the build too.
 6. **Outputs**. Gerbers and drill files (fabrication layers only), pick-and-place, BOM,
-   STEP, schematic PDF and SVG, renders, `LICENSE.txt` and `build-report.json` with the ERC and
-   DRC counts.
+   STEP, schematic PDF and SVG, renders, `LICENSE.txt`, `build-report.json` with the ERC and
+   DRC counts, and `metrics.json` (below).
 
 Outputs are written only when every check passes: 0 ERC violations, 0 DRC errors, 0
 unconnected items and 0 parity problems. A failed build stops before step 6: the previous
@@ -123,6 +127,15 @@ where it stands; otherwise the line goes 2 mm above the ownership line. A design
 line is refused. The revision is the board's `revision` (default "A"). The board file's title block
 says what the schematic's does: title, date, revision, owner, copyright and licence, and for an
 all-rights-reserved board whom to ask for permission.
+
+**Metrics.** `metrics.py` reads a built board's own files (no KiCad needed) and the build writes
+the result to `metrics.json` in the board folder: size and copper layers, the stack-up, parts by
+side, pads, nets, track length per layer, the track widths used and where the narrowest run, vias by
+size and drill, the smallest drilled hole, plated slots, pours and rule areas, the BOM's lines,
+parts and MPN coverage (with the lines that have no MPN), test points and fiducials, and the
+build's check counts. `python3 tools/eos_boards/metrics.py boards/eos/<name>` prints them for any
+built board. A test checks each board README's Fabrication numbers (narrowest track, smallest
+drill, via size and drill) against them.
 
 ## Reusing a reference design's layout exactly
 

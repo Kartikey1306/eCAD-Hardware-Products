@@ -24,7 +24,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
-from eos_boards import build, design, fabrication, schematic  # noqa: E402
+from eos_boards import build, design, fabrication, metrics, schematic  # noqa: E402
 from eos_boards.design import NC, Board, Part  # noqa: E402
 from eos_boards.kicad_lib import Library, pins  # noqa: E402
 from eos_boards.reference import extract_rpi_minimal as extract  # noqa: E402
@@ -1429,6 +1429,146 @@ class RobustRoutingTest(_Lib):
         place = source[source.index("def place("):source.index("def stitch(")]
         self.assertIn("fabrication.route_options(route)", place)
         self.assertIn("MM(width) if width else track_width(spec, net)", place)
+
+
+# What each board README's Fabrication section says now about its narrowest track, smallest drill and
+# vias: (the README's own words, the number in them), None where it states no number. Read by hand on
+# 24 Oct 2026 (P3 stage 1); the test checks each phrase is still in the README.
+README_FAB = {
+    "eos-atmega328p-board": {"narrowest": ("widens it to 0.127 mm, the design's minimum", "0.127"),
+                             "drill": ("**Smallest drill:** 0.3 mm (vias)", "0.3"), "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-cm4-base": {"narrowest": ("narrowing to the 0.09 mm four-layer minimum", "0.09"), "drill": None,
+                     "vias": ("**Vias:** 0.45 mm with a 0.2 mm drill", ["0.45/0.2"])},
+    "eos-cm5-base": {"narrowest": None, "drill": None, "vias": ("**Vias:** 0.45 mm with a 0.2 mm drill", ["0.45/0.2"])},
+    "eos-esp32-devkit": {"narrowest": ("**Tracks:** 0.15 mm (the rules allow 0.1 mm at fine-pitch pads; this build narrows none)", "0.15"),
+                         "drill": ("**Smallest drill:** 0.2 mm", "0.2"), "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-f280049c-board": {"narrowest": ("0.15 mm tracks, 0.4 mm on VBUS and 5 V", "0.15"),
+                           "drill": ("vias 0.6 mm with a 0.3 mm drill, which is the smallest drill", "0.3"),
+                           "vias": ("vias 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-feather-rp2040": {"narrowest": ("0.095 mm on the USB-C receptacle's CC contacts", "0.095"),
+                           "drill": ("**Smallest drill:** 0.2 mm, in the vias", "0.2"),
+                           "vias": ("**Vias:** 0.45 mm with a 0.2 mm drill", ["0.45/0.2"])},
+    "eos-ke16z-board": {"narrowest": ("minimum track is set to 0.127 mm (5 mil, `rules`), so the build widens such necks to it", "0.127"),
+                        "drill": ("**Smallest drill:** 0.3 mm (vias)", "0.3"), "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-kl25-board": {"narrowest": ("minimum track is set to 0.127 mm (5 mil, `rules`), so the build widens such necks to it", "0.127"),
+                       "drill": ("**Smallest drill:** 0.3 mm (vias)", "0.3"), "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-learn-rp2350": {"narrowest": ("narrowing to 0.112 mm where the router necks down", "0.112"), "drill": None,
+                         "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill; Raspberry Pi's own copper uses a 0.25 mm drill",
+                                  ["0.6/0.3", "0.6/0.25"])},
+    "eos-lpc55s69-board": {"narrowest": ("(0.09 mm minimum at fine-pitch pins)", "0.09"), "drill": ("smallest drill 0.3 mm", "0.3"),
+                           "vias": ("Vias 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-motion-wing": {"narrowest": ("**Tracks:** 0.15 mm, 0.25 mm on the 3.3 V net", "0.15"),
+                        "drill": ("**Smallest drill:** 0.3 mm (vias)", "0.3"), "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-msp430g2-board": {"narrowest": ("narrowing to 0.112 mm where the router necks into the CP2102N's fine-pitch pads", "0.112"),
+                           "drill": ("**Smallest drill:** 0.3 mm, in the vias", "0.3"), "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-probe-s3": {"narrowest": ("narrowing to 0.112 mm at fine-pitch pins", "0.112"), "drill": ("**Smallest drill:** 0.2 mm", "0.2"),
+                     "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-ra2e1-board": {"narrowest": ("The smallest track is 0.10 mm", "0.10"), "drill": ("**Smallest drill:** 0.3 mm (vias)", "0.3"),
+                        "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-ra4m2-board": {"narrowest": ("Choose a fab process that allows 0.11 mm tracks", "0.11"),
+                        "drill": ("the smallest drill is 0.3 mm", "0.3"), "vias": ("Vias are 0.6 mm with 0.3 mm drills", ["0.6/0.3"])},
+    "eos-rl78g13-board": {"narrowest": None, "drill": None, "vias": ("Standard vias are 0.60 mm with 0.30 mm drill", ["0.6/0.3"])},
+    "eos-sense-cape": {"narrowest": ("Measured from the board file: 0.15 mm signal tracks", "0.15"), "drill": None,
+                       "vias": ("0.6 mm vias with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-stm32-64": {"narrowest": ("**Tracks:** 0.15 mm signals", "0.15"), "drill": ("**Smallest drill:** 0.3 mm (vias)", "0.3"),
+                     "vias": ("**Vias:** 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-tm4c123-board": {"narrowest": ("So the smallest track is 0.10 mm", "0.10"),
+                          "drill": ("the smallest drill is 0.3 mm, in the vias", "0.3"), "vias": ("Vias 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+    "eos-tm4c1294-board": {"narrowest": ("0.15 mm tracks (every net that enters the TQFP-128), 0.13 mm on the device USB pair", "0.13"),
+                           "drill": ("vias 0.6 mm with a 0.3 mm drill, which is the smallest drill", "0.3"),
+                           "vias": ("vias 0.6 mm with a 0.3 mm drill", ["0.6/0.3"])},
+}
+# Where a README's numbers and the built board disagree today (README first, then the board), from
+# test_readme_fabrication_numbers_agree_with_metrics. P4 fixes each README and removes its entries;
+# this stage does not edit board READMEs.
+README_FAB_MISMATCHES = {
+    ("eos-cm4-base", "narrowest", "0.09", 0.1124), ("eos-cm4-base", "drill", None, 0.2),
+    ("eos-cm5-base", "narrowest", None, 0.1124), ("eos-cm5-base", "drill", None, 0.2),
+    ("eos-f280049c-board", "narrowest", "0.15", 0.1124), ("eos-learn-rp2350", "drill", None, 0.25),
+    ("eos-lpc55s69-board", "narrowest", "0.09", 0.1124), ("eos-probe-s3", "narrowest", "0.112", 0.15),
+    ("eos-ra2e1-board", "narrowest", "0.10", 0.1124), ("eos-rl78g13-board", "narrowest", None, 0.1124),
+    ("eos-rl78g13-board", "drill", None, 0.3), ("eos-sense-cape", "drill", None, 0.3),
+    ("eos-stm32-64", "narrowest", "0.15", 0.1124), ("eos-tm4c1294-board", "narrowest", "0.13", 0.09),
+}
+
+
+def _fab_section(name):
+    text = (EOS_DIR / name / "README.md").read_text(encoding="utf-8")
+    section = text.split("\n## Fabrication", 1)[1].split("\n## ", 1)[0]
+    return " ".join(section.split())
+
+
+def _agrees(stated, value):
+    """A README number agrees with the board's when the board's, rounded as the README writes it
+    (at least two decimals), is the same number."""
+    if stated is None or value is None:
+        return stated is None and value is None
+    decimals = max(2, len(stated.split(".", 1)[1]) if "." in stated else 0)
+    return round(value, decimals) == float(stated)
+
+
+class MetricsTest(unittest.TestCase):
+    """Item 4: the generator's metrics.py reads a built board's fabrication numbers, and each board
+    README's Fabrication numbers agree with them (or are listed as known mismatches for P4)."""
+
+    def test_metrics_of_a_built_board(self):
+        m = metrics.board_metrics(EOS_DIR / "eos-motion-wing")
+        self.assertEqual((m["board"], m["copper_layers"], m["size_mm"]), ("eos-motion-wing", 2, [50.8, 22.86]))
+        self.assertEqual(m["footprints_by_side"], {"bottom": 2, "top": 22})
+        self.assertEqual(m["vias_by_size_drill_mm"], {"0.6/0.3": m["vias"]})
+        self.assertEqual((m["narrowest_track_mm"], m["smallest_drill_mm"]), (0.15, 0.3))
+        self.assertEqual(m["narrowest_track_segments"], sum(1 for kind in ("segment", "arc") for s in find_all(
+            loads((EOS_DIR / "eos-motion-wing" / "hardware" / "eos-motion-wing.kicad_pcb").read_text(encoding="utf-8")), kind)
+            if float(find(s, "width")[1]) == 0.15))
+        self.assertEqual((m["bom_lines"], m["bom_lines_with_mpn"], m["bom_parts"]), (7, 5, 12))
+        self.assertEqual((m["plated_slots"], m["smd_sides"], m["fiducials"], m["stackup"]), ([], ["top"], {}, {}))
+        f = metrics.board_metrics(EOS_DIR / "eos-feather-rp2040")
+        self.assertEqual(f["narrowest_track_mm"], 0.0952)
+        self.assertEqual({a["net"] for a in f["narrowest_track_at"]}, {"/CC1", "/CC2"})
+        self.assertEqual(sorted((s["width_mm"], s["length_mm"]) for s in f["plated_slots"]), [(0.6, 1.2)] * 2 + [(0.6, 1.7)] * 2)
+        self.assertEqual(metrics.board_metrics(EOS_DIR / "eos-tm4c1294-board")["smd_sides"], ["bottom", "top"])
+
+    def test_fab_problems_name_a_missing_stackup_and_fiducials(self):
+        m = metrics.board_metrics(EOS_DIR / "eos-motion-wing")
+        self.assertEqual(metrics.fab_problems(m, 50.8, 22.86, 2.54),
+                         ["no stack-up in the board file", "top: 0 fiducial(s); three are needed"])
+        m = dict(m, stackup={"copper": ["F.Cu", "B.Cu"]}, fiducials={"top": [[4.0, 8.0], [43.75, 4.0], [33.0, 18.75]]})
+        self.assertEqual(metrics.fab_problems(m, 50.8, 22.86, 2.54), [])
+
+    def test_a_build_checks_the_fab_numbers_and_writes_metrics_json(self):
+        source = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
+        self.assertIn("problems = metrics.fab_problems(metrics.board_metrics(out, board.name, report)", source)
+        self.assertLess(source.index("metrics.write(out, board.name, report)"), source.index('report["outputs"] = sorted('))
+
+    def test_metrics_json_is_what_the_board_files_give(self):
+        for name in EOS_BOARDS:
+            path = EOS_DIR / name / "metrics.json"
+            if path.is_file():               # boards built since P3 stage 1 carry one
+                with self.subTest(board=name):
+                    self.assertEqual(json.loads(path.read_text(encoding="utf-8")),
+                                     json.loads(json.dumps(metrics.board_metrics(EOS_DIR / name))))
+
+    def test_readme_phrases_are_still_there(self):
+        self.assertEqual(set(README_FAB), set(EOS_BOARDS))
+        for name, claims in README_FAB.items():
+            section = _fab_section(name)
+            for item, claim in claims.items():
+                if claim is not None:
+                    with self.subTest(board=name, item=item):
+                        self.assertIn(claim[0], section)
+
+    def test_readme_fabrication_numbers_agree_with_metrics(self):
+        found = set()
+        for name, claims in README_FAB.items():
+            path = EOS_DIR / name / "metrics.json"
+            m = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else metrics.board_metrics(EOS_DIR / name)
+            for item, key in (("narrowest", "narrowest_track_mm"), ("drill", "smallest_drill_mm")):
+                stated = claims[item][1] if claims[item] else None
+                if not _agrees(stated, m[key]):
+                    found.add((name, item, stated, m[key]))
+            with self.subTest(board=name, item="vias"):
+                self.assertEqual(sorted(claims["vias"][1]), sorted(m["vias_by_size_drill_mm"]))
+        self.assertEqual(found, README_FAB_MISMATCHES)
 
 
 class CrashSafetyTest(unittest.TestCase):

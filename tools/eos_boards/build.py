@@ -32,7 +32,7 @@ from typing import Any, Dict, List
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
-from eos_boards import fabrication, kicad_env, schematic  # noqa: E402
+from eos_boards import fabrication, kicad_env, metrics, schematic  # noqa: E402
 from eos_boards.design import ALL_RIGHTS_RESERVED, NC, Board, Part, resolve  # noqa: E402
 from eos_boards.kicad_lib import Library  # noqa: E402
 from eos_boards.sexpr import find, find_all  # noqa: E402
@@ -524,6 +524,14 @@ def main() -> int:
         print(json.dumps({k: report[k] for k in ("erc_violations", "drc", "drc_errors", "drc_warnings")}, indent=1))
         raise SystemExit(f"DRC failed; fabrication outputs left as they were, hardware/ holds this attempt. "
                          f"See {out / 'drc.json'} and {work / 'build-report.json'}")
+    # what a fab or an assembler would reject, read back from the saved board: its stack-up, and three
+    # fiducials on each side with surface-mount parts
+    problems = metrics.fab_problems(metrics.board_metrics(out, board.name, report), board.width, board.height,
+                                    board.corner_radius)
+    report["fab_problems"] = problems
+    if problems:
+        (work / "build-report.json").write_text(json.dumps(report, indent=1) + "\n")
+        raise SystemExit("fabrication check failed; outputs left as they were: " + "; ".join(problems))
 
     # 6. outputs
     gerbers = fab / "gerbers"
@@ -551,6 +559,7 @@ def main() -> int:
          "--width", "2400", "--height", "1600", "--background", "opaque", "-o", img / f"{board.name}-iso.png", pcb])
     run([cli, "pcb", "export", "svg", "--layers", "F.Cu,B.Cu,F.SilkS,Edge.Cuts", "--mode-single",
          "--exclude-drawing-sheet", "-o", img / f"{board.name}-copper.svg", pcb])
+    metrics.write(out, board.name, report)        # metrics.json: the board's fabrication numbers
     report["outputs"] = sorted(str(p.relative_to(out)) for p in out.rglob("*")
                                if p.is_file() and ".build" not in p.parts)
     (out / "build-report.json").write_text(json.dumps(report, indent=1) + "\n")
