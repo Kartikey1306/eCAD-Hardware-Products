@@ -8,7 +8,9 @@ is read as text. The exactness check compares in integer nanometres (KiCad's own
 
 from __future__ import annotations
 
+import contextlib
 import importlib
+import io
 import json
 import math
 import os
@@ -1354,6 +1356,79 @@ class ShuntTest(_Lib):
                     undeclared.add((path.stem, p.ref))
         self.assertEqual(auto, {"eos_ra2e1_board": 1, "eos_ra4m2_board": 1})         # their boot-mode jumper (Jumper_2_Open)
         self.assertEqual(undeclared, SHUNTS_TO_DECLARE)
+
+
+class RobustRoutingTest(_Lib):
+    """Deferred routing items: a new Freerouting run when repairs leave opens, a width per priority
+    route, fan-out vias fixed for the router, and pour fragments joined again after each repair."""
+
+    def _route(self, open_counts, attempts=3):
+        """Run build.route with Freerouting, the pcb_build steps and DRC replaced: ``open_counts`` is
+        the number of open connections each run's last DRC reports. Returns (result, the board text
+        each finish step started from, the Freerouting options of each run)."""
+        from unittest import mock
+        out = Path(tempfile.mkdtemp(dir=self.tmp.name))
+        work = out / ".build"
+        work.mkdir()
+        pcb, ses = out / "b.kicad_pcb", work / "b.ses"
+        pcb.write_text("placed\n")
+        seen, runs, reports = [], [], iter(open_counts)
+
+        def step(mode, spec, board, other, tail=2000):
+            seen.append(Path(board).read_text())
+            Path(board).write_text(Path(board).read_text() + "routed\n")   # finish changes the board
+
+        def freeroute(dsn, ses_, passes, attempt, work_):
+            runs.append(build.freerouting_args(attempt))
+            ses_.write_text("session")
+
+        def drc_round(cli, pcb_, out_):
+            n = next(reports)
+            return {"violations": [], "schematic_parity": [],
+                    "unconnected_items": [{"items": [{"description": "Zone [GND]"}]}] * n}   # not repairable
+
+        with mock.patch.object(build, "pcb_step", side_effect=step), mock.patch.object(build, "freeroute", side_effect=freeroute), \
+                mock.patch.object(build, "run_drc", side_effect=drc_round), contextlib.redirect_stdout(io.StringIO()):
+            result = build.route("kicad-cli", "spec.json", pcb, "b.dsn", ses, work, out, 60, attempts)
+        return result, seen, runs
+
+    def test_a_run_that_leaves_opens_is_routed_again_from_the_placed_board(self):
+        (drc, rounds, made), seen, runs = self._route([2, 0])
+        self.assertEqual((len(drc["unconnected_items"]), made), (0, 2))
+        self.assertEqual(seen, ["placed\n", "placed\n"])                 # the second run starts from the placement
+        self.assertEqual(runs, [[], ["-is", "random"]])                     # a new item order: the retry's "seed"
+
+    def test_runs_stop_at_the_limit_and_a_clean_first_run_is_not_repeated(self):
+        self.assertEqual(self._route([1, 1, 1])[0][2], 3)
+        self.assertEqual(self._route([0])[0][2], 1)
+
+    def test_priority_route_options(self):
+        self.assertEqual(fabrication.route_options((("U1", "1"), ("C1", "2"))), (False, None))
+        self.assertEqual(fabrication.route_options((("U1", "1"), ("C1", "2"), "join")), (True, None))
+        self.assertEqual(fabrication.route_options((("U1", "1"), ("C1", "2"), 0.4, "join")), (True, 0.4))
+        for bad in ("joins", 0, -0.2, True, ("join", "join"), (0.3, 0.4)):
+            extra = bad if isinstance(bad, tuple) else (bad,)
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                fabrication.route_options((("U1", "1"), ("C1", "2"), *extra))
+        parts = [Part("U1", "T:U", "U", "fp", (5, 5), {"VDD": "A", "3": NC})]
+        spec = build.spec_for(self.board(parts, priority_routes=[(("U1", "1"), ("U1", "2"), 0.3)]), self.lib, Path(self.tmp.name), [])
+        self.assertEqual(spec["priority_routes"], [[["U1", "1"], ["U1", "2"], 0.3]])
+        for routes, message in (([(("U1", "1"), ("U1", "2"), 0.05)], "minimum track"), ([(("U1", "1"), ("U1", "2"), "jion")], "join")):
+            with self.subTest(message=message), self.assertRaisesRegex(SystemExit, message):
+                build.spec_for(self.board(parts, priority_routes=routes), self.lib, Path(self.tmp.name), [])
+
+    def test_the_router_cannot_take_the_fanout_and_repairs_rejoin_pour_fragments(self):
+        # pcbnew code, read as source: these steps cannot run without KiCad
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        fanout = source[source.index("def fanout("):source.index("REFERENCE_ZONE = ")]
+        self.assertEqual(fanout.count(".SetLocked(True)"), 2)                         # the via and its stub
+        repair = source[source.index("def repair("):source.index("def ease_vias(")]
+        finish = source[source.index("def finish("):source.index('if __name__ == "__main__":')]
+        for body in (repair, finish):
+            self.assertIn("join_all_fragments(board, spec, filler)", body)
+        place = source[source.index("def place("):source.index("def stitch(")]
+        self.assertIn("fabrication.route_options(route)", place)
+        self.assertIn("MM(width) if width else track_width(spec, net)", place)
 
 
 class CrashSafetyTest(unittest.TestCase):

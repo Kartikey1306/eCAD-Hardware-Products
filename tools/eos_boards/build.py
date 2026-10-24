@@ -301,6 +301,14 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
     for side, points in board.fiducials.items():
         if side not in ("F", "B") or len(points) != 3 or not all(len(p) == 2 for p in points):
             raise SystemExit(f'{board.name}: fiducials {side!r}: {points!r}; give "F" or "B" and three (x, y) positions')
+    for r in board.priority_routes:
+        try:
+            _, width = fabrication.route_options(r)
+        except ValueError as e:
+            raise SystemExit(f"{board.name}: {e}")
+        if width is not None and width < rules["min_track"]:
+            raise SystemExit(f"{board.name}: priority route {r!r}: {width} mm is under the board's "
+                             f"{rules['min_track']} mm minimum track")
     if board.reference_copper:
         # Reference footprints can carry their own pad clearance (Raspberry Pi's VREG capacitors
         # use 0.125 mm); the floor drops so it applies. Net classes keep 0.15 mm everywhere else.
@@ -327,6 +335,85 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
             "zones": [{"net": board_net(board, n), "layers": layers} for n, layers in board.pours], "texts": texts,
             "stackup": stackup, "title_block": title_block(board),
             "fiducials": {side: [list(p) for p in points] for side, points in board.fiducials.items()}}
+
+
+ROUTE_ATTEMPTS = 3      # Freerouting runs at most, when the repair rounds leave connections open
+
+
+def freerouting_args(attempt: int) -> List[str]:
+    """Freerouting options for run ``attempt`` (0 first). Freerouting 2.4.1 takes no seed (its router
+    and optimizer settings hold none), so a retry changes its item order instead: the first run uses
+    its default prioritised order, each retry a random one (``-is random``), so no two runs route alike."""
+    return [] if attempt == 0 else ["-is", "random"]
+
+
+def freeroute(dsn: Path, ses: Path, passes: int, attempt: int, work: Path) -> None:
+    """One headless Freerouting run, DSN in, session file out; its log in .build/freerouting.log
+    (freerouting-2.log, -3 for retries)."""
+    java = os.environ.get("JAVA", "/opt/homebrew/opt/openjdk/bin/java")
+    jar = os.environ.get("FREEROUTING_JAR", str(Path.home() / "Desktop/task/tools/freerouting/freerouting-2.4.1.jar"))
+    if ses.exists():
+        ses.unlink()                       # never import an earlier run's session
+    r = run([java, "-Djava.awt.headless=true", "-jar", jar, "-de", dsn, "-do", ses, "-mp", passes,
+             *freerouting_args(attempt), "--gui.enabled=false"], timeout=3600)
+    (work / ("freerouting.log" if attempt == 0 else f"freerouting-{attempt + 1}.log")).write_text(r.stdout + r.stderr)
+    if not ses.is_file():
+        print(r.stdout[-3000:], r.stderr[-3000:])
+        raise SystemExit("Freerouting produced no session file")
+
+
+def run_drc(cli: str, pcb: Path, out: Path) -> Dict[str, Any]:
+    """KiCad's DRC with schematic parity, every severity, as JSON (also left in out/drc.json)."""
+    run([cli, "pcb", "drc", "--schematic-parity", "--format", "json", "--severity-all", "-o", out / "drc.json", pcb])
+    return json.loads((out / "drc.json").read_text())
+
+
+def check_and_repair(cli: str, spec: Path, pcb: Path, work: Path, out: Path):
+    """DRC; close what the autorouter left open (repair) or lift what it left too close (ripup), and
+    check again, up to six rounds. Returns (the last DRC report, the rounds run)."""
+    for attempt in range(6):
+        drc = run_drc(cli, pcb, out)
+        pairs = []
+        for u in drc.get("unconnected_items", []):
+            items = u.get("items", [])
+            if len(items) == 2 and all("pos" in i for i in items) \
+                    and not any(i["description"].startswith("Zone") for i in items):
+                net = items[0]["description"].split("[", 1)[-1].split("]", 1)[0]
+                pairs.append({"net": net, "a": [items[0]["pos"]["x"], items[0]["pos"]["y"]],
+                              "b": [items[1]["pos"]["x"], items[1]["pos"]["y"]]})
+        clashes = clearance_clashes(drc)
+        if not (pairs or clashes) or attempt == 5:
+            break
+        if clashes:
+            # the autorouter can leave a via or track inside another net's clearance: lift that
+            # net's copper there, so this round's DRC lists it as open and the repair re-routes it
+            (work / "clashes.json").write_text(json.dumps(clashes, indent=1))
+            pcb_step("ripup", spec, pcb, work / "clashes.json", tail=1500)
+            continue
+        (work / "open.json").write_text(json.dumps(pairs, indent=1))
+        pcb_step("repair", spec, pcb, work / "open.json", tail=1500)
+    return drc, attempt
+
+
+def route(cli: str, spec: Path, pcb: Path, dsn: Path, ses: Path, work: Path, out: Path, passes: int,
+          attempts: int = ROUTE_ATTEMPTS):
+    """Route with Freerouting, finish, then DRC and repair. When the repair rounds still leave
+    connections open, start again from the placed board with a new Freerouting run (freerouting_args),
+    up to ``attempts`` runs: its result changes from run to run, and a failed run is no proof that the
+    placement cannot be routed. Returns (the last DRC report, its repair rounds, the runs made)."""
+    placed = work / "placed.kicad_pcb"
+    shutil.copyfile(pcb, placed)
+    for attempt in range(attempts):
+        if attempt:
+            shutil.copyfile(placed, pcb)
+            print(f"routing again, run {attempt + 1} of {attempts}: "
+                  f"{len(drc['unconnected_items'])} connection(s) were still open", flush=True)
+        freeroute(dsn, ses, passes, attempt, work)
+        pcb_step("finish", spec, pcb, ses)
+        drc, rounds = check_and_repair(cli, spec, pcb, work, out)
+        if not drc.get("unconnected_items"):
+            break
+    return drc, rounds, attempt + 1
 
 
 def project_file(name: str) -> str:
@@ -425,41 +512,9 @@ def main() -> int:
             print(f"  {v['type']}: {[i['description'] for i in v['items']]}")
         print(f"placement: {len(found)} overlap/clearance problem(s)")
         return 1 if found else 0
-    java = os.environ.get("JAVA", "/opt/homebrew/opt/openjdk/bin/java")
-    jar = os.environ.get("FREEROUTING_JAR", str(Path.home() / "Desktop/task/tools/freerouting/freerouting-2.4.1.jar"))
-    r = run([java, "-Djava.awt.headless=true", "-jar", jar, "-de", dsn, "-do", ses, "-mp", args.passes,
-             "--gui.enabled=false"], timeout=3600)
-    (work / "freerouting.log").write_text(r.stdout + r.stderr)
-    if not ses.is_file():
-        print(r.stdout[-3000:], r.stderr[-3000:])
-        raise SystemExit("Freerouting produced no session file")
-    pcb_step("finish", spec, pcb, ses)
-
-    # 5. DRC with schematic parity; close what the autorouter left open, then check again
-    for attempt in range(6):
-        run([cli, "pcb", "drc", "--schematic-parity", "--format", "json", "--severity-all",
-             "-o", out / "drc.json", pcb])
-        drc = json.loads((out / "drc.json").read_text())
-        pairs = []
-        for u in drc.get("unconnected_items", []):
-            items = u.get("items", [])
-            if len(items) == 2 and all("pos" in i for i in items) \
-                    and not any(i["description"].startswith("Zone") for i in items):
-                net = items[0]["description"].split("[", 1)[-1].split("]", 1)[0]
-                pairs.append({"net": net, "a": [items[0]["pos"]["x"], items[0]["pos"]["y"]],
-                              "b": [items[1]["pos"]["x"], items[1]["pos"]["y"]]})
-        clashes = clearance_clashes(drc)
-        if not (pairs or clashes) or attempt == 5:
-            break
-        if clashes:
-            # the autorouter can leave a via or track inside another net's clearance: lift that
-            # net's copper there, so this round's DRC lists it as open and the repair re-routes it
-            (work / "clashes.json").write_text(json.dumps(clashes, indent=1))
-            pcb_step("ripup", spec, pcb, work / "clashes.json", tail=1500)
-            continue
-        (work / "open.json").write_text(json.dumps(pairs, indent=1))
-        pcb_step("repair", spec, pcb, work / "open.json", tail=1500)
-    report["repair_rounds"] = attempt
+    drc, rounds, runs = route(cli, spec, pcb, dsn, ses, work, out, args.passes)
+    report["repair_rounds"] = rounds
+    report["routing_runs"] = runs
     report["drc"] = {k: len(drc.get(k, [])) for k in ("violations", "unconnected_items", "schematic_parity")}
     report["drc_errors"] = sum(1 for v in drc.get("violations", []) if v.get("severity") == "error")
     report["drc_warnings"] = sum(1 for v in drc.get("violations", []) if v.get("severity") == "warning")

@@ -295,3 +295,22 @@ def choose_fiducials(width, height, corner_radius, obstacles):
         raise ValueError(f"fiducials: the free spots {best} are within {FIDUCIAL_SPREAD} mm of a line; "
                          "give three positions with the design's fiducials option")
     return best
+
+
+# ---- Priority routes ------------------------------------------------------------------------------
+
+
+def route_options(route):
+    """A priority route's options after its two pads: ``"join"`` (end at any copper the net already
+    has) and a number, the route's own track width in mm (wider than its net class for a supply
+    branch, say). Returns (join, width or None); raises ValueError on anything else.
+
+    >>> route_options((("U1", "1"), ("C1", "2"), "join", 0.4))
+    (True, 0.4)
+    """
+    extra = list(route[2:])
+    widths = [x for x in extra if isinstance(x, (int, float)) and not isinstance(x, bool)]
+    bad = [x for x in extra if x != "join" and not (isinstance(x, (int, float)) and not isinstance(x, bool))]
+    if bad or extra.count("join") > 1 or len(widths) > 1 or any(w <= 0 for w in widths):
+        raise ValueError(f"priority route {route!r}: after the two pads give \"join\" and/or one width in mm")
+    return "join" in extra, (float(widths[0]) if widths else None)

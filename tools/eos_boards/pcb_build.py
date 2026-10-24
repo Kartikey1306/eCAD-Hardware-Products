@@ -279,6 +279,7 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
         via.SetWidth(MM(r["via"]))
         via.SetDrill(MM(r["drill"]))
         via.SetNet(net)
+        via.SetLocked(True)      # fixed for the autorouter: Freerouting may otherwise delete or move it
         board.Add(via)
         obstacles.append((_box(pos, via_r), net.GetNetCode()))
 
@@ -370,6 +371,7 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
                     t.SetWidth(stub)
                     t.SetLayer(P.F_Cu if pad.IsOnLayer(P.F_Cu) else P.B_Cu)
                     t.SetNet(net)
+                    t.SetLocked(True)    # with its via: the pad's way into the plane stays as laid
                     board.Add(t)
                     add_via(pos, net)
                     placed += 1
@@ -758,7 +760,7 @@ def place(spec, pcb_path, dsn_path):
             escapes.setdefault(e["net"], []).append(e)
     for route in spec.get("priority_routes", []):
         (ra, pa), (rb, pb) = route[0], route[1]
-        join = len(route) > 2 and route[2] == "join"
+        join, width = fabrication.route_options(route)      # "join", and a width in mm for this route alone
         pad_a = next(p for p in board.FindFootprintByReference(ra).Pads() if p.GetNumber() == pa)
         pad_b = next(p for p in board.FindFootprintByReference(rb).Pads() if p.GetNumber() == pb)
         net, start, laid = pad_a.GetNet(), pad_a.GetPosition(), []
@@ -775,7 +777,7 @@ def place(spec, pcb_path, dsn_path):
             # the escape's far end: the end of its chain furthest from the pad it starts at
             ends = [q for t in laid for q in (t.GetStart(), t.GetEnd())]
             start = max(ends, key=lambda q: (q.x - start.x) ** 2 + (q.y - start.y) ** 2)
-        got = maze(board, spec, net, start, pad_b.GetPosition(), track_width(spec, net), join=join)
+        got = maze(board, spec, net, start, pad_b.GetPosition(), MM(width) if width else track_width(spec, net), join=join)
         if not got:
             raise SystemExit(f"priority route {ra}.{pa} -> {rb}.{pb}: no path")
         for item in laid + got:
@@ -876,6 +878,20 @@ def stitch(board, net, spec, pitch=2.54, margin=1.2):
             x += pitch
         y += pitch
     return placed
+
+
+def join_all_fragments(board, spec, filler):
+    """join_fragments on every poured net, refilling after each round, up to three rounds a net. Run
+    after the pours are first filled (finish) and again after each repair, whose new tracks can cut a
+    pour into pieces that no via reaches."""
+    for z in spec.get("zones", []):
+        net = board.FindNet(z["net"])
+        for _ in range(3):
+            added = join_fragments(board, net, spec)
+            if not added:
+                break
+            print(f"fragment vias on {z['net']}: {added}")
+            filler.Fill(board.Zones())
 
 
 def join_fragments(board, net, spec):
@@ -1454,9 +1470,11 @@ def repair(spec, pcb_path, pairs_path):
         fixed += 1 if done else 0
         if not done:
             print(f"  repair: could not close {pair['net']} at {pair['a']} - {pair['b']}")
-    P.ZONE_FILLER(board).Fill(board.Zones())
+    filler = P.ZONE_FILLER(board)
+    filler.Fill(board.Zones())
+    join_all_fragments(board, spec, filler)       # the new copper can leave a pour fragment with no via
     if prune_dangling(board):
-        P.ZONE_FILLER(board).Fill(board.Zones())
+        filler.Fill(board.Zones())
     P.SaveBoard(pcb_path, board)
     print(f"repaired {fixed} of {len(pairs)} open connection(s)")
 
@@ -1618,14 +1636,7 @@ def finish(spec, pcb_path, ses_path):
         print(f"stitching vias on {z['net']}: {stitch(board, net, spec)}")
     filler = P.ZONE_FILLER(board)
     filler.Fill(board.Zones())
-    for z in spec.get("zones", []):
-        net = board.FindNet(z["net"])
-        for _ in range(3):
-            added = join_fragments(board, net, spec)
-            if not added:
-                break
-            print(f"fragment vias on {z['net']}: {added}")
-            filler.Fill(board.Zones())
+    join_all_fragments(board, spec, filler)
     pruned = prune_dangling(board)
     if pruned:
         print(f"removed {pruned} dangling via(s) and track stub(s)")

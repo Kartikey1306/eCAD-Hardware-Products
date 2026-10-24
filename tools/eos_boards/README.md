@@ -33,9 +33,15 @@ paths that `kicad_env.py` and `build.py` use.
    their vias off every surface pad, their own net's included, by `VIA_PAD_GAP` (0.1 mm): a
    solder-mask web between the two tents the via. Freerouting 2.4.1 already does by
    default; the DSN states it (`via_at_smd off`) so that a later default cannot change it.
-   Finally writes a Specctra DSN for the router.
+   The fan-out's vias and stubs are locked, so the router treats them as fixed and cannot delete
+   or move a pad's way into its plane. Finally writes a Specctra DSN for the router.
 3. **Routing**. Freerouting, headless. The router is given 0.01 mm more clearance than the board's
-   rules, so its grid rounding never reaches DRC.
+   rules, so its grid rounding never reaches DRC. Its result changes from run to run, so when the
+   repair rounds (step 5) still leave connections open, the build starts again from the placed
+   board with a new run, up to three runs. Freerouting 2.4.1 takes no seed, so each retry asks for
+   a random item order (`-is random`) instead of its default prioritised one; logs go to
+   `.build/freerouting.log`, `freerouting-2.log`, `freerouting-3.log`, and `build-report.json`
+   records `routing_runs`.
 4. **Finish** (`pcb_build.py finish`). Imports the routes, widens any track the router necked
    below the board's minimum width, steps any router via that sits within `VIA_PAD_GAP` of a pad
    of its own net away from it (up to 0.5 mm, its tracks following, only where it still clears
@@ -54,7 +60,8 @@ paths that `kicad_env.py` and `build.py` use.
    - a maze search on both outer layers;
    - lifting the router's own tracks next to the pin, then searching again.
 
-   Up to six rounds.
+   After each repair the pour fragments are joined again (`join_all_fragments`, as in step 4):
+   new tracks can cut a pour into pieces that no via reaches. Up to six rounds.
 
    Every `pcb_build.py` step's exit code is checked: a place, finish, repair or rip-up step that
    crashes stops the build with its exit code, instead of passing for a round that found nothing to
@@ -164,7 +171,9 @@ Most boards need only parts, nets and positions. These options cover the rest:
   via spots (EoS F280049C's C11, after VIA_PAD_GAP moved the /VDD4 route). A pad that finds no
   spot then is not tried again after the priority routes: the autorouter joins it.
 - `priority_routes`: lines routed before the autorouter, in the order given. Add `"join"` to end
-  a route at any copper the net already has; that suits a branch such as an ESD part's pad.
+  a route at any copper the net already has; that suits a branch such as an ESD part's pad. Add a
+  number to give that route its own track width in mm (at least the board's minimum track), say a
+  supply branch wider than its net class: `(("U1", "1"), ("C1", "1"), 0.4)`.
   Lines that start at a reference design's pin follow its escape first.
 - `escape_footprints`: fine-pitch connectors whose pads keep a clear way out. The channel
   between the pad rows is closed, and each pad keeps a 1 mm corridor for its own net.
