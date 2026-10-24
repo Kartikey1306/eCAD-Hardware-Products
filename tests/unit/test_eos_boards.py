@@ -1014,5 +1014,45 @@ class OwnershipTest(unittest.TestCase):
         self.assertIn("All rights reserved", notice.read_text(encoding="utf-8"))
         self.assertFalse((notice.parent / "EoS_Connectors.LICENSE.txt").exists())   # would be listed as third-party
 
+class CrashSafetyTest(unittest.TestCase):
+    """Issue #70: KiCad 10's bindings can crash a step when a removed item's proxy is freed, so every
+    board.Remove() keeps its item referenced, and build.py stops when a pcb_build.py step crashes."""
+
+    def test_every_removal_goes_through_the_retaining_helper(self):
+        folder = REPO_ROOT / "tools" / "eos_boards"
+        source = (folder / "pcb_build.py").read_text(encoding="utf-8")
+        self.assertEqual(len(re.findall(r"\.Remove\(", source)), 1, "a board.Remove() outside _remove")
+        helper = source[source.index("def _remove("):]
+        helper = helper[:helper.index("\ndef ")]
+        self.assertIn("board.Remove(item)", helper)
+        self.assertIn("_REMOVED.append(item)", helper)
+        for path in sorted(folder.rglob("*.py")):
+            if path.name != "pcb_build.py":
+                with self.subTest(file=path.name):
+                    self.assertNotIn(".Remove(", path.read_text(encoding="utf-8"))
+
+    def _step(self, returncode):
+        import contextlib
+        import io
+        from unittest import mock
+        done = subprocess.CompletedProcess(["kicad-python"], returncode, "repaired 0 of 3", "TypeError: not iterable")
+        with mock.patch.object(build, "run", return_value=done), \
+                mock.patch.object(build.kicad_env, "python", return_value="kicad-python"), \
+                contextlib.redirect_stdout(io.StringIO()):
+            return build.pcb_step("repair", "spec.json", "board.kicad_pcb", "open.json")
+
+    def test_a_crashed_step_stops_the_build(self):
+        for code in (139, -11, 1):                 # a shell's exit 139, a signal, an exception
+            with self.subTest(exit=code), self.assertRaisesRegex(SystemExit, rf"pcb_build.py repair failed \(exit {code}\)"):
+                self._step(code)
+        self.assertEqual(self._step(0).returncode, 0)
+
+    def test_every_pcb_build_step_in_a_build_is_checked(self):
+        source = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
+        self.assertEqual(source.count('HERE / "pcb_build.py"'), 1)           # only inside pcb_step
+        for mode in ("place", "finish", "ripup", "repair"):
+            self.assertIn(f'pcb_step("{mode}"', source)
+
+
 if __name__ == "__main__":
     unittest.main()

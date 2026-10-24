@@ -55,6 +55,12 @@ paths that `kicad_env.py` and `build.py` use.
    - lifting the router's own tracks next to the pin, then searching again.
 
    Up to six rounds.
+
+   Every `pcb_build.py` step's exit code is checked: a place, finish, repair or rip-up step that
+   crashes stops the build with its exit code, instead of passing for a round that found nothing to
+   do. KiCad 10's bindings can crash when the proxy of an item taken off the board is freed, so
+   every removal goes through one helper, `_remove`, which keeps the item referenced until the
+   process exits.
 6. **Outputs**. Gerbers and drill files (fabrication layers only), pick-and-place, BOM,
    STEP, schematic PDF and SVG, renders, `LICENSE.txt` and `build-report.json` with the ERC and
    DRC counts.

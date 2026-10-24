@@ -26,6 +26,21 @@ def v(x, y):
     return P.VECTOR2I(MM(x), MM(y))
 
 
+# Items taken off the board, kept referenced until the process exits. KiCad 10's SWIG proxies for
+# removed tracks and vias break the bindings when they are garbage-collected: the next
+# board.GetTracks() raises "TypeError: 'swig_runtime_data5.SwigPyObject' object is not iterable"
+# and the process ends with exit 139 (EoS Feather RP2040, 3 builds of 4). Holding them here avoids
+# it; the board's geometry is unchanged. Every removal goes through _remove (issue #70).
+_REMOVED = []
+
+
+def _remove(board, item):
+    """Take ``item`` off ``board`` and keep it referenced in _REMOVED, so Python never frees its
+    proxy while the board is in use. The item can still be added back (repair's all-or-nothing undo)."""
+    board.Remove(item)
+    _REMOVED.append(item)
+
+
 def outline(board, w, h, r):
     def seg(a, b):
         s = P.PCB_SHAPE(board)
@@ -672,11 +687,11 @@ def place(spec, pcb_path, dsn_path):
         layer = P.B_Cu if len(k) > 4 and k[4] == "B.Cu" else P.F_Cu
         _keepout(board, layer, [(MM(x0), MM(y0)), (MM(x1), MM(y0)), (MM(x1), MM(y1)), (MM(x0), MM(y1))])
     for z in [z for z in board.Zones() if z.GetZoneName() == POUR_KEEPOUT]:
-        board.Remove(z)                  # KiCad would export a fill-only rule area as a full keep-out
+        _remove(board, z)                # KiCad would export a fill-only rule area as a full keep-out
     for z in [z for z in board.Zones() if z.GetZoneName() == REFERENCE_ZONE]:
         o = z.Outline()
         _keepout(board, z.GetLayer(), [(o.CVertex(i).x, o.CVertex(i).y) for i in range(o.TotalVertices())])
-        board.Remove(z)
+        _remove(board, z)
     if not P.ExportSpecctraDSN(board, dsn_path):
         raise SystemExit("Specctra DSN export failed")
     # Freerouting may not put a via on a surface pad: 2.4.1's default, stated here so that a
@@ -1138,7 +1153,7 @@ def _lift_near(board, spec, net, points, radius):
                 cx, cy = st.x + k * dx, st.y + k * dy
                 near = near or (cx - q.x) ** 2 + (cy - q.y) ** 2 <= radius ** 2
         if near:
-            board.Remove(t)
+            _remove(board, t)
             lifted.append(t)
     return lifted
 
@@ -1181,7 +1196,7 @@ def ripup(spec, pcb_path, clashes_path):
             box = t.GetBoundingBox()
             box.Inflate(MM(1.0))
             if box.Contains(at):
-                board.Remove(t)
+                _remove(board, t)
                 lifted += 1
     if lifted:
         P.ZONE_FILLER(board).Fill(board.Zones())
@@ -1302,7 +1317,7 @@ def repair(spec, pcb_path, pairs_path):
                 done = True
                 break
             for item in added:
-                board.Remove(item)
+                _remove(board, item)
             for t in lifted:
                 board.Add(t)
         fixed += 1 if done else 0
@@ -1423,14 +1438,6 @@ def ease_vias(board, spec):
     return moved, left
 
 
-# Tracks and vias removed by prune_dangling, kept referenced until the process exits. KiCad 10's
-# SWIG proxies for removed tracks and vias break the bindings when they are garbage-collected: the
-# next board.GetTracks() raises "TypeError: 'swig_runtime_data5.SwigPyObject' object is not
-# iterable" and the process ends with exit 139 (EoS Feather RP2040, 3 builds of 4). Holding them
-# here avoids it; the board's geometry is unchanged.
-_REMOVED = []
-
-
 def prune_dangling(board):
     """Remove the router's vias and track stubs that lead nowhere (connected on one layer, or an
     end touching nothing), until none are left. Locked copper (a reference design's) stays."""
@@ -1442,8 +1449,7 @@ def prune_dangling(board):
         if not dead:
             break
         for t in dead:
-            board.Remove(t)
-        _REMOVED.extend(dead)          # see _REMOVED: freeing their proxies breaks the bindings
+            _remove(board, t)          # see _REMOVED: freeing their proxies breaks the bindings
         removed += len(dead)
     return removed
 
@@ -1470,7 +1476,7 @@ def finish(spec, pcb_path, ses_path):
     done = set(spec.get("complete_nets", []))
     extra = [t for t in board.GetTracks() if not t.IsLocked() and t.GetNetname() in done]
     for t in extra:
-        board.Remove(t)
+        _remove(board, t)
     if extra:
         print(f"removed {len(extra)} router item(s) on nets the reference copper already completes")
     nets = {n.GetNetname(): n for n in board.GetNetsByName().values()} if hasattr(board, "GetNetsByName") else {}

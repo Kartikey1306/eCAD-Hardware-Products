@@ -47,6 +47,19 @@ def run(cmd: List[str], **kw: Any) -> subprocess.CompletedProcess:
     return subprocess.run([str(c) for c in cmd], capture_output=True, text=True, **kw)
 
 
+def pcb_step(mode: str, *args: Any, tail: int = 2000) -> subprocess.CompletedProcess:
+    """Run one ``pcb_build.py`` step (place, finish, repair or ripup) with KiCad's Python and stop the
+    build if it did not finish. KiCad 10's bindings can crash such a step (exit 139, or -11 from a
+    signal); unchecked, a crashed repair or rip-up round would pass for one that found nothing to do,
+    and the next DRC round would see the same problems without a word (issue #70)."""
+    r = run([kicad_env.python(), HERE / "pcb_build.py", mode, *args])
+    print(r.stdout[-tail:], r.stderr[-tail:])
+    if r.returncode:
+        raise SystemExit(f"pcb_build.py {mode} failed (exit {r.returncode}); see the output above. "
+                         "The board file holds what the last finished step saved.")
+    return r
+
+
 def board_net(board: Board, net: str) -> str:
     """The net's name as KiCad gives it: a power symbol's net is global, a label's is local
     to its sheet and gets the sheet path, ``/``."""
@@ -301,10 +314,7 @@ def main() -> int:
     spec = work / "spec.json"
     spec.write_text(json.dumps(spec_for(board, lib, kicad_env.footprints(), texts), indent=1))
     dsn, ses = work / f"{board.name}.dsn", work / f"{board.name}.ses"
-    r = run([kicad_env.python(), HERE / "pcb_build.py", "place", spec, pcb, dsn])
-    print(r.stdout[-2000:], r.stderr[-2000:])
-    if r.returncode:
-        raise SystemExit("placement failed")
+    pcb_step("place", spec, pcb, dsn)
     run([cli, "pcb", "drc", "--format", "json", "--severity-error", "-o", work / "place-drc.json", pcb])
     placed = json.loads((work / "place-drc.json").read_text())
     if board.reference_copper:
@@ -334,10 +344,7 @@ def main() -> int:
     if not ses.is_file():
         print(r.stdout[-3000:], r.stderr[-3000:])
         raise SystemExit("Freerouting produced no session file")
-    r = run([kicad_env.python(), HERE / "pcb_build.py", "finish", spec, pcb, ses])
-    print(r.stdout[-2000:], r.stderr[-2000:])
-    if r.returncode:
-        raise SystemExit("finishing failed")
+    pcb_step("finish", spec, pcb, ses)
 
     # 5. DRC with schematic parity; close what the autorouter left open, then check again
     for attempt in range(6):
@@ -359,12 +366,10 @@ def main() -> int:
             # the autorouter can leave a via or track inside another net's clearance: lift that
             # net's copper there, so this round's DRC lists it as open and the repair re-routes it
             (work / "clashes.json").write_text(json.dumps(clashes, indent=1))
-            r = run([kicad_env.python(), HERE / "pcb_build.py", "ripup", spec, pcb, work / "clashes.json"])
-            print(r.stdout[-1500:])
+            pcb_step("ripup", spec, pcb, work / "clashes.json", tail=1500)
             continue
         (work / "open.json").write_text(json.dumps(pairs, indent=1))
-        r = run([kicad_env.python(), HERE / "pcb_build.py", "repair", spec, pcb, work / "open.json"])
-        print(r.stdout[-1500:])
+        pcb_step("repair", spec, pcb, work / "open.json", tail=1500)
     report["repair_rounds"] = attempt
     report["drc"] = {k: len(drc.get(k, [])) for k in ("violations", "unconnected_items", "schematic_parity")}
     report["drc_errors"] = sum(1 for v in drc.get("violations", []) if v.get("severity") == "error")
