@@ -1286,6 +1286,76 @@ class FtshFootprintTest(unittest.TestCase):
         self.assertEqual(found, FTSH_TO_SWITCH)
 
 
+# 2.54 mm jumper headers (a JP reference, or a BOOT header) drawn with a connector symbol, whose design
+# does not yet say how many shunts come with them (Board.shunts); P4 declares each and empties this set.
+SHUNTS_TO_DECLARE = {("eos_cm4_base", "J9"), ("eos_cm5_base", "J9"), ("eos_f280049c_board", "JP1"),
+                     ("eos_msp430g2_board", "JP1"), ("eos_msp430g2_board", "JP2"), ("eos_msp430g2_board", "JP3"),
+                     ("eos_msp430g2_board", "JP4"), ("eos_rl78g13_board", "JP1"), ("eos_tm4c123_board", "JP1"),
+                     ("eos_tm4c1294_board", "JP1"), ("eos_tm4c1294_board", "JP2")}
+
+
+class ShuntTest(_Lib):
+    """B3: the shunts a 2.54 mm jumper header needs are BOM lines (BOM-only symbols, no footprint)."""
+
+    HOUSING = """(kicad_symbol_lib (version 20231120) (generator "test")
+  (symbol "Housing" (in_bom yes) (on_board yes)
+    (property "Reference" "N" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "Housing" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (symbol "Housing_0_1" (rectangle (start -1 -1) (end 1 1) (stroke (width 0) (type default)) (fill (type none))))))
+"""
+
+    def setUp(self):
+        super().setUp()
+        Path(self.tmp.name, "Mechanical.kicad_sym").write_text(self.HOUSING)
+        self.lib = Library(Path(self.tmp.name))
+        self.jp = Part("JP1", "T:R", "MD", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical", (50, 50), {"1": "A", "2": "B"})
+        self.jp.lib_id = "Jumper:Jumper_2_Open"          # as the RA2E1 draws its boot jumper
+        self.boot = Part("J9", "T:U", "BOOT", "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical", (80, 50),
+                         {"VDD": "A", "3": "B"})
+
+    def test_jumper_symbols_get_one_and_declared_headers_their_count(self):
+        shunts = build.shunt_parts(self.board([self.jp, self.boot], shunts={"J9": 2}))
+        self.assertEqual([(p.ref, p.lib_id, p.value, p.on_board) for p in shunts],
+                         [("JS1", "Mechanical:Housing", "Shunt 2.54 mm", False), ("JS2", "Mechanical:Housing", "Shunt 2.54 mm", False),
+                          ("JS3", "Mechanical:Housing", "Shunt 2.54 mm", False)])
+        self.assertEqual({p.fields["MPN"] for p in shunts}, {"SNT-100-BK-G"})
+        self.assertIn("supplied for J9 (2), JP1 (1)", shunts[0].fields["Description"])
+        self.assertEqual(build.shunt_parts(self.board([self.jp], shunts={"JP1": 0})), [])     # a design can say none
+
+    def test_refusals(self):
+        smd = Part("J4", "T:R", "X", "Connector_PinHeader_1.27mm:PinHeader_1x02_P1.27mm_Vertical", (50, 50), {"1": "A", "2": "B"})
+        for parts, shunts, message in (([self.jp], {"J5": 1}, "does not have"), ([smd], {"J4": 1}, "2.54 mm pin header"),
+                                       ([self.boot], {"J9": -1}, "count"),
+                                       ([self.jp, Part("JS1", "T:R", "x", "fp", (9, 9), {"1": "A", "2": "B"})], {}, "JS references")):
+            with self.subTest(message=message), self.assertRaisesRegex(SystemExit, message):
+                build.shunt_parts(self.board(parts, shunts=shunts))
+
+    def test_a_shunt_is_a_bom_line_in_the_schematic_and_off_the_board(self):
+        board = self.board([self.boot], shunts={"J9": 1})
+        board.parts = board.parts + build.shunt_parts(board)
+        sch = loads(schematic.write(board, self.lib))
+        js = next(n for n in find_all(sch, "symbol") if find(n, "lib_id") and any(
+            str(q[1]) == "Reference" and str(q[2]) == "JS1" for q in find_all(n, "property")))
+        self.assertEqual((str(find(js, "in_bom")[1]), str(find(js, "on_board")[1])), ("yes", "no"))
+        self.assertIn("SNT-100-BK-G", [str(q[2]) for q in find_all(js, "property")])
+        self.assertEqual([p["ref"] for p in build.spec_for(board, self.lib, Path(self.tmp.name), [])["parts"]], ["J9"])
+
+    def test_designs_with_shunts_and_those_still_to_declare(self):
+        auto, undeclared = {}, set()
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            board = importlib.import_module(f"eos_boards.boards.{path.stem}").BOARD
+            shunts = build.shunt_parts(board)
+            if shunts:
+                auto[path.stem] = len(shunts)
+            counted = set(board.shunts) | {p.ref for p in board.parts if p.lib_id.startswith("Jumper:Jumper_")}
+            for p in board.parts:
+                if "PinHeader" in p.footprint and "P2.54mm" in p.footprint and (p.ref.startswith("JP") or p.value == "BOOT") \
+                        and p.ref not in counted:
+                    undeclared.add((path.stem, p.ref))
+        self.assertEqual(auto, {"eos_ra2e1_board": 1, "eos_ra4m2_board": 1})         # their boot-mode jumper (Jumper_2_Open)
+        self.assertEqual(undeclared, SHUNTS_TO_DECLARE)
+
+
 class CrashSafetyTest(unittest.TestCase):
     """Issue #70: KiCad 10's bindings can crash a step when a removed item's proxy is freed, so every
     board.Remove() keeps its item referenced, and build.py stops when a pcb_build.py step crashes."""

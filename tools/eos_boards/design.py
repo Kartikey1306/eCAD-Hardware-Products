@@ -32,6 +32,7 @@ class Part:
     dnp: bool = False
     sch_rotation: int = 0                    # 0, 90, 180 or 270
     model: Optional[Tuple[str, Tuple[float, float, float]]] = None   # 3D model in place of the footprint's: path, offset (mm)
+    on_board: bool = True                    # False: a BOM-only item with no footprint (a jumper shunt)
 
 
 ALL_RIGHTS_RESERVED = "All rights reserved"   # a closed board: its owner's terms file, see Board.licence_terms
@@ -87,6 +88,7 @@ class Board:
     maze_via_cost_mm: float = 1.2                                        # maze router: a via costs as much as this much track
     stackup: Dict[str, object] = field(default_factory=dict)            # overrides of the fab stack-up (fabrication.stackup_for)
     fiducials: Dict[str, List[Tuple[float, float]]] = field(default_factory=dict)  # {"F"|"B": [(x, y) x 3]}: where the automatic choice cannot fit
+    shunts: Dict[str, int] = field(default_factory=dict)                # jumper header ref -> 2.54 mm shunts supplied for it (BOM lines)
 
 
 def resolve(part: Part, lib: Library) -> Dict[str, Tuple[Pin, str]]:

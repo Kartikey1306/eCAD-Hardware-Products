@@ -103,6 +103,12 @@ saved board, so no track, via or pour enters it, and every later step's own copp
 too. Fiducials are board-only footprints: not in the schematic or the BOM, but in the placement file.
 Where no three corners have room, the build stops and names the `fiducials` option.
 
+**Jumper shunts.** A 2.54 mm jumper header's shunts are BOM lines (BENCH-READY B3): Samtec
+SNT-100-BK-G, one for each `Jumper:Jumper_2_*`/`Jumper_3_*` symbol drawn on a 2.54 mm pin header,
+and the count the `shunts` option gives for a jumper header drawn with a connector symbol. Each is
+a BOM-only symbol, JS1, JS2 ... (KiCad's pinless `Mechanical:Housing`, not on the board), so the
+board and its parity check do not change.
+
 **Board identity.** The silkscreen carries the board's name, revision and year,
 "EoS Motion Wing  rev A  2026", beside its ownership line ("(c) 2026 <owner>"), on the same layer
 and mirrored as it is. A design's own name line there, one ending in "rev <revision>", is replaced
@@ -176,6 +182,8 @@ Most boards need only parts, nets and positions. These options cover the rest:
   (R01UH0146 Figure 5-13(d)); its RA parts want the opposite, a bottom ground (R01AN7202 §6.1.3).
 - `fiducials`: `{"F": [(x, y), (x, y), (x, y)]}` (or `"B"`): fiducial positions for a side where the
   automatic choice finds no room. They are checked against the same rules.
+- `shunts`: `{"JP1": 2}`: how many 2.54 mm shunts come with a jumper header drawn with a connector
+  symbol (a 2 × 2 header taking two, say); `0` for none.
 - `stackup`: changes to the fab stack-up: `{"finish": "HAL lead-free"}`, `mask_color`,
   `silk_color`, `mask_thickness`, or a whole `"layers"` list of copper and dielectric rows with its
   `"source"` (see Fabrication data in every board).

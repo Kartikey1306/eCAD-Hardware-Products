@@ -33,7 +33,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
 from eos_boards import fabrication, kicad_env, schematic  # noqa: E402
-from eos_boards.design import ALL_RIGHTS_RESERVED, NC, Board, resolve  # noqa: E402
+from eos_boards.design import ALL_RIGHTS_RESERVED, NC, Board, Part, resolve  # noqa: E402
 from eos_boards.kicad_lib import Library  # noqa: E402
 from eos_boards.sexpr import find, find_all  # noqa: E402
 
@@ -161,6 +161,46 @@ def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, 
     return list(texts) + [line]
 
 
+# The shunt a 2.54 mm jumper header ships with (BENCH-READY B3): Samtec SNT-100-BK-G, a 2-position
+# 2.54 mm shunt with gold contacts, "Active" at DigiKey (read 24 Oct 2026). On the schematic it is a
+# BOM-only symbol (KiCad's pinless Mechanical:Housing, on_board no): a BOM line, no footprint, so the
+# board and its parity check are unchanged.
+SHUNT_FIELDS = {"Manufacturer": "Samtec", "MPN": "SNT-100-BK-G"}
+SHUNT_SYMBOL = "Mechanical:Housing"
+
+
+def shunt_parts(board: Board) -> List[Part]:
+    """The jumper shunts supplied with the board, as BOM-only parts JS1, JS2 ...: one for each
+    ``Jumper:Jumper_2_*``/``Jumper_3_*`` symbol drawn on a 2.54 mm pin header, and the number the
+    design's ``shunts`` option gives for any other jumper header (a 2 x 2 header taking two, say;
+    0 for none)."""
+    count = {}
+    for part in board.parts:
+        if part.lib_id.startswith(("Jumper:Jumper_2_", "Jumper:Jumper_3_")) and "PinHeader" in part.footprint:
+            count[part.ref] = 1
+    by_ref = {p.ref: p for p in board.parts}
+    for ref, n in board.shunts.items():
+        if ref not in by_ref:
+            raise SystemExit(f"{board.name}: shunts names {ref}, which the board does not have")
+        if not ("PinHeader" in by_ref[ref].footprint and "P2.54mm" in by_ref[ref].footprint) or not isinstance(n, int) or n < 0:
+            raise SystemExit(f"{board.name}: shunts {ref}: {n!r}; give a count of 2.54 mm shunts for a 2.54 mm pin header")
+        count[ref] = n
+    taken = sorted(p.ref for p in board.parts if re.fullmatch(r"JS\d+", p.ref))
+    if taken and any(count.values()):
+        raise SystemExit(f"{board.name}: {taken} use the JS references the generator gives jumper shunts")
+    headers = [ref for ref in sorted(count, key=lambda r: (len(r), r)) if count[ref]]
+    description = ("Jumper shunt, 2.54 mm, 2 positions, gold, supplied for "
+                   + ", ".join(f"{ref} ({count[ref]})" for ref in headers) + "; where to fit them: the README")
+    px, py = board.power_block
+    out = []
+    for ref in headers:
+        for _ in range(count[ref]):
+            n = len(out)
+            out.append(Part(f"JS{n + 1}", SHUNT_SYMBOL, "Shunt 2.54 mm", "", (round(px + 15.24 * n, 2), round(py + 30.48, 2)),
+                            {}, fields=dict(SHUNT_FIELDS, Description=description), on_board=False))
+    return out
+
+
 def title_block(board: Board) -> Dict[str, Any]:
     """The board file's title block: what the schematic's says (title, date, revision, owner, copyright
     and licence), and for an all-rights-reserved board whom to ask for permission."""
@@ -219,6 +259,8 @@ def pad_numbers(number: str) -> List[str]:
 def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[str, Any]]) -> Dict[str, Any]:
     parts, nets = [], set()
     for part in board.parts:
+        if not part.on_board:
+            continue                       # a BOM-only item (a jumper shunt): no footprint
         pads = {}
         for num, (pin, net) in resolve(part, lib).items():
             for pad in pad_numbers(num):
@@ -321,6 +363,7 @@ def main() -> int:
 
     # 1. schematic + ERC
     sch, pcb = hw / f"{board.name}.kicad_sch", hw / f"{board.name}.kicad_pcb"
+    board.parts = board.parts + shunt_parts(board)      # BOM lines for the jumper shunts (BENCH-READY B3)
     sch.write_text(schematic.write(board, lib))
     (hw / f"{board.name}.kicad_pro").write_text(project_file(board.name))
     (out / "LICENSE.txt").write_text(licence_text(board, args.board))
