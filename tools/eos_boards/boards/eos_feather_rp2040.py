@@ -107,7 +107,7 @@ reference plane, and the supply pins reach their plane through vias placed inwar
 
 from __future__ import annotations
 
-from ..design import NC, Board, Part, USB_C_EDGE
+from ..design import NC, Board, BringUp, BringUpTest, Part, Rail, USB_C_EDGE, bench_pad
 from .owner import CONTACT, LICENCE, LICENCE_TERMS, OWNER
 
 R0402 = "Resistor_SMD:R_0402_1005Metric"
@@ -297,6 +297,16 @@ PARTS += [
                  "Description": "Pin header 1x12 2.54 mm, Feather 12-pin strip: BAT, EN, USB, D13, D12, D11, D10, D9, D6, "
                                 "D5, SCL, SDA (Feather Specification; Feather RP2040 pinout)"}),
 ]
+# ---- Bench test pads (BENCH-READY C1) at the spots the bench-ready audit (g2, 24 Oct 2026) checked free:
+# every rail of the power tree and a GND pad by the MCU; TP1 (VBAT) was already there
+PARTS += [
+    bench_pad("TP2", "VBUS", "VBUS", (12.9, 12.9), (300, 400)),
+    bench_pad("TP3", "VBUS_F", "VUSB", (16.5, 9.9), (315, 400)),
+    bench_pad("TP4", "VSYS", "VSYS", (16.9, 4.8), (330, 400)),
+    bench_pad("TP5", "+3V3", "3V3", (17.7, 13.6), (345, 400)),
+    bench_pad("TP6", "+1V1", "1V1", (24.8, 9.7), (360, 400)),
+    bench_pad("TP7", "GND", "GND", (26.4, 16.6), (375, 400)),
+]
 for i, _ in enumerate(HOLES):
     PARTS.append(Part(f"H{i + 1}", "Mechanical:MountingHole", "2.5mm", "MountingHole:MountingHole_2.5mm",
                       (60 + 20 * i, 360), {},
@@ -351,6 +361,9 @@ PLACEMENT = {
     "SW1": (33.2, 18.45, 0), "SW3": (38.1, 18.45, 0), "SW2": (43.1, 18.45, 0),
     # battery connector at the right end, facing right; VBAT test pad in the free top-right corner
     "J4": (45.85, 11.43, 90), "TP1": (43.2, 3.3, 0),
+    # bench test pads on each rail (audit g2 spots)
+    "TP2": (12.9, 12.9, 0), "TP3": (16.5, 9.9, 0), "TP4": (16.9, 4.8, 0), "TP5": (17.7, 13.6, 0), "TP6": (24.8, 9.7, 0),
+    "TP7": (26.4, 16.6, 0),
 }
 _unplaced = sorted({p.ref for p in PARTS} - set(PLACEMENT))
 assert not _unplaced, f"parts without a board position: {_unplaced}"
@@ -499,4 +512,60 @@ BOARD = Board(
     net_to_class={"VBUS": "Power", "VBUS_F": "Power", "VSYS": "Power", "VBAT": "Power",
                   "+3V3": "Fine", "+1V1": "Fine",
                   "USB_D+": "USB", "USB_D-": "USB", "RP_USB_DP": "USB", "RP_USB_DM": "USB"},
+    # Bench data (BENCH-READY C): from the bench-ready audit g2 (24 Oct 2026), section 10
+    rails=[
+        Rail("VBUS", "USB-C J1", "5.0 V", "4.75-5.25 V (USB 2.0 VBUS at the connector)", ["TP2"],
+             "about 10 kohm (R13 through F1)", link_note="Measure the board's whole current at the USB input."),
+        Rail("VBUS_F", "F1 from VBUS; also the Feather USB pin (J3.3)", "5.0 V",
+             "VBUS less F1's drop (0805L050: 0.85 ohm maximum)", ["TP3", "J3.3"], "about 10 kohm (R13)",
+             link_note="No link: F1 already sits in series; measure its drop to get the current."),
+        Rail("VSYS", "D1 from VBUS_F, Q1 from VBAT", "4.6 V from USB",
+             "VBUS_F less up to 0.40 V at 0.1 A (PMEG6010CEH); VBAT less Q1's drop on battery", ["TP4"],
+             "about 3.1 Mohm (R14 100 kohm into EN's internal pull-down; inferred)",
+             link_note="No link: no room on this 50.8 x 22.86 mm board; measure at the USB input."),
+        Rail("VBAT", "the cell on J4, charged by U4 MCP73831", "3.7 V",
+             "a cell reads 3.0-4.2 V; the charger regulates 4.168-4.232 V (MCP73831-2, DS20001984H)",
+             ["TP1", "J3.1"], "open (the charger and Q1 only)",
+             link_note="No link: measure the cell's current in series with J4."),
+        Rail("+3V3", "U5 AP2112K-3.3", "3.3 V", "3.25-3.35 V (AP2112K +-1.5 %, DS39724)", ["TP5", "J2.2"],
+             "open (ICs only)",
+             link_note="No link between U5 and the 3.3 V plane: no room on this board (audit g2 fix 6); measure "
+                       "the board's current at the USB input instead."),
+        Rail("+1V1", "the RP2040's own regulator (VREG_VOUT)", "1.1 V",
+             "1.067-1.133 V (RP2040 datasheet, VREG_VOUT +-3 %)", ["TP6"], "open",
+             link_note="The RP2040's internal regulator: no link possible."),
+        Rail("GND", "J1", "0 V", "-", ["TP7", "J2.4"], "-"),
+    ],
+    bringup=BringUp(
+        supply="5.00 V into the USB-C socket J1, with no cell on J4",
+        current_limit_ma=100,
+        idle_current="about 10-25 mA",
+        idle_source="estimate: the RP2040 in USB boot from a blank flash, AP2112K quiescent 55 uA, R13 0.5 mA (audit g2)",
+        clock="USB enumeration in BOOTSEL shows the 12 MHz crystal working (it clocks USB through PLL_USB). With "
+              "firmware, clock_gpio_init on GPIO24 or GPIO25 (D24 and D25, J2.9 and J2.10) puts a clock out to measure.",
+        programming="UF2 in BOOTSEL (hold BOOT, tap RST, copy the UF2 file to the drive), or SWD on J6 with a "
+                    "Raspberry Pi Debug Probe.",
+        before_power=["Before fitting a cell, check its polarity with a meter: + must reach J4 pin 1 (README, Battery "
+                      "polarity). A reversed cell puts about -3.7 V on VBAT, the charger and Q1."],
+        tests=[
+            BringUpTest("USB", "Hold BOOT, tap RST, connect to a computer", "an RPI-RP2 drive appears"),
+            BringUpTest("User LED", "Blink GPIO13 (D13)", "D3 blinks"),
+            BringUpTest("USER button", "Read GPIO4 with its internal pull-up, press SW3", "reads 1, then 0 while pressed"),
+            BringUpTest("STEMMA QT", "I2C1 scan (GPIO2/3) with a known sensor on J5", "the sensor's address is found"),
+            BringUpTest("UART", "Loop TX to RX on the header at 115200 Bd", "every byte sent comes back"),
+            BringUpTest("ADC", "A0-A3 each read a 1.65 V divider", "within +-2 %"),
+            BringUpTest("EN", "Pull the EN pin (J3.2) to GND", "+3V3 at TP5 falls to 0 V"),
+            BringUpTest("Charger", "Fit a checked cell with USB connected", "CHG LED on; about 213 mA into the cell "
+                        "(1000 / RPROG 4.7 kohm, DS20001984H equation 5-1)"),
+            BringUpTest("Battery", "Unplug USB with the cell fitted", "+3V3 at TP5 stays 3.25-3.35 V"),
+        ],
+    ),
+    temperature_range=(-25, 70, "SW1", "SW1-SW3 Omron B3U-1000P, rated -25 to +70 C (Omron catalogue A162-E1-07); "
+                                       "the JST connectors J4-J6 also stop at -25 C (parts.json, 24 Oct 2026)"),
+    pin_labels={
+        "J2": {"1": "RST", "2": "3V", "3": "3V", "4": "GND", "5": "A0", "6": "A1", "7": "A2", "8": "A3", "9": "D24",
+               "10": "D25", "11": "SCK", "12": "MO", "13": "MI", "14": "RX", "15": "TX", "16": "D4"},
+        "J3": {"1": "BAT", "2": "EN", "3": "USB", "4": "D13", "5": "D12", "6": "D11", "7": "D10", "8": "D9", "9": "D6",
+               "10": "D5", "11": "SCL", "12": "SDA"},
+    },
 )

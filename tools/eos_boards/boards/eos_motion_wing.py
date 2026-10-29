@@ -63,7 +63,7 @@ Supply current: ADXL343 140 uA typical at ODR >= 100 Hz, ADT7410 250 uA maximum 
 
 from __future__ import annotations
 
-from ..design import NC, Board, Part
+from ..design import NC, Board, BringUp, BringUpTest, Part, Rail, bench_pad
 from .owner import CONTACT, LICENCE, LICENCE_TERMS, OWNER
 
 R0603 = "Resistor_SMD:R_0603_1608Metric"
@@ -161,6 +161,13 @@ PARTS = [
     Part("JP1", "Jumper:SolderJumper_2_Bridged", "PU", JUMPER2_BRIDGED, (307, 140), {"A": "+3V3", "B": "I2C_PU"},
          fields={"Description": "I2C pull-ups R1 and R2 to 3.3 V: bridged as delivered; cut when the bus already has pull-ups"}),
 ]
+# ---- Bench test pads (BENCH-READY C1): 3V3 and two GND, at the spots the bench-ready audit (g1, 24 Oct
+# 2026) found free; the Feather's 3V and GND header pins (J1.2, J1.4) reach the same nets
+PARTS += [
+    bench_pad("TP1", "+3V3", "3V3", (45.07, 11.95), (150, 395)),
+    bench_pad("TP2", "GND", "GND", (24.0, 18.0), (165, 395)),
+    bench_pad("TP3", "GND", "GND", (38.5, 7.65), (180, 395)),
+]
 for i, _ in enumerate(HOLES):
     PARTS.append(Part(f"H{i + 1}", "Mechanical:MountingHole", "2.5mm", "MountingHole:MountingHole_2.5mm",
                       (60 + 20 * i, 360), {},
@@ -182,6 +189,8 @@ PLACEMENT = {
     "JP3": (41.8, 10.0, 90), "JP6": (42.0, 15.2, 0), "JP5": (42.0, 18.5, 0),
     # I2C pull-ups and their jumper, below the SCL/SDA pins
     "R1": (46.6, 8.4, 90), "R2": (49.0, 8.4, 90), "JP1": (47.8, 12.8, 90),
+    # bench test pads: 3V3 by the pull-ups, GND by the 16-pin strip and by the ADXL343
+    "TP1": (45.07, 11.95, 0), "TP2": (24.0, 18.0, 0), "TP3": (38.5, 7.65, 0),
 }
 _unplaced = sorted({p.ref for p in PARTS} - set(PLACEMENT))
 assert not _unplaced, f"parts without a board position: {_unplaced}"
@@ -234,4 +243,37 @@ BOARD = Board(
                        "interrupt jumpers JP5-JP8 open.")],
     netclasses={"Power": {"track": 0.25, "clearance": 0.15}},   # 3.3 V: narrow enough to enter the 0.8 mm-pitch LGA pads
     net_to_class={"+3V3": "Power"},
+    # Bench data (BENCH-READY C): from the bench-ready audit g1 (24 Oct 2026), section 7
+    rails=[
+        Rail("+3V3", "the Feather's 3V pin (J1.2)", "3.3 V",
+             "3.0-3.3 V: the Feather's own regulator; the Feather Specification lets 3V sag to 3.0 V on a flat battery",
+             ["TP1", "J1.2"], "> 100 kohm (no resistor to GND; the reading climbs while C1, 10 uF, charges)",
+             link_note="No regulator on the wing, so no link: measure its current in series with the 3V pin, J1.2."),
+        Rail("GND", "the Feather's GND pin (J1.4)", "0 V", "-", ["TP2", "TP3", "J1.4"], "-"),
+    ],
+    bringup=BringUp(
+        supply="3.3 V on J1 pin 2 (3V) and pin 4 (GND), or the wing plugged onto a Feather",
+        current_limit_ma=20,
+        idle_current="about 0.25 mA",
+        idle_source="ADT7410 converting from power-up, 210 uA typical and 250 uA maximum (ADT7410 data sheet Rev. C, "
+                    "Table 1); ADXL343 in standby from power-up; the sum is an estimate",
+        clock="N/A: the wing has no clock of its own; the ADXL343 and ADT7410 run on their internal oscillators.",
+        programming="N/A: nothing on the wing is programmed; a Feather sets up both sensors over I2C.",
+        tests=[
+            BringUpTest("I2C", "Scan the bus from a Feather (CircuitPython or Arduino)", "finds 0x48 and 0x53 (jumpers as delivered)"),
+            BringUpTest("ADXL343", "Read DEVID (register 0x00)", "0xE5"),
+            BringUpTest("ADXL343", "Lay the wing flat, components up", "Z about +1 g, X and Y about 0 g"),
+            BringUpTest("ADT7410", "Compare with a reference thermometer at room temperature", "within +-0.5 C (ADT7410 accuracy)"),
+            BringUpTest("Address jumpers", "Cut JP3 1-2, bridge 2-3, power again", "ADXL343 answers at 0x1D"),
+            BringUpTest("Interrupts", "Bridge JP5; enable the ADXL343 activity interrupt and tap the wing", "Feather D5 sees INT1"),
+        ],
+    ),
+    temperature_range=(-40, 85, "U1", "ADXL343, rated -40 to +85 C; every other part is rated wider (ADT7410 -55 to "
+                                     "+150 C, T491A -55 to +125 C, Wurth headers -40 to +105 C; parts.json, 24 Oct 2026)"),
+    pin_labels={
+        "J1": {"1": "RST", "2": "3V", "3": "AREF", "4": "GND", "5": "A0", "6": "A1", "7": "A2", "8": "A3", "9": "A4",
+               "10": "A5", "11": "SCK", "12": "MO", "13": "MI", "14": "RX", "15": "TX"},
+        "J2": {"1": "BAT", "2": "EN", "3": "USB", "4": "D13", "5": "D12", "6": "D11", "7": "D10", "8": "D9", "9": "D6",
+               "10": "D5", "11": "SCL", "12": "SDA"},
+    },
 )

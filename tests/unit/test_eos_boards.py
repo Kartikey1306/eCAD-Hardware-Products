@@ -2013,10 +2013,10 @@ BRINGUP_PENDING = {
     "eos-atmega328p-board", "eos-cm4-base", "eos-cm5-base", "eos-esp32-devkit", "eos-f280049c-board",
     "eos-ke16z-board", "eos-kl25-board", "eos-learn-rp2350", "eos-lpc55s69-board", "eos-msp430g2-board",
     "eos-probe-s3", "eos-ra2e1-board", "eos-ra4m2-board", "eos-rl78g13-board", "eos-sense-cape", "eos-stm32-64",
-    "eos-tm4c123-board", "eos-tm4c1294-board", "eos-motion-wing", "eos-feather-rp2040"}
+    "eos-tm4c123-board", "eos-tm4c1294-board"}
 # Boards that declare bench data but whose committed README predates it: the build writes the section,
 # and the next committed build (P4) brings the README in; then the board leaves this set.
-BRINGUP_README_PENDING = set()
+BRINGUP_README_PENDING = {"eos-motion-wing", "eos-feather-rp2040"}
 
 
 class _Bench(_Lib):
