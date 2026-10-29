@@ -783,6 +783,7 @@ def main() -> int:
     report["silk_fits"] = placed_spec.get("silk_fits", [])
     report["labels_placed"] = placed_spec.get("labels_placed", 0)
     report["labels_skipped"] = placed_spec.get("labels_skipped", [])
+    report["labels_on_back"] = placed_spec.get("labels_on_back", [])
     for t in texts:                        # the identity line as placed (it may have been shortened)
         if t.get("identity") and placed_spec.get("identity_text"):
             t["text"] = placed_spec["identity_text"]

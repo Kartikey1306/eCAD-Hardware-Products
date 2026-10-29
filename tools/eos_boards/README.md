@@ -206,7 +206,9 @@ gets it before its "## Rebuild" heading).
   label, 1.0 mm high, beside its pad (`fabrication.label_spots`: away from a header's row, turned on a
   horizontal row so that neighbours do not meet; to any side of a test pad), at the first spot that
   clears every pad, the edge, all other silkscreen, other parts' courtyards and the fiducial squares.
-  A label with no room is left out and listed in `build-report.json` (`labels_skipped`).
+  A through-hole pin with no room on top is labelled on the bottom silkscreen (mirrored, read from
+  below; listed as `labels_on_back`). A label with no room on either side is left out and listed in
+  `build-report.json` (`labels_skipped`).
 
 ## Reusing a reference design's layout exactly
 

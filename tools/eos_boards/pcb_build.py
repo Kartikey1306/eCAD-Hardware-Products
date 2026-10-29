@@ -663,13 +663,15 @@ def fit_text(board, spec, item, t):
 
 def place_labels(board, spec):
     """Silkscreen labels (BENCH-READY A4, C1): each connector pin the design's ``pin_labels`` names, and
-    each test pad (its value, the rail name), at fabrication.SILK_MIN_TEXT on the top silkscreen (the
-    pad's side for a test pad), beside the pad where it clears every pad, the board edge, every other
-    silkscreen, every other part's courtyard and every fiducial square (fabrication.label_spots). A label
-    that fits nowhere is left out and reported (``spec["labels_skipped"]``). Returns (placed, skipped)."""
+    each test pad (its value, the rail name), at fabrication.SILK_MIN_TEXT on the silkscreen of the pad's
+    side, beside the pad where it clears every pad, the board edge, every other silkscreen, every other
+    part's courtyard and every fiducial square (fabrication.label_spots). A through-hole pin whose top
+    has no room is labelled on the bottom silkscreen instead (mirrored, so it reads from below; the pin
+    is there too), and is listed in ``spec["labels_on_back"]``. A label that fits nowhere is left out
+    and reported (``spec["labels_skipped"]``). Returns (placed, skipped)."""
     jobs = [(ref, pad, label) for ref, labels in spec.get("pin_labels", {}).items() for pad, label in labels.items()]
     jobs += [(p["ref"], "1", p["value"]) for p in spec["parts"] if p.get("test_pad")]
-    placed, skipped = 0, []
+    placed, skipped, back = 0, [], []
     for ref, number, label in jobs:
         fp = board.FindFootprintByReference(ref)
         pad = next((q for q in fp.Pads() if q.GetNumber() == number), None)
@@ -677,36 +679,48 @@ def place_labels(board, spec):
             skipped.append(f"{ref}.{number} {label}: no such pad")
             continue
         bottom = fp.GetLayer() == P.B_Cu and pad.GetAttribute() == P.PAD_ATTRIB_SMD
-        layer, crtyd = (P.B_SilkS, P.B_CrtYd) if bottom else (P.F_SilkS, P.F_CrtYd)
-        size = fabrication.SILK_MIN_TEXT
-        item = text(board, label, 0, 0, size, layer, 0.0, False, bottom)
-        bb = item.GetBoundingBox()
-        w, h = P.ToMM(bb.GetWidth()), P.ToMM(bb.GetHeight())
-        pads, silk = _silk_obstacles(board, item)
-        for other in board.GetFootprints():
-            if other.GetReference() != ref:
-                other.BuildCourtyardCaches()
-                cy = other.GetCourtyard(crtyd)
-                if cy.OutlineCount():
-                    silk["crtyd/" + other.GetReference()] = cy.BBox()
-        for i, k in enumerate(spec.get("fiducial_keepouts", [])):
-            silk[f"fiducial/{i}"] = P.BOX2I(v(k[0], k[1]), P.VECTOR2I(MM(k[2] - k[0]), MM(k[3] - k[1])))
+        sides = [bottom] + ([not bottom] if pad.HasHole() else [])
         xs = [q.GetPosition().x for q in fp.Pads()]
         ys = [q.GetPosition().y for q in fp.Pads()]
         row = "" if len(xs) < 2 else ("horizontal" if max(xs) - min(xs) >= max(ys) - min(ys) else "vertical")
         b = pad.GetBoundingBox()
         box = (P.ToMM(b.GetX()), P.ToMM(b.GetY()), P.ToMM(b.GetRight()), P.ToMM(b.GetBottom()))
-        for x, y, angle in fabrication.label_spots(box, row, w, h):
-            item.SetTextAngleDegrees(angle)
-            item.SetPosition(v(x, y))
-            if _silk_clear(spec, item, pads, silk, set()):
+        for on_bottom in sides:
+            if _place_label(board, spec, ref, label, on_bottom, box, row):
                 placed += 1
+                if on_bottom and not bottom:
+                    back.append(f"{ref}.{number} {label}")
                 break
         else:
-            _remove(board, item)
             skipped.append(f"{ref}.{number} {label}")
-    spec["labels_placed"], spec["labels_skipped"] = placed, skipped
+    spec["labels_placed"], spec["labels_skipped"], spec["labels_on_back"] = placed, skipped, back
     return placed, skipped
+
+
+def _place_label(board, spec, ref, label, bottom, box, row):
+    """One label on the bottom (``bottom``) or top silkscreen at the first of fabrication.label_spots
+    round the pad box ``box`` that is clear (see place_labels); True when it went down, else the text
+    is removed again."""
+    layer, crtyd = (P.B_SilkS, P.B_CrtYd) if bottom else (P.F_SilkS, P.F_CrtYd)
+    item = text(board, label, 0, 0, fabrication.SILK_MIN_TEXT, layer, 0.0, False, bottom)
+    bb = item.GetBoundingBox()
+    w, h = P.ToMM(bb.GetWidth()), P.ToMM(bb.GetHeight())
+    pads, silk = _silk_obstacles(board, item)
+    for other in board.GetFootprints():
+        if other.GetReference() != ref:
+            other.BuildCourtyardCaches()
+            cy = other.GetCourtyard(crtyd)
+            if cy.OutlineCount():
+                silk["crtyd/" + other.GetReference()] = cy.BBox()
+    for i, k in enumerate(spec.get("fiducial_keepouts", [])):
+        silk[f"fiducial/{i}"] = P.BOX2I(v(k[0], k[1]), P.VECTOR2I(MM(k[2] - k[0]), MM(k[3] - k[1])))
+    for x, y, angle in fabrication.label_spots(box, row, w, h):
+        item.SetTextAngleDegrees(angle)
+        item.SetPosition(v(x, y))
+        if _silk_clear(spec, item, pads, silk, set()):
+            return True
+    _remove(board, item)
+    return False
 
 
 def place_fiducials(board, spec):

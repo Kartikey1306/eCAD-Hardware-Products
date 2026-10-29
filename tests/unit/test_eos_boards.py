@@ -2179,6 +2179,18 @@ class LabelTest(_Bench):
                        "skipped.append(", "_silk_clear(spec, item, pads, silk, set())"):
             self.assertIn(needed, labels)
 
+    def test_a_through_hole_pin_may_be_labelled_on_the_back(self):
+        """A pin's pad is on both sides, so a label with no room on top goes on the bottom silkscreen,
+        mirrored to read from below, and the build report lists it; a test pad (top copper only) never."""
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        labels = source[source.index("def place_labels("):source.index("def place_fiducials(")]
+        self.assertIn("sides = [bottom] + ([not bottom] if pad.HasHole() else [])", labels)
+        self.assertIn("text(board, label, 0, 0, fabrication.SILK_MIN_TEXT, layer, 0.0, False, bottom)", labels)
+        self.assertIn("(P.B_SilkS, P.B_CrtYd) if bottom else (P.F_SilkS, P.F_CrtYd)", labels)
+        self.assertIn('spec["labels_on_back"]', labels)
+        report = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
+        self.assertIn('report["labels_on_back"] = placed_spec.get("labels_on_back", [])', report)
+
 
 class CrashSafetyTest(unittest.TestCase):
     """Issue #70: KiCad 10's bindings can crash a step when a removed item's proxy is freed, so every
