@@ -1610,13 +1610,24 @@ def _fab_section(name):
     return " ".join(section.split())
 
 
+FIXED_LINES = {"narrowest": "Narrowest track", "drill": "Smallest drill"}
+
+
+def _fixed_line(section, item):
+    """The number on a README's fixed line, "**Narrowest track:** 0.1124 mm" or "**Smallest drill:** 0.3
+    mm", or None. P4 writes these lines from metrics.json; once a README has one, it is what is checked."""
+    m = re.search(r"\*\*" + FIXED_LINES[item] + r":\*\* ([0-9.]+) mm", section)
+    return m.group(1) if m else None
+
+
 def _agrees(stated, value):
-    """A README number agrees with the board's when the board's, rounded as the README writes it
-    (at least two decimals), is the same number."""
+    """A README's minimum agrees with the board's when it is not above it (a fab process chosen for the
+    README's number must make the board) and the board's number, rounded as the README writes it (at
+    least two decimals), is the same number (review m7: rounding alone let 0.15 pass for 0.146)."""
     if stated is None or value is None:
         return stated is None and value is None
     decimals = max(2, len(stated.split(".", 1)[1]) if "." in stated else 0)
-    return round(value, decimals) == float(stated)
+    return float(stated) <= value + 1e-9 and round(value, decimals) == float(stated)
 
 
 class MetricsTest(unittest.TestCase):
@@ -1735,6 +1746,16 @@ class MetricsTest(unittest.TestCase):
                     self.assertEqual(json.loads(path.read_text(encoding="utf-8")),
                                      json.loads(json.dumps(metrics.board_metrics(EOS_DIR / name))))
 
+    def test_the_readme_rule_for_minima(self):
+        self.assertTrue(_agrees("0.112", 0.1124))
+        self.assertTrue(_agrees("0.10", 0.1))
+        self.assertFalse(_agrees("0.15", 0.146))         # rounds to it, but claims a wider track than the board's
+        self.assertFalse(_agrees("0.1", 0.095))
+        self.assertFalse(_agrees("0.09", 0.1124))
+        self.assertEqual(_fixed_line("x **Narrowest track:** 0.1124 mm (3 segments) y", "narrowest"), "0.1124")
+        self.assertEqual(_fixed_line("**Smallest drill:** 0.3 mm (vias).", "drill"), "0.3")
+        self.assertIsNone(_fixed_line("narrowing to 0.112 mm", "narrowest"))
+
     def test_readme_phrases_are_still_there(self):
         self.assertEqual(set(README_FAB), set(EOS_BOARDS))
         for name, claims in README_FAB.items():
@@ -1749,10 +1770,14 @@ class MetricsTest(unittest.TestCase):
         for name, claims in README_FAB.items():
             path = EOS_DIR / name / "metrics.json"
             m = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else metrics.board_metrics(EOS_DIR / name)
+            section = _fab_section(name)
             for item, key in (("narrowest", "narrowest_track_mm"), ("drill", "smallest_drill_mm")):
-                stated = claims[item][1] if claims[item] else None
+                stated = _fixed_line(section, item) or (claims[item][1] if claims[item] else None)
                 if not _agrees(stated, m[key]):
                     found.add((name, item, stated, m[key]))
+                if name not in BUILT_BEFORE_P3:                  # a rebuilt board's README has the fixed lines
+                    with self.subTest(board=name, item=item):
+                        self.assertIsNotNone(_fixed_line(section, item), f"no **{FIXED_LINES[item]}:** line")
             with self.subTest(board=name, item="vias"):
                 self.assertEqual(sorted(claims["vias"][1]), sorted(m["vias_by_size_drill_mm"]))
         self.assertEqual(found, README_FAB_MISMATCHES)
