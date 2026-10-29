@@ -1391,6 +1391,34 @@ FTSH_TO_SWITCH = {("eos_ke16z_board", "J2"), ("eos_kl25_board", "J7"), ("eos_lpc
                   ("eos_stm32_64", "J3"), ("eos_tm4c123_board", "J7"), ("eos_tm4c1294_board", "J9")}
 
 
+class OneRevisionTest(_Lib):
+    """PR #74 review (qodo): a hand-drawn name line on the other side kept its own revision, so a board
+    raised to rev B would show rev B on one side and rev A on the other."""
+
+    def test_every_name_line_carries_the_board_revision(self):
+        board = self.board([], revision="B")
+        board.title = "EoS Sense Cape for PocketBeagle"
+        texts = [{"text": "EoS Sense Cape  rev A", "x": 27.5, "y": 37.2, "size": 1.0, "bold": True},
+                 {"text": "EoS Sense Cape for PocketBeagle  rev A", "x": 27.5, "y": 44.0, "size": 1.0,
+                  "layer": "B_SilkS", "bold": True, "mirror": True},
+                 {"text": "(c) 2026 Kartikeydheer Srivastava", "x": 27.5, "y": 46.0, "size": 0.8, "layer": "B_SilkS", "mirror": True},
+                 {"text": "PWR", "x": 3.0, "y": 3.0, "size": 0.8}]
+        out = build.one_revision(board, build.identity_texts(board, texts))
+        self.assertEqual(out[0], dict(texts[0], text="EoS Sense Cape  rev B"))     # moved nowhere, resized never
+        self.assertFalse([t["text"] for t in out if "rev A" in t["text"]])
+        self.assertEqual(out[3], texts[3])
+        source = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
+        self.assertIn('texts = one_revision(board, identity_texts(board, getattr(module, "TEXTS", [])))', source)
+
+    def test_designs_show_one_revision(self):
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            module = importlib.import_module(f"eos_boards.boards.{path.stem}")
+            out = build.one_revision(module.BOARD, build.identity_texts(module.BOARD, module.TEXTS))
+            revs = {m.group(1) for t in out for m in [re.search(r"\brev ([A-Z0-9]+)\b", t["text"])] if m}
+            with self.subTest(board=path.stem):
+                self.assertEqual(revs, {module.BOARD.revision})
+
+
 class FtshFootprintTest(unittest.TestCase):
     """Samtec FTSH-105 on Samtec's recommended land pattern (Rev H, Fig 1): pads 0.74 x 2.79 mm,
     1.27 mm pitch, 6.86 mm across both rows; pad order as KiCad's generic 1.27 mm SMD header."""

@@ -148,6 +148,14 @@ def dangling_via_problems(drc: Dict[str, Any]) -> List[str]:
             for i in v.get("items", [])[:1]]
 
 
+def one_revision(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """The texts with every other hand-drawn name line, one ending in "rev <letter or number>" (a front
+    name line beside the identity line on the back, say), given the board's revision, so the board
+    never shows two (PR #74 review). The rest of each line stays as drawn."""
+    return [dict(t, text=re.sub(r"\brev [A-Z0-9]+$", f"rev {board.revision}", t["text"]))
+            if re.search(r"\brev [A-Z0-9]+$", t["text"]) else t for t in texts]
+
+
 def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """The design's silkscreen texts with the board's identity line, "<title>  rev <revision>  <year>",
     beside its ownership line ("(c) <year> <owner>"), on the same layer and mirrored as it is. A design
@@ -541,7 +549,7 @@ def main() -> int:
 
     module = importlib.import_module(f"eos_boards.boards.{args.board}")
     board: Board = module.BOARD
-    texts = identity_texts(board, getattr(module, "TEXTS", []))
+    texts = one_revision(board, identity_texts(board, getattr(module, "TEXTS", [])))
     lib = Library(kicad_env.symbols(), (HERE / "symbols",))
     out = args.out or HERE.parents[1] / "boards" / "eos" / board.name
     hw, fab, img = out / "hardware", out / "fab", out / "images"
