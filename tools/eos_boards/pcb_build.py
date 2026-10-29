@@ -760,7 +760,8 @@ def place(spec, pcb_path, dsn_path):
         item = text(board, t["text"], t["x"], t["y"], t["size"], getattr(P, t.get("layer", "F_SilkS")),
                     t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False))
         if t.get("identity"):
-            print(f"identity line: {fit_identity(board, spec, item, t)}")
+            spec["identity_fit"] = fit_identity(board, spec, item, t)       # recorded in build-report.json
+            print(f"identity line: {spec['identity_fit']}")
     tb = board.GetTitleBlock()       # as the schematic's: title, date, revision, owner and licence
     tb.SetTitle(spec["title_block"]["title"])
     tb.SetDate(spec["title_block"]["date"])

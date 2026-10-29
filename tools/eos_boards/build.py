@@ -582,6 +582,7 @@ def main() -> int:
     placed_spec = json.loads(spec.read_text())       # place records its fiducials, and why a side has two
     report["fiducials"] = placed_spec.get("fiducials_placed", [])
     report["fiducial_notes"] = placed_spec.get("fiducial_notes", {})
+    report["identity_line"] = placed_spec.get("identity_fit", "")
     if board.reference_copper:
         # nets the reference copper completes on its own, which the router must leave alone
         ref = json.loads((HERE / board.reference_copper["file"]).read_text())
