@@ -369,6 +369,13 @@ def bringup_markdown(board: Board) -> str:
         lo, hi, ref, why = board.temperature_range
         out += [f"Rated operating range: {_degrees(lo)} to {_degrees(hi)} \u00b0C, the narrowest of its parts: "
                 f"{ref}, {why}.", ""]
+    pads = [p for p in board.parts if p.lib_id == TESTPOINT_SYMBOL and p.pcb]
+    if pads:      # where to find them: a dense board has no room for every pad's silkscreen label
+        out += ["Test pads (centre, mm from the board's top-left corner, on its "
+                + ("top" if all(p.side == "F" for p in pads) else "marked") + " side): "
+                + ", ".join(f"{p.ref} {p.value} ({p.pcb[0]:g}, {p.pcb[1]:g}"
+                            + ("" if p.side == "F" else ", bottom") + ")" for p in pads)
+                + ". Each is labelled on the silkscreen where there is room.", ""]
     polar = [p.ref for p in board.parts if p.on_board and (p.ref[:1] in "UDQ" or "Polarized" in p.lib_id)]
     out += ["### 1. Before power", "",
             "1. Look at the board: the orientation (pin 1 or polarity) of " + (", ".join(polar) if polar else "every polarised part")

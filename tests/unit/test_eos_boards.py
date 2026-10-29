@@ -2113,6 +2113,9 @@ class BenchTest(_Bench):
         self.assertTrue(text.rstrip().endswith(build.BRINGUP_END))
         self.assertIn("Rated operating range: \u221240 to 85 \u00b0C, the narrowest of its parts: U1", text)
         self.assertIn("2. Check the cell's polarity with a meter.", text)
+        pads = [p for p in board.parts if p.lib_id == design.TESTPOINT_SYMBOL]
+        self.assertIn(f"Test pads (centre, mm from the board's top-left corner, on its top side): {pads[0].ref} "
+                      f"{pads[0].value} ({pads[0].pcb[0]:g}, {pads[0].pcb[1]:g})", text)
         self.assertIn("| +3V3 | TP1 | > 100 kohm |", text)
         self.assertIn("GND test points: TP2, TP3.", text)
         self.assertIn("from a bench supply limited to 20 mA. Expected current: about 0.3 mA (estimate)", text)
