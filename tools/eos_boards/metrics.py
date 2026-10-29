@@ -124,17 +124,25 @@ def board_metrics(folder: Path, name: str = "", report: Dict[str, Any] = None) -
 
     vias = find_all(pcb, "via")
     holes, slots, pads, sides, fids, tps, smd = [], [], Counter(), Counter(), defaultdict(list), [], set()
+    fid_flags = []                                  # fiducials not board-only or not excluded from the BOM
     for v in vias:
         holes.append(_r(_val(v, "drill")))
     for fp in find_all(pcb, "footprint"):
         side = "top" if str(_val(fp, "layer")) == "F.Cu" else "bottom"
         sides[side] += 1
         ref = _ref(fp)
+        attr = [str(a) for a in find(fp, "attr")[1:]] if find(fp, "attr") is not None else []
         if str(fp[1]) == fabrication.FIDUCIAL_FOOTPRINT:
             at = find(fp, "at")
             fids[side].append([_r(at[1], 3), _r(at[2], 3)])
-        elif any(str(p[2]) == "smd" and str(p[1]) for p in find_all(fp, "pad")):
-            smd.add(side)                          # a side the placement machine populates
+            missing = [a for a in ("board_only", "exclude_from_bom") if a not in attr]
+            if missing:
+                fid_flags.append(f"{ref} not {' or '.join(missing)}")
+        elif fabrication.carries_smd_parts(
+                "dnp" in attr or find(fp, "dnp") is not None, "exclude_from_pos_files" in attr,
+                [(str(p[2]) == "smd", any(str(l).endswith(".Paste") for l in find(p, "layers")[1:]))
+                 for p in find_all(fp, "pad")]):
+            smd.add(side)                          # a side the assembler populates
         if ref.startswith("TP"):
             tps.append(ref)
         for p in find_all(fp, "pad"):
@@ -187,6 +195,7 @@ def board_metrics(folder: Path, name: str = "", report: Dict[str, Any] = None) -
         "test_points": sorted(tps, key=lambda r: (len(r), r)),
         "fiducials": {side: sorted(points) for side, points in sorted(fids.items())},
         "smd_sides": sorted(smd),
+        "fiducial_flags": fid_flags,
     }
     m.update(_bom(folder, name))
     if report is None and (folder / "build-report.json").is_file():
@@ -200,8 +209,9 @@ def board_metrics(folder: Path, name: str = "", report: Dict[str, Any] = None) -
 def fab_problems(m: Dict[str, Any], width: float, height: float, corner_radius: float) -> List[str]:
     """What a fab or an assembler would reject in a board's metrics, as sentences ([] when nothing):
     no stack-up or one whose copper is not the board's; a side with surface-mount pads and fewer than
-    three fiducials, or fiducials too near the edge or in a line."""
-    out = []
+    three fiducials (or two diagonally apart), fiducials too near the edge or in a line, or a fiducial
+    that is not a board-only footprint excluded from the BOM."""
+    out = list(f"fiducial {f}" for f in m.get("fiducial_flags", []))
     st = m.get("stackup") or {}
     if not st:
         out.append("no stack-up in the board file")

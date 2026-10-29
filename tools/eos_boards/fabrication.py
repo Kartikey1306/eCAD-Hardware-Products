@@ -207,17 +207,35 @@ def insert_stackup(board_text, stackup):
 
 
 # ---- Fiducials (BENCH-READY A2) --------------------------------------------------------------------
-# Three global fiducials on every side that carries surface-mount parts, for the placement machine's
+# Three global fiducials on every side that the assembler populates, for the placement machine's
 # camera: KiCad's Fiducial_1mm_Mask2mm (a 1 mm copper dot in a 2 mm solder-mask opening, which keeps
 # 0.6 mm of copper clearance round the dot itself). They are board-only footprints: not in the
-# schematic or the BOM, but in the placement file. Each sits near its own corner of the board, and
-# the three are not in a line, so the machine can find the board's position, rotation and scale.
+# schematic or the BOM, but in the placement file. They sit near three corners, as far apart as the
+# free spots allow and not in a line, so the machine can find the board's position, rotation and scale.
+# Clearance: IPC-7351B asks for a clear area round the mark, "devoid of any other circuit features or
+# markings", of at least twice the mark's radius (as quoted by Tom Hausherr, PCB Libraries forum topic
+# 3428, 1 Oct 2024; the standard itself was not read). The copper-free square here keeps other copper
+# 1.5 mm from the centre: 1.0 mm beyond the 1 mm dot's edge, outside the 2 mm mask opening.
+# Where three do not fit, two diagonally opposite ones (BENCH-READY A2, corrected 29 Oct 2026), and the
+# board's README says why.
 FIDUCIAL_FOOTPRINT = "Fiducial:Fiducial_1mm_Mask2mm"
 FIDUCIAL_MASK_RADIUS = 1.0      # the 2 mm mask opening
 FIDUCIAL_EDGE = 3.0             # board edge to the edge of the mask opening, at least (centre >= 4 mm in)
 FIDUCIAL_CLEAR = 1.5            # half the copper-free square round each dot: no track, via or pour in it
-FIDUCIAL_SPREAD = 5.0           # each fiducial at least this far (mm) from the line through the other two
+FIDUCIAL_SPREAD = 5.0           # three: each at least this far from the line through the other two;
+                                # two: at least this far apart in x and in y
 FIDUCIAL_STEP = 0.25            # search grid, mm
+FIDUCIAL_NEAREST = 25           # free spots per corner that the three are chosen from
+CORNERS = (("top-left", False, False), ("top-right", True, False), ("bottom-left", False, True),
+           ("bottom-right", True, True))
+
+
+def carries_smd_parts(dnp, excluded_from_pos, pads):
+    """True when the assembler places this footprint on its side: it is fitted (not DNP), it is in the
+    position file, and it has a surface-mount pad that gets solder paste. ``pads`` are (surface-mount,
+    has paste) pairs. A paste-less, unfitted test pad (EoS STM32 64's TP1/TP2) does not count, so its
+    side gets no fiducials. The one definition used by the placement step, metrics.py and the tests."""
+    return not dnp and not excluded_from_pos and any(smd and paste for smd, paste in pads)
 
 
 def inside_outline(x, y, width, height, corner_radius, margin):
@@ -251,14 +269,26 @@ def _spread(points):
     return out
 
 
+def _diagonal(pair):
+    """How diagonal two points are: the smaller of their x and y separations."""
+    (ax, ay), (bx, by) = pair
+    return min(abs(ax - bx), abs(ay - by))
+
+
+def _min_distance(points):
+    return min(((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5 for i, a in enumerate(points) for b in points[i + 1:])
+
+
 def fiducial_problems(points, width, height, corner_radius, obstacles):
     """What is wrong with fiducials at ``points`` (mm) on one side, as sentences ([] when nothing):
-    fewer than three, a mask opening within FIDUCIAL_EDGE of the board edge, a copper-free square that
-    meets an obstacle (a courtyard, pad, hole, silkscreen text or keep-out on that side, as boxes), or
-    three in a line."""
+    fewer than two, two that are not diagonally apart, three in a line, a mask opening within
+    FIDUCIAL_EDGE of the board edge, or a copper-free square that meets an obstacle (a courtyard, pad,
+    hole, silkscreen text or keep-out on that side, as boxes)."""
     out = []
-    if len(points) < 3:
-        out.append(f"{len(points)} fiducial(s); three are needed")
+    if len(points) < 2:
+        out.append(f"{len(points)} fiducial(s); three are needed (two diagonally opposite where three do not fit)")
+    elif len(points) == 2 and _diagonal(points) < FIDUCIAL_SPREAD:
+        out.append(f"two fiducials {list(points)} are not diagonally apart (under {FIDUCIAL_SPREAD} mm in x or y)")
     for x, y in points:
         if not inside_outline(x, y, width, height, corner_radius, FIDUCIAL_EDGE + FIDUCIAL_MASK_RADIUS):
             out.append(f"fiducial at ({x}, {y}): its mask opening is under {FIDUCIAL_EDGE} mm from the board edge")
@@ -271,43 +301,72 @@ def fiducial_problems(points, width, height, corner_radius, obstacles):
 
 
 def choose_fiducials(width, height, corner_radius, obstacles):
-    """Three fiducial positions (mm) for one side: for each corner, the free spot nearest to it in that
-    corner's quarter of the board; then the three corners whose spots are furthest from a line.
-    ``obstacles`` are the side's (x0, y0, x1, y1) boxes. Raises ValueError when fewer than three
-    corners have a spot or the three are too close to a line: the design then gives positions with
-    the ``fiducials`` option.
+    """Fiducial positions (mm) for one side, and a note (empty, or why there are only two).
+
+    Three when they fit: for each corner, the FIDUCIAL_NEAREST free spots nearest to it in its quarter
+    of the board (0.25 mm grid), then the trio from three different corners whose closest two are
+    furthest apart, each at least FIDUCIAL_SPREAD off the line through the other two. Where fewer than
+    three corners have room, two diagonally opposite ones: the free spots nearest to two opposite
+    corners, searched over the whole board, at least FIDUCIAL_SPREAD apart in x and in y. ``obstacles``
+    are the side's (x0, y0, x1, y1) boxes. Raises ValueError when neither fits: the design then gives
+    positions with the ``fiducials`` option.
 
     >>> choose_fiducials(30.0, 20.0, 1.0, [])
-    [(4.0, 4.0), (26.0, 4.0), (4.0, 16.0)]
+    ([(4.0, 4.0), (26.0, 4.0), (4.0, 16.0)], '')
     """
     margin = FIDUCIAL_EDGE + FIDUCIAL_MASK_RADIUS
     nx, ny = int(width / FIDUCIAL_STEP), int(height / FIDUCIAL_STEP)
+    grid = [(round(i * FIDUCIAL_STEP, 4), round(j * FIDUCIAL_STEP, 4)) for i in range(nx + 1) for j in range(ny + 1)]
+
+    def free(p):
+        return inside_outline(p[0], p[1], width, height, corner_radius, margin) and \
+            not any(_overlaps(fiducial_box(*p), o) for o in obstacles)
+
+    def nearest(points, right, bottom, k):
+        cx, cy = (width if right else 0.0), (height if bottom else 0.0)
+        out = []
+        for p in sorted(points, key=lambda p: ((p[0] - cx) ** 2 + (p[1] - cy) ** 2, p)):
+            if free(p):
+                out.append(p)
+                if len(out) == k:
+                    break
+        return out
+
     spots = {}
-    for corner, (cx, cy) in (("top-left", (0.0, 0.0)), ("top-right", (width, 0.0)),
-                             ("bottom-left", (0.0, height)), ("bottom-right", (width, height))):
-        quarter = [(round(i * FIDUCIAL_STEP, 4), round(j * FIDUCIAL_STEP, 4)) for i in range(nx + 1) for j in range(ny + 1)
-                   if (i * FIDUCIAL_STEP <= width / 2) == (cx == 0.0) and (j * FIDUCIAL_STEP <= height / 2) == (cy == 0.0)]
-        near = [o for o in obstacles if _overlaps(o, (0.0 if cx == 0 else width / 2 - FIDUCIAL_CLEAR,
-                                                      0.0 if cy == 0 else height / 2 - FIDUCIAL_CLEAR,
-                                                      width / 2 + FIDUCIAL_CLEAR if cx == 0 else width,
-                                                      height / 2 + FIDUCIAL_CLEAR if cy == 0 else height))]
-        for x, y in sorted(quarter, key=lambda p: ((p[0] - cx) ** 2 + (p[1] - cy) ** 2, p)):
-            if inside_outline(x, y, width, height, corner_radius, margin) and \
-                    not any(_overlaps(fiducial_box(x, y), o) for o in near):
-                spots[corner] = (x, y)
-                break
-    if len(spots) < 3:
-        raise ValueError(f"fiducials: a free spot near only {len(spots)} corner(s) ({sorted(spots)}); "
-                         "give three positions with the design's fiducials option")
-    names = list(spots)
-    # with four, leave out the corner that spreads the other three most; on a tie, the last one
-    trios = [[spots[n] for n in names[:i] + names[i + 1:]] for i in reversed(range(len(names)))] if len(names) == 4 \
-        else [[spots[n] for n in names]]
-    best = max(trios, key=_spread)
-    if _spread(best) < FIDUCIAL_SPREAD:
-        raise ValueError(f"fiducials: the free spots {best} are within {FIDUCIAL_SPREAD} mm of a line; "
-                         "give three positions with the design's fiducials option")
-    return best
+    for name, right, bottom in CORNERS:
+        quarter = [p for p in grid if (p[0] > width / 2) == right and (p[1] > height / 2) == bottom]
+        found = nearest(quarter, right, bottom, FIDUCIAL_NEAREST)
+        if found:
+            spots[name] = found
+    best = None
+    names = [n for n, *_ in CORNERS if n in spots]
+    for i in range(len(names)):
+        for j in range(i + 1, len(names)):
+            for k in range(j + 1, len(names)):
+                for a in spots[names[i]]:
+                    for b in spots[names[j]]:
+                        for c in spots[names[k]]:
+                            trio = [a, b, c]
+                            if _spread(trio) < FIDUCIAL_SPREAD:
+                                continue
+                            score = _min_distance(trio)
+                            # nearest-to-the-corners trios come first; a later one must spread wider by
+                            # FIDUCIAL_STEP x 2 to win, so free corners keep their corner spots
+                            if best is None or score > best[0] + 2 * FIDUCIAL_STEP:
+                                best = (score, trio)
+    if best is not None:
+        return best[1], ""
+    pairs = []
+    for (n1, r1, b1), (n2, r2, b2) in ((CORNERS[0], CORNERS[3]), (CORNERS[1], CORNERS[2])):
+        a, b = nearest(grid, r1, b1, 1), nearest(grid, r2, b2, 1)
+        if a and b and _diagonal((a[0], b[0])) >= FIDUCIAL_SPREAD:
+            pairs.append((_diagonal((a[0], b[0])), [a[0], b[0]], f"{n1} and {n2}"))
+    if pairs:
+        _, pair, which = max(pairs, key=lambda q: q[0])
+        return pair, (f"two diagonally opposite fiducials ({which}): only {len(spots)} corner quarter(s) "
+                      f"have room for one ({', '.join(sorted(spots)) or 'none'})")
+    raise ValueError(f"fiducials: room near only {len(spots)} corner(s) ({sorted(spots)}) and no two diagonally "
+                     "opposite free spots; give positions with the design's fiducials option")
 
 
 # ---- Priority routes ------------------------------------------------------------------------------

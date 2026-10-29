@@ -106,16 +106,24 @@ copper: size inner supply tracks for it. A board whose pairs need controlled imp
 the node into the saved file, and KiCad keeps it through every later load and save. A board of
 another thickness, or for another fab, gives its own with the `stackup` option.
 
-**Fiducials.** Every side that carries surface-mount parts gets three global fiducials, KiCad's
+**Fiducials.** Every side the assembler populates gets three global fiducials, KiCad's
 `Fiducial_1mm_Mask2mm` (a 1 mm copper dot in a 2 mm solder-mask opening), for the placement
-machine's camera. The generator puts one near each of three corners: for each corner, the free spot
-nearest to it in its quarter of the board, then the three corners whose spots are furthest from a
-line (each at least 5 mm off the line through the other two). Each mask opening is at least 3 mm
-from the board edge, and a 3 mm square round each dot is clear of every courtyard, pad, drilled
-hole, silkscreen text, keep-out and earlier copper on that side. That square is a rule area on the
-saved board, so no track, via or pour enters it, and every later step's own copper keeps out of it
-too. Fiducials are board-only footprints: not in the schematic or the BOM, but in the placement file.
-Where no three corners have room, the build stops and names the `fiducials` option.
+machine's camera. A side counts when it has a fitted part (not DNP), in the position file, with a
+surface-mount pad that gets paste (`fabrication.carries_smd_parts`, the one definition the placement
+step, `metrics.py` and the tests share): EoS STM32 64's unfitted, paste-less bottom test pads do not
+make it two-sided. For each corner the generator takes the 25 free spots nearest to it in its
+quarter of the board, then the trio from three corners whose closest two are furthest apart, each at
+least 5 mm off the line through the other two. Where fewer than three corners have room, it places
+two diagonally opposite ones (the free spots nearest two opposite corners, at least 5 mm apart in x
+and in y), records why in `build-report.json` (`fiducial_notes`), and the board's README must say so
+(BENCH-READY A2). Each mask opening is at least 3 mm from the board edge, and a 3 mm square round each
+dot is clear of every courtyard, pad, drilled hole, silkscreen text, keep-out and earlier copper on
+that side: other copper stays 1.0 mm beyond the dot's edge, outside the mask opening, which meets
+IPC-7351B's clear area of at least twice the mark's radius. That square is a rule area on the saved
+board, so no track, via or pour enters it, and every later step's own copper keeps out of it too.
+Fiducials are board-only footprints excluded from the BOM: not in the schematic or the BOM, but in the
+placement file; the build's fabrication check fails a fiducial that is not. Where neither three nor
+two fit, the build stops and names the `fiducials` option.
 
 **Jumper shunts.** A 2.54 mm jumper header's shunts are BOM lines (BENCH-READY B3): Samtec
 SNT-100-BK-G, one for each `Jumper:Jumper_2_*`/`Jumper_3_*` symbol drawn on a 2.54 mm pin header,
@@ -205,8 +213,9 @@ Most boards need only parts, nets and positions. These options cover the rest:
   tracks and pads may enter. They stay on the saved board as rule areas, and no stitching via goes
   in one. Renesas's RL78 manual forbids a ground pattern under the X1/X2 wiring and the resonator
   (R01UH0146 Figure 5-13(d)); its RA parts want the opposite, a bottom ground (R01AN7202 §6.1.3).
-- `fiducials`: `{"F": [(x, y), (x, y), (x, y)]}` (or `"B"`): fiducial positions for a side where the
-  automatic choice finds no room. They are checked against the same rules.
+- `fiducials`: `{"F": [(x, y), (x, y), (x, y)]}` (or `"B"`; or two diagonally opposite positions):
+  fiducial positions for a side where the automatic choice finds no room. They are checked against
+  the same rules.
 - `shunts`: `{"JP1": 2}`: how many 2.54 mm shunts come with a jumper header drawn with a connector
   symbol (a 2 × 2 header taking two, say); `0` for none.
 - `stackup`: changes to the fab stack-up: `{"finish": "HAL lead-free"}`, `mask_color`,

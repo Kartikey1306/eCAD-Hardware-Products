@@ -1207,40 +1207,82 @@ class IdentityTest(_Lib):
 
 
 class FiducialTest(_Lib):
-    """A2: three fiducials per side that carries surface-mount parts, near three corners, not in a line,
-    their mask openings 3 mm or more from the edge, their copper-free squares clear of everything."""
+    """A2: three fiducials per side the assembler populates, near three corners and spread, not in a line,
+    their mask openings 3 mm or more from the edge, their copper-free squares clear of everything; two
+    diagonally opposite where three do not fit."""
 
     def test_free_board_gets_three_corners(self):
-        points = fabrication.choose_fiducials(30.0, 20.0, 1.0, [])
-        self.assertEqual(points, [(4.0, 4.0), (26.0, 4.0), (4.0, 16.0)])
+        points, note = fabrication.choose_fiducials(30.0, 20.0, 1.0, [])
+        self.assertEqual((points, note), ([(4.0, 4.0), (26.0, 4.0), (4.0, 16.0)], ""))
         self.assertEqual(fabrication.fiducial_problems(points, 30.0, 20.0, 1.0, []), [])
 
     def test_blocked_corners_are_avoided(self):
         # a FeatherWing: headers along both long edges, holes in the corners (motion wing's courtyards)
         obstacles = [(0, -0.5, 50.8, 3.04), (0, 19.82, 50.8, 23.4), (0, 0, 5.3, 5.3), (45.5, 0, 50.8, 5.3),
                      (0, 17.5, 5.3, 22.9), (45.5, 17.5, 50.8, 22.9), (3.0, 3.0, 9.0, 9.0)]
-        points = fabrication.choose_fiducials(50.8, 22.86, 2.54, obstacles)
-        self.assertEqual(fabrication.fiducial_problems(points, 50.8, 22.86, 2.54, obstacles), [])
+        points, note = fabrication.choose_fiducials(50.8, 22.86, 2.54, obstacles)
+        self.assertEqual((note, fabrication.fiducial_problems(points, 50.8, 22.86, 2.54, obstacles)), ("", []))
         self.assertEqual(len({(x < 25.4, y < 11.43) for x, y in points}), 3)          # three different corners
+
+    def test_crowded_corners_still_spread_the_three(self):
+        # review m5: the free spot nearest each corner can sit near the middle (Feather RP2040's three were
+        # within 17 x 15 mm); the trio is chosen among each corner's 25 nearest free spots for its spread
+        obstacles = [(0, 0, 15, 9), (36, 0, 50.8, 3), (0, 14, 25, 22.86), (30, 15, 50.8, 22.86)]
+        points, note = fabrication.choose_fiducials(50.8, 22.86, 2.54, obstacles)
+        self.assertEqual(note, "")
+        self.assertEqual(fabrication.fiducial_problems(points, 50.8, 22.86, 2.54, obstacles), [])
+        self.assertGreaterEqual(fabrication._min_distance(points), 9.0)
+        self.assertGreaterEqual(max(x for x, _ in points) - min(x for x, _ in points), 40.0)   # across the board
+
+    def test_two_diagonally_opposite_where_three_do_not_fit(self):
+        # ESP32 DevKit's case (review m4): the module and its antenna keep-out fill the top half
+        obstacles = [(0, 0, 27.94, 24.0), (0, 0, 2.5, 48.76), (25.4, 0, 27.94, 48.76)]
+        points, note = fabrication.choose_fiducials(27.94, 48.76, 1.0, obstacles)
+        self.assertEqual(len(points), 2)
+        self.assertIn("two diagonally opposite fiducials", note)
+        self.assertIn("only 2 corner quarter(s) have room", note)
+        self.assertGreaterEqual(fabrication._diagonal(points), fabrication.FIDUCIAL_SPREAD)
+        self.assertEqual(fabrication.fiducial_problems(points, 27.94, 48.76, 1.0, obstacles), [])
 
     def test_no_room_is_refused_with_the_way_out(self):
         with self.assertRaisesRegex(ValueError, "near only 0 corner.*fiducials option"):
             fabrication.choose_fiducials(30.0, 20.0, 1.0, [(0, 0, 30, 20)])
-        with self.assertRaisesRegex(ValueError, "near only 2 corner"):          # a strip too thin for two rows
+        with self.assertRaisesRegex(ValueError, "no two diagonally opposite"):     # a strip too thin to go diagonal
             fabrication.choose_fiducials(40.0, 9.0, 1.0, [(0, 0, 40, 3.5)])
 
     def test_problems_are_named(self):
         args = (30.0, 20.0, 1.0)
-        self.assertIn("three are needed", fabrication.fiducial_problems([(5, 5), (25, 5)], *args, [])[0])
+        self.assertIn("three are needed", fabrication.fiducial_problems([(5, 5)], *args, [])[0])
+        self.assertIn("not diagonally apart", fabrication.fiducial_problems([(5, 5), (25, 7)], *args, [])[0])
+        self.assertEqual(fabrication.fiducial_problems([(5, 5), (25, 15)], *args, []), [])
         self.assertIn("under 3.0 mm from the board edge", fabrication.fiducial_problems([(3.5, 5), (25, 5), (5, 15)], *args, [])[0])
         self.assertIn("meets 1 item", fabrication.fiducial_problems([(5, 5), (25, 5), (5, 15)], *args, [(5.5, 5.5, 7, 7)])[0])
         self.assertIn("of a line", fabrication.fiducial_problems([(5, 5), (15, 7), (25, 9)], *args, [])[0])
+
+    def test_one_definition_of_an_assembled_side(self):
+        # review m3/D1: fitted, in the position file, and a pad that gets paste
+        self.assertTrue(fabrication.carries_smd_parts(False, False, [(True, True), (True, True)]))
+        for dnp, excluded, pads in ((True, False, [(True, True)]), (False, True, [(True, True)]),
+                                    (False, False, [(True, False)]), (False, False, [(False, False)])):
+            with self.subTest(dnp=dnp, excluded=excluded, pads=pads):
+                self.assertFalse(fabrication.carries_smd_parts(dnp, excluded, pads))
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        place = source[source.index("def place_fiducials("):source.index("def place(")]
+        self.assertIn("fabrication.carries_smd_parts(", place)
+        self.assertIn("fp.SetBoardOnly(True)", place)
+        self.assertIn("fp.SetExcludedFromBOM(True)", place)
+        self.assertIn("fabrication.carries_smd_parts(", (REPO_ROOT / "tools" / "eos_boards" / "metrics.py").read_text(encoding="utf-8"))
+        # STM32 64's bottom: two fitted-nothing test pads (dnp, exclude_from_pos_files, no paste)
+        self.assertEqual(metrics.board_metrics(EOS_DIR / "eos-stm32-64")["smd_sides"], ["top"])
+        self.assertEqual(metrics.board_metrics(EOS_DIR / "eos-cm5-base")["smd_sides"], ["bottom", "top"])   # BT1 on the bottom
 
     def test_design_positions_reach_the_spec_and_bad_ones_are_refused(self):
         parts = [Part("U1", "T:M", "M", "fp", (5, 5), {"GND": "GND", "A/B": NC})]
         spec = build.spec_for(self.board(parts, fiducials={"B": [(4, 4), (6, 4), (4, 6)]}), self.lib, Path(self.tmp.name), [])
         self.assertEqual(spec["fiducials"], {"B": [[4, 4], [6, 4], [4, 6]]})
-        for bad in ({"T": [(1, 1)] * 3}, {"F": [(1, 1), (2, 2)]}, {"F": [(1, 1, 0)] * 3}):
+        spec = build.spec_for(self.board(parts, fiducials={"F": [(4, 4), (6, 6)]}), self.lib, Path(self.tmp.name), [])
+        self.assertEqual(spec["fiducials"], {"F": [[4, 4], [6, 6]]})                 # two: checked for diagonal in place
+        for bad in ({"T": [(1, 1)] * 3}, {"F": [(1, 1)]}, {"F": [(1, 1, 0)] * 3}, {"F": [(1, 1)] * 4}):
             with self.subTest(bad=bad), self.assertRaisesRegex(SystemExit, "three"):
                 build.spec_for(self.board(parts, fiducials=bad), self.lib, Path(self.tmp.name), [])
 
@@ -1257,23 +1299,17 @@ class FiducialTest(_Lib):
             folder = EOS_DIR / name
             pcb = loads((folder / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
             board = importlib.import_module(f"eos_boards.boards.{EOS_BOARDS[name]}").BOARD
-            fids, smd_sides = {}, set()
-            for fp in find_all(pcb, "footprint"):
-                side = str(find(fp, "layer")[1])[0]
-                attr = [str(a) for a in find(fp, "attr")[1:]] if find(fp, "attr") else []
-                if str(fp[1]) == fabrication.FIDUCIAL_FOOTPRINT:
-                    self.assertIn("board_only", attr)
-                    self.assertIn("exclude_from_bom", attr)
-                    at = find(fp, "at")
-                    fids.setdefault(side, []).append((float(at[1]), float(at[2])))
-                elif "smd" in attr:
-                    smd_sides.add(side)
+            m = metrics.board_metrics(folder)
             areas = [z for z in find_all(pcb, "zone") if find(z, "name") and str(find(z, "name")[1]) == "eos-fiducial-keepout"]
             with self.subTest(board=name):
-                self.assertTrue(smd_sides <= set(fids))
-                for side, points in fids.items():
-                    self.assertEqual(fabrication.fiducial_problems(points, board.width, board.height, board.corner_radius, []), [])
-                self.assertEqual(len(areas), sum(len(p) for p in fids.values()))
+                self.assertEqual(sorted(m["fiducials"]), m["smd_sides"])           # fiducials on, and only on, assembled sides
+                self.assertEqual(m["fiducial_flags"], [])                           # board-only, out of the BOM
+                for side, points in m["fiducials"].items():
+                    self.assertEqual(fabrication.fiducial_problems([tuple(q) for q in points], board.width, board.height,
+                                                                   board.corner_radius, []), [])
+                    if len(points) == 2:                                            # A2: the README says why
+                        self.assertIn("two fiducials", (folder / "README.md").read_text(encoding="utf-8").lower())
+                self.assertEqual(len(areas), sum(len(p) for p in m["fiducials"].values()))
                 placement = (folder / "fab" / f"{name}-placement.csv").read_text(encoding="utf-8")
                 bom = (folder / "fab" / f"{name}-bom.csv").read_text(encoding="utf-8")
                 self.assertIn('"FID1"', placement)
@@ -1611,7 +1647,8 @@ class MetricsTest(unittest.TestCase):
         self.assertEqual((m["vias"], m["vias_by_size_drill_mm"], m["smallest_drill_mm"]), (1, {"0.6/0.3": 1}, 0.3))
         self.assertEqual(m["plated_slots"], [{"ref": "J1", "pad": "1", "width_mm": 0.6, "length_mm": 1.2}])
         self.assertEqual((m["pours"], m["rule_areas"]), ([{"net": "GND", "layers": ["F.Cu", "B.Cu"]}], {"eos-fiducial-keepout": 1}))
-        self.assertEqual((m["test_points"], m["fiducials"], m["smd_sides"]), (["TP1"], {"top": [[4.0, 4.0], [4.0, 16.0], [26.0, 4.0]]}, ["top"]))
+        self.assertEqual((m["test_points"], m["fiducials"], m["smd_sides"], m["fiducial_flags"]),
+                         (["TP1"], {"top": [[4.0, 4.0], [4.0, 16.0], [26.0, 4.0]]}, ["top"], []))
         self.assertEqual((m["bom_lines"], m["bom_parts"], m["bom_lines_with_mpn"], m["bom_mpn_coverage"], m["bom_lines_without_mpn"]),
                          (2, 2, 1, 0.5, ["Header (J1)"]))
         self.assertEqual(m["checks"], {"erc": 0, "drc_errors": 0, "drc_warnings": 2, "violations": 2, "unconnected_items": 0,
@@ -1619,11 +1656,18 @@ class MetricsTest(unittest.TestCase):
 
     def test_fab_problems_name_a_missing_stackup_and_fiducials(self):
         self.assertEqual(metrics.fab_problems(metrics.board_metrics(self._fixture()), 30, 20, 1.0),
-                         ["no stack-up in the board file", "top: 0 fiducial(s); three are needed"])
+                         ["no stack-up in the board file",
+                          "top: 0 fiducial(s); three are needed (two diagonally opposite where three do not fit)"])
         self.assertEqual(metrics.fab_problems(metrics.board_metrics(self._fixture(stackup=True, fiducials=True)), 30, 20, 1.0), [])
         m = metrics.board_metrics(self._fixture(stackup=True, fiducials=True))
         m["copper_layers"] = 4
         self.assertEqual(metrics.fab_problems(m, 30, 20, 1.0), ["stack-up has 2 copper layers, the board 4"])
+        # review m1/M18: a fiducial left in the BOM, or in the schematic's parity, stops the build
+        folder = self._fixture(stackup=True, fiducials=True)
+        pcb = folder / "hardware" / "eos-fixture.kicad_pcb"
+        pcb.write_text(pcb.read_text(encoding="utf-8").replace("(attr smd board_only exclude_from_bom)", "(attr smd board_only)", 1),
+                       encoding="utf-8")
+        self.assertEqual(metrics.fab_problems(metrics.board_metrics(folder), 30, 20, 1.0), ["fiducial FID1 not exclude_from_bom"])
 
     def test_metrics_write_and_read_back(self):
         folder = self._fixture(stackup=True, fiducials=True)

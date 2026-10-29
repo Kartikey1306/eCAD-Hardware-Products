@@ -299,8 +299,9 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
     except ValueError as e:
         raise SystemExit(f"{board.name}: {e}")
     for side, points in board.fiducials.items():
-        if side not in ("F", "B") or len(points) != 3 or not all(len(p) == 2 for p in points):
-            raise SystemExit(f'{board.name}: fiducials {side!r}: {points!r}; give "F" or "B" and three (x, y) positions')
+        if side not in ("F", "B") or len(points) not in (2, 3) or not all(len(p) == 2 for p in points):
+            raise SystemExit(f'{board.name}: fiducials {side!r}: {points!r}; give "F" or "B" and three (x, y) '
+                             "positions, or two diagonally opposite ones")
     for r in board.priority_routes:
         try:
             _, width = fabrication.route_options(r)
@@ -504,6 +505,9 @@ def main() -> int:
     dsn, ses = work / f"{board.name}.dsn", work / f"{board.name}.ses"
     pcb_step("place", spec, pcb, dsn)
     placed = kicad_check([cli, "pcb", "drc", "--format", "json", "--severity-error", pcb], work / "place-drc.json")
+    placed_spec = json.loads(spec.read_text())       # place records its fiducials, and why a side has two
+    report["fiducials"] = placed_spec.get("fiducials_placed", [])
+    report["fiducial_notes"] = placed_spec.get("fiducial_notes", {})
     if board.reference_copper:
         # nets the reference copper completes on its own, which the router must leave alone
         ref = json.loads((HERE / board.reference_copper["file"]).read_text())

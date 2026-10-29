@@ -598,14 +598,18 @@ def _fiducial_obstacles(board, spec, side):
 
 
 def place_fiducials(board, spec):
-    """Three fiducials on every side that carries surface-mount parts (fabrication.py): positions from
-    the design's ``fiducials`` option for a side it names, else chosen near three corners. Each is a
-    board-only footprint (no schematic symbol, no BOM line, in the placement file) with a rule area
-    round it that no track, via or pour may enter; the square also goes into the spec, so every later
-    step's own copper keeps out. Returns [(reference, side, x, y)]."""
+    """Fiducials on every side the assembler populates (fabrication.carries_smd_parts): positions from
+    the design's ``fiducials`` option for a side it names, else three chosen near three corners, or two
+    diagonally opposite where three do not fit (the reason goes into the spec's ``fiducial_notes``).
+    Each is a board-only footprint (no schematic symbol, no BOM line, in the placement file) with a
+    rule area round it that no track, via or pour may enter; the square also goes into the spec, so
+    every later step's own copper keeps out. Returns [(reference, side, x, y)]."""
+    def paste(pad):
+        return pad.IsOnLayer(P.F_Paste) or pad.IsOnLayer(P.B_Paste)
     sides = [s for s, layer in (("F", P.F_Cu), ("B", P.B_Cu))
-             if any(fp.GetLayer() == layer and any(p.GetAttribute() == P.PAD_ATTRIB_SMD for p in fp.Pads())
-                    for fp in board.GetFootprints())]
+             if any(fp.GetLayer() == layer and fabrication.carries_smd_parts(
+                 fp.IsDNP(), fp.IsExcludedFromPosFiles(), [(p.GetAttribute() == P.PAD_ATTRIB_SMD, paste(p)) for p in fp.Pads()])
+                 for fp in board.GetFootprints())]
     given = spec.get("fiducials", {})
     sides += [s for s in given if s not in sides]
     lib, name = fabrication.FIDUCIAL_FOOTPRINT.split(":")
@@ -622,9 +626,12 @@ def place_fiducials(board, spec):
                 raise SystemExit(f"fiducials on {side} from the design: " + "; ".join(problems))
         else:
             try:
-                points = fabrication.choose_fiducials(*args, obstacles)
+                points, note = fabrication.choose_fiducials(*args, obstacles)
             except ValueError as e:
                 raise SystemExit(f"{side} side: {e}")
+            if note:
+                spec.setdefault("fiducial_notes", {})[side] = note
+                print(f"  fiducials on {side}: {note}")
         for x, y in points:
             fp = P.FootprintLoad(str(Path(spec["footprint_dir"]) / f"{lib}.pretty"), name)
             fp.SetFPIDAsString(fabrication.FIDUCIAL_FOOTPRINT)
