@@ -17,11 +17,13 @@ read on 24 October 2026:
   2116 x 1 0.1164, inner copper 0.0152, core 0.5, inner copper 0.0152, prepreg 1080 x 2 (0.0764 +
   0.0764), inner copper 0.0152, core 0.5, inner copper 0.0152, prepreg 2116 x 1 0.1164, copper 0.035
   mm; prepreg 2116 er 4.16, 1080 er 3.91, core 4.6. Of JLCPCB's standard six-layer stacks it is the one
-  that puts the only six-layer board's pairs on target: a 2D field solve (work/bench-ready-p3/impedance/
-  in the campaign folder) gives EoS TM4C1294's 0.15 mm Ethernet lines 0.25 mm apart about 96-101 ohm
-  under solder mask (100 ohm +-10 %), where the thinner JLC06161H-3313 (3313, 0.0994 mm) gives about
-  89-93 ohm and the earlier default, JLC06161H-7628 (0.2104 mm), about 119 ohm. Every standard JLCPCB
-  six-layer stack has 0.5 oz (0.0152 mm) inner copper.
+  that centres the only six-layer board's pairs: the stage-1 verifier's 2D field solve (validated on TI
+  SPMA056 Table 4, with JLCPCB's coated-microstrip mask model; campaign folder, work/bench-ready-p3-
+  review/fix1/zsolve/) gives EoS TM4C1294's 0.15 mm Ethernet lines 0.25 mm apart about 100 ohm under
+  solder mask and 107 ohm bare (100 ohm +-10 %), and its 0.13 mm device USB pair about 103 ohm under
+  mask (90 ohm +-15 %, the top of the band); the thinner JLC06161H-3313 (3313, 0.0994 mm) gives about
+  94 ohm, and the earlier default, JLC06161H-7628 (0.2104 mm), well above 110 ohm. Every standard
+  JLCPCB six-layer stack has 0.5 oz (0.0152 mm) inner copper.
 * 2 layers: JLCPCB's capabilities page (https://jlcpcb.com/capabilities/pcb-capabilities) gives the
   FR-4 dielectric constant "4.5 (2-Layer PCB)", 1 oz finished outer copper (0.035 mm) by default and
   1.6 mm board thickness. It publishes no core thickness for two layers on these pages, so the core
@@ -386,3 +388,19 @@ def route_options(route):
     if bad or extra.count("join") > 1 or len(widths) > 1 or any(w <= 0 for w in widths):
         raise ValueError(f"priority route {route!r}: after the two pads give \"join\" and/or one width in mm")
     return "join" in extra, (float(widths[0]) if widths else None)
+
+
+def lift_with_fallback(clash, lift):
+    """Rip-up of one clearance clash (build.clearance_clashes): lift the named item's copper with
+    ``lift(net, pos)`` (which returns how many items it took off); when that takes nothing, because
+    the item is fixed copper such as a locked fan-out via, lift the item it clashes with instead.
+    Returns the number of items lifted.
+
+    >>> lift_with_fallback({"net": "GND", "pos": [1, 2], "other": {"net": "/A", "pos": [1, 3]}},
+    ...                    lambda net, pos: 0 if net == "GND" else 2)
+    2
+    """
+    n = lift(clash["net"], clash["pos"])
+    if not n and clash.get("other"):
+        n = lift(clash["other"]["net"], clash["other"]["pos"])
+    return n

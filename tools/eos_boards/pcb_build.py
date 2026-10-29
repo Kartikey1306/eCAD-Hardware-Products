@@ -1407,11 +1407,8 @@ def ripup(spec, pcb_path, clashes_path):
         return n
 
     for c in clashes:
-        n = lift(c["net"], c["pos"])
-        if not n and c.get("other"):
-            # the named item is fixed copper (a locked fan-out via): lift what it clashes with instead
-            n = lift(c["other"]["net"], c["other"]["pos"])
-        lifted += n
+        # the named item, or what it clashes with when the named one is fixed copper (a locked fan-out via)
+        lifted += fabrication.lift_with_fallback(c, lift)
     if lifted:
         P.ZONE_FILLER(board).Fill(board.Zones())
     P.SaveBoard(pcb_path, board)

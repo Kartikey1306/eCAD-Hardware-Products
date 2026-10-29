@@ -252,7 +252,19 @@ class ClashTest(unittest.TestCase):
         # or stub is pruned; a via_dangling warning fails the build
         source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
         ripup = source[source.index("def ripup("):source.index("def repair(")]
-        self.assertIn('n = lift(c["other"]["net"], c["other"]["pos"])', ripup)
+        self.assertIn("fabrication.lift_with_fallback(c, lift)", ripup)
+        # the behaviour (review n3, N14): the named item first, the other only when the first lifts nothing
+        calls = []
+
+        def lift(net, pos, fixed=("GND",)):
+            calls.append(net)
+            return 0 if net in fixed else 3
+        clash = {"net": "GND", "pos": [1.0, 2.0], "other": {"net": "/A", "pos": [1.0, 2.2]}}
+        self.assertEqual((fabrication.lift_with_fallback(clash, lift), calls), (3, ["GND", "/A"]))
+        calls.clear()
+        self.assertEqual((fabrication.lift_with_fallback(dict(clash, net="/B"), lift), calls), (3, ["/B"]))
+        calls.clear()
+        self.assertEqual((fabrication.lift_with_fallback({"net": "GND", "pos": [0, 0]}, lift), calls), (0, ["GND"]))
         fanout = source[source.index("def fanout("):source.index("REFERENCE_ZONE = ")]
         self.assertEqual(fanout.count('spec.setdefault("fanout_copper", []).append('), 2)      # its vias and stubs
         prune = source[source.index("def prune_dangling("):source.index("def finish(")]
@@ -1273,6 +1285,16 @@ class FiducialTest(_Lib):
         self.assertGreaterEqual(fabrication._min_distance(points), 9.0)
         self.assertGreaterEqual(max(x for x, _ in points) - min(x for x, _ in points), 40.0)   # across the board
 
+    def test_the_widest_trio_wins_over_the_first(self):
+        # review n3 (N12): with the top-left corner blocked, the nearest trio (top-left, top-right,
+        # bottom-left) has its closest pair 22.5 mm apart; leaving out bottom-left for bottom-right
+        # spreads it to 32 mm, and the chooser must prefer that (by more than its 0.5 mm hysteresis)
+        points, note = fabrication.choose_fiducials(60.0, 40.0, 1.0, [(0, 0, 20, 12)])
+        self.assertEqual((points, note), ([(4.0, 13.5), (56.0, 4.0), (56.0, 36.0)], ""))
+        self.assertEqual(fabrication._min_distance(points), 32.0)
+        nearest = [(4.0, 13.5), (56.0, 4.0), (4.0, 36.0)]
+        self.assertEqual(fabrication._min_distance(nearest), 22.5)
+
     def test_two_diagonally_opposite_where_three_do_not_fit(self):
         # ESP32 DevKit's case (review m4): the module and its antenna keep-out fill the top half
         obstacles = [(0, 0, 27.94, 24.0), (0, 0, 2.5, 48.76), (25.4, 0, 27.94, 48.76)]
@@ -1526,7 +1548,7 @@ class RobustRoutingTest(_Lib):
 
         def freeroute(dsn, ses_, passes, attempt, work_):
             runs.append(build.freerouting_args(attempt))
-            ses_.write_text("session")
+            ses_.write_text(f"session of run {len(runs)}")
 
         def drc_round(cli, pcb_, out_):
             return {"violations": [], "schematic_parity": [], "unconnected_items": next(reports)}
@@ -1535,6 +1557,7 @@ class RobustRoutingTest(_Lib):
                 mock.patch.object(build, "check_and_repair", side_effect=lambda *a: (drc_round(*a[:1], None, None), 0)), \
                 mock.patch.object(build, "run_drc", side_effect=drc_round), contextlib.redirect_stdout(io.StringIO()):
             result = build.route("kicad-cli", "spec.json", pcb, "b.dsn", ses, work, out, 60, attempts)
+        self.session = ses.read_text()
         return result, seen, runs, pcb.read_text()
 
     def test_a_run_that_leaves_opens_is_routed_again_with_other_costs(self):
@@ -1547,6 +1570,7 @@ class RobustRoutingTest(_Lib):
         (drc, _, made, kept), _, runs, board = self._route([[self.OPEN], [self.OPEN] * 3, [self.OPEN] * 2])
         self.assertEqual((made, kept, len(drc["unconnected_items"])), (3, 1, 1))
         self.assertEqual(board, "placed\nrouted by run 1\n")                  # run 1's board, restored
+        self.assertEqual(self.session, "session of run 1")                    # and its session (review n2)
         self.assertEqual(runs[2], ["--router.scoring.start_ripup_costs=300"])
         (drc, _, made, kept), _, _, _ = self._route([[self.ISLAND]])           # nothing a new route would change
         self.assertEqual((made, kept), (1, 1))

@@ -493,11 +493,13 @@ def route(cli: str, spec: Path, pcb: Path, dsn: Path, ses: Path, work: Path, out
         if best is None or opens < best[0]:
             best = (opens, attempt, drc, rounds)
             shutil.copyfile(pcb, kept)
+            shutil.copyfile(ses, work / "best-routed.ses")
         if not opens or not repairable_opens(drc):
             break                          # done, or only what a new route would not change (a zone island)
     runs = attempt + 1
-    if best[1] != attempt:                 # an earlier run did better: its board, checked again
+    if best[1] != attempt:                 # an earlier run did better: its board and session, checked again
         shutil.copyfile(kept, pcb)
+        shutil.copyfile(work / "best-routed.ses", ses)    # .build/<name>.ses must be the kept board's (review n2)
         print(f"keeping run {best[1] + 1}: {best[0]} connection(s) open, against {opens} in run {runs}", flush=True)
         drc = run_drc(cli, pcb, out)
     return drc, best[3], runs, best[1] + 1
