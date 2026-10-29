@@ -1225,7 +1225,8 @@ class IdentityTest(_Lib):
             {"type": "silk_overlap", "severity": "warning", "items": [{"description": "PCB text 'EoS Test  rev A  2026' on B.Silkscreen"}]}]}
         self.assertEqual(build.generated_silk_problems(drc, texts),
                          ["silk_over_copper: PCB text 'EoS Test  rev A  2026' on B.Silkscreen",
-                          "silk_edge_clearance: PCB text 'EoS Test  rev A  2026' on B.Silkscreen"])
+                          "silk_edge_clearance: PCB text 'EoS Test  rev A  2026' on B.Silkscreen",
+                          "silk_overlap: PCB text 'EoS Test  rev A  2026' on B.Silkscreen"])     # PR #74 review
         source = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
         self.assertIn("+ generated_silk_problems(drc, texts)", source)
         pcb = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
@@ -1417,6 +1418,23 @@ class OneRevisionTest(_Lib):
             revs = {m.group(1) for t in out for m in [re.search(r"\brev ([A-Z0-9]+)\b", t["text"])] if m}
             with self.subTest(board=path.stem):
                 self.assertEqual(revs, {module.BOARD.revision})
+
+
+class GeneratedSilkGateTest(unittest.TestCase):
+    """PR #74 review (greptile, qodo): the name line over other silkscreen fails the build, as it does
+    over copper or at the edge; findings on the design's own texts stay warnings."""
+
+    def test_the_name_line_over_other_silk_fails_the_build(self):
+        texts = [{"text": "EoS T  rev A  2026", "identity": True}, {"text": "(c) 2026 Kartikeydheer Srivastava"}]
+        def drc(kind, first):
+            return {"violations": [{"type": kind, "severity": "warning", "items": [
+                {"description": f"PCB text '{first}' on B.Silkscreen"},
+                {"description": "PCB text '(c) 2026 Kartikeydheer Srivastava' on B.Silkscreen"}]}]}
+        self.assertEqual(build.generated_silk_problems(drc("silk_overlap", "EoS T  rev A  2026"), texts),
+                         ["silk_overlap: PCB text 'EoS T  rev A  2026' on B.Silkscreen"])
+        self.assertEqual(build.generated_silk_problems(drc("silk_overlap", "PWR"), texts), [])
+        for kind in ("silk_over_copper", "silk_edge_clearance"):
+            self.assertEqual(len(build.generated_silk_problems(drc(kind, "EoS T  rev A  2026"), texts)), 1)
 
 
 class FtshFootprintTest(unittest.TestCase):
