@@ -9,6 +9,7 @@ is read as text. The exactness check compares in integer nanometres (KiCad's own
 from __future__ import annotations
 
 import contextlib
+import dataclasses
 import importlib
 import io
 import json
@@ -2005,6 +2006,146 @@ class MetricsTest(unittest.TestCase):
             with self.subTest(board=name, item="vias"):
                 self.assertEqual(sorted(claims["vias"][1]), sorted(m["vias_by_size_drill_mm"]))
         self.assertEqual(found, README_FAB_MISMATCHES)
+
+
+# Boards whose design file has no bench data yet (rails, bring-up); P4 adds theirs and empties the set.
+BRINGUP_PENDING = {
+    "eos-atmega328p-board", "eos-cm4-base", "eos-cm5-base", "eos-esp32-devkit", "eos-f280049c-board",
+    "eos-ke16z-board", "eos-kl25-board", "eos-learn-rp2350", "eos-lpc55s69-board", "eos-msp430g2-board",
+    "eos-probe-s3", "eos-ra2e1-board", "eos-ra4m2-board", "eos-rl78g13-board", "eos-sense-cape", "eos-stm32-64",
+    "eos-tm4c123-board", "eos-tm4c1294-board", "eos-motion-wing", "eos-feather-rp2040"}
+# Boards that declare bench data but whose committed README predates it: the build writes the section,
+# and the next committed build (P4) brings the README in; then the board leaves this set.
+BRINGUP_README_PENDING = set()
+
+
+class BenchTest(_Lib):
+    """Stage 2 items 1-4 and 7: test pads, rail links, the rail list and bring-up data, the README's
+    bring-up section, and the honest temperature range."""
+
+    LIBS = {"Connector": """(kicad_symbol_lib (version 20231120) (generator "test")
+  (symbol "TestPoint" (in_bom yes) (on_board yes)
+    (property "Reference" "TP" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "TestPoint" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (symbol "TestPoint_1_1"
+      (pin passive line (at 0 0 90) (length 1.27) (name "1" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27))))))))
+""", "Jumper": """(kicad_symbol_lib (version 20231120) (generator "test")
+  (symbol "SolderJumper_2_Bridged" (in_bom no) (on_board yes)
+    (property "Reference" "JP" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "SJ" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (symbol "SolderJumper_2_Bridged_1_1"
+      (pin passive line (at -3.81 0 0) (length 1.27) (name "A" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
+      (pin passive line (at 3.81 0 180) (length 1.27) (name "B" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))))))
+"""}
+
+    def setUp(self):
+        super().setUp()
+        for name, text in self.LIBS.items():
+            Path(self.tmp.name, f"{name}.kicad_sym").write_text(text)
+        self.lib = Library(Path(self.tmp.name))
+
+    def bench(self, **kw):
+        parts = [Part("U1", "T:U", "U", "fp", (50, 50), {"VDD": "+3V3", "3": "SIG"}),
+                 Part("R1", "T:R", "10k", "fp", (60, 50), {"1": "+3V3_REG", "2": "GND"}),
+                 design.rail_link("JP1", "+3V3_REG", "+3V3", (5.0, 5.0, 0.0), (70, 50)),
+                 design.bench_pad("TP1", "+3V3", "3V3", (2.0, 2.0), (80, 50)),
+                 design.bench_pad("TP2", "GND", "GND", (3.0, 2.0), (90, 50)),
+                 design.bench_pad("TP3", "GND", "GND", (4.0, 2.0), (100, 50)),
+                 design.bench_pad("TP4", "+3V3_REG", "REG", (5.0, 2.0), (110, 50), diameter=1.5)]
+        rails = [design.Rail("+3V3_REG", "the regulator", "3.3 V", "3.25-3.35 V (a data sheet)", ["TP4"], "about 10 kohm",
+                             link_note="the regulator's output, before JP1"),
+                 design.Rail("+3V3", "JP1 from +3V3_REG", "3.3 V", "3.25-3.35 V (a data sheet)", ["TP1"], "> 100 kohm", link="JP1"),
+                 design.Rail("GND", "-", "0 V", "-", ["TP2", "TP3"], "-")]
+        bring = design.BringUp(supply="3.3 V on TP1 and TP2", current_limit_ma=20, idle_current="about 0.3 mA",
+                               idle_source="estimate", clock="N/A: no clock", programming="N/A: nothing to program",
+                               tests=[design.BringUpTest("I2C", "Scan", "finds 0x48")],
+                               before_power=["Check the cell's polarity with a meter."])
+        args = dict(rails=rails, bringup=bring, temperature_range=(-40, 85, "U1", "rated -40 to +85 C (its data sheet)"),
+                    power_nets={"+3V3": "power:+3V3", "GND": "power:GND"})
+        args.update(kw)
+        return self.board(parts, **args)
+
+    def test_pads_and_links_reach_the_schematic_and_the_spec(self):
+        board = self.bench()
+        spec = build.spec_for(board, self.lib, Path(self.tmp.name), [])
+        flags = {p["ref"]: (p["in_bom"], p["footprint"]) for p in spec["parts"]}
+        self.assertEqual(flags["TP1"], (False, "TestPoint:TestPoint_Pad_D1.0mm"))    # copper only: not a BOM line
+        self.assertEqual(flags["TP4"], (False, "TestPoint:TestPoint_Pad_D1.5mm"))
+        self.assertEqual(flags["JP1"], (False, design.RAIL_LINK_FOOTPRINT))
+        self.assertEqual(spec["parts"][2]["pads"], {"1": "/+3V3_REG", "2": "+3V3"})          # +3V3 is a power net
+        sch = loads(schematic.write(self.bench(power_nets={}), self.lib))    # no power symbols in the test library
+        tp = next(n for n in find_all(sch, "symbol") if any(str(q[1]) == "Reference" and str(q[2]) == "TP1"
+                                                            for q in find_all(n, "property")))
+        self.assertEqual((str(find(tp, "in_bom")[1]), str(find(tp, "on_board")[1])), ("no", "yes"))
+        with self.assertRaisesRegex(ValueError, "diameter"):
+            design.bench_pad("TP9", "GND", "GND", (1, 1), (1, 1), diameter=1.2)
+
+    def test_bench_data_is_checked_against_the_design(self):
+        good = self.bench()
+        build.check_bench(good)
+        rails = good.rails
+        bad = [({"rails": [dataclasses.replace(rails[0], test_points=[])] + rails[1:]}, "no test point"),
+               ({"rails": [dataclasses.replace(rails[0], test_points=["TP1"])] + rails[1:]}, "TP1 is not a test pad"),
+               ({"rails": rails[:2] + [dataclasses.replace(rails[2], test_points=["TP2"])]}, "at least two test points"),
+               ({"rails": rails[:2] + [dataclasses.replace(rails[2], test_points=["TP2", "U1.3"])]}, "U1.3 is not"),
+               ({"rails": [dataclasses.replace(rails[0], net="+5V")] + rails[1:]}, "no part has that net"),
+               ({"rails": [dataclasses.replace(rails[0], link_note="")] + rails[1:]}, "no link, and no note"),
+               ({"rails": [rails[0], dataclasses.replace(rails[1], link="R1")] + rails[2:]}, "is not a rail link"),
+               ({"power_nets": {"+3V3": "power:+3V3", "GND": "power:GND", "SIG": "power:x"}}, "not in the rail list"),
+               ({"rails": []}, "needs the rail list"),
+               ({"pin_labels": {"U1": {"9": "X"}}}, "pins \\['9'\\]"),
+               ({"pin_labels": {"J5": {"1": "X"}}}, "J5, which"),
+               ({"temperature_range": (85, -40, "U1", "x")}, "temperature_range"),
+               ({"temperature_range": (-40, 85, "U7", "x")}, "temperature_range")]
+        for kw, message in bad:
+            with self.subTest(kw=str(kw)[:70]), self.assertRaisesRegex(SystemExit, message):
+                build.check_bench(self.bench(**kw))
+        build.check_bench(self.bench(pin_labels={"U1": {"VDD": "3V3", "3": "IO"}}))    # by pin number or name
+
+    def test_the_readme_section_is_written_from_the_data(self):
+        board = self.bench()
+        text = build.bringup_markdown(board)
+        self.assertTrue(text.startswith(build.BRINGUP_BEGIN + "\n## Bench bring-up\n"))
+        self.assertTrue(text.rstrip().endswith(build.BRINGUP_END))
+        self.assertIn("Rated operating range: \u221240 to 85 \u00b0C, the narrowest of its parts: U1", text)
+        self.assertIn("2. Check the cell's polarity with a meter.", text)
+        self.assertIn("| +3V3 | TP1 | > 100 kohm |", text)
+        self.assertIn("GND test points: TP2, TP3.", text)
+        self.assertIn("from a bench supply limited to 20 mA. Expected current: about 0.3 mA (estimate)", text)
+        self.assertIn("| +3V3 | JP1 from +3V3_REG | TP1 | 3.3 V | 3.25-3.35 V (a data sheet) |", text)
+        self.assertIn("cut JP1's bridge, put an ammeter across its two pads", text)
+        self.assertIn("| I2C: Scan | | finds 0x48 | |", text)
+        for step in ("### 1. Before power", "### 2. Resistance to GND", "### 3. First power", "### 4. Rail voltages",
+                     "### 5. Rail links", "### 6. Clocks", "### 7. Programming", "### 8. Peripheral tests", "### Results"):
+            self.assertIn(step, text)
+        readme = "# Board\n\nText.\n\n## Rebuild\n\n    python3 build.py\n"
+        once = build.update_readme(readme, text)
+        self.assertEqual(once.count("## Bench bring-up"), 1)
+        self.assertLess(once.index("## Bench bring-up"), once.index("## Rebuild"))
+        self.assertEqual(build.update_readme(once, text), once)                       # rewriting changes nothing
+        changed = build.update_readme(once, text.replace("20 mA", "50 mA"))
+        self.assertEqual((changed.count("## Bench bring-up"), "50 mA" in changed, "20 mA" in changed), (1, True, False))
+        self.assertIn("## Bench bring-up", build.update_readme("# Board\n", text))  # no Rebuild heading: at the end
+
+    def test_every_design_with_bench_data_passes_its_checks_and_its_readme_has_the_section(self):
+        self.assertFalse(BRINGUP_PENDING & BRINGUP_README_PENDING)
+        self.assertLessEqual(BRINGUP_PENDING | BRINGUP_README_PENDING, set(EOS_BOARDS))
+        for name, module in EOS_BOARDS.items():
+            board = importlib.import_module(f"eos_boards.boards.{module}").BOARD
+            readme = (EOS_DIR / name / "README.md").read_text(encoding="utf-8")
+            with self.subTest(board=name):
+                if name in BRINGUP_PENDING:
+                    self.assertIsNone(board.bringup, "declares bring-up data now: take it out of BRINGUP_PENDING")
+                    continue
+                self.assertIsNotNone(board.bringup)
+                build.check_bench(board)
+                self.assertTrue(any(r.net == "GND" and len(r.test_points) >= 2 for r in board.rails))
+                self.assertIsNotNone(board.temperature_range)
+                if name in BRINGUP_README_PENDING:
+                    self.assertNotIn(build.BRINGUP_BEGIN, readme, "README has the section: take it out of BRINGUP_README_PENDING")
+                else:
+                    self.assertIn(build.bringup_markdown(board).strip(), readme)
+                    self.assertEqual(readme.count("## Bench bring-up"), 1)
 
 
 class CrashSafetyTest(unittest.TestCase):

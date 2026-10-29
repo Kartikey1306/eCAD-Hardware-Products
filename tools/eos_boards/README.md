@@ -175,6 +175,33 @@ build's check counts. `python3 tools/eos_boards/metrics.py boards/eos/<name>` pr
 built board. A test checks each board README's Fabrication numbers (narrowest track, smallest
 drill, via size and drill) against them.
 
+## Bench data in the design file
+
+A board can describe how to bring it up on the bench (BENCH-READY section C). The build checks the
+data against the design (`build.check_bench`) and writes the README's **Bench bring-up** section from
+it (`build.bringup_markdown`, between `<!-- bring-up ... -->` markers; a README without the section
+gets it before its "## Rebuild" heading).
+
+- `design.bench_pad(ref, net, label, (x, y), sch, diameter=1.0)`: a test pad (C1), KiCad's
+  `Connector:TestPoint` on `TestPoint:TestPoint_Pad_D1.0mm` (or `D1.5mm`). It is in the schematic, so
+  the parity check covers it, but it is not a BOM line and not in the position file: a bare pad is
+  nothing to buy or place, and the parts review counted test pads in the BOM as noise. Its value is
+  its label, which the placement step prints on the silkscreen beside it.
+- `design.rail_link(ref, source_net, load_net, (x, y, rot), sch)`: a rail link (C2), KiCad's
+  `SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm`, bridged as delivered (a 0.6 mm copper bridge,
+  about 1.6 A for a 10 °C rise by IPC-2221's external formula). Chosen over a 0 Ω resistor: no part
+  to buy or place. To check a rail unloaded or measure its load's current, cut the bridge, put an
+  ammeter across the pads, and bridge them again with solder.
+- `rails`: a `design.Rail` per supply net, GND included: the net, its source, nominal voltage,
+  tolerance with its data-sheet source, test points (test pads, or connector pins as `"J1.4"`), the
+  expected resistance to GND unpowered, and its link or a note saying why it has none. Every supply net
+  (`power_nets`) must be listed; every rail needs a test point on its own net, and GND two.
+- `bringup`: a `design.BringUp`: where first power goes in and its current limit, the expected idle
+  current and its source (or "estimate"), the clock check, programming, board-specific checks before
+  power, and the peripheral tests with their pass criteria (`design.BringUpTest`).
+- `temperature_range`: `(min, max, limiting part, its rating and source)`, the narrowest rated range
+  of the board's parts (BENCH-READY D8), printed in the bring-up section.
+
 ## Reusing a reference design's layout exactly
 
 Some layouts should be copied, not redrawn. Raspberry Pi's RP2350 datasheet says the core
@@ -243,6 +270,7 @@ Most boards need only parts, nets and positions. These options cover the rest:
 - `fiducials`: `{"F": [(x, y), (x, y), (x, y)]}` (or `"B"`; or two diagonally opposite positions):
   fiducial positions for a side where the automatic choice finds no room. They are checked against
   the same rules.
+- `rails`, `bringup`, `temperature_range`: bench data (see Bench data in the design file).
 - `shunts`: `{"JP1": 2}`: how many 2.54 mm shunts come with a jumper header drawn with a connector
   symbol (a 2 × 2 header taking two, say); `0` for none.
 - `stackup`: changes to the fab stack-up: `{"finish": "HAL lead-free"}`, `mask_color`,
