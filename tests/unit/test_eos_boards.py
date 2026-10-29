@@ -1214,7 +1214,9 @@ class IdentityTest(_Lib):
         own = [dict(t, text=t["text"].replace("2026", "2027")) for t in self.OWN]
         out = build.identity_texts(board, own)
         self.assertEqual(out[-1], {"text": "EoS Test  rev B  2027", "x": 10.0, "y": 6.0, "size": 1.0, "bold": True,
-                                   "layer": "B_SilkS", "mirror": True, "identity": True, "design_text": ""})
+                                   "layer": "B_SilkS", "mirror": True, "identity": True, "fit": True,
+                                   "variants": ["EoS Test  rev B  2027", "EoS Test  rev B", "EoS Test rev B"],
+                                   "design_text": "", "design_size": 1.0})
         # review m6: a later revision replaces the old hand-drawn "rev A" line, it does not sit beside it
         out = build.identity_texts(board, own + [dict(own[0], text="EoS Test  rev A", y=5.0)])
         self.assertEqual([t["text"] for t in out if "rev" in t["text"]], ["EoS Test  rev B  2027"])
@@ -1224,6 +1226,30 @@ class IdentityTest(_Lib):
             build.identity_texts(self.board([]), [])
         with self.assertRaisesRegex(SystemExit, "2 name lines"):
             build.identity_texts(self.board([]), self.OWN + [dict(self.OWN[0], text="T  rev A"), dict(self.OWN[0], text="X  rev A")])
+
+    def test_generator_silk_is_legible(self):
+        # stage 2 item 6: every line the generator sizes is at least 1.0 mm high with a 0.15 mm stroke
+        # (JLCPCB's stated minimum), the ownership lines go up from 0.8 mm, and a line that does not fit
+        # is shortened, never shrunk
+        self.assertEqual((fabrication.SILK_MIN_TEXT, fabrication.SILK_MIN_STROKE), (1.0, 0.15))
+        for size in (1.0, 1.2, 2.0):
+            for bold in (False, True):
+                self.assertGreaterEqual(fabrication.silk_stroke(size, bold), 0.15)
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            module = importlib.import_module(f"eos_boards.boards.{path.stem}")
+            out = build.identity_texts(module.BOARD, module.TEXTS)
+            fitted = [t for t in out if t.get("fit")]
+            with self.subTest(board=path.stem):
+                self.assertEqual(sorted(t["text"].split("  ")[0] for t in fitted),
+                                 sorted([module.BOARD.title, "(c) 2026 Kartikeydheer Srivastava", "All rights reserved"]))
+                self.assertTrue(all(t["size"] >= 1.0 for t in fitted))
+                identity = next(t for t in fitted if t.get("identity"))
+                self.assertEqual(identity["variants"][-1], f"{module.BOARD.title} rev {module.BOARD.revision}")
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        fit = source[source.index("def fit_text("):source.index("def place_fiducials(")]
+        self.assertEqual(fit.count("item.SetTextSize(v(t[\"size\"], t[\"size\"]))"), 1)   # one size: never shrunk
+        self.assertNotIn("0.8", fit)
+        self.assertIn("allowed", fit)                        # other silkscreen checked (review n4)
 
     def test_generated_silk_over_copper_or_the_edge_fails_the_build(self):
         texts = [{"text": "EoS Test  rev A  2026", "identity": True}, {"text": "J1"}]
@@ -1263,7 +1289,7 @@ class IdentityTest(_Lib):
             pcb = loads((EOS_DIR / name / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
             with self.subTest(board=name):
                 silk = [str(t[1]) for t in find_all(pcb, "gr_text") if str(find(t, "layer")[1]) == "B.SilkS"]
-                self.assertIn(f"{board.title}  rev {board.revision}  {board.date[:4]}", silk)
+                self.assertTrue(set(fabrication.identity_variants(board.title, board.revision, board.date[:4])) & set(silk))
                 tb = find(pcb, "title_block")
                 self.assertEqual(str(find(tb, "company")[1]), board.company)
                 self.assertEqual([str(c[2]) for c in find_all(tb, "comment")], build.title_block(board)["comments"])
@@ -1452,7 +1478,7 @@ FIT_SCRIPT = """
 import json, sys
 sys.path.insert(0, sys.argv[1])
 import pcbnew as P
-import pcb_build
+import fabrication, pcb_build
 v = pcb_build.v
 board = P.BOARD()
 spec = {"width": 40.0, "height": 20.0, "corner_radius": 0.0}
@@ -1461,10 +1487,11 @@ for x in (12.0, 16.0, 20.0, 24.0, 28.0):         # 4 mm pads under the name line
     board.Add(fp)
     fp.SetPosition(v(x, 6.3))
 own = pcb_build.text(board, "(c) 2026 Kartikeydheer Srivastava", 20.0, float(sys.argv[3]), 0.8, P.F_SilkS)
-t = {"text": "EoS T  rev A  2026", "x": 20.0, "y": 8.0, "size": 1.0, "bold": True, "identity": True, "design_text": ""}
+t = {"text": "EoS T  rev A  2026", "x": 20.0, "y": 8.0, "size": 1.0, "bold": True, "identity": True, "fit": True,
+     "variants": fabrication.identity_variants("EoS T", "A", "2026"), "design_text": "", "design_size": 1.0}
 item = pcb_build.text(board, t["text"], t["x"], t["y"], t["size"], P.F_SilkS, 0.0, True)
 try:
-    where = pcb_build.fit_identity(board, spec, item, t)
+    where = pcb_build.fit_text(board, spec, item, t)[1]       # the one fitter (stage 2 replaced fit_identity)
 except SystemExit as e:
     where = "stopped: " + str(e)
 print(json.dumps({"where": where, "on_ownership": item.GetBoundingBox().Intersects(own.GetBoundingBox())}))
@@ -1477,11 +1504,13 @@ class IdentityFitTest(unittest.TestCase):
 
     def test_the_fitter_checks_other_silk_after_every_text_is_down(self):
         source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
-        fit = source[source.index("def fit_identity("):source.index("def place_fiducials(")]
-        self.assertIn("and not any(box.Intersects(b) for uid, box in silk.items() if uid not in allowed)", fit)
+        clear = source[source.index("def _silk_clear("):source.index("def fit_text(")]
+        self.assertIn("and not any(box.Intersects(b) for uid, box in silk.items() if uid not in allowed)", clear)
+        fit = source[source.index("def fit_text("):source.index("def place_fiducials(")]
+        self.assertIn("_silk_clear(spec, item, pads, silk, allowed)", fit)
         place = source[source.index("def place(spec"):]
-        self.assertLess(place.index("placed_texts = [(text(board"), place.index("fit_identity(board, spec, item, t)"))
-        self.assertIn('line["design_text"] = old[0]["text"] if old else ""',
+        self.assertLess(place.index("placed_texts = [(t, text(board"), place.index("fit_text(board, spec, item, t)"))
+        self.assertIn('design_text=old[0]["text"] if old else ""',
                       (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8"))
 
     @unittest.skipUnless(os.environ.get("EOS_KICAD_TESTS"), "set EOS_KICAD_TESTS=1 to run the KiCad-backed fit "
@@ -1498,8 +1527,8 @@ class IdentityFitTest(unittest.TestCase):
                 self.assertEqual(run.returncode, 0, run.stderr[-2000:])
                 results[own_y] = json.loads(run.stdout.strip().splitlines()[-1])
         # just below: no spot within 2 mm clears both, so the build stops (before the fix: 1.0 mm on top of it)
-        self.assertTrue(results[10.0]["where"].startswith("stopped: identity line 'EoS T  rev A  2026' clears no pad, "
-                                                          "edge or other silkscreen"), results[10.0])
+        self.assertTrue(results[10.0]["where"].startswith("stopped: silkscreen line 'EoS T  rev A  2026' at 1.0 mm "
+                                                          "clears no pad, edge or other silkscreen"), results[10.0])
         self.assertFalse(results[13.0]["where"].startswith("stopped"), results[13.0])   # room below the pads: it goes there
         self.assertFalse(results[13.0]["on_ownership"])
 

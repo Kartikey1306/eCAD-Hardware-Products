@@ -162,9 +162,11 @@ def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, 
     beside its ownership line ("(c) <year> <owner>"), on the same layer and mirrored as it is. A design
     line on that layer ending in "rev <letter or number>" (the name line every design drew by hand, of
     any revision) is replaced in place; otherwise the line goes 2 mm above the ownership line. The line
-    is marked ``identity``: the placement step moves or shrinks it until it clears every pad and the
-    board edge, or stops the build. A design without an ownership line is refused: there is nowhere to
-    put the identity beside it."""
+    is marked ``identity``; it and the two ownership lines ("(c) ...", "All rights reserved") are at
+    least fabrication.SILK_MIN_TEXT high and marked ``fit``: the placement step moves them (and shortens
+    the identity line, fabrication.identity_variants) until they clear every pad, the board edge and any
+    silkscreen their design lines did not already touch, or stops the build. A design without an
+    ownership line is refused: there is nowhere to put the identity beside it."""
     year = board.date[:4]
     owner = f"(c) {year} {board.company}"
     found = [t for t in texts if t["text"] == owner]
@@ -173,18 +175,27 @@ def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, 
                          "the board's identity beside")
     own = found[0]
     layer = own.get("layer", "F_SilkS")
-    identity = f"{board.title}  rev {board.revision}  {year}"
+    variants = fabrication.identity_variants(board.title, board.revision, year)
     old = [t for t in texts if t.get("layer", "F_SilkS") == layer and re.search(r"\brev [A-Z0-9]+$", t["text"])]
     if len(old) > 1:
         raise SystemExit(f"{board.name}: {len(old)} name lines ending in 'rev <revision>' on {layer}; keep one")
     line = dict(old[0]) if old else {"x": own["x"], "y": round(own["y"] - 2.0, 4), "size": 1.0, "bold": True,
                                      "layer": layer, "mirror": own.get("mirror", False)}
-    line["text"] = identity
-    line["identity"] = True
-    line["design_text"] = old[0]["text"] if old else ""     # the design's line, which fit_identity starts from
-    if old:
-        return [line if t is old[0] else t for t in texts]
-    return list(texts) + [line]
+    # the design's own line (text, size) is what its designer checked against the silkscreen round it
+    line.update(text=variants[0], identity=True, fit=True, variants=variants,
+                design_text=old[0]["text"] if old else "", design_size=line["size"],
+                size=max(line["size"], fabrication.SILK_MIN_TEXT))
+    out = []
+    for t in texts:
+        if old and t is old[0]:
+            out.append(line)
+        elif t.get("layer", "F_SilkS") == layer and t["text"] in (owner, "All rights reserved"):
+            # the ownership lines go up to the legible minimum, fitted like the identity line (no shortening)
+            out.append(dict(t, fit=True, design_text=t["text"], design_size=t["size"],
+                            size=max(t["size"], fabrication.SILK_MIN_TEXT)))
+        else:
+            out.append(t)
+    return out if old else out + [line]
 
 
 # The shunt a 2.54 mm jumper header ships with (BENCH-READY B3): Samtec SNT-100-BK-G, a 2-position
@@ -609,6 +620,10 @@ def main() -> int:
     report["fiducials"] = placed_spec.get("fiducials_placed", [])
     report["fiducial_notes"] = placed_spec.get("fiducial_notes", {})
     report["identity_line"] = placed_spec.get("identity_fit", "")
+    report["silk_fits"] = placed_spec.get("silk_fits", [])
+    for t in texts:                        # the identity line as placed (it may have been shortened)
+        if t.get("identity") and placed_spec.get("identity_text"):
+            t["text"] = placed_spec["identity_text"]
     if board.reference_copper:
         # nets the reference copper completes on its own, which the router must leave alone
         ref = json.loads((HERE / board.reference_copper["file"]).read_text())

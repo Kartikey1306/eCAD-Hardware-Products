@@ -408,3 +408,35 @@ def lift_with_fallback(clash, lift, fixed=lambda item: False):
     if not n and clash.get("other"):
         n = lift(clash["other"]["net"], clash["other"]["pos"])
     return n
+
+
+# ---- Silkscreen the generator places (BENCH-READY A3/A4, coordinator decision of 29 Oct 2026) -------
+# JLCPCB's capabilities page (https://jlcpcb.com/capabilities/pcb-capabilities, read 24 and 29 Oct 2026):
+# "Minimum text height 40 mil (1.0mm) Characters height less than 40 mil(1.0mm) will be unidentifiable",
+# "Minimum Line Width >= 0.15mm", "Pad To Silkscreen 0.15mm". Every text the generator places (the
+# identity line, the ownership lines, test-point and pin labels) is at least that size; a line that does
+# not fit is shortened or moved, never shrunk.
+SILK_MIN_TEXT = 1.0          # mm, text height
+SILK_MIN_STROKE = 0.15       # mm
+SILK_PAD_GAP = 0.15          # mm, silkscreen to a pad
+SILK_EDGE_GAP = 0.3          # mm, silkscreen to the board edge
+
+
+def silk_stroke(size, bold=False):
+    """The stroke for silkscreen text of ``size`` mm: 15 % of the height (20 % bold), never under
+    SILK_MIN_STROKE.
+
+    >>> silk_stroke(1.0), silk_stroke(1.0, bold=True), silk_stroke(2.0)
+    (0.15, 0.2, 0.3)
+    """
+    return round(max(SILK_MIN_STROKE, size * (0.2 if bold else 0.15)), 4)
+
+
+def identity_variants(title, revision, year):
+    """The identity line, longest first, for a board where the full line does not fit: the year
+    dropped, then single spaces. Shortened, never shrunk below SILK_MIN_TEXT.
+
+    >>> identity_variants("EoS Motion Wing", "A", "2026")
+    ['EoS Motion Wing  rev A  2026', 'EoS Motion Wing  rev A', 'EoS Motion Wing rev A']
+    """
+    return [f"{title}  rev {revision}  {year}", f"{title}  rev {revision}", f"{title} rev {revision}"]

@@ -149,14 +149,20 @@ marked `on_board=False`.
 "EoS Motion Wing  rev A  2026", beside its ownership line ("(c) 2026 <owner>"), on the same layer
 and mirrored as it is. A design's own name line there, one ending in "rev <letter or number>", is
 replaced where it stands; otherwise the line goes 2 mm above the ownership line. A design with no
-ownership line is refused. The line must never sit on a pad or other silkscreen: the placement step
-puts every design text down first, then checks the line against every pad of its side and every
-drilled pad (0.15 mm, JLCPCB's pad-to-silkscreen minimum), the board edge (0.3 mm) and the other
-silkscreen of its layer that the design's own name line did not already touch (the ownership line
-below it, say), moves it up or down by up to 2 mm, then tries 0.8 mm text (the boards'
-ownership-line size), and stops the build when it fits nowhere. A DRC `silk_over_copper`,
-`silk_edge_clearance` or `silk_overlap` finding on the line, which KiCad grades a warning, fails the
-build too. The revision is the board's `revision` (default "A"). The board file's title block
+ownership line is refused.
+
+**Legible silkscreen.** Every line the generator places or sizes (the identity line, the two
+ownership lines, test-point and pin labels) is at least 1.0 mm high with a stroke of at least
+0.15 mm: JLCPCB's capabilities page gives "Minimum text height 40 mil (1.0mm)" ("less than 1.0 mm
+will be unidentifiable") and a 0.15 mm minimum line width. The ownership lines go up from the
+designs' 0.8 mm. The placement step fits each of these lines: it must clear every pad of its side
+and every drilled pad by 0.15 mm (JLCPCB's pad-to-silkscreen minimum), stay 0.3 mm inside the
+outline, and touch no other silkscreen that the design's own line did not already touch (where the
+designer checked it). It is tried where the design put it, then up or down by up to 2 mm; the
+identity line is then shortened (the year dropped, then single spaces), never shrunk. A line that fits
+nowhere stops the build. A DRC `silk_over_copper` or `silk_edge_clearance` finding on the identity
+line, which KiCad grades a warning, fails the build too; `build-report.json` records where each line
+went (`silk_fits`). The revision is the board's `revision` (default "A"). The board file's title block
 says what the schematic's does: title, date, revision, owner, copyright and licence, and for an
 all-rights-reserved board whom to ask for permission.
 

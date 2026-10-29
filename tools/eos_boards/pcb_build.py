@@ -123,8 +123,7 @@ def text(board, s, x, y, size, layer=P.F_SilkS, angle=0.0, bold=False, mirror=Fa
     t.SetPosition(v(x, y))
     t.SetLayer(layer)
     t.SetTextSize(v(size, size))
-    # 15 % of the height (20 % bold), never under 0.15 mm, the stroke most fabs print reliably
-    t.SetTextThickness(MM(max(0.15, size * (0.2 if bold else 0.15))))
+    t.SetTextThickness(MM(fabrication.silk_stroke(size, bold)))     # 15 % of the height (20 % bold), >= 0.15 mm
     t.SetTextAngleDegrees(angle)
     board.Add(t)
     return t
@@ -600,23 +599,13 @@ def _fiducial_obstacles(board, spec, side):
     return out
 
 
-IDENTITY_PAD_GAP = 0.15      # mm from silkscreen to a pad: JLCPCB's "Pad To Silkscreen" minimum
-IDENTITY_EDGE_GAP = 0.3      # mm from silkscreen to the board edge
-IDENTITY_MIN_SIZE = 0.8      # mm: the smallest text the boards use (their ownership lines)
-
-
-def fit_identity(board, spec, item, t):
-    """Move or shrink the generator's identity line until it clears every pad of its side and every
-    drilled pad by IDENTITY_PAD_GAP, stays IDENTITY_EDGE_GAP inside the outline, and touches no other
-    silkscreen of its layer (board texts and drawings, footprint graphics and visible footprint texts)
-    that the design's own name line (``design_text``, where its designer checked it) did not already
-    touch (PR #74 review: a line moved down could land on the ownership line): first where the design
-    put it, then up or down in 0.25 mm steps (up to 2 mm), then the same at IDENTITY_MIN_SIZE. A line
-    that fits nowhere stops the build: fabs clip silkscreen off pads, and KiCad reports silk over
-    copper only as a warning. Every design text is on the board before this runs. Returns where it went."""
+def _silk_obstacles(board, item):
+    """What silkscreen ``item`` (a board text) must keep off: every pad of its side and every drilled
+    pad, grown by SILK_PAD_GAP, as boxes; and every other silkscreen item on its layer (board texts and
+    shapes, footprint graphics and visible footprint texts), as {uuid: box}."""
     layer = item.GetLayer()
     cu = P.B_Cu if layer == P.B_SilkS else P.F_Cu
-    gap = MM(IDENTITY_PAD_GAP)
+    gap = MM(fabrication.SILK_PAD_GAP)
     pads, silk = [], {}
     own = item.m_Uuid.AsString()
     for fp in board.GetFootprints():
@@ -631,27 +620,45 @@ def fit_identity(board, spec, item, t):
     for d in board.GetDrawings():
         if d.GetLayer() == layer and d.m_Uuid.AsString() != own:
             silk[d.m_Uuid.AsString()] = d.GetBoundingBox()
-    allowed = set()
-    if t.get("design_text"):                        # what the design's line touched where it was drawn
-        item.SetText(t["design_text"])
-        item.SetPosition(v(t["x"], t["y"]))
-        allowed = {uid for uid, box in silk.items() if box.Intersects(item.GetBoundingBox())}
-        item.SetText(t["text"])
-    sizes = [t["size"]] + ([IDENTITY_MIN_SIZE] if t["size"] > IDENTITY_MIN_SIZE else [])
+    return pads, silk
+
+
+def _silk_clear(spec, item, pads, silk, allowed):
+    """True when ``item`` keeps SILK_PAD_GAP off every pad, SILK_EDGE_GAP inside the outline, and off
+    every other silkscreen item but those in ``allowed``."""
+    b = item.GetBoundingBox()
+    corners = [P.VECTOR2I(x, y) for x in (b.GetX(), b.GetRight()) for y in (b.GetY(), b.GetBottom())]
+    plain = dict(spec, copper_keepouts=[], fiducial_keepouts=[])
+    return all(_inside(plain, c, MM(fabrication.SILK_EDGE_GAP)) for c in corners) \
+        and not any(p.Intersects(b) for p in pads) \
+        and not any(box.Intersects(b) for uid, box in silk.items() if uid not in allowed)
+
+
+def fit_text(board, spec, item, t):
+    """Fit a silkscreen line the generator sizes (the identity line, the ownership lines): at least
+    SILK_MIN_TEXT high, clear of every pad of its side and every drilled pad by SILK_PAD_GAP, inside
+    the outline by SILK_EDGE_GAP, and off any other silkscreen that its design line (``design_text`` at
+    ``design_size``, where the designer checked it) did not already touch. Tried where the design put
+    it, then up or down in 0.25 mm steps (up to 2 mm), for each of its ``variants`` (the identity line
+    shortens: fabrication.identity_variants); never shrunk. A line that fits nowhere stops the build:
+    fabs clip silkscreen off pads, and KiCad reports silk over copper only as a warning. Returns
+    (the text placed, a description of where it went)."""
+    pads, silk = _silk_obstacles(board, item)
+    item.SetText(t.get("design_text") or t["text"])                   # what the designer checked, as drawn
+    item.SetTextSize(v(t["design_size"], t["design_size"]))
+    item.SetTextThickness(MM(fabrication.silk_stroke(t["design_size"], t.get("bold", False))))
+    allowed = {uid for uid, box in silk.items() if box.Intersects(item.GetBoundingBox())} if t.get("design_text") else set()
+    item.SetTextSize(v(t["size"], t["size"]))
+    item.SetTextThickness(MM(fabrication.silk_stroke(t["size"], t.get("bold", False))))
     steps = [0.0] + [s * d for s in (0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0) for d in (-1, 1)]
-    for size in sizes:
-        item.SetTextSize(v(size, size))
-        item.SetTextThickness(MM(max(0.15, size * (0.2 if t.get("bold") else 0.15))))
+    for words in t.get("variants", [t["text"]]):
+        item.SetText(words)
         for dy in steps:
             item.SetPosition(v(t["x"], t["y"] + dy))
-            b = item.GetBoundingBox()
-            corners = [P.VECTOR2I(x, y) for x in (b.GetX(), b.GetRight()) for y in (b.GetY(), b.GetBottom())]
-            if all(_inside(dict(spec, copper_keepouts=[], fiducial_keepouts=[]), c, MM(IDENTITY_EDGE_GAP)) for c in corners) \
-                    and not any(p.Intersects(b) for p in pads) \
-                    and not any(box.Intersects(b) for uid, box in silk.items() if uid not in allowed):
-                return f"{size} mm at ({t['x']}, {round(t['y'] + dy, 2)})"
-    raise SystemExit(f"identity line {t['text']!r} clears no pad, edge or other silkscreen at {t['size']} or "
-                     f"{IDENTITY_MIN_SIZE} mm within 2 mm of ({t['x']}, {t['y']}); move the design's name line")
+            if _silk_clear(spec, item, pads, silk, allowed):
+                return words, f"{words!r} {t['size']} mm at ({t['x']}, {round(t['y'] + dy, 2)})"
+    raise SystemExit(f"silkscreen line {t['text']!r} at {t['size']} mm clears no pad, edge or other silkscreen "
+                     f"within 2 mm of ({t['x']}, {t['y']}); move the design's line")
 
 
 def place_fiducials(board, spec):
@@ -774,13 +781,17 @@ def place(spec, pcb_path, dsn_path):
             net = part["pads"].get(pad.GetNumber())
             if net:
                 pad.SetNet(nets[net])
-    placed_texts = [(text(board, t["text"], t["x"], t["y"], t["size"], getattr(P, t.get("layer", "F_SilkS")),
-                          t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False)), t)
+    placed_texts = [(t, text(board, t["text"], t["x"], t["y"], t["size"], getattr(P, t.get("layer", "F_SilkS")),
+                             t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False)))
                     for t in spec.get("texts", [])]
-    for item, t in placed_texts:        # every design text is down before the name line is fitted round them
+    # the generator's own lines, the ownership lines first and the identity line last, each fitted
+    # against everything already on the board (recorded in build-report.json)
+    for t, item in sorted([pt for pt in placed_texts if pt[0].get("fit")], key=lambda pt: bool(pt[0].get("identity"))):
+        words, where = fit_text(board, spec, item, t)
+        spec.setdefault("silk_fits", []).append(where)
         if t.get("identity"):
-            spec["identity_fit"] = fit_identity(board, spec, item, t)       # recorded in build-report.json
-            print(f"identity line: {spec['identity_fit']}")
+            spec["identity_fit"], spec["identity_text"] = where, words
+        print(f"silkscreen: {where}")
     tb = board.GetTitleBlock()       # as the schematic's: title, date, revision, owner and licence
     tb.SetTitle(spec["title_block"]["title"])
     tb.SetDate(spec["title_block"]["date"])
