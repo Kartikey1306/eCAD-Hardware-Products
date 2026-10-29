@@ -268,11 +268,12 @@ def shunt_parts(board: Board) -> List[Part]:
 
 
 def generated_silk_problems(drc: Dict[str, Any], texts: List[Dict[str, Any]]) -> List[str]:
-    """DRC findings that name silkscreen the generator placed (the identity line) over copper, at the
-    board edge or over other silkscreen (PR #74 review: a moved name line could land on the ownership
-    line). KiCad grades them as warnings; the build treats them as errors, so a clipped or overprinted
-    board name never reaches a fab."""
-    ours = [t["text"] for t in texts if t.get("identity")]
+    """DRC findings that name silkscreen the generator placed or sized (the identity line and, since
+    stage 2, the ownership lines it fits at 1.0 mm) over copper, at the board edge or over other
+    silkscreen (PR #74 review: a moved name line could land on the ownership line). KiCad grades them as
+    warnings; the build treats them as errors, so a clipped or overprinted board name or ownership
+    line never reaches a fab."""
+    ours = [t["text"] for t in texts if t.get("identity") or t.get("fit")]
     out = []
     for v in drc.get("violations", []):
         if v.get("type") not in ("silk_over_copper", "silk_edge_clearance", "silk_overlap"):

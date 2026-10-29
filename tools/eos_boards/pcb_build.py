@@ -599,14 +599,16 @@ def _fiducial_obstacles(board, spec, side):
     return out
 
 
-def _silk_obstacles(board, item):
+def _silk_obstacles(board, item, items=None):
     """What silkscreen ``item`` (a board text) must keep off: every pad of its side and every drilled
     pad, grown by SILK_PAD_GAP, as boxes; and every other silkscreen item on its layer (board texts and
-    shapes, footprint graphics and visible footprint texts), as {uuid: box}."""
+    shapes, footprint graphics and visible footprint texts), as {uuid: box}. ``items``, a dict when
+    given, also receives those items themselves by uuid."""
     layer = item.GetLayer()
     cu = P.B_Cu if layer == P.B_SilkS else P.F_Cu
     gap = MM(fabrication.SILK_PAD_GAP)
     pads, silk = [], {}
+    items = {} if items is None else items
     own = item.m_Uuid.AsString()
     for fp in board.GetFootprints():
         for pad in fp.Pads():
@@ -617,10 +619,19 @@ def _silk_obstacles(board, item):
         for g in list(fp.GraphicalItems()) + [fp.Reference(), fp.Value()]:
             if g.GetLayer() == layer and (not hasattr(g, "IsVisible") or g.IsVisible()):
                 silk[g.m_Uuid.AsString()] = g.GetBoundingBox()
+                items[g.m_Uuid.AsString()] = g
     for d in board.GetDrawings():
         if d.GetLayer() == layer and d.m_Uuid.AsString() != own:
             silk[d.m_Uuid.AsString()] = d.GetBoundingBox()
+            items[d.m_Uuid.AsString()] = d
     return pads, silk
+
+
+def _strokes_touch(item, others):
+    """True when ``item``'s strokes touch any of ``others`` (silkscreen on its layer), as KiCad's DRC
+    sees silk over silk: their real shapes, not their boxes."""
+    shape = item.GetEffectiveShape(item.GetLayer())
+    return any(shape.Collide(o.GetEffectiveShape(item.GetLayer()), 0) for o in others)
 
 
 def _silk_clear(spec, item, pads, silk, allowed):
@@ -638,19 +649,23 @@ def fit_text(board, spec, item, t, pending=()):
     """Fit a silkscreen line the generator sizes (the identity line, the ownership lines): at least
     SILK_MIN_TEXT high, clear of every pad of its side and every drilled pad by SILK_PAD_GAP, inside
     the outline by SILK_EDGE_GAP, and off any other silkscreen that its design line (``design_text`` at
-    ``design_size``, where the designer checked it) did not already touch; the generator lines still to
+    ``design_size``, where the designer checked it) did not already touch (and whose strokes, not just
+    boxes, it then keeps off: a larger line can reach them); the generator lines still to
     be fitted (``pending``, uuids) are not in the way yet, they fit round this one. Tried where the
     design put it, then moved (fabrication.silk_moves: up or down by up to 2 mm, then also up to 3 mm
     sideways), for each of its ``variants`` (the identity line shortens: fabrication.identity_variants),
     and last with narrower characters (fabrication.SILK_WIDTHS); the height and stroke never go down. A
     line that fits nowhere stops the build: fabs clip silkscreen off pads, and KiCad reports silk over
     copper only as a warning. Returns (the text placed, a description of where it went)."""
-    pads, silk = _silk_obstacles(board, item)
+    items = {}
+    pads, silk = _silk_obstacles(board, item, items)
     item.SetText(t.get("design_text") or t["text"])                   # what the designer checked, as drawn
     item.SetTextSize(v(t["design_size"], t["design_size"]))
     item.SetTextThickness(MM(fabrication.silk_stroke(t["design_size"], t.get("bold", False))))
-    allowed = {uid for uid, box in silk.items() if box.Intersects(item.GetBoundingBox())} if t.get("design_text") else set()
-    allowed |= set(pending)
+    touched = {uid for uid, box in silk.items() if box.Intersects(item.GetBoundingBox())} if t.get("design_text") else set()
+    # what the design line's box touched may stay box to box with the larger line, never stroke to stroke
+    near = [items[uid] for uid in touched - set(pending)]
+    allowed = touched | set(pending)
     item.SetTextThickness(MM(fabrication.silk_stroke(t["size"], t.get("bold", False))))
     for width in fabrication.SILK_WIDTHS:
         item.SetTextSize(v(t["size"] * width, t["size"]))                # the height stays t["size"]
@@ -658,7 +673,7 @@ def fit_text(board, spec, item, t, pending=()):
             item.SetText(words)
             for dx, dy in fabrication.silk_moves():
                 item.SetPosition(v(t["x"] + dx, t["y"] + dy))
-                if _silk_clear(spec, item, pads, silk, allowed):
+                if _silk_clear(spec, item, pads, silk, allowed) and not _strokes_touch(item, near):
                     narrow = "" if width == 1.0 else f" ({width:g} wide)"
                     return words, f"{words!r} {t['size']} mm{narrow} at ({round(t['x'] + dx, 2)}, {round(t['y'] + dy, 2)})"
     raise SystemExit(f"silkscreen line {t['text']!r} at {t['size']} mm clears no pad, edge or other silkscreen "

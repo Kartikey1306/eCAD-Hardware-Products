@@ -1273,7 +1273,7 @@ class IdentityTest(_Lib):
         # widths outermost, then the identity line's variants, then the moves: shortening before narrowing
         self.assertLess(fit.index("for width in fabrication.SILK_WIDTHS:"), fit.index('for words in t.get("variants"'))
         self.assertLess(fit.index('for words in t.get("variants"'), fit.index("for dx, dy in fabrication.silk_moves():"))
-        self.assertIn("allowed |= set(pending)", fit)
+        self.assertIn("allowed = touched | set(pending)", fit)
         place = source[source.index("def place(spec"):]
         self.assertIn("fit_text(board, spec, item, t, {later.m_Uuid.AsString() for _, later in fits[i + 1:]})", place)
 
@@ -1498,6 +1498,22 @@ class GeneratedSilkGateTest(unittest.TestCase):
         self.assertEqual(build.generated_silk_problems(drc("silk_overlap", "PWR"), texts), [])
         for kind in ("silk_over_copper", "silk_edge_clearance"):
             self.assertEqual(len(build.generated_silk_problems(drc(kind, "EoS T  rev A  2026"), texts)), 1)
+
+    def test_an_ownership_line_over_other_silk_fails_the_build_too(self):
+        # stage 2 sweep (30 Oct): EoS ESP32 DevKit's ownership line, raised to 1.0 mm, met the pin label "16"
+        # stroke to stroke; the generator sizes and fits the ownership lines, so the gate covers them
+        texts = [{"text": "(c) 2026 Kartikeydheer Srivastava", "fit": True}, {"text": "All rights reserved", "fit": True},
+                 {"text": "16"}]
+        drc = {"violations": [{"type": "silk_overlap", "severity": "warning", "items": [
+            {"description": "PCB text '16' on B.Silkscreen"},
+            {"description": "PCB text '(c) 2026 Kartikeydheer Srivastava' on B.Silkscreen"}]}]}
+        self.assertEqual(build.generated_silk_problems(drc, texts),
+                         ["silk_overlap: PCB text '(c) 2026 Kartikeydheer Srivastava' on B.Silkscreen"])
+        self.assertEqual(build.generated_silk_problems(drc, texts[2:]), [])          # a design text alone: a warning
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        fit = source[source.index("def fit_text("):source.index("def place_labels(")]
+        self.assertIn("_silk_clear(spec, item, pads, silk, allowed) and not _strokes_touch(item, near)", fit)
+        self.assertIn("near = [items[uid] for uid in touched - set(pending)]", fit)
 
 
 FIT_SCRIPT = """
