@@ -141,7 +141,9 @@ a BOM-only symbol, JS1, JS2 ... (KiCad's pinless `Mechanical:Housing`, not on th
 board and its parity check do not change. The BOM's Assembly column marks the line "Loose: supplied
 with the board, not placed", so an assembler matching BOM lines to placement rows does not look for
 it, and its description names a second source, Sullins QPC02SXGN-RC. `spec_for` refuses a `shunts`
-entry for anything but a 2.54 mm pin header, and a part with pins marked `on_board=False`.
+count for anything but a 2.54 mm pin header, a jumper symbol on a header of another pitch unless
+`shunts` gives it 0 (no 2.54 mm shunt fits it; the README names its shunt), and a part with pins
+marked `on_board=False`.
 
 **Board identity.** The silkscreen carries the board's name, revision and year,
 "EoS Motion Wing  rev A  2026", beside its ownership line ("(c) 2026 <owner>"), on the same layer

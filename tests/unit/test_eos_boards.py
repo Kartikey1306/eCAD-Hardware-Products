@@ -1472,6 +1472,18 @@ class ShuntTest(_Lib):
             with self.subTest(message=message), self.assertRaisesRegex(SystemExit, message):
                 build.shunt_parts(self.board(parts, shunts=shunts))
 
+    def test_a_jumper_on_a_finer_header_gets_no_2_54_mm_shunt(self):
+        # PR #74 review (greptile): the automatic count took any PinHeader, 1.27 mm too, past the pitch check
+        fine = Part("JP2", "T:R", "MD", "Connector_PinHeader_1.27mm:PinHeader_1x02_P1.27mm_Vertical", (50, 50),
+                    {"1": "A", "2": "B"})
+        fine.lib_id = "Jumper:Jumper_2_Open"
+        with self.assertRaisesRegex(SystemExit, r"JP2 is a jumper on .*P1\.27mm.*no 2\.54 mm shunt fits; give shunts=\{'JP2': 0\}"):
+            build.shunt_parts(self.board([fine]))
+        self.assertEqual(build.shunt_parts(self.board([fine], shunts={"JP2": 0})), [])    # the design says none
+        with self.assertRaisesRegex(SystemExit, "2.54 mm pin header"):
+            build.shunt_parts(self.board([fine], shunts={"JP2": 1}))
+        self.assertEqual([p.ref for p in build.shunt_parts(self.board([fine, self.jp], shunts={"JP2": 0}))], ["JS1"])
+
     def test_the_spec_validates_shunts_and_bom_only_parts(self):
         # review m8: spec_for itself refuses a bad shunts entry and a part with pins left off the board
         for kw, message in (({"shunts": {"U1": 5}}, "U1 has pins|does not have|2.54 mm pin header"),

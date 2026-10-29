@@ -188,20 +188,33 @@ SHUNT_FIELDS = {"Manufacturer": "Samtec", "MPN": "SNT-100-BK-G",
                 "Assembly": "Loose: supplied with the board, not placed"}
 SHUNT_SECOND_SOURCE = "Sullins QPC02SXGN-RC"
 SHUNT_SYMBOL = "Mechanical:Housing"
+JUMPER_SYMBOLS = ("Jumper:Jumper_2_", "Jumper:Jumper_3_")     # header jumpers, which take a shunt
 BOM_FIELDS = ("Reference,Value,Footprint,Manufacturer,MPN,Description,Assembly,${QUANTITY},${DNP}",
               "Refs,Value,Footprint,Manufacturer,MPN,Description,Assembly,Qty,DNP")
 
 
+def _takes_shunt(part: Part) -> bool:
+    """A 2.54 mm pin header: what the generator's 2.54 mm shunt fits."""
+    return "PinHeader" in part.footprint and "P2.54mm" in part.footprint
+
+
 def check_shunts(board: Board) -> None:
-    """Refuse a ``shunts`` entry for a part the board does not have, for anything but a 2.54 mm pin
-    header, or with a count that is not a whole number of shunts."""
+    """Refuse a ``shunts`` entry for a part the board does not have, with a count that is not a whole
+    number of shunts, or with shunts for anything but a 2.54 mm pin header (0, "none supplied", is
+    accepted for any part); and a jumper symbol drawn on a pin header of another pitch that the entry
+    does not settle: no 2.54 mm shunt fits it, so the design must say ``shunts={ref: 0}`` and name its
+    shunt in the README (PR #74 review: the automatic count skipped the pitch check)."""
     by_ref = {p.ref: p for p in board.parts}
     for ref, n in board.shunts.items():
         if ref not in by_ref:
             raise SystemExit(f"{board.name}: shunts names {ref}, which the board does not have")
-        if not ("PinHeader" in by_ref[ref].footprint and "P2.54mm" in by_ref[ref].footprint) or not isinstance(n, int) \
-                or isinstance(n, bool) or n < 0:
+        if not isinstance(n, int) or isinstance(n, bool) or n < 0 or (n and not _takes_shunt(by_ref[ref])):
             raise SystemExit(f"{board.name}: shunts {ref}: {n!r}; give a count of 2.54 mm shunts for a 2.54 mm pin header")
+    for p in board.parts:
+        if p.lib_id.startswith(JUMPER_SYMBOLS) and "PinHeader" in p.footprint and not _takes_shunt(p) \
+                and p.ref not in board.shunts:
+            raise SystemExit(f"{board.name}: {p.ref} is a jumper on {p.footprint}, which no 2.54 mm shunt fits; "
+                             f"give shunts={{{p.ref!r}: 0}} and name its shunt in the README")
 
 
 def shunt_parts(board: Board) -> List[Part]:
@@ -212,7 +225,7 @@ def shunt_parts(board: Board) -> List[Part]:
     check_shunts(board)
     count = {}
     for part in board.parts:
-        if part.lib_id.startswith(("Jumper:Jumper_2_", "Jumper:Jumper_3_")) and "PinHeader" in part.footprint:
+        if part.lib_id.startswith(JUMPER_SYMBOLS) and _takes_shunt(part):
             count[part.ref] = 1
     count.update(board.shunts)
     taken = sorted(p.ref for p in board.parts if re.fullmatch(r"JS\d+", p.ref))
