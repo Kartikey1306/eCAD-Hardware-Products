@@ -133,7 +133,10 @@ two fit, the build stops and names the `fiducials` option.
 SNT-100-BK-G, one for each `Jumper:Jumper_2_*`/`Jumper_3_*` symbol drawn on a 2.54 mm pin header,
 and the count the `shunts` option gives for a jumper header drawn with a connector symbol. Each is
 a BOM-only symbol, JS1, JS2 ... (KiCad's pinless `Mechanical:Housing`, not on the board), so the
-board and its parity check do not change.
+board and its parity check do not change. The BOM's Assembly column marks the line "Loose: supplied
+with the board, not placed", so an assembler matching BOM lines to placement rows does not look for
+it, and its description names a second source, Sullins QPC02SXGN-RC. `spec_for` refuses a `shunts`
+entry for anything but a 2.54 mm pin header, and a part with pins marked `on_board=False`.
 
 **Board identity.** The silkscreen carries the board's name, revision and year,
 "EoS Motion Wing  rev A  2026", beside its ownership line ("(c) 2026 <owner>"), on the same layer

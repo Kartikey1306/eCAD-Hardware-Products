@@ -1426,6 +1426,28 @@ class ShuntTest(_Lib):
             with self.subTest(message=message), self.assertRaisesRegex(SystemExit, message):
                 build.shunt_parts(self.board(parts, shunts=shunts))
 
+    def test_the_spec_validates_shunts_and_bom_only_parts(self):
+        # review m8: spec_for itself refuses a bad shunts entry and a part with pins left off the board
+        for kw, message in (({"shunts": {"U1": 5}}, "U1 has pins|does not have|2.54 mm pin header"),
+                            ({"shunts": {"NOPE": 1}}, "does not have"), ({"shunts": {"J9": True}}, "count")):
+            with self.subTest(**{k: str(v) for k, v in kw.items()}), self.assertRaisesRegex(SystemExit, message):
+                build.spec_for(self.board([self.boot], **kw), self.lib, Path(self.tmp.name), [])
+        off = Part("R5", "T:R", "1k", "fp", (9, 9), {"1": "A", "2": "B"}, on_board=False)
+        with self.assertRaisesRegex(SystemExit, "R5 has pins"):
+            build.spec_for(self.board([self.boot, off]), self.lib, Path(self.tmp.name), [])
+        board = self.board([self.boot], shunts={"J9": 1})
+        board.parts = board.parts + build.shunt_parts(board)            # pinless and off the board: fine
+        self.assertEqual([p["ref"] for p in build.spec_for(board, self.lib, Path(self.tmp.name), [])["parts"]], ["J9"])
+
+    def test_a_shunt_line_says_it_is_loose_and_names_a_second_source(self):
+        # review m9: an assembler matching BOM lines to placement rows must not look for it; B1 fallback
+        shunt = build.shunt_parts(self.board([self.boot], shunts={"J9": 1}))[0]
+        self.assertEqual(shunt.fields["Assembly"], "Loose: supplied with the board, not placed")
+        self.assertIn("Second source: Sullins QPC02SXGN-RC", shunt.fields["Description"])
+        self.assertIn("Assembly", build.BOM_FIELDS[0].split(","))
+        self.assertEqual(len(build.BOM_FIELDS[0].split(",")), len(build.BOM_FIELDS[1].split(",")))
+        self.assertIn("BOM_FIELDS[0]", (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8"))
+
     def test_a_shunt_is_a_bom_line_in_the_schematic_and_off_the_board(self):
         board = self.board([self.boot], shunts={"J9": 1})
         board.parts = board.parts + build.shunt_parts(board)

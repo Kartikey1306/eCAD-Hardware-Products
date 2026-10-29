@@ -165,11 +165,30 @@ def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, 
 
 
 # The shunt a 2.54 mm jumper header ships with (BENCH-READY B3): Samtec SNT-100-BK-G, a 2-position
-# 2.54 mm shunt with gold contacts, "Active" at DigiKey (read 24 Oct 2026). On the schematic it is a
-# BOM-only symbol (KiCad's pinless Mechanical:Housing, on_board no): a BOM line, no footprint, so the
-# board and its parity check are unchanged.
-SHUNT_FIELDS = {"Manufacturer": "Samtec", "MPN": "SNT-100-BK-G"}
+# 2.54 mm shunt with gold contacts, "Active" at DigiKey (read 24 Oct 2026). Second source (B1, a
+# single-source part names a fallback): Sullins QPC02SXGN-RC, 2-position 2.54 mm, gold, open top,
+# "Active" at DigiKey (read 29 Oct 2026). On the schematic it is a BOM-only symbol (KiCad's pinless
+# Mechanical:Housing, on_board no): a BOM line, no footprint, so the board and its parity check are
+# unchanged. Its BOM line says it is loose (the Assembly column), so an assembler matching BOM lines to
+# placement rows does not look for it on the board.
+SHUNT_FIELDS = {"Manufacturer": "Samtec", "MPN": "SNT-100-BK-G",
+                "Assembly": "Loose: supplied with the board, not placed"}
+SHUNT_SECOND_SOURCE = "Sullins QPC02SXGN-RC"
 SHUNT_SYMBOL = "Mechanical:Housing"
+BOM_FIELDS = ("Reference,Value,Footprint,Manufacturer,MPN,Description,Assembly,${QUANTITY},${DNP}",
+              "Refs,Value,Footprint,Manufacturer,MPN,Description,Assembly,Qty,DNP")
+
+
+def check_shunts(board: Board) -> None:
+    """Refuse a ``shunts`` entry for a part the board does not have, for anything but a 2.54 mm pin
+    header, or with a count that is not a whole number of shunts."""
+    by_ref = {p.ref: p for p in board.parts}
+    for ref, n in board.shunts.items():
+        if ref not in by_ref:
+            raise SystemExit(f"{board.name}: shunts names {ref}, which the board does not have")
+        if not ("PinHeader" in by_ref[ref].footprint and "P2.54mm" in by_ref[ref].footprint) or not isinstance(n, int) \
+                or isinstance(n, bool) or n < 0:
+            raise SystemExit(f"{board.name}: shunts {ref}: {n!r}; give a count of 2.54 mm shunts for a 2.54 mm pin header")
 
 
 def shunt_parts(board: Board) -> List[Part]:
@@ -177,23 +196,19 @@ def shunt_parts(board: Board) -> List[Part]:
     ``Jumper:Jumper_2_*``/``Jumper_3_*`` symbol drawn on a 2.54 mm pin header, and the number the
     design's ``shunts`` option gives for any other jumper header (a 2 x 2 header taking two, say;
     0 for none)."""
+    check_shunts(board)
     count = {}
     for part in board.parts:
         if part.lib_id.startswith(("Jumper:Jumper_2_", "Jumper:Jumper_3_")) and "PinHeader" in part.footprint:
             count[part.ref] = 1
-    by_ref = {p.ref: p for p in board.parts}
-    for ref, n in board.shunts.items():
-        if ref not in by_ref:
-            raise SystemExit(f"{board.name}: shunts names {ref}, which the board does not have")
-        if not ("PinHeader" in by_ref[ref].footprint and "P2.54mm" in by_ref[ref].footprint) or not isinstance(n, int) or n < 0:
-            raise SystemExit(f"{board.name}: shunts {ref}: {n!r}; give a count of 2.54 mm shunts for a 2.54 mm pin header")
-        count[ref] = n
+    count.update(board.shunts)
     taken = sorted(p.ref for p in board.parts if re.fullmatch(r"JS\d+", p.ref))
     if taken and any(count.values()):
         raise SystemExit(f"{board.name}: {taken} use the JS references the generator gives jumper shunts")
     headers = [ref for ref in sorted(count, key=lambda r: (len(r), r)) if count[ref]]
     description = ("Jumper shunt, 2.54 mm, 2 positions, gold, supplied for "
-                   + ", ".join(f"{ref} ({count[ref]})" for ref in headers) + "; where to fit them: the README")
+                   + ", ".join(f"{ref} ({count[ref]})" for ref in headers) + "; where to fit them: the README. "
+                   + f"Second source: {SHUNT_SECOND_SOURCE}")
     px, py = board.power_block
     out = []
     for ref in headers:
@@ -275,9 +290,12 @@ def pad_numbers(number: str) -> List[str]:
 
 
 def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[str, Any]]) -> Dict[str, Any]:
+    check_shunts(board)
     parts, nets = [], set()
     for part in board.parts:
         if not part.on_board:
+            if resolve(part, lib):         # a part with pins left off the board would vanish from it silently
+                raise SystemExit(f"{board.name}: {part.ref} has pins, so it cannot be a BOM-only part (on_board=False)")
             continue                       # a BOM-only item (a jumper shunt): no footprint
         pads = {}
         for num, (pin, net) in resolve(part, lib).items():
@@ -605,8 +623,7 @@ def main() -> int:
          "--generate-map", "--map-format", "pdf", "-o", str(gerbers) + "/", pcb])
     run([cli, "pcb", "export", "pos", "--format", "csv", "--units", "mm", "--side", "both",
          "-o", fab / f"{board.name}-placement.csv", pcb])
-    run([cli, "sch", "export", "bom", "--fields", "Reference,Value,Footprint,Manufacturer,MPN,Description,${QUANTITY},${DNP}",
-         "--labels", "Refs,Value,Footprint,Manufacturer,MPN,Description,Qty,DNP", "--group-by", "Value,Footprint,MPN",
+    run([cli, "sch", "export", "bom", "--fields", BOM_FIELDS[0], "--labels", BOM_FIELDS[1], "--group-by", "Value,Footprint,MPN",
          "--exclude-dnp", "-o", fab / f"{board.name}-bom.csv", sch])
     run([cli, "pcb", "export", "step", "--subst-models", "--force", "-o", fab / f"{board.name}.step", pcb])
     run([cli, "sch", "export", "pdf", "-o", out / f"{board.name}-schematic.pdf", sch])
