@@ -1406,9 +1406,19 @@ def ripup(spec, pcb_path, clashes_path):
                 n += 1
         return n
 
+    def fixed(item):
+        # the named item is locked copper: a locked via, or a locked track of its length, of its net at its spot
+        at = v(*item["pos"])
+        for t in board.GetTracks():
+            via = t.GetClass() == "PCB_VIA"
+            if t.IsLocked() and t.GetNetname() == item["net"] and via == item.get("via", False) \
+                    and t.HitTest(at, MM(0.005)) and (via or abs(P.ToMM(t.GetLength()) - item.get("length", 0.0)) < 0.001):
+                return True
+        return False
+
     for c in clashes:
         # the named item, or what it clashes with when the named one is fixed copper (a locked fan-out via)
-        lifted += fabrication.lift_with_fallback(c, lift)
+        lifted += fabrication.lift_with_fallback(c, lift, fixed)
     if lifted:
         P.ZONE_FILLER(board).Fill(board.Zones())
     P.SaveBoard(pcb_path, board)

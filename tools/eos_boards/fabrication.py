@@ -390,17 +390,21 @@ def route_options(route):
     return "join" in extra, (float(widths[0]) if widths else None)
 
 
-def lift_with_fallback(clash, lift):
+def lift_with_fallback(clash, lift, fixed=lambda item: False):
     """Rip-up of one clearance clash (build.clearance_clashes): lift the named item's copper with
-    ``lift(net, pos)`` (which returns how many items it took off); when that takes nothing, because
-    the item is fixed copper such as a locked fan-out via, lift the item it clashes with instead.
+    ``lift(net, pos)`` (which returns how many items it took off); when the named item is fixed copper
+    such as a locked fan-out via (``fixed(clash)``; PR #74 review: lifting its net's other copper
+    nearby leaves the clash), or lifting takes nothing, lift the item it clashes with instead.
     Returns the number of items lifted.
 
     >>> lift_with_fallback({"net": "GND", "pos": [1, 2], "other": {"net": "/A", "pos": [1, 3]}},
     ...                    lambda net, pos: 0 if net == "GND" else 2)
     2
+    >>> lift_with_fallback({"net": "GND", "pos": [1, 2], "other": {"net": "/A", "pos": [1, 3]}},
+    ...                    lambda net, pos: 5 if net == "GND" else 2, lambda item: item["net"] == "GND")
+    2
     """
-    n = lift(clash["net"], clash["pos"])
+    n = 0 if fixed(clash) else lift(clash["net"], clash["pos"])
     if not n and clash.get("other"):
         n = lift(clash["other"]["net"], clash["other"]["pos"])
     return n

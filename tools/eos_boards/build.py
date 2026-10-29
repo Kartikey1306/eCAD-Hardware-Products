@@ -117,10 +117,11 @@ def licence_text(board, module=""):
 
 def clearance_clashes(drc):
     """The clearance errors between two pieces of routed copper (track or via), from KiCad's DRC
-    report, as {net, pos, other}: the via if one is involved, else the shorter track. That is the item
-    to lift and route again; ``other`` ({net, pos}) is the item it clashes with, which rip-up lifts
-    instead when the first is fixed copper (a locked fan-out via). A clash with a pad or a zone is left
-    for the build to fail on."""
+    report, as {net, pos, via, length, other}: the via if one is involved, else the shorter track. That
+    is the item to lift and route again (``via`` says which kind it is and ``length`` a track's length
+    in mm, so rip-up can tell whether it is locked copper); ``other`` (the same keys) is the item it
+    clashes with, which rip-up lifts instead when the first is fixed copper (a locked fan-out via). A
+    clash with a pad or a zone is left for the build to fail on."""
     out = []
     for v in drc.get("violations", []):
         items = v.get("items", [])
@@ -133,10 +134,10 @@ def clearance_clashes(drc):
             return float(m.group(1)) if m else 0.0       # a via has no length: lift it first
         item = min(items, key=length)
         other = items[1] if item is items[0] else items[0]
-        out.append({"net": item["description"].split("[", 1)[1].split("]", 1)[0],
-                    "pos": [item["pos"]["x"], item["pos"]["y"]],
-                    "other": {"net": other["description"].split("[", 1)[1].split("]", 1)[0],
-                              "pos": [other["pos"]["x"], other["pos"]["y"]]}})
+        def named(i):
+            return {"net": i["description"].split("[", 1)[1].split("]", 1)[0], "pos": [i["pos"]["x"], i["pos"]["y"]],
+                    "via": i["description"].startswith("Via ["), "length": length(i)}
+        out.append(dict(named(item), other=named(other)))
     return out
 
 

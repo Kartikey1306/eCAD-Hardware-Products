@@ -244,15 +244,18 @@ class ClashTest(unittest.TestCase):
             {"type": "silk_edge_clearance", "severity": "warning", "items": [item("Track [/E] on F.Cu, length 1 mm", 5.0)] * 2},
         ]}
         self.assertEqual(build.clearance_clashes(drc), [
-            {"net": "/PH0", "pos": [30.09, 1.0], "other": {"net": "/PA1", "pos": [30.08, 1.0]}},
-            {"net": "/B", "pos": [2.0, 1.0], "other": {"net": "/A", "pos": [1.0, 1.0]}}])
+            {"net": "/PH0", "pos": [30.09, 1.0], "via": True, "length": 0.0,
+             "other": {"net": "/PA1", "pos": [30.08, 1.0], "via": False, "length": 5.2445}},
+            {"net": "/B", "pos": [2.0, 1.0], "via": False, "length": 0.4,
+             "other": {"net": "/A", "pos": [1.0, 1.0], "via": False, "length": 9.0}}])
 
     def test_locked_fanout_copper_can_be_lifted_round_and_pruned(self):
         # review m10/D5: a clash naming a locked fan-out via lifts the other item; a dangling fan-out via
         # or stub is pruned; a via_dangling warning fails the build
         source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
         ripup = source[source.index("def ripup("):source.index("def repair(")]
-        self.assertIn("fabrication.lift_with_fallback(c, lift)", ripup)
+        self.assertIn("fabrication.lift_with_fallback(c, lift, fixed)", ripup)
+        self.assertIn('t.IsLocked() and t.GetNetname() == item["net"] and via == item.get("via", False)', ripup)
         # the behaviour (review n3, N14): the named item first, the other only when the first lifts nothing
         calls = []
 
@@ -265,6 +268,14 @@ class ClashTest(unittest.TestCase):
         self.assertEqual((fabrication.lift_with_fallback(dict(clash, net="/B"), lift), calls), (3, ["/B"]))
         calls.clear()
         self.assertEqual((fabrication.lift_with_fallback({"net": "GND", "pos": [0, 0]}, lift), calls), (0, ["GND"]))
+        # PR #74 review (coderabbit): a locked named item is never lifted round, even when its net has
+        # loose copper nearby that lift() would take; the item it clashes with goes instead
+        calls.clear()
+        locked = dict(clash, net="/B", via=True)
+        self.assertEqual((fabrication.lift_with_fallback(locked, lift, lambda item: item.get("via")), calls), (3, ["/A"]))
+        calls.clear()
+        self.assertEqual((fabrication.lift_with_fallback(dict(locked, via=False), lift, lambda item: item.get("via")), calls),
+                         (3, ["/B"]))
         fanout = source[source.index("def fanout("):source.index("REFERENCE_ZONE = ")]
         self.assertEqual(fanout.count('spec.setdefault("fanout_copper", []).append('), 2)      # its vias and stubs
         prune = source[source.index("def prune_dangling("):source.index("def finish(")]
