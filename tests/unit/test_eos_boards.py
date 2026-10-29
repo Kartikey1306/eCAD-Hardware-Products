@@ -1435,45 +1435,63 @@ class RobustRoutingTest(_Lib):
     """Deferred routing items: a new Freerouting run when repairs leave opens, a width per priority
     route, fan-out vias fixed for the router, and pour fragments joined again after each repair."""
 
-    def _route(self, open_counts, attempts=3):
-        """Run build.route with Freerouting, the pcb_build steps and DRC replaced: ``open_counts`` is
-        the number of open connections each run's last DRC reports. Returns (result, the board text
-        each finish step started from, the Freerouting options of each run)."""
+    OPEN = {"items": [{"description": "Pad 1 [/A] of R1 on F.Cu", "pos": {"x": 1.0, "y": 1.0}},
+                      {"description": "Pad 2 [/A] of R2 on F.Cu", "pos": {"x": 2.0, "y": 1.0}}]}
+    ISLAND = {"items": [{"description": "Zone [GND] on B.Cu", "pos": {"x": 3.0, "y": 3.0}},
+                        {"description": "Zone [GND] on B.Cu", "pos": {"x": 4.0, "y": 3.0}}]}
+
+    def _route(self, opens, attempts=3):
+        """Run build.route with Freerouting, the pcb_build steps and DRC replaced: ``opens`` is, per
+        run, the unconnected items its last DRC reports (after a keep-the-best restore, the DRC is run
+        once more). Returns (result, the board text each finish step started from, the Freerouting
+        options of each run, the board file at the end)."""
         from unittest import mock
         out = Path(tempfile.mkdtemp(dir=self.tmp.name))
         work = out / ".build"
         work.mkdir()
         pcb, ses = out / "b.kicad_pcb", work / "b.ses"
         pcb.write_text("placed\n")
-        seen, runs, reports = [], [], iter(open_counts)
+        seen, runs, reports = [], [], iter(list(opens) + [opens[0]])
 
         def step(mode, spec, board, other, tail=2000):
             seen.append(Path(board).read_text())
-            Path(board).write_text(Path(board).read_text() + "routed\n")   # finish changes the board
+            Path(board).write_text(Path(board).read_text() + f"routed by run {len(runs)}\n")
 
         def freeroute(dsn, ses_, passes, attempt, work_):
             runs.append(build.freerouting_args(attempt))
             ses_.write_text("session")
 
         def drc_round(cli, pcb_, out_):
-            n = next(reports)
-            return {"violations": [], "schematic_parity": [],
-                    "unconnected_items": [{"items": [{"description": "Zone [GND]"}]}] * n}   # not repairable
+            return {"violations": [], "schematic_parity": [], "unconnected_items": next(reports)}
 
         with mock.patch.object(build, "pcb_step", side_effect=step), mock.patch.object(build, "freeroute", side_effect=freeroute), \
+                mock.patch.object(build, "check_and_repair", side_effect=lambda *a: (drc_round(*a[:1], None, None), 0)), \
                 mock.patch.object(build, "run_drc", side_effect=drc_round), contextlib.redirect_stdout(io.StringIO()):
             result = build.route("kicad-cli", "spec.json", pcb, "b.dsn", ses, work, out, 60, attempts)
-        return result, seen, runs
+        return result, seen, runs, pcb.read_text()
 
-    def test_a_run_that_leaves_opens_is_routed_again_from_the_placed_board(self):
-        (drc, rounds, made), seen, runs = self._route([2, 0])
-        self.assertEqual((len(drc["unconnected_items"]), made), (0, 2))
+    def test_a_run_that_leaves_opens_is_routed_again_with_other_costs(self):
+        (drc, rounds, made, kept), seen, runs, board = self._route([[self.OPEN] * 2, []])
+        self.assertEqual((len(drc["unconnected_items"]), made, kept), (0, 2, 2))
         self.assertEqual(seen, ["placed\n", "placed\n"])                 # the second run starts from the placement
-        self.assertEqual(runs, [[], ["-is", "random"]])                     # a new item order: the retry's "seed"
+        self.assertEqual(runs, [[], ["--router.scoring.via_costs=100"]])   # with Freerouting's via cost changed
 
-    def test_runs_stop_at_the_limit_and_a_clean_first_run_is_not_repeated(self):
-        self.assertEqual(self._route([1, 1, 1])[0][2], 3)
-        self.assertEqual(self._route([0])[0][2], 1)
+    def test_the_best_run_is_kept_and_zone_islands_are_not_retried(self):
+        (drc, _, made, kept), _, runs, board = self._route([[self.OPEN], [self.OPEN] * 3, [self.OPEN] * 2])
+        self.assertEqual((made, kept, len(drc["unconnected_items"])), (3, 1, 1))
+        self.assertEqual(board, "placed\nrouted by run 1\n")                  # run 1's board, restored
+        self.assertEqual(runs[2], ["--router.scoring.start_ripup_costs=300"])
+        (drc, _, made, kept), _, _, _ = self._route([[self.ISLAND]])           # nothing a new route would change
+        self.assertEqual((made, kept), (1, 1))
+        self.assertEqual(self._route([[]])[0][2], 1)                           # a clean first run is not repeated
+
+    def test_retry_settings_change_the_auto_router(self):
+        # review MAJOR-2: "-is random" only reordered the optimizer; each retry now changes a router cost
+        self.assertEqual([build.freerouting_args(i) for i in range(build.ROUTE_ATTEMPTS)],
+                         [[], ["--router.scoring.via_costs=100"], ["--router.scoring.start_ripup_costs=300"]])
+        self.assertEqual(len({tuple(a) for a in build.RETRY_SETTINGS}), build.ROUTE_ATTEMPTS)
+        self.assertEqual(build.repairable_opens({"unconnected_items": [self.OPEN, self.ISLAND]}),
+                         [{"net": "/A", "a": [1.0, 1.0], "b": [2.0, 1.0]}])
 
     def test_priority_route_options(self):
         self.assertEqual(fabrication.route_options((("U1", "1"), ("C1", "2"))), (False, None))

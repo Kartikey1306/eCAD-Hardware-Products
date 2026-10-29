@@ -36,12 +36,16 @@ paths that `kicad_env.py` and `build.py` use.
    The fan-out's vias and stubs are locked, so the router treats them as fixed and cannot delete
    or move a pad's way into its plane. Finally writes a Specctra DSN for the router.
 3. **Routing**. Freerouting, headless. The router is given 0.01 mm more clearance than the board's
-   rules, so its grid rounding never reaches DRC. Its result changes from run to run, so when the
-   repair rounds (step 5) still leave connections open, the build starts again from the placed
-   board with a new run, up to three runs. Freerouting 2.4.1 takes no seed, so each retry asks for
-   a random item order (`-is random`) instead of its default prioritised one; logs go to
-   `.build/freerouting.log`, `freerouting-2.log`, `freerouting-3.log`, and `build-report.json`
-   records `routing_runs`.
+   rules, so its grid rounding never reaches DRC. Freerouting 2.4.1 routes a given DSN the same way
+   every time and takes no seed, so a retry changes its own costs instead: when the repair rounds
+   (step 5) still leave connections that a route could close, the build starts again from the placed
+   board with the cost of a via doubled (`--router.scoring.via_costs=100`, default 50), then with the
+   cost of ripping up routed copper tripled (`--router.scoring.start_ripup_costs=300`, default 100),
+   up to three runs, and keeps the run that left the fewest connections open. On EoS Learn RP2350's
+   placement these settings each gave a different route, and the via-cost run closed /GPIO5, which
+   the default run had left open. A zone island left unconnected is no reason to route again. Logs go
+   to `.build/freerouting.log`, `freerouting-2.log`, `freerouting-3.log`; `build-report.json`
+   records `routing_runs` and `routing_run_kept`.
 4. **Finish** (`pcb_build.py finish`). Imports the routes, widens any track the router necked
    below the board's minimum width, steps any router via that sits within `VIA_PAD_GAP` of a pad
    of its own net away from it (up to 0.5 mm, its tracks following, only where it still clears

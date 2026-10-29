@@ -338,14 +338,21 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
             "fiducials": {side: [list(p) for p in points] for side, points in board.fiducials.items()}}
 
 
-ROUTE_ATTEMPTS = 3      # Freerouting runs at most, when the repair rounds leave connections open
+ROUTE_ATTEMPTS = 3      # Freerouting runs at most, when the repair rounds leave repairable connections open
+
+# Freerouting 2.4.1 routes a DSN the same way every time (the same board after every pass), and takes
+# no seed. A retry therefore changes the auto-router's own costs (its CLI sets any router setting as
+# --router.<path>=<value>): run 2 doubles the cost of a via (default 50), run 3 triples the cost of
+# ripping up routed copper to start a route (default 100). On EoS Learn RP2350's placement the four
+# runs (default, via cost 100, via cost 25, start rip-up 300) wrote four different sessions, and the
+# via-cost-100 run left 4 connections open on +3V3 where the default left 5 on +3V3 and /GPIO5
+# (campaign folder work/bench-ready-p3/fr-retry/, 29 Oct 2026).
+RETRY_SETTINGS = ([], ["--router.scoring.via_costs=100"], ["--router.scoring.start_ripup_costs=300"])
 
 
 def freerouting_args(attempt: int) -> List[str]:
-    """Freerouting options for run ``attempt`` (0 first). Freerouting 2.4.1 takes no seed (its router
-    and optimizer settings hold none), so a retry changes its item order instead: the first run uses
-    its default prioritised order, each retry a random one (``-is random``), so no two runs route alike."""
-    return [] if attempt == 0 else ["-is", "random"]
+    """Freerouting options for run ``attempt`` (0 first): Freerouting's defaults, then RETRY_SETTINGS."""
+    return list(RETRY_SETTINGS[attempt])
 
 
 def freeroute(dsn: Path, ses: Path, passes: int, attempt: int, work: Path) -> None:
@@ -381,19 +388,26 @@ def run_drc(cli: str, pcb: Path, out: Path) -> Dict[str, Any]:
     return kicad_check([cli, "pcb", "drc", "--schematic-parity", "--format", "json", "--severity-all", pcb], out / "drc.json")
 
 
+def repairable_opens(drc: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """The open connections the repair step works on: two located items, neither a zone. A zone island
+    left unconnected is not a routing gap; no repair or new route closes it."""
+    pairs = []
+    for u in drc.get("unconnected_items", []):
+        items = u.get("items", [])
+        if len(items) == 2 and all("pos" in i for i in items) \
+                and not any(i["description"].startswith("Zone") for i in items):
+            net = items[0]["description"].split("[", 1)[-1].split("]", 1)[0]
+            pairs.append({"net": net, "a": [items[0]["pos"]["x"], items[0]["pos"]["y"]],
+                          "b": [items[1]["pos"]["x"], items[1]["pos"]["y"]]})
+    return pairs
+
+
 def check_and_repair(cli: str, spec: Path, pcb: Path, work: Path, out: Path):
     """DRC; close what the autorouter left open (repair) or lift what it left too close (ripup), and
     check again, up to six rounds. Returns (the last DRC report, the rounds run)."""
     for attempt in range(6):
         drc = run_drc(cli, pcb, out)
-        pairs = []
-        for u in drc.get("unconnected_items", []):
-            items = u.get("items", [])
-            if len(items) == 2 and all("pos" in i for i in items) \
-                    and not any(i["description"].startswith("Zone") for i in items):
-                net = items[0]["description"].split("[", 1)[-1].split("]", 1)[0]
-                pairs.append({"net": net, "a": [items[0]["pos"]["x"], items[0]["pos"]["y"]],
-                              "b": [items[1]["pos"]["x"], items[1]["pos"]["y"]]})
+        pairs = repairable_opens(drc)
         clashes = clearance_clashes(drc)
         if not (pairs or clashes) or attempt == 5:
             break
@@ -411,22 +425,33 @@ def check_and_repair(cli: str, spec: Path, pcb: Path, work: Path, out: Path):
 def route(cli: str, spec: Path, pcb: Path, dsn: Path, ses: Path, work: Path, out: Path, passes: int,
           attempts: int = ROUTE_ATTEMPTS):
     """Route with Freerouting, finish, then DRC and repair. When the repair rounds still leave
-    connections open, start again from the placed board with a new Freerouting run (freerouting_args),
-    up to ``attempts`` runs: its result changes from run to run, and a failed run is no proof that the
-    placement cannot be routed. Returns (the last DRC report, its repair rounds, the runs made)."""
-    placed = work / "placed.kicad_pcb"
+    repairable connections open, start again from the placed board with Freerouting's costs changed
+    (RETRY_SETTINGS), up to ``attempts`` runs, and keep the run that left the fewest connections open
+    (the earliest on a tie). Returns (its DRC report, its repair rounds, the runs made, the run kept,
+    1 first)."""
+    placed, kept = work / "placed.kicad_pcb", work / "best-routed.kicad_pcb"
     shutil.copyfile(pcb, placed)
+    best = None
     for attempt in range(attempts):
         if attempt:
             shutil.copyfile(placed, pcb)
-            print(f"routing again, run {attempt + 1} of {attempts}: "
-                  f"{len(drc['unconnected_items'])} connection(s) were still open", flush=True)
+            print(f"routing again, run {attempt + 1} of {attempts} ({' '.join(freerouting_args(attempt))}): "
+                  f"{len(repairable_opens(drc))} repairable connection(s) were still open", flush=True)
         freeroute(dsn, ses, passes, attempt, work)
         pcb_step("finish", spec, pcb, ses)
         drc, rounds = check_and_repair(cli, spec, pcb, work, out)
-        if not drc.get("unconnected_items"):
-            break
-    return drc, rounds, attempt + 1
+        opens = len(drc.get("unconnected_items", []))
+        if best is None or opens < best[0]:
+            best = (opens, attempt, drc, rounds)
+            shutil.copyfile(pcb, kept)
+        if not opens or not repairable_opens(drc):
+            break                          # done, or only what a new route would not change (a zone island)
+    runs = attempt + 1
+    if best[1] != attempt:                 # an earlier run did better: its board, checked again
+        shutil.copyfile(kept, pcb)
+        print(f"keeping run {best[1] + 1}: {best[0]} connection(s) open, against {opens} in run {runs}", flush=True)
+        drc = run_drc(cli, pcb, out)
+    return drc, best[3], runs, best[1] + 1
 
 
 def project_file(name: str) -> str:
@@ -527,9 +552,10 @@ def main() -> int:
             print(f"  {v['type']}: {[i['description'] for i in v['items']]}")
         print(f"placement: {len(found)} overlap/clearance problem(s)")
         return 1 if found else 0
-    drc, rounds, runs = route(cli, spec, pcb, dsn, ses, work, out, args.passes)
+    drc, rounds, runs, kept = route(cli, spec, pcb, dsn, ses, work, out, args.passes)
     report["repair_rounds"] = rounds
     report["routing_runs"] = runs
+    report["routing_run_kept"] = kept
     report["drc"] = {k: len(drc.get(k, [])) for k in ("violations", "unconnected_items", "schematic_parity")}
     report["drc_errors"] = sum(1 for v in drc.get("violations", []) if v.get("severity") == "error")
     report["drc_warnings"] = sum(1 for v in drc.get("violations", []) if v.get("severity") == "warning")
