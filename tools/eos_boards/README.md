@@ -127,7 +127,9 @@ and in y), records why in `build-report.json` (`fiducial_notes`), and the board'
 dot is clear of every courtyard, pad, drilled hole, silkscreen text, keep-out and earlier copper on
 that side: other copper stays 1.0 mm beyond the dot's edge, outside the mask opening, which meets
 IPC-7351B's clear area of at least twice the mark's radius. That square is a rule area on the saved
-board, so no track, via or pour enters it, and every later step's own copper keeps out of it too.
+board, so no track, via or pour enters it on the fiducial's side, and the generator's own vias keep
+out of it on every layer, its tracks on that side. Fiducials are placed after the reference copper,
+pre-routes and priority routes, the copper a design lays first, and before the main plane fan-out.
 Fiducials are board-only footprints excluded from the BOM: not in the schematic or the BOM, but in the
 placement file; the build's fabrication check fails a fiducial that is not. Where neither three nor
 two fit, the build stops and names the `fiducials` option.

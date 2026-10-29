@@ -779,9 +779,6 @@ def place(spec, pcb_path, dsn_path):
     if spec.get("preroutes"):
         done, skipped = preroute(board, spec)
         print(f"pre-routed {done} critical connection(s), {skipped} left to the router")
-    # Fiducials after the reference copper and pre-routes (they keep clear of them) and before the
-    # priority routes and the fan-out, which then keep their copper out of the fiducials' squares.
-    print(f"fiducials: {place_fiducials(board, spec)}")
     # A tight bus is routed first, in the order given, the way a designer lays it by hand: the
     # autorouter, left to pick its own order, can box one of its lines in. Locked, so it stays.
     # Before the plane fan-out, so the fan-out's vias fit around these lines, not across them.
@@ -833,6 +830,10 @@ def place(spec, pcb_path, dsn_path):
                 item.SetLocked(True)
         print(f"priority route {ra}.{pa} -> {rb}.{pb} ({net.GetNetname()}): "
               f"{len(laid)} escape segment(s) from the reference, then {len(got)} item(s)")
+    # Fiducials after the reference copper, pre-routes and priority routes, the copper a designer lays
+    # first (they take the free spots round it), and before the main fan-out, which then keeps its vias
+    # out of the fiducials' squares, as every later step does.
+    print(f"fiducials: {place_fiducials(board, spec)}")
     placed, left = fanout(board, spec, exclude=early | first)   # two layers: the exposed pads' vias only
     if placed or left:
         print(f"plane fan-out: {placed} vias, {left} pads left to the router")
@@ -1173,14 +1174,24 @@ def maze(board, spec, net, a, b, width, join=False):
             track_block[layers.index(P.F_Cu)][j * nx + i] = 1
     # outside the board outline (its rounded corners included) is closed to tracks and vias
     t_edge, v_edge = edge + hw + margin, edge + via_r + margin
+    no_fiducials = dict(spec, fiducial_keepouts=[])
     for j in range(ny):
         for i in range(nx):
             pt = P.VECTOR2I(x0 + i * g, y0 + j * g)
-            if not _inside(spec, pt, v_edge):
+            if not _inside(spec, pt, v_edge):              # a via spans every layer: any fiducial's square
                 via_block[j * nx + i] = 1
-                if not _inside(spec, pt, t_edge):
+                if not _inside(no_fiducials, pt, t_edge):
                     track_block[0][j * nx + i] = 1
                     track_block[1][j * nx + i] = 1
+    # a fiducial's square closes tracks on its own layer only: its rule area is on that layer, and a
+    # track on the other side may pass under it
+    for k in spec.get("fiducial_keepouts", []):
+        li = 0 if k[4] == "F" else 1
+        grow = hw + margin
+        box = P.BOX2I(P.VECTOR2I(MM(k[0]) - grow, MM(k[1]) - grow), P.VECTOR2I(MM(k[2] - k[0]) + 2 * grow, MM(k[3] - k[1]) + 2 * grow))
+        if box.Intersects(search):
+            for i, j, pt in cells(box):
+                track_block[li][j * nx + i] = 1
     # drilled holes of any net, this one's included: a new via keeps HOLE_TO_HOLE from each
     for c, rad in _holes(board):
         reach_h = rad + MM(r["drill"]) // 2 + MM(HOLE_TO_HOLE) + margin

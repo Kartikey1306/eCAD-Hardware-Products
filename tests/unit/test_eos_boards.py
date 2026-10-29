@@ -1330,6 +1330,12 @@ class FiducialTest(_Lib):
         inside = source[source.index("def _inside("):source.index("def _in_fiducial_keepout(")]
         self.assertIn('spec.get("fiducial_keepouts", [])', inside)          # fan-out, stitching, maze, repair vias
         self.assertEqual(source.count("_in_fiducial_keepout(spec, "), 5)    # its definition; fan-out stub, pre-route, repair track, fragment via
+        maze = source[source.index("def maze("):source.index("def _track(")]
+        self.assertIn('li = 0 if k[4] == "F" else 1', maze)                 # tracks: the fiducial's own layer only
+        self.assertIn("_inside(no_fiducials, pt, t_edge)", maze)
+        place = source[source.index("def place("):source.index("def stitch(")]
+        self.assertLess(place.index("for route in spec.get(\"priority_routes\""), place.index("place_fiducials(board, spec)"))
+        self.assertLess(place.index("place_fiducials(board, spec)"), place.index("fanout(board, spec, exclude=early | first)"))
 
     def test_every_built_board_has_fiducials_on_each_assembled_side(self):
         for name in EOS_BOARDS:
