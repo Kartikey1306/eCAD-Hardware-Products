@@ -137,9 +137,13 @@ board and its parity check do not change.
 
 **Board identity.** The silkscreen carries the board's name, revision and year,
 "EoS Motion Wing  rev A  2026", beside its ownership line ("(c) 2026 <owner>"), on the same layer
-and mirrored as it is. A design's own name line there, one ending in "rev <revision>", is replaced
-where it stands; otherwise the line goes 2 mm above the ownership line. A design with no ownership
-line is refused. The revision is the board's `revision` (default "A"). The board file's title block
+and mirrored as it is. A design's own name line there, one ending in "rev <letter or number>", is
+replaced where it stands; otherwise the line goes 2 mm above the ownership line. A design with no
+ownership line is refused. The line must never sit on a pad: the placement step checks it against
+every pad of its side and every drilled pad (0.15 mm, JLCPCB's pad-to-silkscreen minimum) and the
+board edge (0.3 mm), moves it up or down by up to 2 mm, then tries 0.8 mm text (the boards'
+ownership-line size), and stops the build when it fits nowhere. A DRC `silk_over_copper` or
+`silk_edge_clearance` finding on the line, which KiCad grades a warning, fails the build too. The revision is the board's `revision` (default "A"). The board file's title block
 says what the schematic's does: title, date, revision, owner, copyright and licence, and for an
 all-rights-reserved board whom to ask for permission.
 

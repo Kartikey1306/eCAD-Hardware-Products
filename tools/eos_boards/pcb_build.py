@@ -127,6 +127,7 @@ def text(board, s, x, y, size, layer=P.F_SilkS, angle=0.0, bold=False, mirror=Fa
     t.SetTextThickness(MM(max(0.15, size * (0.2 if bold else 0.15))))
     t.SetTextAngleDegrees(angle)
     board.Add(t)
+    return t
 
 
 def _box(center, half):
@@ -597,6 +598,42 @@ def _fiducial_obstacles(board, spec, side):
     return out
 
 
+IDENTITY_PAD_GAP = 0.15      # mm from silkscreen to a pad: JLCPCB's "Pad To Silkscreen" minimum
+IDENTITY_EDGE_GAP = 0.3      # mm from silkscreen to the board edge
+IDENTITY_MIN_SIZE = 0.8      # mm: the smallest text the boards use (their ownership lines)
+
+
+def fit_identity(board, spec, item, t):
+    """Move or shrink the generator's identity line until it clears every pad of its side and every
+    drilled pad by IDENTITY_PAD_GAP and stays IDENTITY_EDGE_GAP inside the outline: first where the
+    design put it, then up or down in 0.25 mm steps (up to 2 mm), then the same at IDENTITY_MIN_SIZE.
+    A line that fits nowhere stops the build: fabs clip silkscreen off pads, and KiCad reports silk
+    over copper only as a warning. Returns where it went."""
+    cu = P.B_Cu if item.GetLayer() == P.B_SilkS else P.F_Cu
+    gap = MM(IDENTITY_PAD_GAP)
+    pads = []
+    for fp in board.GetFootprints():
+        for pad in fp.Pads():
+            if pad.IsOnLayer(cu) or pad.HasHole():
+                b = pad.GetBoundingBox()
+                pads.append(P.BOX2I(P.VECTOR2I(b.GetX() - gap, b.GetY() - gap),
+                                    P.VECTOR2I(b.GetWidth() + 2 * gap, b.GetHeight() + 2 * gap)))
+    sizes = [t["size"]] + ([IDENTITY_MIN_SIZE] if t["size"] > IDENTITY_MIN_SIZE else [])
+    steps = [0.0] + [s * d for s in (0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0) for d in (-1, 1)]
+    for size in sizes:
+        item.SetTextSize(v(size, size))
+        item.SetTextThickness(MM(max(0.15, size * (0.2 if t.get("bold") else 0.15))))
+        for dy in steps:
+            item.SetPosition(v(t["x"], t["y"] + dy))
+            b = item.GetBoundingBox()
+            corners = [P.VECTOR2I(x, y) for x in (b.GetX(), b.GetRight()) for y in (b.GetY(), b.GetBottom())]
+            if all(_inside(dict(spec, copper_keepouts=[], fiducial_keepouts=[]), c, MM(IDENTITY_EDGE_GAP)) for c in corners) \
+                    and not any(p.Intersects(b) for p in pads):
+                return f"{size} mm at ({t['x']}, {round(t['y'] + dy, 2)})"
+    raise SystemExit(f"identity line {t['text']!r} clears no pad or edge at {t['size']} or {IDENTITY_MIN_SIZE} mm "
+                     f"within 2 mm of ({t['x']}, {t['y']}); move the design's name line")
+
+
 def place_fiducials(board, spec):
     """Fiducials on every side the assembler populates (fabrication.carries_smd_parts): positions from
     the design's ``fiducials`` option for a side it names, else three chosen near three corners, or two
@@ -718,8 +755,10 @@ def place(spec, pcb_path, dsn_path):
             if net:
                 pad.SetNet(nets[net])
     for t in spec.get("texts", []):
-        text(board, t["text"], t["x"], t["y"], t["size"], getattr(P, t.get("layer", "F_SilkS")),
-             t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False))
+        item = text(board, t["text"], t["x"], t["y"], t["size"], getattr(P, t.get("layer", "F_SilkS")),
+                    t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False))
+        if t.get("identity"):
+            print(f"identity line: {fit_identity(board, spec, item, t)}")
     tb = board.GetTitleBlock()       # as the schematic's: title, date, revision, owner and licence
     tb.SetTitle(spec["title_block"]["title"])
     tb.SetDate(spec["title_block"]["date"])

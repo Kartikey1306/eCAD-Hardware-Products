@@ -138,9 +138,11 @@ def clearance_clashes(drc):
 def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """The design's silkscreen texts with the board's identity line, "<title>  rev <revision>  <year>",
     beside its ownership line ("(c) <year> <owner>"), on the same layer and mirrored as it is. A design
-    line on that layer ending in "rev <revision>" (the name line every design drew by hand) is replaced
-    in place, where its designer checked it fits; otherwise the line goes 2 mm above the ownership line.
-    A design without an ownership line is refused: there is nowhere to put the identity beside it."""
+    line on that layer ending in "rev <letter or number>" (the name line every design drew by hand, of
+    any revision) is replaced in place; otherwise the line goes 2 mm above the ownership line. The line
+    is marked ``identity``: the placement step moves or shrinks it until it clears every pad and the
+    board edge, or stops the build. A design without an ownership line is refused: there is nowhere to
+    put the identity beside it."""
     year = board.date[:4]
     owner = f"(c) {year} {board.company}"
     found = [t for t in texts if t["text"] == owner]
@@ -150,12 +152,13 @@ def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, 
     own = found[0]
     layer = own.get("layer", "F_SilkS")
     identity = f"{board.title}  rev {board.revision}  {year}"
-    old = [t for t in texts if t.get("layer", "F_SilkS") == layer and t["text"].endswith(f"rev {board.revision}")]
+    old = [t for t in texts if t.get("layer", "F_SilkS") == layer and re.search(r"\brev [A-Z0-9]+$", t["text"])]
     if len(old) > 1:
-        raise SystemExit(f"{board.name}: {len(old)} name lines ending in 'rev {board.revision}' on {layer}; keep one")
+        raise SystemExit(f"{board.name}: {len(old)} name lines ending in 'rev <revision>' on {layer}; keep one")
     line = dict(old[0]) if old else {"x": own["x"], "y": round(own["y"] - 2.0, 4), "size": 1.0, "bold": True,
                                      "layer": layer, "mirror": own.get("mirror", False)}
     line["text"] = identity
+    line["identity"] = True
     if old:
         return [line if t is old[0] else t for t in texts]
     return list(texts) + [line]
@@ -198,6 +201,21 @@ def shunt_parts(board: Board) -> List[Part]:
             n = len(out)
             out.append(Part(f"JS{n + 1}", SHUNT_SYMBOL, "Shunt 2.54 mm", "", (round(px + 15.24 * n, 2), round(py + 30.48, 2)),
                             {}, fields=dict(SHUNT_FIELDS, Description=description), on_board=False))
+    return out
+
+
+def generated_silk_problems(drc: Dict[str, Any], texts: List[Dict[str, Any]]) -> List[str]:
+    """DRC findings that name silkscreen the generator placed (the identity line) over copper or at the
+    board edge. KiCad grades them as warnings; the build treats them as errors, so a clipped board name
+    never reaches a fab."""
+    ours = [t["text"] for t in texts if t.get("identity")]
+    out = []
+    for v in drc.get("violations", []):
+        if v.get("type") not in ("silk_over_copper", "silk_edge_clearance"):
+            continue
+        for i in v.get("items", []):
+            if any(f"'{text}'" in i.get("description", "") for text in ours):
+                out.append(f"{v['type']}: {i['description']}")
     return out
 
 
@@ -568,7 +586,7 @@ def main() -> int:
     # what a fab or an assembler would reject, read back from the saved board: its stack-up, and three
     # fiducials on each side with surface-mount parts
     problems = metrics.fab_problems(metrics.board_metrics(out, board.name, report), board.width, board.height,
-                                    board.corner_radius)
+                                    board.corner_radius) + generated_silk_problems(drc, texts)
     report["fab_problems"] = problems
     if problems:
         (work / "build-report.json").write_text(json.dumps(report, indent=1) + "\n")

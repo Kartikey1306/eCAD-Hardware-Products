@@ -1173,12 +1173,33 @@ class IdentityTest(_Lib):
         own = [dict(t, text=t["text"].replace("2026", "2027")) for t in self.OWN]
         out = build.identity_texts(board, own)
         self.assertEqual(out[-1], {"text": "EoS Test  rev B  2027", "x": 10.0, "y": 6.0, "size": 1.0, "bold": True,
-                                   "layer": "B_SilkS", "mirror": True})
+                                   "layer": "B_SilkS", "mirror": True, "identity": True})
+        # review m6: a later revision replaces the old hand-drawn "rev A" line, it does not sit beside it
+        out = build.identity_texts(board, own + [dict(own[0], text="EoS Test  rev A", y=5.0)])
+        self.assertEqual([t["text"] for t in out if "rev" in t["text"]], ["EoS Test  rev B  2027"])
+        self.assertEqual(out[-1]["y"], 5.0)
         self.assertEqual(self.board([]).revision, "A")                            # the default revision
         with self.assertRaisesRegex(SystemExit, "needs one ownership line"):
             build.identity_texts(self.board([]), [])
         with self.assertRaisesRegex(SystemExit, "2 name lines"):
             build.identity_texts(self.board([]), self.OWN + [dict(self.OWN[0], text="T  rev A"), dict(self.OWN[0], text="X  rev A")])
+
+    def test_generated_silk_over_copper_or_the_edge_fails_the_build(self):
+        texts = [{"text": "EoS Test  rev A  2026", "identity": True}, {"text": "J1"}]
+        drc = {"violations": [
+            {"type": "silk_over_copper", "severity": "warning",
+             "items": [{"description": "PCB text 'EoS Test  rev A  2026' on B.Silkscreen"}, {"description": "PTH pad 8 [GND] of J1"}]},
+            {"type": "silk_over_copper", "severity": "warning", "items": [{"description": "PCB text 'J1' on F.Silkscreen"}]},
+            {"type": "silk_edge_clearance", "severity": "warning",
+             "items": [{"description": "Segment on Edge.Cuts"}, {"description": "PCB text 'EoS Test  rev A  2026' on B.Silkscreen"}]},
+            {"type": "silk_overlap", "severity": "warning", "items": [{"description": "PCB text 'EoS Test  rev A  2026' on B.Silkscreen"}]}]}
+        self.assertEqual(build.generated_silk_problems(drc, texts),
+                         ["silk_over_copper: PCB text 'EoS Test  rev A  2026' on B.Silkscreen",
+                          "silk_edge_clearance: PCB text 'EoS Test  rev A  2026' on B.Silkscreen"])
+        source = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
+        self.assertIn("+ generated_silk_problems(drc, texts)", source)
+        pcb = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        self.assertIn('if t.get("identity"):', pcb)            # the placement step fits the line or stops
 
     def test_title_block_carries_owner_and_rights(self):
         board = self.board([], contact="kartikeydheer@gmail.com", licence_terms="boards/licence_terms.txt")
