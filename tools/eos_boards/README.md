@@ -201,6 +201,12 @@ gets it before its "## Rebuild" heading).
   power, and the peripheral tests with their pass criteria (`design.BringUpTest`).
 - `temperature_range`: `(min, max, limiting part, its rating and source)`, the narrowest rated range
   of the board's parts (BENCH-READY D8), printed in the bring-up section.
+- `pin_labels`: `{"J1": {"1": "RST", "2": "3V", ...}}` (pins by number or name): connector pin labels on
+  the top silkscreen (A4). Each test pad gets its value as a label too. The placement step puts each
+  label, 1.0 mm high, beside its pad (`fabrication.label_spots`: away from a header's row, turned on a
+  horizontal row so that neighbours do not meet; to any side of a test pad), at the first spot that
+  clears every pad, the edge, all other silkscreen, other parts' courtyards and the fiducial squares.
+  A label with no room is left out and listed in `build-report.json` (`labels_skipped`).
 
 ## Reusing a reference design's layout exactly
 

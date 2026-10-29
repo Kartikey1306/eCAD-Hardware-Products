@@ -440,3 +440,31 @@ def identity_variants(title, revision, year):
     ['EoS Motion Wing  rev A  2026', 'EoS Motion Wing  rev A', 'EoS Motion Wing rev A']
     """
     return [f"{title}  rev {revision}  {year}", f"{title}  rev {revision}", f"{title} rev {revision}"]
+
+
+LABEL_GAPS = (0.2, 0.6, 1.0, 1.4)    # mm from a pad's edge to its label, nearest first
+
+
+def label_spots(pad_box, row, text_w, text_h):
+    """Where a pad's silkscreen label may go, best first, as (x, y, angle) of its centre in mm: beside
+    the pad at each of LABEL_GAPS. ``row`` is "horizontal" or "vertical" for a connector pin (the label
+    runs away from the row, turned 90 degrees on a horizontal row so that neighbours' labels do not meet),
+    or "" for a lone test pad (to its right, left, then above and below). ``text_w`` x ``text_h`` is the
+    label's extent unturned.
+
+    >>> label_spots((0, 0, 2, 2), "vertical", 3.0, 1.0)[:2]
+    [(3.7, 1.0, 0.0), (-1.7, 1.0, 0.0)]
+    """
+    x0, y0, x1, y1 = pad_box
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    out = []
+    for g in LABEL_GAPS:
+        right = (round(x1 + g + text_w / 2, 4), cy, 0.0)
+        left = (round(x0 - g - text_w / 2, 4), cy, 0.0)
+        if row == "horizontal":                 # turned: its length runs up or down from the pad
+            out += [(cx, round(y0 - g - text_w / 2, 4), 90.0), (cx, round(y1 + g + text_w / 2, 4), 90.0)]
+        elif row == "vertical":
+            out += [right, left]
+        else:
+            out += [right, left, (cx, round(y0 - g - text_h / 2, 4), 0.0), (cx, round(y1 + g + text_h / 2, 4), 0.0)]
+    return out

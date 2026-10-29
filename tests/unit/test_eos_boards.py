@@ -2019,9 +2019,8 @@ BRINGUP_PENDING = {
 BRINGUP_README_PENDING = set()
 
 
-class BenchTest(_Lib):
-    """Stage 2 items 1-4 and 7: test pads, rail links, the rail list and bring-up data, the README's
-    bring-up section, and the honest temperature range."""
+class _Bench(_Lib):
+    """A small design with test pads, a rail link, rails and bring-up data, on a test symbol library."""
 
     LIBS = {"Connector": """(kicad_symbol_lib (version 20231120) (generator "test")
   (symbol "TestPoint" (in_bom yes) (on_board yes)
@@ -2064,6 +2063,11 @@ class BenchTest(_Lib):
                     power_nets={"+3V3": "power:+3V3", "GND": "power:GND"})
         args.update(kw)
         return self.board(parts, **args)
+
+
+class BenchTest(_Bench):
+    """Stage 2 items 1-4 and 7: test pads, rail links, the rail list and bring-up data, the README's
+    bring-up section, and the honest temperature range."""
 
     def test_pads_and_links_reach_the_schematic_and_the_spec(self):
         board = self.bench()
@@ -2146,6 +2150,34 @@ class BenchTest(_Lib):
                 else:
                     self.assertIn(build.bringup_markdown(board).strip(), readme)
                     self.assertEqual(readme.count("## Bench bring-up"), 1)
+
+
+class LabelTest(_Bench):
+    """Stage 2 item 5 (A4): pin and test-pad labels on the silkscreen, beside the pad where they fit."""
+
+    def test_spots_beside_a_pad(self):
+        pad = (10.0, 20.0, 11.7, 21.7)                          # a 1.7 mm header pad
+        vertical = fabrication.label_spots(pad, "vertical", 2.4, 1.0)
+        self.assertEqual(vertical[:2], [(13.1, 20.85, 0.0), (8.6, 20.85, 0.0)])          # right, then left, 0.2 mm off
+        self.assertEqual(len(vertical), 2 * len(fabrication.LABEL_GAPS))
+        horizontal = fabrication.label_spots(pad, "horizontal", 2.4, 1.0)
+        self.assertEqual(horizontal[:2], [(10.85, 18.6, 90.0), (10.85, 23.1, 90.0)])     # turned: up, then down
+        lone = fabrication.label_spots(pad, "", 2.4, 1.0)
+        self.assertEqual([a for _, _, a in lone[:4]], [0.0] * 4)
+        self.assertEqual(lone[2:4], [(10.85, 19.3, 0.0), (10.85, 22.4, 0.0)])            # above, below
+        gaps = [x - 11.7 - 1.2 for x, _, _ in vertical[::2]]
+        self.assertEqual([round(g, 4) for g in gaps], list(fabrication.LABEL_GAPS))       # nearest first
+
+    def test_labels_reach_the_spec_by_pad(self):
+        board = self.bench(pin_labels={"U1": {"VDD": "3V3", "3": "IO"}})
+        spec = build.spec_for(board, self.lib, Path(self.tmp.name), [])
+        self.assertEqual(spec["pin_labels"], {"U1": {"1": "3V3", "3": "IO"}})     # a shared name: its first pad
+        self.assertEqual({p["ref"] for p in spec["parts"] if p["test_pad"]}, {"TP1", "TP2", "TP3", "TP4"})
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        labels = source[source.index("def place_labels("):source.index("def place_fiducials(")]
+        for needed in ("fabrication.SILK_MIN_TEXT", "fabrication.label_spots(", 'silk["crtyd/"', 'silk[f"fiducial/{i}"]',
+                       "skipped.append(", "_silk_clear(spec, item, pads, silk, set())"):
+            self.assertIn(needed, labels)
 
 
 class CrashSafetyTest(unittest.TestCase):

@@ -661,6 +661,54 @@ def fit_text(board, spec, item, t):
                      f"within 2 mm of ({t['x']}, {t['y']}); move the design's line")
 
 
+def place_labels(board, spec):
+    """Silkscreen labels (BENCH-READY A4, C1): each connector pin the design's ``pin_labels`` names, and
+    each test pad (its value, the rail name), at fabrication.SILK_MIN_TEXT on the top silkscreen (the
+    pad's side for a test pad), beside the pad where it clears every pad, the board edge, every other
+    silkscreen, every other part's courtyard and every fiducial square (fabrication.label_spots). A label
+    that fits nowhere is left out and reported (``spec["labels_skipped"]``). Returns (placed, skipped)."""
+    jobs = [(ref, pad, label) for ref, labels in spec.get("pin_labels", {}).items() for pad, label in labels.items()]
+    jobs += [(p["ref"], "1", p["value"]) for p in spec["parts"] if p.get("test_pad")]
+    placed, skipped = 0, []
+    for ref, number, label in jobs:
+        fp = board.FindFootprintByReference(ref)
+        pad = next((q for q in fp.Pads() if q.GetNumber() == number), None)
+        if pad is None:
+            skipped.append(f"{ref}.{number} {label}: no such pad")
+            continue
+        bottom = fp.GetLayer() == P.B_Cu and pad.GetAttribute() == P.PAD_ATTRIB_SMD
+        layer, crtyd = (P.B_SilkS, P.B_CrtYd) if bottom else (P.F_SilkS, P.F_CrtYd)
+        size = fabrication.SILK_MIN_TEXT
+        item = text(board, label, 0, 0, size, layer, 0.0, False, bottom)
+        bb = item.GetBoundingBox()
+        w, h = P.ToMM(bb.GetWidth()), P.ToMM(bb.GetHeight())
+        pads, silk = _silk_obstacles(board, item)
+        for other in board.GetFootprints():
+            if other.GetReference() != ref:
+                other.BuildCourtyardCaches()
+                cy = other.GetCourtyard(crtyd)
+                if cy.OutlineCount():
+                    silk["crtyd/" + other.GetReference()] = cy.BBox()
+        for i, k in enumerate(spec.get("fiducial_keepouts", [])):
+            silk[f"fiducial/{i}"] = P.BOX2I(v(k[0], k[1]), P.VECTOR2I(MM(k[2] - k[0]), MM(k[3] - k[1])))
+        xs = [q.GetPosition().x for q in fp.Pads()]
+        ys = [q.GetPosition().y for q in fp.Pads()]
+        row = "" if len(xs) < 2 else ("horizontal" if max(xs) - min(xs) >= max(ys) - min(ys) else "vertical")
+        b = pad.GetBoundingBox()
+        box = (P.ToMM(b.GetX()), P.ToMM(b.GetY()), P.ToMM(b.GetRight()), P.ToMM(b.GetBottom()))
+        for x, y, angle in fabrication.label_spots(box, row, w, h):
+            item.SetTextAngleDegrees(angle)
+            item.SetPosition(v(x, y))
+            if _silk_clear(spec, item, pads, silk, set()):
+                placed += 1
+                break
+        else:
+            _remove(board, item)
+            skipped.append(f"{ref}.{number} {label}")
+    spec["labels_placed"], spec["labels_skipped"] = placed, skipped
+    return placed, skipped
+
+
 def place_fiducials(board, spec):
     """Fiducials on every side the assembler populates (fabrication.carries_smd_parts): positions from
     the design's ``fiducials`` option for a side it names, else three chosen near three corners, or two
@@ -868,6 +916,8 @@ def place(spec, pcb_path, dsn_path):
     placed, left = fanout(board, spec, exclude=early | first)   # two layers: the exposed pads' vias only
     if placed or left:
         print(f"plane fan-out: {placed} vias, {left} pads left to the router")
+    labelled, unlabelled = place_labels(board, spec)          # after the fiducials: labels keep off their squares
+    print(f"labels: {labelled} placed, {len(unlabelled)} with no room: {unlabelled}")
     for x0, y0, x1, y1 in spec.get("copper_keepouts", []):
         copper_keepout(board, [(MM(x0), MM(y0)), (MM(x1), MM(y0)), (MM(x1), MM(y1)), (MM(x0), MM(y1))])
     for x0, y0, x1, y1, layer in spec.get("pour_keepouts", []):

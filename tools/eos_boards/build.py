@@ -425,6 +425,20 @@ def update_readme(text: str, section: str) -> str:
     return text.rstrip("\n") + "\n\n" + section
 
 
+def pin_label_pads(board: Board, lib: Library) -> Dict[str, Dict[str, str]]:
+    """``pin_labels`` with every pin (named by number or name) turned into its pad number: a pin with
+    stacked pads is labelled at its first."""
+    out = {}
+    for ref, labels in board.pin_labels.items():
+        part = next(p for p in board.parts if p.ref == ref)
+        pins = resolve(part, lib)
+        out[ref] = {}
+        for key, label in labels.items():
+            number = key if key in pins else next(n for n, (pin, _) in pins.items() if pin.name == key)
+            out[ref][pad_numbers(number)[0]] = label
+    return out
+
+
 def title_block(board: Board) -> Dict[str, Any]:
     """The board file's title block: what the schematic's says (title, date, revision, owner, copyright
     and licence), and for an all-rights-reserved board whom to ask for permission."""
@@ -503,6 +517,7 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
         flag = find(symbol, "in_bom")
         in_bom = part.in_bom and not (flag is not None and str(flag[1]) == "no")      # as the schematic writes it
         parts.append({"ref": part.ref, "value": part.value, "footprint": part.footprint, "in_bom": in_bom,
+                      "test_pad": part.lib_id == TESTPOINT_SYMBOL,
                       "x": part.pcb[0], "y": part.pcb[1], "rot": part.pcb[2], "side": part.side,
                       "pads": pads, "uuid": schematic._u(f"{board.name}/sym/{part.ref}"), "dnp": part.dnp,
                       "fields": fields, "model": list(part.model) if part.model else None})
@@ -563,7 +578,8 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
             "maze_via_cost_mm": board.maze_via_cost_mm,
             "zones": [{"net": board_net(board, n), "layers": layers} for n, layers in board.pours], "texts": texts,
             "stackup": stackup, "title_block": title_block(board),
-            "fiducials": {side: [list(p) for p in points] for side, points in board.fiducials.items()}}
+            "fiducials": {side: [list(p) for p in points] for side, points in board.fiducials.items()},
+            "pin_labels": pin_label_pads(board, lib)}
 
 
 ROUTE_ATTEMPTS = 3      # Freerouting runs at most, when the repair rounds leave repairable connections open
@@ -765,6 +781,8 @@ def main() -> int:
     report["fiducial_notes"] = placed_spec.get("fiducial_notes", {})
     report["identity_line"] = placed_spec.get("identity_fit", "")
     report["silk_fits"] = placed_spec.get("silk_fits", [])
+    report["labels_placed"] = placed_spec.get("labels_placed", 0)
+    report["labels_skipped"] = placed_spec.get("labels_skipped", [])
     for t in texts:                        # the identity line as placed (it may have been shortened)
         if t.get("identity") and placed_spec.get("identity_text"):
             t["text"] = placed_spec["identity_text"]
