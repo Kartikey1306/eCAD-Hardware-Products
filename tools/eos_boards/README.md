@@ -160,8 +160,8 @@ and every drilled pad by 0.15 mm (JLCPCB's pad-to-silkscreen minimum), stay 0.3 
 outline, and touch no other silkscreen that the design's own line did not already touch (where the
 designer checked it). It is tried where the design put it, then up or down by up to 2 mm; the
 identity line is then shortened (the year dropped, then single spaces), never shrunk. A line that fits
-nowhere stops the build. A DRC `silk_over_copper` or `silk_edge_clearance` finding on the identity
-line, which KiCad grades a warning, fails the build too; `build-report.json` records where each line
+nowhere stops the build. A DRC `silk_over_copper`, `silk_edge_clearance` or `silk_overlap` finding on
+the identity line, which KiCad grades a warning, fails the build too; `build-report.json` records where each line
 went (`silk_fits`). The revision is the board's `revision` (default "A"). The board file's title block
 says what the schematic's does: title, date, revision, owner, copyright and licence, and for an
 all-rights-reserved board whom to ask for permission.

@@ -1534,6 +1534,54 @@ class IdentityFitTest(unittest.TestCase):
         self.assertFalse(results[13.0]["on_ownership"])
 
 
+FIT_TEXT_SCRIPT = """
+import json, sys
+sys.path.insert(0, sys.argv[1])
+import pcbnew as P
+import fabrication, pcb_build
+v = pcb_build.v
+board = P.BOARD()
+spec = {"width": 40.0, "height": 20.0, "corner_radius": 0.0}
+for x in (12.0, 16.0, 20.0, 24.0, 28.0):         # 4 mm pads under the name line and every spot above it
+    fp = P.FootprintLoad(sys.argv[2] + "/TestPoint.pretty", "TestPoint_Pad_4.0x4.0mm")
+    board.Add(fp)
+    fp.SetPosition(v(x, 6.3))
+own = pcb_build.text(board, "(c) 2026 Kartikeydheer Srivastava", 20.0, float(sys.argv[3]), 1.0, P.F_SilkS)
+t = {"text": "EoS T  rev A  2026", "x": 20.0, "y": 8.0, "size": 1.0, "bold": True, "identity": True, "fit": True,
+     "variants": fabrication.identity_variants("EoS T", "A", "2026"), "design_text": "", "design_size": 1.0}
+item = pcb_build.text(board, t["text"], t["x"], t["y"], t["size"], P.F_SilkS, 0.0, True)
+try:
+    where = pcb_build.fit_text(board, spec, item, t)[1]
+except SystemExit as e:
+    where = "stopped: " + str(e)
+print(json.dumps({"where": where, "on_ownership": item.GetBoundingBox().Intersects(own.GetBoundingBox())}))
+"""
+
+
+class FitTextTest(unittest.TestCase):
+    """PR #74 review (greptile, qodo), as it applies to the stage-2 fitter: a name line moved off pads
+    never lands on the ownership line (or other silkscreen)."""
+
+    @unittest.skipUnless(os.environ.get("EOS_KICAD_TESTS"), "set EOS_KICAD_TESTS=1 to run the KiCad-backed fit "
+                         "(one small KiCad job: run it through the campaign's locked.sh)")
+    def test_a_blocked_name_line_never_lands_on_the_ownership_line(self):
+        from eos_boards import kicad_env
+        with tempfile.TemporaryDirectory() as tmp:
+            script = Path(tmp, "fit.py")
+            script.write_text(FIT_TEXT_SCRIPT, encoding="utf-8")
+            results = {}
+            for own_y in (10.0, 13.0):           # the ownership line just below, or out of the way
+                run = subprocess.run([kicad_env.python(), str(script), str(REPO_ROOT / "tools" / "eos_boards"),
+                                      str(kicad_env.footprints()), str(own_y)], capture_output=True, text=True, timeout=300)
+                self.assertEqual(run.returncode, 0, run.stderr[-2000:])
+                results[own_y] = json.loads(run.stdout.strip().splitlines()[-1])
+        # just below: no spot within 2 mm clears both, so the build stops; out of the way: it moves below the pads
+        self.assertTrue(results[10.0]["where"].startswith("stopped: silkscreen line 'EoS T  rev A  2026' at 1.0 mm "
+                                                          "clears no pad, edge or other silkscreen"), results[10.0])
+        self.assertFalse(results[13.0]["where"].startswith("stopped"), results[13.0])
+        self.assertFalse(results[13.0]["on_ownership"])
+
+
 class FtshFootprintTest(unittest.TestCase):
     """Samtec FTSH-105 on Samtec's recommended land pattern (Rev H, Fig 1): pads 0.74 x 2.79 mm,
     1.27 mm pitch, 6.86 mm across both rows; pad order as KiCad's generic 1.27 mm SMD header."""
