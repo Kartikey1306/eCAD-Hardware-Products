@@ -1511,29 +1511,96 @@ class MetricsTest(unittest.TestCase):
     """Item 4: the generator's metrics.py reads a built board's fabrication numbers, and each board
     README's Fabrication numbers agree with them (or are listed as known mismatches for P4)."""
 
+    # A small built board, written here so the numbers below stay fixed when P4 rebuilds the real ones:
+    # a 30 x 20 mm two-layer board, a resistor on top, a header with a plated slot on the bottom, two
+    # track widths, one via, a ground pour, a fiducial rule area, and a BOM with one line lacking an MPN.
+    FIXTURE_PCB = """(kicad_pcb (version 20260206) (generator "pcbnew")
+  (layers (0 "F.Cu" signal) (2 "B.Cu" signal) (25 "Edge.Cuts" user))
+  (setup (pad_to_mask_clearance 0)
+    STACKUP)
+  (footprint "Resistor_SMD:R_0603_1608Metric" (layer "F.Cu") (at 10 10)
+    (property "Reference" "R1" (at 0 0 0)) (attr smd)
+    (pad "1" smd roundrect (at -0.8 0) (size 0.8 0.9) (layers "F.Cu" "F.Mask" "F.Paste") (net "/A"))
+    (pad "2" smd roundrect (at 0.8 0) (size 0.8 0.9) (layers "F.Cu" "F.Mask" "F.Paste") (net "GND")))
+  (footprint "Connector:Slot" (layer "B.Cu") (at 20 10)
+    (property "Reference" "J1" (at 0 0 0)) (attr through_hole)
+    (pad "1" thru_hole oval (at 0 0) (size 1.2 1.8) (drill oval 0.6 1.2) (layers "*.Cu" "*.Mask") (net "/A"))
+    (pad "2" thru_hole circle (at 2.54 0) (size 1.7 1.7) (drill 1.0) (layers "*.Cu" "*.Mask") (net "GND")))
+  (footprint "TestPoint:TestPoint_Pad_D1.0mm" (layer "F.Cu") (at 5 15)
+    (property "Reference" "TP1" (at 0 0 0)) (attr smd)
+    (pad "1" smd circle (at 0 0) (size 1 1) (layers "F.Cu" "F.Mask") (net "GND")))
+  FIDUCIALS
+  (gr_line (start 0 0) (end 30 0) (layer "Edge.Cuts")) (gr_line (start 30 0) (end 30 20) (layer "Edge.Cuts"))
+  (gr_line (start 30 20) (end 0 20) (layer "Edge.Cuts")) (gr_line (start 0 20) (end 0 0) (layer "Edge.Cuts"))
+  (segment (start 10.8 10) (end 20 10) (width 0.2) (layer "F.Cu") (net "/A"))
+  (segment (start 9.2 10) (end 9.2 13) (width 0.1) (layer "B.Cu") (net "GND"))
+  (segment (start 9.2 13) (end 5 15) (width 0.2) (layer "B.Cu") (net "GND"))
+  (via (at 9.2 13) (size 0.6) (drill 0.3) (layers "F.Cu" "B.Cu") (net "GND"))
+  (zone (net "GND") (net_name "GND") (layers "F.Cu" "B.Cu") (name "pour"))
+  (zone (layer "F.Cu") (name "eos-fiducial-keepout") (keepout (tracks not_allowed) (vias not_allowed)))
+)
+"""
+    STACK = '(stackup (layer "F.Cu" (type "copper") (thickness 0.035)) (layer "dielectric 1" (type "core") ' \
+            '(thickness 1.51) (material "FR4") (epsilon_r 4.5)) (layer "B.Cu" (type "copper") (thickness 0.035)) ' \
+            '(copper_finish "ENIG") (dielectric_constraints no))'
+    FIDS = "".join(f'(footprint "Fiducial:Fiducial_1mm_Mask2mm" (layer "F.Cu") (at {x} {y}) (property "Reference" "FID{i}" ' \
+                   f'(at 0 0 0)) (attr smd board_only exclude_from_bom) (pad "" smd circle (at 0 0) (size 1 1) (layers "F.Cu" "F.Mask")))'
+                   for i, (x, y) in enumerate(((4, 4), (26, 4), (4, 16)), 1))
+
+    def _fixture(self, stackup=False, fiducials=False):
+        folder = Path(tempfile.mkdtemp()) / "eos-fixture"
+        (folder / "hardware").mkdir(parents=True)
+        (folder / "fab").mkdir()
+        self.addCleanup(lambda: __import__("shutil").rmtree(folder.parent))
+        text = self.FIXTURE_PCB.replace("STACKUP", self.STACK if stackup else "").replace("FIDUCIALS", self.FIDS if fiducials else "")
+        (folder / "hardware" / "eos-fixture.kicad_pcb").write_text(text, encoding="utf-8")
+        (folder / "fab" / "eos-fixture-bom.csv").write_text(
+            '"Refs","Value","Footprint","Manufacturer","MPN","Description","Qty","DNP"\n'
+            '"R1","10k","R_0603_1608Metric","Yageo","RC0603FR-0710KL","","1",""\n'
+            '"J1","Header","Slot","","","","1",""\n', encoding="utf-8")
+        (folder / "build-report.json").write_text(json.dumps({"erc_violations": 0, "drc_errors": 0, "drc_warnings": 2,
+                                                              "drc": {"violations": 2, "unconnected_items": 0, "schematic_parity": 0}}))
+        return folder
+
     def test_metrics_of_a_built_board(self):
-        m = metrics.board_metrics(EOS_DIR / "eos-motion-wing")
-        self.assertEqual((m["board"], m["copper_layers"], m["size_mm"]), ("eos-motion-wing", 2, [50.8, 22.86]))
-        self.assertEqual(m["footprints_by_side"], {"bottom": 2, "top": 22})
-        self.assertEqual(m["vias_by_size_drill_mm"], {"0.6/0.3": m["vias"]})
-        self.assertEqual((m["narrowest_track_mm"], m["smallest_drill_mm"]), (0.15, 0.3))
-        self.assertEqual(m["narrowest_track_segments"], sum(1 for kind in ("segment", "arc") for s in find_all(
-            loads((EOS_DIR / "eos-motion-wing" / "hardware" / "eos-motion-wing.kicad_pcb").read_text(encoding="utf-8")), kind)
-            if float(find(s, "width")[1]) == 0.15))
-        self.assertEqual((m["bom_lines"], m["bom_lines_with_mpn"], m["bom_parts"]), (7, 5, 12))
-        self.assertEqual((m["plated_slots"], m["smd_sides"], m["fiducials"], m["stackup"]), ([], ["top"], {}, {}))
-        f = metrics.board_metrics(EOS_DIR / "eos-feather-rp2040")
-        self.assertEqual(f["narrowest_track_mm"], 0.0952)
-        self.assertEqual({a["net"] for a in f["narrowest_track_at"]}, {"/CC1", "/CC2"})
-        self.assertEqual(sorted((s["width_mm"], s["length_mm"]) for s in f["plated_slots"]), [(0.6, 1.2)] * 2 + [(0.6, 1.7)] * 2)
-        self.assertEqual(metrics.board_metrics(EOS_DIR / "eos-tm4c1294-board")["smd_sides"], ["bottom", "top"])
+        m = metrics.board_metrics(self._fixture(stackup=True, fiducials=True))
+        self.assertEqual((m["board"], m["copper_layers"], m["size_mm"]), ("eos-fixture", 2, [30.0, 20.0]))
+        self.assertEqual((m["stackup"]["copper"], m["stackup"]["finish"], m["stackup"]["thickness_mm"]), (["F.Cu", "B.Cu"], "ENIG", 1.58))
+        self.assertEqual((m["footprints"], m["footprints_by_side"]), (6, {"bottom": 1, "top": 5}))
+        self.assertEqual((m["pads"], m["nets"], m["track_segments"]), ({"smd": 6, "thru_hole": 2}, 2, 3))
+        self.assertEqual(m["track_length_mm"], {"B.Cu": 7.7, "F.Cu": 9.2})            # 3.0 + 4.65 on B.Cu
+        self.assertEqual((m["track_widths_mm"], m["narrowest_track_mm"], m["narrowest_track_segments"]), ({"0.1": 1, "0.2": 2}, 0.1, 1))
+        self.assertEqual(m["narrowest_track_at"], [{"net": "GND", "layer": "B.Cu", "start": [9.2, 10.0], "end": [9.2, 13.0], "length_mm": 3.0}])
+        self.assertEqual((m["vias"], m["vias_by_size_drill_mm"], m["smallest_drill_mm"]), (1, {"0.6/0.3": 1}, 0.3))
+        self.assertEqual(m["plated_slots"], [{"ref": "J1", "pad": "1", "width_mm": 0.6, "length_mm": 1.2}])
+        self.assertEqual((m["pours"], m["rule_areas"]), ([{"net": "GND", "layers": ["F.Cu", "B.Cu"]}], {"eos-fiducial-keepout": 1}))
+        self.assertEqual((m["test_points"], m["fiducials"], m["smd_sides"]), (["TP1"], {"top": [[4.0, 4.0], [4.0, 16.0], [26.0, 4.0]]}, ["top"]))
+        self.assertEqual((m["bom_lines"], m["bom_parts"], m["bom_lines_with_mpn"], m["bom_mpn_coverage"], m["bom_lines_without_mpn"]),
+                         (2, 2, 1, 0.5, ["Header (J1)"]))
+        self.assertEqual(m["checks"], {"erc": 0, "drc_errors": 0, "drc_warnings": 2, "violations": 2, "unconnected_items": 0,
+                                       "schematic_parity": 0})
 
     def test_fab_problems_name_a_missing_stackup_and_fiducials(self):
-        m = metrics.board_metrics(EOS_DIR / "eos-motion-wing")
-        self.assertEqual(metrics.fab_problems(m, 50.8, 22.86, 2.54),
+        self.assertEqual(metrics.fab_problems(metrics.board_metrics(self._fixture()), 30, 20, 1.0),
                          ["no stack-up in the board file", "top: 0 fiducial(s); three are needed"])
-        m = dict(m, stackup={"copper": ["F.Cu", "B.Cu"]}, fiducials={"top": [[4.0, 8.0], [43.75, 4.0], [33.0, 18.75]]})
-        self.assertEqual(metrics.fab_problems(m, 50.8, 22.86, 2.54), [])
+        self.assertEqual(metrics.fab_problems(metrics.board_metrics(self._fixture(stackup=True, fiducials=True)), 30, 20, 1.0), [])
+        m = metrics.board_metrics(self._fixture(stackup=True, fiducials=True))
+        m["copper_layers"] = 4
+        self.assertEqual(metrics.fab_problems(m, 30, 20, 1.0), ["stack-up has 2 copper layers, the board 4"])
+
+    def test_metrics_write_and_read_back(self):
+        folder = self._fixture(stackup=True, fiducials=True)
+        written = metrics.write(folder)
+        self.assertEqual(json.loads((folder / "metrics.json").read_text(encoding="utf-8")), json.loads(json.dumps(written)))
+
+    def test_every_board_narrowest_track_and_vias_read_independently(self):
+        for name in EOS_BOARDS:
+            pcb = loads((EOS_DIR / name / "hardware" / f"{name}.kicad_pcb").read_text(encoding="utf-8"))
+            widths = [round(float(find(s, "width")[1]), 4) for kind in ("segment", "arc") for s in find_all(pcb, kind)]
+            m = metrics.board_metrics(EOS_DIR / name)
+            with self.subTest(board=name):
+                self.assertEqual((m["narrowest_track_mm"], m["narrowest_track_segments"]), (min(widths), widths.count(min(widths))))
+                self.assertEqual(m["vias"], len(find_all(pcb, "via")))
 
     def test_a_build_checks_the_fab_numbers_and_writes_metrics_json(self):
         source = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
