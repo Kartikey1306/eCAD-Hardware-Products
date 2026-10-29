@@ -34,7 +34,10 @@ paths that `kicad_env.py` and `build.py` use.
    solder-mask web between the two tents the via. Freerouting 2.4.1 already does by
    default; the DSN states it (`via_at_smd off`) so that a later default cannot change it.
    The fan-out's vias and stubs are locked, so the router treats them as fixed and cannot delete
-   or move a pad's way into its plane. Finally writes a Specctra DSN for the router.
+   or move a pad's way into its plane. They are recorded in the spec (`fanout_copper`), so a later
+   step can still prune one that ends up leading nowhere, and a rip-up that names one lifts the
+   other side of the clash instead; a `via_dangling` DRC finding, a warning to KiCad, fails the
+   build. Finally writes a Specctra DSN for the router.
 3. **Routing**. Freerouting, headless. The router is given 0.01 mm more clearance than the board's
    rules, so its grid rounding never reaches DRC. Freerouting 2.4.1 routes a given DSN the same way
    every time and takes no seed, so a retry changes its own costs instead: when the repair rounds

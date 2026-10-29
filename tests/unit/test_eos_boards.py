@@ -243,7 +243,25 @@ class ClashTest(unittest.TestCase):
              "items": [item("Pad 3 [/C] of U1 on F.Cu", 3.0), item("Track [/D] on F.Cu, length 1.0 mm", 4.0)]},
             {"type": "silk_edge_clearance", "severity": "warning", "items": [item("Track [/E] on F.Cu, length 1 mm", 5.0)] * 2},
         ]}
-        self.assertEqual(build.clearance_clashes(drc), [{"net": "/PH0", "pos": [30.09, 1.0]}, {"net": "/B", "pos": [2.0, 1.0]}])
+        self.assertEqual(build.clearance_clashes(drc), [
+            {"net": "/PH0", "pos": [30.09, 1.0], "other": {"net": "/PA1", "pos": [30.08, 1.0]}},
+            {"net": "/B", "pos": [2.0, 1.0], "other": {"net": "/A", "pos": [1.0, 1.0]}}])
+
+    def test_locked_fanout_copper_can_be_lifted_round_and_pruned(self):
+        # review m10/D5: a clash naming a locked fan-out via lifts the other item; a dangling fan-out via
+        # or stub is pruned; a via_dangling warning fails the build
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        ripup = source[source.index("def ripup("):source.index("def repair(")]
+        self.assertIn('n = lift(c["other"]["net"], c["other"]["pos"])', ripup)
+        fanout = source[source.index("def fanout("):source.index("REFERENCE_ZONE = ")]
+        self.assertEqual(fanout.count('spec.setdefault("fanout_copper", []).append('), 2)      # its vias and stubs
+        prune = source[source.index("def prune_dangling("):source.index("def finish(")]
+        self.assertIn("(not t.IsLocked() or _fanout_item(t, fanout))", prune)
+        self.assertEqual(source.count("prune_dangling(board, spec)"), 2)                        # finish and repair
+        drc = {"violations": [{"type": "via_dangling", "severity": "warning", "items": [{"description": "Via [GND] on F.Cu - B.Cu"}]},
+                              {"type": "track_dangling", "severity": "warning", "items": [{"description": "Track [+3V3] on F.Cu"}]}]}
+        self.assertEqual(build.dangling_via_problems(drc), ["via_dangling: Via [GND] on F.Cu - B.Cu"])
+        self.assertIn("+ dangling_via_problems(drc)", (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8"))
 
 
 class LicenceTest(_Lib):

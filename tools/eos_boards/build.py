@@ -117,8 +117,10 @@ def licence_text(board, module=""):
 
 def clearance_clashes(drc):
     """The clearance errors between two pieces of routed copper (track or via), from KiCad's DRC
-    report, as {net, pos}: the via if one is involved, else the shorter track. That is the item to
-    lift and route again. A clash with a pad or a zone is left for the build to fail on."""
+    report, as {net, pos, other}: the via if one is involved, else the shorter track. That is the item
+    to lift and route again; ``other`` ({net, pos}) is the item it clashes with, which rip-up lifts
+    instead when the first is fixed copper (a locked fan-out via). A clash with a pad or a zone is left
+    for the build to fail on."""
     out = []
     for v in drc.get("violations", []):
         items = v.get("items", [])
@@ -130,9 +132,20 @@ def clearance_clashes(drc):
             m = re.search(r"length ([0-9.]+) mm", i["description"])
             return float(m.group(1)) if m else 0.0       # a via has no length: lift it first
         item = min(items, key=length)
+        other = items[1] if item is items[0] else items[0]
         out.append({"net": item["description"].split("[", 1)[1].split("]", 1)[0],
-                    "pos": [item["pos"]["x"], item["pos"]["y"]]})
+                    "pos": [item["pos"]["x"], item["pos"]["y"]],
+                    "other": {"net": other["description"].split("[", 1)[1].split("]", 1)[0],
+                              "pos": [other["pos"]["x"], other["pos"]["y"]]}})
     return out
+
+
+def dangling_via_problems(drc: Dict[str, Any]) -> List[str]:
+    """DRC via_dangling findings: a via that joins nothing on one side. KiCad grades them as warnings;
+    the build treats them as errors (no committed board has one), since the fan-out's locked vias are
+    no longer pruned by the router."""
+    return [f"via_dangling: {i['description']}" for v in drc.get("violations", []) if v.get("type") == "via_dangling"
+            for i in v.get("items", [])[:1]]
 
 
 def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -604,7 +617,7 @@ def main() -> int:
     # what a fab or an assembler would reject, read back from the saved board: its stack-up, and three
     # fiducials on each side with surface-mount parts
     problems = metrics.fab_problems(metrics.board_metrics(out, board.name, report), board.width, board.height,
-                                    board.corner_radius) + generated_silk_problems(drc, texts)
+                                    board.corner_radius) + generated_silk_problems(drc, texts) + dangling_via_problems(drc)
     report["fab_problems"] = problems
     if problems:
         (work / "build-report.json").write_text(json.dumps(report, indent=1) + "\n")

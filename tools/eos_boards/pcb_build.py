@@ -283,6 +283,7 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
         via.SetLocked(True)      # fixed for the autorouter: Freerouting may otherwise delete or move it
         board.Add(via)
         obstacles.append((_box(pos, via_r), net.GetNetCode()))
+        spec.setdefault("fanout_copper", []).append([pos.x, pos.y])    # prune_dangling may still take it
 
     for fp in board.GetFootprints():
         if (only is not None and fp.GetReference() not in only) or fp.GetReference() in exclude:
@@ -374,6 +375,7 @@ def fanout(board, spec, only=None, exclude=(), beyond=0, inward=False):
                     t.SetNet(net)
                     t.SetLocked(True)    # with its via: the pad's way into the plane stays as laid
                     board.Add(t)
+                    spec.setdefault("fanout_copper", []).append([c.x, c.y, pos.x, pos.y])
                     add_via(pos, net)
                     placed += 1
                     done = True
@@ -1379,16 +1381,25 @@ def ripup(spec, pcb_path, clashes_path):
     board = P.LoadBoard(pcb_path)
     clashes = json.loads(Path(clashes_path).read_text())
     lifted = 0
-    for c in clashes:
-        at = v(*c["pos"])
+
+    def lift(net, pos):
+        at, n = v(*pos), 0
         for t in list(board.GetTracks()):
-            if t.IsLocked() or t.GetNetname() != c["net"]:
+            if t.IsLocked() or t.GetNetname() != net:
                 continue
             box = t.GetBoundingBox()
             box.Inflate(MM(1.0))
             if box.Contains(at):
                 _remove(board, t)
-                lifted += 1
+                n += 1
+        return n
+
+    for c in clashes:
+        n = lift(c["net"], c["pos"])
+        if not n and c.get("other"):
+            # the named item is fixed copper (a locked fan-out via): lift what it clashes with instead
+            n = lift(c["other"]["net"], c["other"]["pos"])
+        lifted += n
     if lifted:
         P.ZONE_FILLER(board).Fill(board.Zones())
     P.SaveBoard(pcb_path, board)
@@ -1519,7 +1530,7 @@ def repair(spec, pcb_path, pairs_path):
     filler = P.ZONE_FILLER(board)
     filler.Fill(board.Zones())
     join_all_fragments(board, spec, filler)       # the new copper can leave a pour fragment with no via
-    if prune_dangling(board):
+    if prune_dangling(board, spec):
         filler.Fill(board.Zones())
     P.SaveBoard(pcb_path, board)
     print(f"repaired {fixed} of {len(pairs)} open connection(s)")
@@ -1633,14 +1644,26 @@ def ease_vias(board, spec):
     return moved, left
 
 
-def prune_dangling(board):
+def _fanout_item(t, fanout):
+    """True when ``t`` is a fan-out via or stub that place() recorded (``spec["fanout_copper"]``: a via
+    as [x, y], a stub as [x0, y0, x1, y1], in nm)."""
+    if t.GetClass() == "PCB_VIA":
+        return (t.GetPosition().x, t.GetPosition().y) in fanout
+    a, b = t.GetStart(), t.GetEnd()
+    return (a.x, a.y, b.x, b.y) in fanout or (b.x, b.y, a.x, a.y) in fanout
+
+
+def prune_dangling(board, spec=None):
     """Remove the router's vias and track stubs that lead nowhere (connected on one layer, or an
-    end touching nothing), until none are left. Locked copper (a reference design's) stays."""
+    end touching nothing), until none are left, and the fan-out's own locked vias and stubs that do.
+    Other locked copper (a reference design's, the priority routes) stays."""
+    fanout = {tuple(x) for x in (spec or {}).get("fanout_copper", [])}
     removed = 0
     for _ in range(20):
         board.BuildConnectivity()
         conn = board.GetConnectivity()
-        dead = [t for t in board.GetTracks() if not t.IsLocked() and conn.TestTrackEndpointDangling(t, False)]
+        dead = [t for t in board.GetTracks() if (not t.IsLocked() or _fanout_item(t, fanout))
+                and conn.TestTrackEndpointDangling(t, False)]
         if not dead:
             break
         for t in dead:
@@ -1683,7 +1706,7 @@ def finish(spec, pcb_path, ses_path):
     filler = P.ZONE_FILLER(board)
     filler.Fill(board.Zones())
     join_all_fragments(board, spec, filler)
-    pruned = prune_dangling(board)
+    pruned = prune_dangling(board, spec)
     if pruned:
         print(f"removed {pruned} dangling via(s) and track stub(s)")
         filler.Fill(board.Zones())
