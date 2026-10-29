@@ -13,9 +13,15 @@ read on 24 October 2026:
   0.035 mm, prepreg 7628 x 1 0.2104 mm, inner copper 0.0152 mm, core 1.065 mm ("1.1mm H/HOZ with
   copper"), inner copper 0.0152 mm, prepreg 7628 x 1 0.2104 mm, copper 0.035 mm. The same page gives
   the dielectric constants: prepreg 7628 4.4, core 4.6.
-* 6 layers, JLC06161H-7628 (same page): copper 0.035, prepreg 7628 0.2104, inner copper 0.0152,
-  core 0.4, inner copper 0.0152, prepreg 7628 0.2028, inner copper 0.0152, core 0.4, inner copper
-  0.0152, prepreg 7628 0.2104, copper 0.035 mm.
+* 6 layers, JLC06161H-2116B (same page, read again on 29 October 2026): copper 0.035, prepreg
+  2116 x 1 0.1164, inner copper 0.0152, core 0.5, inner copper 0.0152, prepreg 1080 x 2 (0.0764 +
+  0.0764), inner copper 0.0152, core 0.5, inner copper 0.0152, prepreg 2116 x 1 0.1164, copper 0.035
+  mm; prepreg 2116 er 4.16, 1080 er 3.91, core 4.6. Of JLCPCB's standard six-layer stacks it is the one
+  that puts the only six-layer board's pairs on target: a 2D field solve (work/bench-ready-p3/impedance/
+  in the campaign folder) gives EoS TM4C1294's 0.15 mm Ethernet lines 0.25 mm apart about 96-101 ohm
+  under solder mask (100 ohm +-10 %), where the thinner JLC06161H-3313 (3313, 0.0994 mm) gives about
+  89-93 ohm and the earlier default, JLC06161H-7628 (0.2104 mm), about 119 ohm. Every standard JLCPCB
+  six-layer stack has 0.5 oz (0.0152 mm) inner copper.
 * 2 layers: JLCPCB's capabilities page (https://jlcpcb.com/capabilities/pcb-capabilities) gives the
   FR-4 dielectric constant "4.5 (2-Layer PCB)", 1 oz finished outer copper (0.035 mm) by default and
   1.6 mm board thickness. It publishes no core thickness for two layers on these pages, so the core
@@ -74,12 +80,17 @@ STACKUPS = {
     4: {"source": f"JLCPCB JLC04161H-7628 ({JLCPCB_IMPEDANCE}, read {STACKUP_CHECKED})",
         "layers": [_cu("F.Cu", OUTER_CU), _prepreg_7628(0.2104), _cu("In1.Cu", INNER_CU), _core(1.065),
                    _cu("In2.Cu", INNER_CU), _prepreg_7628(0.2104), _cu("B.Cu", OUTER_CU)]},
-    6: {"source": f"JLCPCB JLC06161H-7628 ({JLCPCB_IMPEDANCE}, read {STACKUP_CHECKED})",
-        "layers": [_cu("F.Cu", OUTER_CU), _prepreg_7628(0.2104), _cu("In1.Cu", INNER_CU), _core(0.4),
-                   _cu("In2.Cu", INNER_CU), _prepreg_7628(0.2028), _cu("In3.Cu", INNER_CU), _core(0.4),
-                   _cu("In4.Cu", INNER_CU), _prepreg_7628(0.2104), _cu("B.Cu", OUTER_CU)]},
+    6: {"source": f"JLCPCB JLC06161H-2116B ({JLCPCB_IMPEDANCE}, read 2026-10-29)",
+        "layers": [_cu("F.Cu", OUTER_CU), _dielectric("prepreg", 0.1164, "FR4 2116", 4.16), _cu("In1.Cu", INNER_CU),
+                   _core(0.5), _cu("In2.Cu", INNER_CU), _dielectric("prepreg", 0.1528, "FR4 1080 x 2", 3.91),
+                   _cu("In3.Cu", INNER_CU), _core(0.5), _cu("In4.Cu", INNER_CU),
+                   _dielectric("prepreg", 0.1164, "FR4 2116", 4.16), _cu("B.Cu", OUTER_CU)]},
 }
-DEFAULTS = {"finish": "ENIG", "mask_color": "Green", "silk_color": "White", "mask_thickness": MASK}
+# impedance_controlled: the board asks the fab to hold impedance (USB, Ethernet pairs). KiCad then writes
+# each dielectric's er and loss tangent and "ImpedanceControlled" into the Gerber job file; without it the
+# job file carries thickness and material only.
+DEFAULTS = {"finish": "ENIG", "mask_color": "Green", "silk_color": "White", "mask_thickness": MASK,
+            "impedance_controlled": False}
 
 
 def copper_names(layers):
@@ -134,6 +145,8 @@ def check_stackup(stackup, layers, thickness):
             raise ValueError(f"stack-up: row {r} has no thickness")
         if r["type"] != "copper" and not (r.get("material") and r.get("epsilon_r", 0) > 1):
             raise ValueError(f"stack-up: dielectric row {r} needs a material and its epsilon_r")
+    if not isinstance(stackup["impedance_controlled"], bool):
+        raise ValueError(f"stack-up: impedance_controlled {stackup['impedance_controlled']!r}; give True or False")
     if stackup["finish"] not in FINISHES:
         raise ValueError(f"stack-up: finish {stackup['finish']!r} is not one of KiCad's: {FINISHES}")
     total = stackup_thickness(stackup)
@@ -175,7 +188,7 @@ def stackup_text(stackup):
               '\t(layer "B.Paste" (type "Bottom Solder Paste"))',
               f'\t(layer "B.SilkS" (type "Bottom Silk Screen") (color {_q(stackup["silk_color"])}))',
               f'\t(copper_finish {_q(stackup["finish"])})',
-              "\t(dielectric_constraints no)",
+              f'\t(dielectric_constraints {"yes" if stackup["impedance_controlled"] else "no"})',
               ")"]
     return "\n".join(lines)
 

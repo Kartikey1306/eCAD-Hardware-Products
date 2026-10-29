@@ -94,11 +94,14 @@ are JLCPCB's published standard stack-ups for 1.6 mm boards, read on 24 October 
 |---|---|---|
 | 2 | copper 0.035 / FR-4 core 1.51, εr 4.5 / copper 0.035 mm | [capabilities](https://jlcpcb.com/capabilities/pcb-capabilities): FR-4 εr "4.5 (2-Layer PCB)", 1 oz outer copper. No two-layer core thickness is published there: 1.51 mm makes copper, core and masks add up to 1.6 mm |
 | 4 | JLC04161H-7628: copper 0.035 / prepreg 7628 0.2104, εr 4.4 / copper 0.0152 / core 1.065, εr 4.6 / copper 0.0152 / prepreg 7628 0.2104 / copper 0.035 mm | [impedance page](https://jlcpcb.com/impedance) |
-| 6 | JLC06161H-7628: copper 0.035 / 7628 0.2104 / 0.0152 / core 0.4 / 0.0152 / 7628 0.2028 / 0.0152 / core 0.4 / 0.0152 / 7628 0.2104 / copper 0.035 mm | [impedance page](https://jlcpcb.com/impedance) |
+| 6 | JLC06161H-2116B: copper 0.035 / 2116 0.1164, εr 4.16 / 0.0152 / core 0.5 / 0.0152 / 1080 × 2 0.1528, εr 3.91 / 0.0152 / core 0.5 / 0.0152 / 2116 0.1164 / copper 0.035 mm | [impedance page](https://jlcpcb.com/impedance), read again 29 Oct 2026. Chosen for EoS TM4C1294, the only six-layer board: its 0.15 mm Ethernet lines 0.25 mm apart come out about 96–101 Ω under solder mask (2D field solve), against 89–93 Ω on JLC06161H-3313 and 119 Ω on JLC06161H-7628 |
 
 Solder mask 0.01 mm each side, green; silkscreen white; surface finish ENIG (BENCH-READY A5: ENIG
 wherever a pitch is 0.5 mm or finer or a part is a QFN). The loss tangent is not published there;
-KiCad writes its default, 0.02. A stack-up must add up to the board's thickness within JLCPCB's
+KiCad writes its default, 0.02. Every JLCPCB standard multilayer stack has 0.5 oz (0.0152 mm) inner
+copper: size inner supply tracks for it. A board whose pairs need controlled impedance sets
+`{"impedance_controlled": True}`: KiCad then puts each dielectric's εr and loss tangent, and
+`"ImpedanceControlled": true`, into the Gerber job file. A stack-up must add up to the board's thickness within JLCPCB's
 ±10 %. KiCad 10's Python does not wrap the board's stack-up object, so `pcb_build.py place` writes
 the node into the saved file, and KiCad keeps it through every later load and save. A board of
 another thickness, or for another fab, gives its own with the `stackup` option.
@@ -207,7 +210,7 @@ Most boards need only parts, nets and positions. These options cover the rest:
 - `shunts`: `{"JP1": 2}`: how many 2.54 mm shunts come with a jumper header drawn with a connector
   symbol (a 2 × 2 header taking two, say); `0` for none.
 - `stackup`: changes to the fab stack-up: `{"finish": "HAL lead-free"}`, `mask_color`,
-  `silk_color`, `mask_thickness`, or a whole `"layers"` list of copper and dielectric rows with its
+  `silk_color`, `mask_thickness`, `impedance_controlled`, or a whole `"layers"` list of copper and dielectric rows with its
   `"source"` (see Fabrication data in every board).
 - `reference_copper`, `local_footprints`, `rules`, `credits`.
 

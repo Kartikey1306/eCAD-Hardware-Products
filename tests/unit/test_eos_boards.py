@@ -1047,6 +1047,13 @@ BUILT_BEFORE_P3 = {
     "eos-rl78g13-board", "eos-sense-cape", "eos-stm32-64", "eos-tm4c123-board", "eos-tm4c1294-board"}
 
 
+# Designs whose README tabulates a stack-up other than the one the generator writes (TM4C1294 asks for a
+# ~0.10 mm top prepreg and 1 oz inner copper; the generator now writes JLC06161H-2116B, 0.5 oz inner).
+# P4 sets the design's stackup option (impedance_controlled), settles the inner copper (widen the inner
+# 5 V tracks for 0.5 oz, or order 1 oz) and rewrites the README's table; then this set empties.
+STACKUP_TO_DECLARE = {"eos-tm4c1294-board"}
+
+
 class StackupTest(unittest.TestCase):
     """A1: the board file carries the fab's stack-up (JLCPCB's published 1.6 mm stack-ups)."""
 
@@ -1054,8 +1061,9 @@ class StackupTest(unittest.TestCase):
         rows = {n: [(r["type"], r["thickness"], r.get("epsilon_r")) for r in fabrication.STACKUPS[n]["layers"]] for n in (2, 4, 6)}
         cu, inner, p7628, core = ("copper", 0.035, None), ("copper", 0.0152, None), ("prepreg", 0.2104, 4.4), ("core", 1.065, 4.6)
         self.assertEqual(rows[4], [cu, p7628, inner, core, inner, p7628, cu])                  # JLC04161H-7628
-        self.assertEqual(rows[6], [cu, p7628, inner, ("core", 0.4, 4.6), inner, ("prepreg", 0.2028, 4.4), inner,
-                                   ("core", 0.4, 4.6), inner, p7628, cu])                       # JLC06161H-7628
+        p2116 = ("prepreg", 0.1164, 4.16)
+        self.assertEqual(rows[6], [cu, p2116, inner, ("core", 0.5, 4.6), inner, ("prepreg", 0.1528, 3.91), inner,
+                                   ("core", 0.5, 4.6), inner, p2116, cu])                       # JLC06161H-2116B (1080 x 2 in the middle)
         self.assertEqual(rows[2], [cu, ("core", 1.51, 4.5), cu])
         for n in (2, 4, 6):
             with self.subTest(layers=n):
@@ -1075,10 +1083,39 @@ class StackupTest(unittest.TestCase):
         bad = [((2, 1.0, None), "no published standard"), ((4, 1.6, {"layers": own["layers"]}), "needs a source"),
                ((2, 1.6, own), "copper layers"), ((2, 1.6, {"finish": "Gold"}), "finish"),
                ((2, 1.6, {"colour": "Red"}), "unknown option"),
-               ((4, 1.6, dict(own, layers=own["layers"][:1] + [own["layers"][1]] * 2 + own["layers"][2:])), "copper layers|alternate")]
+               ((4, 1.6, dict(own, layers=own["layers"][:1] + [own["layers"][1]] * 2 + own["layers"][2:])), "copper layers|alternate"),
+               # JLCPCB holds 1.6 mm boards to +-10 %: a 1.0 mm core makes 1.09 mm, a 2.0 mm one 2.09 mm
+               ((2, 1.6, {"source": "x", "layers": [own["layers"][0], dict(own["layers"][1], thickness=1.0), dict(own["layers"][0], name="B.Cu")]}),
+                "adds up to 1.0900 mm, outside 1.6 mm"),
+               ((2, 1.6, {"source": "x", "layers": [own["layers"][0], dict(own["layers"][1], thickness=2.0), dict(own["layers"][0], name="B.Cu")]}),
+                "adds up to 2.0900 mm"),
+               ((2, 1.6, {"impedance_controlled": "yes"}), "impedance_controlled")]
+        ok = {"source": "x", "layers": [own["layers"][0], dict(own["layers"][1], thickness=1.45), dict(own["layers"][0], name="B.Cu")]}
+        self.assertAlmostEqual(fabrication.stackup_thickness(fabrication.stackup_for(2, 1.6, ok)), 1.54)   # inside +-10 %
         for args, message in bad:
             with self.subTest(args=str(args)[:60]), self.assertRaisesRegex(ValueError, message):
                 fabrication.stackup_for(*args)
+
+    def test_an_impedance_controlled_board_puts_er_in_the_job_file(self):
+        # KiCad copies er, loss tangent and "ImpedanceControlled" into the job file only with this flag (review m2)
+        self.assertIn("(dielectric_constraints no)", fabrication.stackup_text(fabrication.stackup_for(6, 1.6)))
+        self.assertIn("(dielectric_constraints yes)",
+                      fabrication.stackup_text(fabrication.stackup_for(6, 1.6, {"impedance_controlled": True})))
+
+    def test_a_readme_stack_up_table_names_the_stackup_the_board_carries(self):
+        # A README that tabulates its stack-up must name the JLCPCB stack-up the generator writes, so the
+        # README and the board file cannot ask the fab for two different boards (review MAJOR-1).
+        found = set()
+        for name, module in EOS_BOARDS.items():
+            text = (EOS_DIR / name / "README.md").read_text(encoding="utf-8")
+            if not re.search(r"^\| (F|In\d|B)\.Cu \|", text, re.M):
+                continue
+            board = importlib.import_module(f"eos_boards.boards.{module}").BOARD
+            source = fabrication.stackup_for(board.layers, board.thickness, board.stackup)["source"]
+            named = re.findall(r"JLC0\d{4}H-[0-9A-Z]+", text)
+            if not named or any(n not in source for n in named):
+                found.add(name)
+        self.assertEqual(found, STACKUP_TO_DECLARE)
 
     def test_inserted_stackup_reads_back_as_kicad_writes_it(self):
         board = '(kicad_pcb\n\t(version 20260206)\n\t(layers\n\t\t(0 "F.Cu" signal)\n\t\t(4 "In1.Cu" signal)\n' \
