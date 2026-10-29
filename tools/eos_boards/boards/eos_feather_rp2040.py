@@ -297,15 +297,18 @@ PARTS += [
                  "Description": "Pin header 1x12 2.54 mm, Feather 12-pin strip: BAT, EN, USB, D13, D12, D11, D10, D9, D6, "
                                 "D5, SCL, SDA (Feather Specification; Feather RP2040 pinout)"}),
 ]
-# ---- Bench test pads (BENCH-READY C1) at the spots the bench-ready audit (g2, 24 Oct 2026) checked free:
-# every rail of the power tree and a GND pad by the MCU; TP1 (VBAT) was already there
+# ---- Bench test pads (BENCH-READY C1): every rail of the power tree and a GND pad by the MCU; TP1 (VBAT)
+# was already there. The bench-ready audit (g2, 24 Oct 2026) found the spots with the pad's centre clear;
+# each is nudged (0.2-0.4 mm) so the pad's 1 mm courtyard clears its neighbours' courtyards too, and +3V3
+# moved from beside C14 (17.7, 13.6) to (14.4, 10.7) beside the other power pads, because at C14 it took
+# the only bottom-left room for a fiducial and the board fell back to two (stage 2 probe, 30 Oct 2026).
 PARTS += [
-    bench_pad("TP2", "VBUS", "VBUS", (12.9, 12.9), (300, 400)),
-    bench_pad("TP3", "VBUS_F", "VUSB", (16.5, 9.9), (315, 400)),
-    bench_pad("TP4", "VSYS", "VSYS", (16.9, 4.8), (330, 400)),
-    bench_pad("TP5", "+3V3", "3V3", (17.7, 13.6), (345, 400)),
+    bench_pad("TP2", "VBUS", "VBUS", (13.1, 12.9), (300, 400)),
+    bench_pad("TP3", "VBUS_F", "VUSB", (16.5, 10.2), (315, 400)),
+    bench_pad("TP4", "VSYS", "VSYS", (16.6, 4.8), (330, 400)),
+    bench_pad("TP5", "+3V3", "3V3", (14.4, 10.7), (345, 400)),
     bench_pad("TP6", "+1V1", "1V1", (24.8, 9.7), (360, 400)),
-    bench_pad("TP7", "GND", "GND", (26.4, 16.6), (375, 400)),
+    bench_pad("TP7", "GND", "GND", (26.4, 16.2), (375, 400)),
 ]
 for i, _ in enumerate(HOLES):
     PARTS.append(Part(f"H{i + 1}", "Mechanical:MountingHole", "2.5mm", "MountingHole:MountingHole_2.5mm",
@@ -362,8 +365,8 @@ PLACEMENT = {
     # battery connector at the right end, facing right; VBAT test pad in the free top-right corner
     "J4": (45.85, 11.43, 90), "TP1": (43.2, 3.3, 0),
     # bench test pads on each rail (audit g2 spots)
-    "TP2": (12.9, 12.9, 0), "TP3": (16.5, 9.9, 0), "TP4": (16.9, 4.8, 0), "TP5": (17.7, 13.6, 0), "TP6": (24.8, 9.7, 0),
-    "TP7": (26.4, 16.6, 0),
+    "TP2": (13.1, 12.9, 0), "TP3": (16.5, 10.2, 0), "TP4": (16.6, 4.8, 0), "TP5": (14.4, 10.7, 0), "TP6": (24.8, 9.7, 0),
+    "TP7": (26.4, 16.2, 0),
 }
 _unplaced = sorted({p.ref for p in PARTS} - set(PLACEMENT))
 assert not _unplaced, f"parts without a board position: {_unplaced}"

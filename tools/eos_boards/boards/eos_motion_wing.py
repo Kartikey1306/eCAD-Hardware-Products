@@ -164,7 +164,7 @@ PARTS = [
 # ---- Bench test pads (BENCH-READY C1): 3V3 and two GND, at the spots the bench-ready audit (g1, 24 Oct
 # 2026) found free; the Feather's 3V and GND header pins (J1.2, J1.4) reach the same nets
 PARTS += [
-    bench_pad("TP1", "+3V3", "3V3", (45.07, 11.95), (150, 395)),
+    bench_pad("TP1", "+3V3", "3V3", (45.07, 11.1), (150, 395)),
     bench_pad("TP2", "GND", "GND", (24.0, 18.0), (165, 395)),
     bench_pad("TP3", "GND", "GND", (38.5, 7.65), (180, 395)),
 ]
@@ -190,7 +190,7 @@ PLACEMENT = {
     # I2C pull-ups and their jumper, below the SCL/SDA pins
     "R1": (46.6, 8.4, 90), "R2": (49.0, 8.4, 90), "JP1": (47.8, 12.8, 90),
     # bench test pads: 3V3 by the pull-ups, GND by the 16-pin strip and by the ADXL343
-    "TP1": (45.07, 11.95, 0), "TP2": (24.0, 18.0, 0), "TP3": (38.5, 7.65, 0),
+    "TP1": (45.07, 11.1, 0), "TP2": (24.0, 18.0, 0), "TP3": (38.5, 7.65, 0),
 }
 _unplaced = sorted({p.ref for p in PARTS} - set(PLACEMENT))
 assert not _unplaced, f"parts without a board position: {_unplaced}"
