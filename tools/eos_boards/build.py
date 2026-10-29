@@ -362,10 +362,22 @@ def freeroute(dsn: Path, ses: Path, passes: int, attempt: int, work: Path) -> No
         raise SystemExit("Freerouting produced no session file")
 
 
+def kicad_check(cmd: List[Any], report: Path) -> Dict[str, Any]:
+    """Run a kicad-cli check (ERC or DRC) that writes a JSON report, and read it. The old report is
+    deleted first and the exit code checked: a kicad-cli that crashed before writing would otherwise
+    leave the last good build's clean report in place, and the build would pass its gate unchecked."""
+    report.unlink(missing_ok=True)
+    r = run([*cmd[:-1], "-o", report, cmd[-1]])          # the input file last
+    if r.returncode or not report.is_file():
+        print(r.stdout[-2000:], r.stderr[-2000:])
+        raise SystemExit(f"{' '.join(str(c) for c in cmd[1:3])} failed (exit {r.returncode}"
+                         f"{'' if report.is_file() else ', no report written'}); the board was not checked")
+    return json.loads(report.read_text())
+
+
 def run_drc(cli: str, pcb: Path, out: Path) -> Dict[str, Any]:
     """KiCad's DRC with schematic parity, every severity, as JSON (also left in out/drc.json)."""
-    run([cli, "pcb", "drc", "--schematic-parity", "--format", "json", "--severity-all", "-o", out / "drc.json", pcb])
-    return json.loads((out / "drc.json").read_text())
+    return kicad_check([cli, "pcb", "drc", "--schematic-parity", "--format", "json", "--severity-all", pcb], out / "drc.json")
 
 
 def check_and_repair(cli: str, spec: Path, pcb: Path, work: Path, out: Path):
@@ -477,7 +489,7 @@ def main() -> int:
                 shutil.copy(licence, hw / "footprints" / licence.name)
             rows.append(f'  (lib (name "{name}") (type "KiCad") (uri "${{KIPRJMOD}}/footprints/{name}.pretty") (options "") (descr ""))')
         (hw / "fp-lib-table").write_text("(fp_lib_table\n  (version 7)\n" + "\n".join(rows) + "\n)\n")
-    run([cli, "sch", "erc", "--format", "json", "--severity-all", "-o", out / "erc.json", sch])
+    kicad_check([cli, "sch", "erc", "--format", "json", "--severity-all", sch], out / "erc.json")
     erc = violations(out / "erc.json")
     report["erc_violations"] = len(erc)
     if erc:
@@ -491,8 +503,7 @@ def main() -> int:
     spec.write_text(json.dumps(spec_for(board, lib, kicad_env.footprints(), texts), indent=1))
     dsn, ses = work / f"{board.name}.dsn", work / f"{board.name}.ses"
     pcb_step("place", spec, pcb, dsn)
-    run([cli, "pcb", "drc", "--format", "json", "--severity-error", "-o", work / "place-drc.json", pcb])
-    placed = json.loads((work / "place-drc.json").read_text())
+    placed = kicad_check([cli, "pcb", "drc", "--format", "json", "--severity-error", pcb], work / "place-drc.json")
     if board.reference_copper:
         # nets the reference copper completes on its own, which the router must leave alone
         ref = json.loads((HERE / board.reference_copper["file"]).read_text())

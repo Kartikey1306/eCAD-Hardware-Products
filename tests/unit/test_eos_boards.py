@@ -1671,11 +1671,35 @@ class CrashSafetyTest(unittest.TestCase):
                 self._step(code)
         self.assertEqual(self._step(0).returncode, 0)
 
+    def _check(self, returncode, writes):
+        from unittest import mock
+        out = Path(tempfile.mkdtemp())
+        self.addCleanup(lambda: __import__("shutil").rmtree(out))
+        report = out / "drc.json"
+        report.write_text('{"violations": [], "unconnected_items": [], "schematic_parity": []}')   # the last good build's
+
+        def fake(cmd, **kw):
+            self.assertEqual(cmd[-3:], ["-o", report, "board.kicad_pcb"])
+            self.assertFalse(report.exists(), "the old report must be gone before kicad-cli runs")
+            if writes:
+                report.write_text('{"violations": [1]}')
+            return subprocess.CompletedProcess(cmd, returncode, "", "")
+        with mock.patch.object(build, "run", side_effect=fake), contextlib.redirect_stdout(io.StringIO()):
+            return build.kicad_check(["kicad-cli", "pcb", "drc", "--format", "json", "board.kicad_pcb"], report)
+
+    def test_a_crashed_or_silent_kicad_check_never_reads_an_old_report(self):
+        self.assertEqual(self._check(0, True), {"violations": [1]})
+        for code, writes, message in ((0, False, "no report written"), (134, True, r"exit 134"), (-11, False, r"exit -11")):
+            with self.subTest(exit=code, writes=writes), self.assertRaisesRegex(SystemExit, message):
+                self._check(code, writes)
+
     def test_every_pcb_build_step_in_a_build_is_checked(self):
         source = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
         self.assertEqual(source.count('HERE / "pcb_build.py"'), 1)           # only inside pcb_step
         for mode in ("place", "finish", "ripup", "repair"):
             self.assertIn(f'pcb_step("{mode}"', source)
+        self.assertEqual(source.count('"erc", "--format"') + source.count('"drc", "--format"') + source.count('"drc", "--schematic-parity"'),
+                         source.count("kicad_check([cli, "))          # every ERC and DRC through kicad_check
 
 
 if __name__ == "__main__":
