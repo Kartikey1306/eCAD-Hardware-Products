@@ -634,31 +634,36 @@ def _silk_clear(spec, item, pads, silk, allowed):
         and not any(box.Intersects(b) for uid, box in silk.items() if uid not in allowed)
 
 
-def fit_text(board, spec, item, t):
+def fit_text(board, spec, item, t, pending=()):
     """Fit a silkscreen line the generator sizes (the identity line, the ownership lines): at least
     SILK_MIN_TEXT high, clear of every pad of its side and every drilled pad by SILK_PAD_GAP, inside
     the outline by SILK_EDGE_GAP, and off any other silkscreen that its design line (``design_text`` at
-    ``design_size``, where the designer checked it) did not already touch. Tried where the design put
-    it, then up or down in 0.25 mm steps (up to 2 mm), for each of its ``variants`` (the identity line
-    shortens: fabrication.identity_variants); never shrunk. A line that fits nowhere stops the build:
-    fabs clip silkscreen off pads, and KiCad reports silk over copper only as a warning. Returns
-    (the text placed, a description of where it went)."""
+    ``design_size``, where the designer checked it) did not already touch; the generator lines still to
+    be fitted (``pending``, uuids) are not in the way yet, they fit round this one. Tried where the
+    design put it, then moved (fabrication.silk_moves: up or down by up to 2 mm, then also up to 3 mm
+    sideways), for each of its ``variants`` (the identity line shortens: fabrication.identity_variants),
+    and last with narrower characters (fabrication.SILK_WIDTHS); the height and stroke never go down. A
+    line that fits nowhere stops the build: fabs clip silkscreen off pads, and KiCad reports silk over
+    copper only as a warning. Returns (the text placed, a description of where it went)."""
     pads, silk = _silk_obstacles(board, item)
     item.SetText(t.get("design_text") or t["text"])                   # what the designer checked, as drawn
     item.SetTextSize(v(t["design_size"], t["design_size"]))
     item.SetTextThickness(MM(fabrication.silk_stroke(t["design_size"], t.get("bold", False))))
     allowed = {uid for uid, box in silk.items() if box.Intersects(item.GetBoundingBox())} if t.get("design_text") else set()
-    item.SetTextSize(v(t["size"], t["size"]))
+    allowed |= set(pending)
     item.SetTextThickness(MM(fabrication.silk_stroke(t["size"], t.get("bold", False))))
-    steps = [0.0] + [s * d for s in (0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0) for d in (-1, 1)]
-    for words in t.get("variants", [t["text"]]):
-        item.SetText(words)
-        for dy in steps:
-            item.SetPosition(v(t["x"], t["y"] + dy))
-            if _silk_clear(spec, item, pads, silk, allowed):
-                return words, f"{words!r} {t['size']} mm at ({t['x']}, {round(t['y'] + dy, 2)})"
+    for width in fabrication.SILK_WIDTHS:
+        item.SetTextSize(v(t["size"] * width, t["size"]))                # the height stays t["size"]
+        for words in t.get("variants", [t["text"]]):
+            item.SetText(words)
+            for dx, dy in fabrication.silk_moves():
+                item.SetPosition(v(t["x"] + dx, t["y"] + dy))
+                if _silk_clear(spec, item, pads, silk, allowed):
+                    narrow = "" if width == 1.0 else f" ({width:g} wide)"
+                    return words, f"{words!r} {t['size']} mm{narrow} at ({round(t['x'] + dx, 2)}, {round(t['y'] + dy, 2)})"
     raise SystemExit(f"silkscreen line {t['text']!r} at {t['size']} mm clears no pad, edge or other silkscreen "
-                     f"within 2 mm of ({t['x']}, {t['y']}); move the design's line")
+                     f"within 2 mm up or down and 3 mm sideways of ({t['x']}, {t['y']}), even "
+                     f"{min(fabrication.SILK_WIDTHS):g} wide; move the design's line")
 
 
 def place_labels(board, spec):
@@ -847,9 +852,11 @@ def place(spec, pcb_path, dsn_path):
                              t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False)))
                     for t in spec.get("texts", [])]
     # the generator's own lines, the ownership lines first and the identity line last, each fitted
-    # against everything already on the board (recorded in build-report.json)
-    for t, item in sorted([pt for pt in placed_texts if pt[0].get("fit")], key=lambda pt: bool(pt[0].get("identity"))):
-        words, where = fit_text(board, spec, item, t)
+    # against everything already on the board but the generator lines after it, which then fit round it
+    # (recorded in build-report.json)
+    fits = sorted([pt for pt in placed_texts if pt[0].get("fit")], key=lambda pt: bool(pt[0].get("identity")))
+    for i, (t, item) in enumerate(fits):
+        words, where = fit_text(board, spec, item, t, {later.m_Uuid.AsString() for _, later in fits[i + 1:]})
         spec.setdefault("silk_fits", []).append(where)
         if t.get("identity"):
             spec["identity_fit"], spec["identity_text"] = where, words

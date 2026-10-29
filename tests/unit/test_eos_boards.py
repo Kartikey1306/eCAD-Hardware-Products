@@ -1248,9 +1248,34 @@ class IdentityTest(_Lib):
                 self.assertEqual(identity["variants"][-1], f"{module.BOARD.title} rev {module.BOARD.revision}")
         source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
         fit = source[source.index("def fit_text("):source.index("def place_fiducials(")]
-        self.assertEqual(fit.count("item.SetTextSize(v(t[\"size\"], t[\"size\"]))"), 1)   # one size: never shrunk
+        # one height, never lowered; only the character width may narrow, last (SILK_WIDTHS)
+        self.assertEqual(fit.count("item.SetTextSize("), 2)                     # the design line's check, and the fit
+        self.assertEqual(fit.count('item.SetTextSize(v(t["size"] * width, t["size"]))'), 1)
         self.assertNotIn("0.8", fit)
         self.assertIn("allowed", fit)                        # other silkscreen checked (review n4)
+
+    def test_a_line_moves_then_shortens_then_narrows(self):
+        # stage 2 sweep (30 Oct): at 1.0 mm the 26.4 mm ownership line fits nowhere on four boards, so a
+        # line may also move sideways and, last, take narrower characters; its height never changes
+        widths = fabrication.SILK_WIDTHS
+        self.assertEqual(widths[0], 1.0)
+        self.assertEqual(list(widths), sorted(widths, reverse=True))
+        self.assertGreaterEqual(min(widths), 0.8)
+        moves = fabrication.silk_moves()
+        self.assertEqual(moves[0], (0.0, 0.0))
+        vertical = [m for m in moves if m[0] == 0.0]
+        self.assertEqual(moves[:len(vertical)], vertical)                       # up and down before sideways
+        self.assertEqual(max(abs(dy) for _, dy in moves), 2.0)
+        self.assertEqual(max(abs(dx) for dx, _ in moves), max(fabrication.SILK_SIDEWAYS))
+        self.assertEqual(len(set(moves)), len(moves))
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        fit = source[source.index("def fit_text("):source.index("def place_labels(")]
+        # widths outermost, then the identity line's variants, then the moves: shortening before narrowing
+        self.assertLess(fit.index("for width in fabrication.SILK_WIDTHS:"), fit.index('for words in t.get("variants"'))
+        self.assertLess(fit.index('for words in t.get("variants"'), fit.index("for dx, dy in fabrication.silk_moves():"))
+        self.assertIn("allowed |= set(pending)", fit)
+        place = source[source.index("def place(spec"):]
+        self.assertIn("fit_text(board, spec, item, t, {later.m_Uuid.AsString() for _, later in fits[i + 1:]})", place)
 
     def test_generated_silk_over_copper_or_the_edge_fails_the_build(self):
         texts = [{"text": "EoS Test  rev A  2026", "identity": True}, {"text": "J1"}]
@@ -1510,7 +1535,7 @@ class IdentityFitTest(unittest.TestCase):
         fit = source[source.index("def fit_text("):source.index("def place_fiducials(")]
         self.assertIn("_silk_clear(spec, item, pads, silk, allowed)", fit)
         place = source[source.index("def place(spec"):]
-        self.assertLess(place.index("placed_texts = [(t, text(board"), place.index("fit_text(board, spec, item, t)"))
+        self.assertLess(place.index("placed_texts = [(t, text(board"), place.index("fit_text(board, spec, item, t,"))
         self.assertIn('design_text=old[0]["text"] if old else ""',
                       (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8"))
 

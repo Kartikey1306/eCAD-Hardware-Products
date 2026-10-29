@@ -158,9 +158,12 @@ will be unidentifiable") and a 0.15 mm minimum line width. The ownership lines g
 designs' 0.8 mm. The placement step fits each of these lines: it must clear every pad of its side
 and every drilled pad by 0.15 mm (JLCPCB's pad-to-silkscreen minimum), stay 0.3 mm inside the
 outline, and touch no other silkscreen that the design's own line did not already touch (where the
-designer checked it). It is tried where the design put it, then up or down by up to 2 mm; the
-identity line is then shortened (the year dropped, then single spaces), never shrunk. A line that fits
-nowhere stops the build. A DRC `silk_over_copper`, `silk_edge_clearance` or `silk_overlap` finding on
+designer checked it); the generator lines not yet fitted are not in its way, they fit round it after.
+It is tried where the design put it, then up or down by up to 2 mm, then also up to 3 mm sideways; the
+identity line is then shortened (the year dropped, then single spaces); last, its characters are set
+narrower (0.9, then 0.8 of the height wide), the height and stroke unchanged: the 26.4 mm ownership
+line fits nowhere at full width on a 28 mm board between two pin rows. A line that fits nowhere stops
+the build. A DRC `silk_over_copper`, `silk_edge_clearance` or `silk_overlap` finding on
 the identity line, which KiCad grades a warning, fails the build too; `build-report.json` records where each line
 went (`silk_fits`). The revision is the board's `revision` (default "A"). The board file's title block
 says what the schematic's does: title, date, revision, owner, copyright and licence, and for an

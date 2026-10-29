@@ -415,11 +415,30 @@ def lift_with_fallback(clash, lift, fixed=lambda item: False):
 # "Minimum text height 40 mil (1.0mm) Characters height less than 40 mil(1.0mm) will be unidentifiable",
 # "Minimum Line Width >= 0.15mm", "Pad To Silkscreen 0.15mm". Every text the generator places (the
 # identity line, the ownership lines, test-point and pin labels) is at least that size; a line that does
-# not fit is shortened or moved, never shrunk.
+# not fit is moved, shortened (the identity line) or, last, set in narrower characters, never lower.
 SILK_MIN_TEXT = 1.0          # mm, text height
 SILK_MIN_STROKE = 0.15       # mm
 SILK_PAD_GAP = 0.15          # mm, silkscreen to a pad
 SILK_EDGE_GAP = 0.3          # mm, silkscreen to the board edge
+# Character width as a share of the height, tried in turn for a line that fits nowhere at full width (a
+# 26 mm ownership line on a 28 mm board between two pin rows): the height and the stroke, which JLCPCB's
+# minimums are about, stay; the letters get narrower, as 0.8-wide silkscreen text commonly is.
+SILK_WIDTHS = (1.0, 0.9, 0.8)
+SILK_SIDEWAYS = (0.5, 1.0, 1.5, 2.0, 2.5, 3.0)    # mm a line may also move left or right
+
+
+def silk_moves(reach=2.0, step=0.25, sideways=SILK_SIDEWAYS):
+    """The moves (dx, dy) mm tried for a generator line, best first: in place, then up or down in
+    ``step`` steps up to ``reach``, then the same at each sideways offset, left before right.
+
+    >>> silk_moves()[:5]
+    [(0.0, 0.0), (0.0, -0.25), (0.0, 0.25), (0.0, -0.5), (0.0, 0.5)]
+    >>> silk_moves()[17:19], len(silk_moves())
+    ([(-0.5, 0.0), (-0.5, -0.25)], 221)
+    """
+    n = int(round(reach / step))
+    vertical = [0.0] + [round(i * step * d, 4) for i in range(1, n + 1) for d in (-1, 1)]
+    return [(0.0, dy) for dy in vertical] + [(dx * side, dy) for dx in sideways for side in (-1, 1) for dy in vertical]
 
 
 def silk_stroke(size, bold=False):
