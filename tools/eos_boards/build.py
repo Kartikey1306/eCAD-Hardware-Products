@@ -181,6 +181,7 @@ def identity_texts(board: Board, texts: List[Dict[str, Any]]) -> List[Dict[str, 
                                      "layer": layer, "mirror": own.get("mirror", False)}
     line["text"] = identity
     line["identity"] = True
+    line["design_text"] = old[0]["text"] if old else ""     # the design's line, which fit_identity starts from
     if old:
         return [line if t is old[0] else t for t in texts]
     return list(texts) + [line]

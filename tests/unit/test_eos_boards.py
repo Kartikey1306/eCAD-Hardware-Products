@@ -1214,7 +1214,7 @@ class IdentityTest(_Lib):
         own = [dict(t, text=t["text"].replace("2026", "2027")) for t in self.OWN]
         out = build.identity_texts(board, own)
         self.assertEqual(out[-1], {"text": "EoS Test  rev B  2027", "x": 10.0, "y": 6.0, "size": 1.0, "bold": True,
-                                   "layer": "B_SilkS", "mirror": True, "identity": True})
+                                   "layer": "B_SilkS", "mirror": True, "identity": True, "design_text": ""})
         # review m6: a later revision replaces the old hand-drawn "rev A" line, it does not sit beside it
         out = build.identity_texts(board, own + [dict(own[0], text="EoS Test  rev A", y=5.0)])
         self.assertEqual([t["text"] for t in out if "rev" in t["text"]], ["EoS Test  rev B  2027"])
@@ -1446,6 +1446,62 @@ class GeneratedSilkGateTest(unittest.TestCase):
         self.assertEqual(build.generated_silk_problems(drc("silk_overlap", "PWR"), texts), [])
         for kind in ("silk_over_copper", "silk_edge_clearance"):
             self.assertEqual(len(build.generated_silk_problems(drc(kind, "EoS T  rev A  2026"), texts)), 1)
+
+
+FIT_SCRIPT = """
+import json, sys
+sys.path.insert(0, sys.argv[1])
+import pcbnew as P
+import pcb_build
+v = pcb_build.v
+board = P.BOARD()
+spec = {"width": 40.0, "height": 20.0, "corner_radius": 0.0}
+for x in (12.0, 16.0, 20.0, 24.0, 28.0):         # 4 mm pads under the name line and every spot above it
+    fp = P.FootprintLoad(sys.argv[2] + "/TestPoint.pretty", "TestPoint_Pad_4.0x4.0mm")
+    board.Add(fp)
+    fp.SetPosition(v(x, 6.3))
+own = pcb_build.text(board, "(c) 2026 Kartikeydheer Srivastava", 20.0, float(sys.argv[3]), 0.8, P.F_SilkS)
+t = {"text": "EoS T  rev A  2026", "x": 20.0, "y": 8.0, "size": 1.0, "bold": True, "identity": True, "design_text": ""}
+item = pcb_build.text(board, t["text"], t["x"], t["y"], t["size"], P.F_SilkS, 0.0, True)
+try:
+    where = pcb_build.fit_identity(board, spec, item, t)
+except SystemExit as e:
+    where = "stopped: " + str(e)
+print(json.dumps({"where": where, "on_ownership": item.GetBoundingBox().Intersects(own.GetBoundingBox())}))
+"""
+
+
+class IdentityFitTest(unittest.TestCase):
+    """PR #74 review (greptile, qodo): the name line, moved off pads, must not land on the ownership
+    line (or other silkscreen), and every design text is down before it is fitted."""
+
+    def test_the_fitter_checks_other_silk_after_every_text_is_down(self):
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        fit = source[source.index("def fit_identity("):source.index("def place_fiducials(")]
+        self.assertIn("and not any(box.Intersects(b) for uid, box in silk.items() if uid not in allowed)", fit)
+        place = source[source.index("def place(spec"):]
+        self.assertLess(place.index("placed_texts = [(text(board"), place.index("fit_identity(board, spec, item, t)"))
+        self.assertIn('line["design_text"] = old[0]["text"] if old else ""',
+                      (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8"))
+
+    @unittest.skipUnless(os.environ.get("EOS_KICAD_TESTS"), "set EOS_KICAD_TESTS=1 to run the KiCad-backed fit "
+                         "(one small KiCad job: run it through the campaign's locked.sh)")
+    def test_a_blocked_name_line_never_lands_on_the_ownership_line(self):
+        from eos_boards import kicad_env
+        with tempfile.TemporaryDirectory() as tmp:
+            script = Path(tmp, "fit.py")
+            script.write_text(FIT_SCRIPT, encoding="utf-8")
+            results = {}
+            for own_y in (10.0, 13.0):           # the ownership line just below, or out of the way
+                run = subprocess.run([kicad_env.python(), str(script), str(REPO_ROOT / "tools" / "eos_boards"),
+                                      str(kicad_env.footprints()), str(own_y)], capture_output=True, text=True, timeout=300)
+                self.assertEqual(run.returncode, 0, run.stderr[-2000:])
+                results[own_y] = json.loads(run.stdout.strip().splitlines()[-1])
+        # just below: no spot within 2 mm clears both, so the build stops (before the fix: 1.0 mm on top of it)
+        self.assertTrue(results[10.0]["where"].startswith("stopped: identity line 'EoS T  rev A  2026' clears no pad, "
+                                                          "edge or other silkscreen"), results[10.0])
+        self.assertFalse(results[13.0]["where"].startswith("stopped"), results[13.0])   # room below the pads: it goes there
+        self.assertFalse(results[13.0]["on_ownership"])
 
 
 class FtshFootprintTest(unittest.TestCase):

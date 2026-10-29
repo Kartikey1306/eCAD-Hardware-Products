@@ -607,19 +607,36 @@ IDENTITY_MIN_SIZE = 0.8      # mm: the smallest text the boards use (their owner
 
 def fit_identity(board, spec, item, t):
     """Move or shrink the generator's identity line until it clears every pad of its side and every
-    drilled pad by IDENTITY_PAD_GAP and stays IDENTITY_EDGE_GAP inside the outline: first where the
-    design put it, then up or down in 0.25 mm steps (up to 2 mm), then the same at IDENTITY_MIN_SIZE.
-    A line that fits nowhere stops the build: fabs clip silkscreen off pads, and KiCad reports silk
-    over copper only as a warning. Returns where it went."""
-    cu = P.B_Cu if item.GetLayer() == P.B_SilkS else P.F_Cu
+    drilled pad by IDENTITY_PAD_GAP, stays IDENTITY_EDGE_GAP inside the outline, and touches no other
+    silkscreen of its layer (board texts and drawings, footprint graphics and visible footprint texts)
+    that the design's own name line (``design_text``, where its designer checked it) did not already
+    touch (PR #74 review: a line moved down could land on the ownership line): first where the design
+    put it, then up or down in 0.25 mm steps (up to 2 mm), then the same at IDENTITY_MIN_SIZE. A line
+    that fits nowhere stops the build: fabs clip silkscreen off pads, and KiCad reports silk over
+    copper only as a warning. Every design text is on the board before this runs. Returns where it went."""
+    layer = item.GetLayer()
+    cu = P.B_Cu if layer == P.B_SilkS else P.F_Cu
     gap = MM(IDENTITY_PAD_GAP)
-    pads = []
+    pads, silk = [], {}
+    own = item.m_Uuid.AsString()
     for fp in board.GetFootprints():
         for pad in fp.Pads():
             if pad.IsOnLayer(cu) or pad.HasHole():
                 b = pad.GetBoundingBox()
                 pads.append(P.BOX2I(P.VECTOR2I(b.GetX() - gap, b.GetY() - gap),
                                     P.VECTOR2I(b.GetWidth() + 2 * gap, b.GetHeight() + 2 * gap)))
+        for g in list(fp.GraphicalItems()) + [fp.Reference(), fp.Value()]:
+            if g.GetLayer() == layer and (not hasattr(g, "IsVisible") or g.IsVisible()):
+                silk[g.m_Uuid.AsString()] = g.GetBoundingBox()
+    for d in board.GetDrawings():
+        if d.GetLayer() == layer and d.m_Uuid.AsString() != own:
+            silk[d.m_Uuid.AsString()] = d.GetBoundingBox()
+    allowed = set()
+    if t.get("design_text"):                        # what the design's line touched where it was drawn
+        item.SetText(t["design_text"])
+        item.SetPosition(v(t["x"], t["y"]))
+        allowed = {uid for uid, box in silk.items() if box.Intersects(item.GetBoundingBox())}
+        item.SetText(t["text"])
     sizes = [t["size"]] + ([IDENTITY_MIN_SIZE] if t["size"] > IDENTITY_MIN_SIZE else [])
     steps = [0.0] + [s * d for s in (0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0) for d in (-1, 1)]
     for size in sizes:
@@ -630,10 +647,11 @@ def fit_identity(board, spec, item, t):
             b = item.GetBoundingBox()
             corners = [P.VECTOR2I(x, y) for x in (b.GetX(), b.GetRight()) for y in (b.GetY(), b.GetBottom())]
             if all(_inside(dict(spec, copper_keepouts=[], fiducial_keepouts=[]), c, MM(IDENTITY_EDGE_GAP)) for c in corners) \
-                    and not any(p.Intersects(b) for p in pads):
+                    and not any(p.Intersects(b) for p in pads) \
+                    and not any(box.Intersects(b) for uid, box in silk.items() if uid not in allowed):
                 return f"{size} mm at ({t['x']}, {round(t['y'] + dy, 2)})"
-    raise SystemExit(f"identity line {t['text']!r} clears no pad or edge at {t['size']} or {IDENTITY_MIN_SIZE} mm "
-                     f"within 2 mm of ({t['x']}, {t['y']}); move the design's name line")
+    raise SystemExit(f"identity line {t['text']!r} clears no pad, edge or other silkscreen at {t['size']} or "
+                     f"{IDENTITY_MIN_SIZE} mm within 2 mm of ({t['x']}, {t['y']}); move the design's name line")
 
 
 def place_fiducials(board, spec):
@@ -756,9 +774,10 @@ def place(spec, pcb_path, dsn_path):
             net = part["pads"].get(pad.GetNumber())
             if net:
                 pad.SetNet(nets[net])
-    for t in spec.get("texts", []):
-        item = text(board, t["text"], t["x"], t["y"], t["size"], getattr(P, t.get("layer", "F_SilkS")),
-                    t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False))
+    placed_texts = [(text(board, t["text"], t["x"], t["y"], t["size"], getattr(P, t.get("layer", "F_SilkS")),
+                          t.get("angle", 0.0), t.get("bold", False), t.get("mirror", False)), t)
+                    for t in spec.get("texts", [])]
+    for item, t in placed_texts:        # every design text is down before the name line is fitted round them
         if t.get("identity"):
             spec["identity_fit"] = fit_identity(board, spec, item, t)       # recorded in build-report.json
             print(f"identity line: {spec['identity_fit']}")
