@@ -405,6 +405,10 @@ for _p in PARTS:
 # * GPIO20 (MI), GPIO25 (D25), GPIO24 (D24) and GPIO27 (A1), each of which the autorouter left open
 #   in at least one of builds 3, 7, 8 and 9 (the bottom edge is crowded by the buttons and the lines
 #   to the 16-pin strip).
+# * GPIO9 (D9) up to the 12-pin strip and GPIO19 (MO) down to the 16-pin strip: with the bench test pads
+#   and the fiducials (P3) on the board, the autorouter left GPIO9 open in all three runs of the stage-2
+#   build (30 Oct 2026) and GPIO19 in two; the top-right fiducial's copper-free square sits in front of
+#   D9's pin. Laid first, the fiducials go round them.
 # SWCLK, SWDIO and RUN are the autorouter's: past the chip's 1 mm pad corridors (which bind only
 # the maze router) the column left of them beside C20 is 0.66 mm, room for two fixed lines, not
 # three; the autorouter may use the corridors and has about 2 mm.
@@ -425,6 +429,7 @@ PRIORITY = [
     (("R6", "2"), ("SW2", "1")),
     (("U1", "31"), ("J2", "13")), (("U1", "37"), ("J2", "10")), (("U1", "36"), ("J2", "9")),
     (("U1", "39"), ("J2", "6")),
+    (("U1", "12"), ("J3", "8")), (("U1", "30"), ("J2", "12")),
 ]
 
 TEXTS = [
