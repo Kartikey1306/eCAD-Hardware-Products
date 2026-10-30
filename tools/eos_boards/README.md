@@ -154,9 +154,12 @@ replaced where it stands; otherwise the line goes 2 mm above the ownership line.
 ownership line is refused.
 
 **Legible silkscreen.** Every line the generator places or sizes (the identity line, the two
-ownership lines, test-point and pin labels) is at least 1.0 mm high with a stroke of at least
-0.15 mm: JLCPCB's capabilities page gives "Minimum text height 40 mil (1.0mm)" ("less than 1.0 mm
-will be unidentifiable") and a 0.15 mm minimum line width. The ownership lines go up from the
+ownership lines, test-point and pin labels) is at least 1.0 mm high, with a stroke of a sixth of the
+height (0.167 mm at 1.0 mm; 20 % for the bold identity line) and never under 0.15 mm: JLCPCB's
+capabilities page gives "Minimum text height 40 mil (1.0mm)" ("less than 1.0 mm will be
+unidentifiable"), a 0.15 mm minimum line width and "The preferred ratio of width to height is 1:6".
+A generator line that fits nowhere with the 1:6 stroke is fitted again at 0.15 mm, and
+`build-report.json` says so on that line. The ownership lines go up from the
 designs' 0.8 mm. The placement step fits each of these lines: it must clear every pad of its side
 and every drilled pad by 0.15 mm (JLCPCB's pad-to-silkscreen minimum), stay 0.3 mm inside the
 outline, and touch no other silkscreen that the design's own line did not already touch (where the
@@ -166,7 +169,7 @@ identity line is then shortened (the year dropped, then single spaces); last, it
 narrower (0.9, then 0.8 of the height wide), the height and stroke unchanged: the 26.4 mm ownership
 line fits nowhere at full width on a 28 mm board between two pin rows. A line that fits nowhere stops
 the build. A DRC `silk_over_copper`, `silk_edge_clearance` or `silk_overlap` finding on
-the identity line, which KiCad grades a warning, fails the build too; `build-report.json` records where each line
+the identity line or an ownership line, which KiCad grades a warning, fails the build too; `build-report.json` records where each line
 went (`silk_fits`). The revision is the board's `revision` (default "A"). The board file's title block
 says what the schematic's does: title, date, revision, owner, copyright and licence, and for an
 all-rights-reserved board whom to ask for permission.

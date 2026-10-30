@@ -442,13 +442,15 @@ def silk_moves(reach=2.0, step=0.25, sideways=SILK_SIDEWAYS):
 
 
 def silk_stroke(size, bold=False):
-    """The stroke for silkscreen text of ``size`` mm: 15 % of the height (20 % bold), never under
-    SILK_MIN_STROKE.
+    """The stroke for silkscreen text of ``size`` mm: a sixth of the height, JLCPCB's preferred ratio
+    ("The preferred ratio of width to height is 1:6", capabilities page, read 30 Oct 2026; stage-2
+    review n7), 20 % bold, never under SILK_MIN_STROKE. A generator line that fits nowhere with it is
+    fitted again at SILK_MIN_STROKE (pcb_build.fit_text), and says so.
 
-    >>> silk_stroke(1.0), silk_stroke(1.0, bold=True), silk_stroke(2.0)
-    (0.15, 0.2, 0.3)
+    >>> silk_stroke(1.0), silk_stroke(1.0, bold=True), silk_stroke(2.0), silk_stroke(0.8)
+    (0.1667, 0.2, 0.3333, 0.15)
     """
-    return round(max(SILK_MIN_STROKE, size * (0.2 if bold else 0.15)), 4)
+    return round(max(SILK_MIN_STROKE, size * 0.2 if bold else size / 6), 4)
 
 
 def identity_variants(title, revision, year):

@@ -654,8 +654,9 @@ def fit_text(board, spec, item, t, pending=()):
     be fitted (``pending``, uuids) are not in the way yet, they fit round this one. Tried where the
     design put it, then moved (fabrication.silk_moves: up or down by up to 2 mm, then also up to 3 mm
     sideways), for each of its ``variants`` (the identity line shortens: fabrication.identity_variants),
-    and last with narrower characters (fabrication.SILK_WIDTHS); the height and stroke never go down. A
-    line that fits nowhere stops the build: fabs clip silkscreen off pads, and KiCad reports silk over
+    and last with narrower characters (fabrication.SILK_WIDTHS), all with the preferred 1:6 stroke and
+    then, only if nothing fits, again at the 0.15 mm minimum; the height never goes down. A line that
+    fits nowhere stops the build: fabs clip silkscreen off pads, and KiCad reports silk over
     copper only as a warning. Returns (the text placed, a description of where it went)."""
     items = {}
     pads, silk = _silk_obstacles(board, item, items)
@@ -666,16 +667,21 @@ def fit_text(board, spec, item, t, pending=()):
     # what the design line's box touched may stay box to box with the larger line, never stroke to stroke
     near = [items[uid] for uid in touched - set(pending)]
     allowed = touched | set(pending)
-    item.SetTextThickness(MM(fabrication.silk_stroke(t["size"], t.get("bold", False))))
-    for width in fabrication.SILK_WIDTHS:
-        item.SetTextSize(v(t["size"] * width, t["size"]))                # the height stays t["size"]
-        for words in t.get("variants", [t["text"]]):
-            item.SetText(words)
-            for dx, dy in fabrication.silk_moves():
-                item.SetPosition(v(t["x"] + dx, t["y"] + dy))
-                if _silk_clear(spec, item, pads, silk, allowed) and not _strokes_touch(item, near):
-                    narrow = "" if width == 1.0 else f" ({width:g} wide)"
-                    return words, f"{words!r} {t['size']} mm{narrow} at ({round(t['x'] + dx, 2)}, {round(t['y'] + dy, 2)})"
+    preferred = fabrication.silk_stroke(t["size"], t.get("bold", False))
+    # JLCPCB's preferred 1:6 stroke first; only a line that fits nowhere with it keeps the 0.15 mm minimum
+    for stroke in [preferred] + ([fabrication.SILK_MIN_STROKE] if preferred > fabrication.SILK_MIN_STROKE else []):
+        item.SetTextThickness(MM(stroke))
+        for width in fabrication.SILK_WIDTHS:
+            item.SetTextSize(v(t["size"] * width, t["size"]))            # the height stays t["size"]
+            for words in t.get("variants", [t["text"]]):
+                item.SetText(words)
+                for dx, dy in fabrication.silk_moves():
+                    item.SetPosition(v(t["x"] + dx, t["y"] + dy))
+                    if _silk_clear(spec, item, pads, silk, allowed) and not _strokes_touch(item, near):
+                        narrow = "" if width == 1.0 else f" ({width:g} wide)"
+                        thin = "" if stroke == preferred else f" ({stroke:g} stroke: none fits at {preferred:g})"
+                        return words, (f"{words!r} {t['size']} mm{narrow}{thin} at "
+                                       f"({round(t['x'] + dx, 2)}, {round(t['y'] + dy, 2)})")
     raise SystemExit(f"silkscreen line {t['text']!r} at {t['size']} mm clears no pad, edge or other silkscreen "
                      f"within 2 mm up or down and 3 mm sideways of ({t['x']}, {t['y']}), even "
                      f"{min(fabrication.SILK_WIDTHS):g} wide; move the design's line")

@@ -1254,6 +1254,20 @@ class IdentityTest(_Lib):
         self.assertNotIn("0.8", fit)
         self.assertIn("allowed", fit)                        # other silkscreen checked (review n4)
 
+    def test_the_stroke_is_a_sixth_of_the_height(self):
+        # stage-2 review n7: JLCPCB "The preferred ratio of width to height is 1:6"; 0.15 mm stays the floor
+        for size in (1.0, 1.2, 1.5, 2.0):
+            self.assertGreaterEqual(fabrication.silk_stroke(size), round(size / 6, 4))
+            self.assertGreaterEqual(fabrication.silk_stroke(size, bold=True), round(size * 0.2, 4))
+        self.assertEqual(fabrication.silk_stroke(1.0), 0.1667)
+        self.assertEqual(fabrication.silk_stroke(0.8), fabrication.SILK_MIN_STROKE)
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        fit = source[source.index("def fit_text("):source.index("def place_labels(")]
+        # the preferred stroke first; the 0.15 mm minimum only for a line that fits nowhere with it, reported
+        self.assertIn("for stroke in [preferred] + ([fabrication.SILK_MIN_STROKE] if preferred > fabrication.SILK_MIN_STROKE else []):", fit)
+        self.assertLess(fit.index("for stroke in"), fit.index("for width in fabrication.SILK_WIDTHS:"))
+        self.assertIn('stroke: none fits at', fit)
+
     def test_a_line_moves_then_shortens_then_narrows(self):
         # stage 2 sweep (30 Oct): at 1.0 mm the 26.4 mm ownership line fits nowhere on four boards, so a
         # line may also move sideways and, last, take narrower characters; its height never changes
