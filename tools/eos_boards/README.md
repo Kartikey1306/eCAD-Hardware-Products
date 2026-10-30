@@ -124,8 +124,9 @@ make it two-sided. For each corner the generator takes the 25 free spots nearest
 quarter of the board, then the trio from three corners whose closest two are furthest apart, each at
 least 5 mm off the line through the other two. Where fewer than three corners have room, it places
 two diagonally opposite ones (the free spots nearest two opposite corners, at least 5 mm apart in x
-and in y), records why in `build-report.json` (`fiducial_notes`), and the board's README must say so
-(BENCH-READY A2). Each mask opening is at least 3 mm from the board edge, and a 3 mm square round each
+and in y), records why in `build-report.json` (`fiducial_notes`: the two spots, their spacing, and
+"use the panel-rail fiducials as well"; the two can sit in the same half of the board), and the
+board's README must say so (BENCH-READY A2). Each mask opening is at least 3 mm from the board edge, and a 3 mm square round each
 dot is clear of every courtyard, pad, drilled hole, silkscreen text, keep-out and earlier copper on
 that side: other copper stays 1.0 mm beyond the dot's edge, outside the mask opening, which meets
 IPC-7351B's clear area of at least twice the mark's radius. That square is a rule area on the saved

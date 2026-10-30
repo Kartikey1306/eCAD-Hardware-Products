@@ -365,8 +365,13 @@ def choose_fiducials(width, height, corner_radius, obstacles):
             pairs.append((_diagonal((a[0], b[0])), [a[0], b[0]], f"{n1} and {n2}"))
     if pairs:
         _, pair, which = max(pairs, key=lambda q: q[0])
-        return pair, (f"two diagonally opposite fiducials ({which}): only {len(spots)} corner quarter(s) "
-                      f"have room for one ({', '.join(sorted(spots)) or 'none'})")
+        (ax, ay), (bx, by) = pair
+        # stage-2 review n8: name the dots for what they are, wherever they sit, and send the assembler
+        # to the panel rails, since two dots this close are a short baseline for rotation
+        return pair, (f"two fiducials, the free spots nearest the {which} corners, "
+                      f"{((ax - bx) ** 2 + (ay - by) ** 2) ** 0.5:.1f} mm apart ({abs(ax - bx):g} mm in x, "
+                      f"{abs(ay - by):g} mm in y): only {len(spots)} corner quarter(s) have room for one "
+                      f"({', '.join(sorted(spots)) or 'none'}); use the panel-rail fiducials as well")
     raise ValueError(f"fiducials: room near only {len(spots)} corner(s) ({sorted(spots)}) and no two diagonally "
                      "opposite free spots; give positions with the design's fiducials option")
 

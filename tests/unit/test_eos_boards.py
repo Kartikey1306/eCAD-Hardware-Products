@@ -1378,8 +1378,13 @@ class FiducialTest(_Lib):
         obstacles = [(0, 0, 27.94, 24.0), (0, 0, 2.5, 48.76), (25.4, 0, 27.94, 48.76)]
         points, note = fabrication.choose_fiducials(27.94, 48.76, 1.0, obstacles)
         self.assertEqual(len(points), 2)
-        self.assertIn("two diagonally opposite fiducials", note)
+        # stage-2 review n8: what the dots are, their spacing, and the panel rails
+        (ax, ay), (bx, by) = points
+        self.assertIn("two fiducials, the free spots nearest the top-left and bottom-right corners", note)
+        self.assertIn(f"{((ax - bx) ** 2 + (ay - by) ** 2) ** 0.5:.1f} mm apart ({abs(ax - bx):g} mm in x, "
+                      f"{abs(ay - by):g} mm in y)", note)
         self.assertIn("only 2 corner quarter(s) have room", note)
+        self.assertIn("use the panel-rail fiducials as well", note)
         self.assertGreaterEqual(fabrication._diagonal(points), fabrication.FIDUCIAL_SPREAD)
         self.assertEqual(fabrication.fiducial_problems(points, 27.94, 48.76, 1.0, obstacles), [])
 
