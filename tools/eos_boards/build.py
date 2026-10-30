@@ -33,7 +33,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
 from eos_boards import fabrication, kicad_env, metrics, schematic  # noqa: E402
-from eos_boards.design import (ALL_RIGHTS_RESERVED, NC, RAIL_LINK_SYMBOL, TESTPOINT_SYMBOL, Board, Part,  # noqa: E402
+from eos_boards.design import (ALL_RIGHTS_RESERVED, BOTTOM_PAD_FIELD, NC, RAIL_LINK_SYMBOL, TESTPOINT_SYMBOL, Board, Part,  # noqa: E402
                                resolve)
 from eos_boards.kicad_lib import Library  # noqa: E402
 from eos_boards.sexpr import find, find_all  # noqa: E402
@@ -287,7 +287,8 @@ def generated_silk_problems(drc: Dict[str, Any], texts: List[Dict[str, Any]]) ->
 def check_bench(board: Board) -> None:
     """Refuse bench data that does not match the design (BENCH-READY C1, C2, C5, A4, D8): a rail on a
     net no part has; a rail without a test point, or a test point that is not a test pad or connector pin
-    on that rail's net; fewer than two test points on GND; a supply net (``power_nets``) missing from the
+    on that rail's net (a pin counts only on a connector); a bench test pad on the bottom side with no
+    reason given; fewer than two test points on GND; a supply net (``power_nets``) missing from the
     rail list; a rail link that is not a link from that rail to another net; bring-up data without
     rails; pin labels for pins the board does not have; a temperature range that is empty or names a part
     the board does not have. Pins are read from each part's ``nets`` (by number or name), so this runs
@@ -305,10 +306,15 @@ def check_bench(board: Board) -> None:
             return None
         if not pad:                                     # a test pad, by its reference
             return part.nets.get("1") if part.lib_id == TESTPOINT_SYMBOL else None
-        return part.nets.get(pad)
+        # a pin a probe or clip can take: a connector's (stage-2 review n4: U1.5 is not a test point)
+        return part.nets.get(pad) if part.lib_id.startswith("Connector") else None
 
     if board.bringup is not None and not board.rails:
         fail("bring-up data needs the rail list (rails)")
+    for part in board.parts:            # BENCH-READY C1: test pads on the top side, where the probe goes
+        if part.lib_id == TESTPOINT_SYMBOL and not part.in_bom and part.side != "F" \
+                and not part.fields.get(BOTTOM_PAD_FIELD, "").strip():
+            fail(f"test pad {part.ref} is on the bottom side with no reason; give bench_pad(..., bottom_reason=...)")
     seen = set()
     for rail in board.rails:
         if rail.net not in nets:
@@ -507,6 +513,11 @@ def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[s
     check_bench(board)
     parts, nets = [], set()
     for part in board.parts:
+        if not part.in_bom and not part.lib_id.startswith((TESTPOINT_SYMBOL, "Mechanical:")):
+            # stage-2 review n4: only a bare test pad or a mechanical item may stay out of the BOM; any
+            # other part left out would never be bought
+            raise SystemExit(f"{board.name}: {part.ref} ({part.lib_id}) is left out of the BOM (in_bom=False); "
+                             f"only a test pad ({TESTPOINT_SYMBOL}) or a Mechanical: symbol may be")
         if not part.on_board:
             if resolve(part, lib):         # a part with pins left off the board would vanish from it silently
                 raise SystemExit(f"{board.name}: {part.ref} has pins, so it cannot be a BOM-only part (on_board=False)")

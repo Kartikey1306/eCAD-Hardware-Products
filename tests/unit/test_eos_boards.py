@@ -2234,6 +2234,32 @@ class BenchTest(_Bench):
                 build.check_bench(self.bench(**kw))
         build.check_bench(self.bench(pin_labels={"U1": {"VDD": "3V3", "3": "IO"}}))    # by pin number or name
 
+    def test_bom_exclusion_test_point_kinds_and_pad_side_are_checked(self):
+        # stage-2 review n4: three options the build took on trust
+        good = self.bench()
+        # 1. only a test pad or a mechanical item may stay out of the BOM
+        silent = Part("R9", "T:R", "1k", "fp", (9, 9), {"1": "SIG", "2": "GND"}, in_bom=False)
+        board = self.bench()
+        board.parts = board.parts + [silent]
+        with self.assertRaisesRegex(SystemExit, r"R9 \(T:R\) is left out of the BOM"):
+            build.spec_for(board, self.lib, Path(self.tmp.name), [])
+        self.assertTrue(all(p["ref"] != "R9" for p in build.spec_for(good, self.lib, Path(self.tmp.name), [])["parts"]))
+        # 2. a pin is a test point only on a connector: U1's VDD is on +3V3 but is no probe point
+        rails = [dataclasses.replace(good.rails[1], test_points=["TP1", "U1.VDD"])] + good.rails[:1] + good.rails[2:]
+        with self.assertRaisesRegex(SystemExit, "U1.VDD is not a test pad or connector pin"):
+            build.check_bench(self.bench(rails=rails))
+        # 3. test pads on the top side, or a reason
+        with self.assertRaisesRegex(ValueError, "needs bottom_reason"):
+            design.bench_pad("TP5", "GND", "GND", (6.0, 2.0), (120, 50), side="B")
+        bottom = design.bench_pad("TP5", "GND", "GND", (6.0, 2.0), (120, 50), side="B", bottom_reason="under the shield can")
+        self.assertEqual(bottom.fields[design.BOTTOM_PAD_FIELD], "under the shield can")
+        board = self.bench()
+        board.parts = board.parts + [bottom]
+        build.check_bench(board)
+        board.parts = board.parts[:-1] + [dataclasses.replace(bottom, fields={"Description": "no reason"})]
+        with self.assertRaisesRegex(SystemExit, "TP5 is on the bottom side with no reason"):
+            build.check_bench(board)
+
     def test_no_designs_test_pad_is_a_bom_line(self):
         # stage-2 review n2: a test pad is bare copper with no placement row, so it is no BOM line either.
         # Two older designs still draw theirs as BOM parts; P4 turns them into bench pads (ratchet)

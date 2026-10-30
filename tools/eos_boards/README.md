@@ -195,14 +195,17 @@ gets it before its "## Rebuild" heading).
   `Connector:TestPoint` on `TestPoint:TestPoint_Pad_D1.0mm` (or `D1.5mm`). It is in the schematic, so
   the parity check covers it, but it is not a BOM line and not in the position file: a bare pad is
   nothing to buy or place, and the parts review counted test pads in the BOM as noise. Its value is
-  its label, which the placement step prints on the silkscreen beside it.
+  its label, which the placement step prints on the silkscreen beside it. It goes on the top side,
+  where the probe goes; `side="B"` needs `bottom_reason=...`, which the build checks. The build also
+  refuses `in_bom=False` on anything but a test pad or a `Mechanical:` symbol.
 - `design.rail_link(ref, source_net, load_net, (x, y, rot), sch)`: a rail link (C2), KiCad's
   `SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm`, bridged as delivered (a 0.6 mm copper bridge,
   about 1.6 A for a 10 °C rise by IPC-2221's external formula). Chosen over a 0 Ω resistor: no part
   to buy or place. To check a rail unloaded or measure its load's current, cut the bridge, put an
   ammeter across the pads, and bridge them again with solder.
 - `rails`: a `design.Rail` per supply net, GND included: the net, its source, nominal voltage,
-  tolerance with its data-sheet source, test points (test pads, or connector pins as `"J1.4"`), the
+  tolerance with its data-sheet source, test points (test pads, or pins of a `Connector*:` symbol as
+  `"J1.4"`; another part's pin is no probe point), the
   expected resistance to GND unpowered, and its link or a note saying why it has none. Every supply net
   (`power_nets`) must be listed; every rail needs a test point on its own net, and GND two.
 - `bringup`: a `design.BringUp`: where first power goes in and its current limit, the expected idle

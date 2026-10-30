@@ -42,6 +42,7 @@ ALL_RIGHTS_RESERVED = "All rights reserved"   # a closed board: its owner's term
 # check, on a bare round pad of at least 1.0 mm. Not a BOM line and not in the position file: there is
 # nothing to buy or place (the parts review counted bare test pads as BOM noise).
 TESTPOINT_SYMBOL = "Connector:TestPoint"
+BOTTOM_PAD_FIELD = "Bottom side"            # why a bench test pad sits on the bottom (C1 asks for the top)
 TESTPOINT_FOOTPRINTS = {1.0: "TestPoint:TestPoint_Pad_D1.0mm", 1.5: "TestPoint:TestPoint_Pad_D1.5mm"}
 
 # Rail links (BENCH-READY C2): a solder jumper bridged as delivered, KiCad's
@@ -54,18 +55,24 @@ RAIL_LINK_FOOTPRINT = "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm"
 
 
 def bench_pad(ref: str, net: str, label: str, pcb: Tuple[float, float], sch: Tuple[float, float],
-               diameter: float = 1.0, side: str = "F") -> "Part":
+               diameter: float = 1.0, side: str = "F", bottom_reason: str = "") -> "Part":
     """A test pad on ``net`` at ``pcb`` (x, y mm), labelled ``label`` (its value; the generator prints it
-    on the silkscreen beside the pad). ``diameter`` 1.0 or 1.5 mm.
+    on the silkscreen beside the pad). ``diameter`` 1.0 or 1.5 mm. BENCH-READY C1 puts test pads on the
+    top side, where the probe goes; one on the bottom (``side="B"``) needs ``bottom_reason``, which the
+    build checks and the schematic carries.
 
     >>> bench_pad("TP2", "+3V3", "3V3", (10.0, 5.0), (100, 50)).footprint
     'TestPoint:TestPoint_Pad_D1.0mm'
     """
     if diameter not in TESTPOINT_FOOTPRINTS:
         raise ValueError(f"{ref}: test pad diameter {diameter}; use one of {sorted(TESTPOINT_FOOTPRINTS)} mm")
+    if side != "F" and not bottom_reason.strip():
+        raise ValueError(f"{ref}: a test pad on the bottom side needs bottom_reason (BENCH-READY C1: top side)")
+    fields = {"Description": f"Test pad {label} ({net}), {diameter} mm bare copper: no part fitted"}
+    if side != "F":
+        fields[BOTTOM_PAD_FIELD] = bottom_reason
     return Part(ref, TESTPOINT_SYMBOL, label, TESTPOINT_FOOTPRINTS[diameter], sch, {"1": net},
-                pcb=(pcb[0], pcb[1], 0.0), side=side, in_bom=False,
-                fields={"Description": f"Test pad {label} ({net}), {diameter} mm bare copper: no part fitted"})
+                pcb=(pcb[0], pcb[1], 0.0), side=side, in_bom=False, fields=fields)
 
 
 def rail_link(ref: str, source_net: str, load_net: str, pcb: Tuple[float, float, float], sch: Tuple[float, float]) -> "Part":
