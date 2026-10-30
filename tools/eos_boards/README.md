@@ -41,12 +41,14 @@ paths that `kicad_env.py` and `build.py` use.
 3. **Routing**. Freerouting, headless. The router is given 0.01 mm more clearance than the board's
    rules, so its grid rounding never reaches DRC. Freerouting 2.4.1 routes a given DSN the same way
    every time and takes no seed, so a retry changes its own costs instead: when the repair rounds
-   (step 5) still leave connections that a route could close, the build starts again from the placed
+   (step 5) still leave anything unconnected, the build starts again from the placed
    board with the cost of a via doubled (`--router.scoring.via_costs=100`, default 50), then with the
    cost of ripping up routed copper tripled (`--router.scoring.start_ripup_costs=300`, default 100),
    up to three runs, and keeps the run that left the fewest connections open. On EoS Learn RP2350's
    placement these settings each gave a different route, and the via-cost run closed /GPIO5, which
-   the default run had left open. A zone island left unconnected is no reason to route again. Logs go
+   the default run had left open. A pour island counts: a route can cut a pad's patch of pour off from
+   the rest (on EoS Feather RP2040, J6.2's 1 x 2 mm of top ground, too small for a via), and another
+   route may not. Logs go
    to `.build/freerouting.log`, `freerouting-2.log`, `freerouting-3.log`; `build-report.json`
    records `routing_runs` and `routing_run_kept`.
 4. **Finish** (`pcb_build.py finish`). Imports the routes, widens any track the router necked

@@ -677,10 +677,11 @@ def check_and_repair(cli: str, spec: Path, pcb: Path, work: Path, out: Path):
 def route(cli: str, spec: Path, pcb: Path, dsn: Path, ses: Path, work: Path, out: Path, passes: int,
           attempts: int = ROUTE_ATTEMPTS):
     """Route with Freerouting, finish, then DRC and repair. When the repair rounds still leave
-    repairable connections open, start again from the placed board with Freerouting's costs changed
+    anything unconnected, start again from the placed board with Freerouting's costs changed
     (RETRY_SETTINGS), up to ``attempts`` runs, and keep the run that left the fewest connections open
-    (the earliest on a tie). Returns (its DRC report, its repair rounds, the runs made, the run kept,
-    1 first)."""
+    (the earliest on a tie). A pour island counts: a route can cut a pad's patch of pour off from the
+    rest (EoS Feather RP2040, stage 2: J6.2's 1 x 2 mm of top ground, too small for a via), and another
+    route may not. Returns (its DRC report, its repair rounds, the runs made, the run kept, 1 first)."""
     placed, kept = work / "placed.kicad_pcb", work / "best-routed.kicad_pcb"
     shutil.copyfile(pcb, placed)
     best = None
@@ -688,7 +689,8 @@ def route(cli: str, spec: Path, pcb: Path, dsn: Path, ses: Path, work: Path, out
         if attempt:
             shutil.copyfile(placed, pcb)
             print(f"routing again, run {attempt + 1} of {attempts} ({' '.join(freerouting_args(attempt))}): "
-                  f"{len(repairable_opens(drc))} repairable connection(s) were still open", flush=True)
+                  f"{len(drc.get('unconnected_items', []))} connection(s) were still open, "
+                  f"{len(repairable_opens(drc))} of them repairable", flush=True)
         freeroute(dsn, ses, passes, attempt, work)
         pcb_step("finish", spec, pcb, ses)
         drc, rounds = check_and_repair(cli, spec, pcb, work, out)
@@ -697,8 +699,8 @@ def route(cli: str, spec: Path, pcb: Path, dsn: Path, ses: Path, work: Path, out
             best = (opens, attempt, drc, rounds)
             shutil.copyfile(pcb, kept)
             shutil.copyfile(ses, work / "best-routed.ses")
-        if not opens or not repairable_opens(drc):
-            break                          # done, or only what a new route would not change (a zone island)
+        if not opens:
+            break
     runs = attempt + 1
     if best[1] != attempt:                 # an earlier run did better: its board and session, checked again
         shutil.copyfile(kept, pcb)

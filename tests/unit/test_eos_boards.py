@@ -1810,14 +1810,17 @@ class RobustRoutingTest(_Lib):
         self.assertEqual(seen, ["placed\n", "placed\n"])                 # the second run starts from the placement
         self.assertEqual(runs, [[], ["--router.scoring.via_costs=100"]])   # with Freerouting's via cost changed
 
-    def test_the_best_run_is_kept_and_zone_islands_are_not_retried(self):
+    def test_the_best_run_is_kept_and_zone_islands_are_retried(self):
         (drc, _, made, kept), _, runs, board = self._route([[self.OPEN], [self.OPEN] * 3, [self.OPEN] * 2])
         self.assertEqual((made, kept, len(drc["unconnected_items"])), (3, 1, 1))
         self.assertEqual(board, "placed\nrouted by run 1\n")                  # run 1's board, restored
         self.assertEqual(self.session, "session of run 1")                    # and its session (review n2)
         self.assertEqual(runs[2], ["--router.scoring.start_ripup_costs=300"])
-        (drc, _, made, kept), _, _, _ = self._route([[self.ISLAND]])           # nothing a new route would change
-        self.assertEqual((made, kept), (1, 1))
+        # stage 2 (EoS Feather RP2040): a route can cut a pad's patch of pour off, and another may not
+        (drc, _, made, kept), _, _, _ = self._route([[self.ISLAND], []])
+        self.assertEqual((made, kept, len(drc["unconnected_items"])), (2, 2, 0))
+        (drc, _, made, kept), _, _, _ = self._route([[self.ISLAND]] * 3)       # an island every run: the first kept
+        self.assertEqual((made, kept), (3, 1))
         self.assertEqual(self._route([[]])[0][2], 1)                           # a clean first run is not repeated
 
     def test_retry_settings_change_the_auto_router(self):
