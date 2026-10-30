@@ -572,7 +572,8 @@ BOARD = Board(
         ],
     ),
     temperature_range=(-25, 70, "SW1", "SW1-SW3 Omron B3U-1000P, rated -25 to +70 C (Omron catalogue A162-E1-07); "
-                                       "the JST connectors J4-J6 also stop at -25 C (parts.json, 24 Oct 2026)"),
+                                       "the JST SH connectors J5 and J6 also stop at -25 C (JST eSH.pdf), while J4 "
+                                       "(JST PH) is rated -40 to +105 C (JST ePH.pdf; parts review, 29 Oct 2026)"),
     pin_labels={
         "J2": {"1": "RST", "2": "3V", "3": "3V", "4": "GND", "5": "A0", "6": "A1", "7": "A2", "8": "A3", "9": "D24",
                "10": "D25", "11": "SCK", "12": "MO", "13": "MI", "14": "RX", "15": "TX", "16": "D4"},

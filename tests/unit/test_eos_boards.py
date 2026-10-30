@@ -2260,6 +2260,16 @@ class BenchTest(_Bench):
         with self.assertRaisesRegex(SystemExit, "TP5 is on the bottom side with no reason"):
             build.check_bench(board)
 
+    def test_the_feather_range_names_its_minus_25_connectors(self):
+        # stage-2 review n6: the parts review corrected J4 (JST PH S2B-PH-SM4-TB) to -40/+105 C; J5 and J6
+        # (JST SH) stop at -25 C with the B3U-1000P buttons
+        board = importlib.import_module("eos_boards.boards.eos_feather_rp2040").BOARD
+        lo, hi, ref, why = board.temperature_range
+        self.assertEqual((lo, hi, ref), (-25, 70, "SW1"))
+        self.assertIn("J5 and J6 also stop at -25 C", why.replace("JST SH connectors ", ""))
+        self.assertIn("J4 (JST PH) is rated -40 to +105 C", why)
+        self.assertNotIn("J4-J6", why)
+
     def test_no_designs_test_pad_is_a_bom_line(self):
         # stage-2 review n2: a test pad is bare copper with no placement row, so it is no BOM line either.
         # Two older designs still draw theirs as BOM parts; P4 turns them into bench pads (ratchet)
