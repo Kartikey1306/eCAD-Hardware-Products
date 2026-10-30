@@ -15,11 +15,6 @@ has never run.
 
 ### Added
 
-- EoS Feather RP2040, an original board in the Feather form factor (50.8 × 22.86 mm, four layers),
-  all rights reserved like the others: RP2040, 16 MB QSPI flash, USB-C, a LiPo charger with load
-  sharing, STEMMA QT and a 3-pin SWD connector. Built with `tools/eos_boards` at ERC 0, DRC errors
-  0, unconnected 0 and schematic parity 0; an independent review (0 blocker, 0 major, 9 minor), its
-  findings fixed in the README or listed as rev B follow-ups, and a second independent check.
 - One more original EmbeddedOS board (batch 4), all rights reserved like the others: the EoS
   TM4C1294 Board, a TI TM4C1294NCPDT board for the EK-TM4C1294XL form factor (two 40-pin
   BoosterPack sites, a 98-hole breakout, 10/100 Ethernet on the chip's own PHY, USB device, a
@@ -29,6 +24,11 @@ has never run.
 - Generic libraries (MIT, like the generator): the `EoS_MCU:TM4C1294NCPDT` symbol, checked pin for
   pin against TI SPMS433B; `EoS_Connectors:Conn_02x49_Odd_Even`; and `PinHeader_2x49_P2.54mm_Vertical`
   from `footprints/generate.py`. The batch-3 symbol test covers the new symbol's supply and debug pins.
+- EoS Feather RP2040, an original board in the Feather form factor (50.8 × 22.86 mm, four layers),
+  all rights reserved like the others: RP2040, 16 MB QSPI flash, USB-C, a LiPo charger with load
+  sharing, STEMMA QT and a 3-pin SWD connector. Built with `tools/eos_boards` at ERC 0, DRC errors
+  0, unconnected 0 and schematic parity 0; an independent review (0 blocker, 0 major, 9 minor), its
+  findings fixed in the README or listed as rev B follow-ups, and a second independent check.
 
 - Three more original EmbeddedOS boards (batch 3), all rights reserved like the others. Each was
   built with `tools/eos_boards` at ERC 0, DRC errors 0, unconnected 0 and schematic parity 0. Each
