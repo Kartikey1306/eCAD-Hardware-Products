@@ -195,8 +195,9 @@ PARTS = [
          (210, 70), {"1": "VBAT", "2": "GND"},
          fields={"Manufacturer": "JST", "MPN": "S2B-PH-SM4-TB",
                  "Description": "JST PH 2-pin side entry: 1 battery +, 2 battery - (polarity of Adafruit's LiPo cells)"}),
-    Part("TP1", "Connector:TestPoint", "VBAT", "TestPoint:TestPoint_Pad_D1.0mm", (225, 50), {"1": "VBAT"},
-         fields={"Description": "Test pad, battery rail (VBAT); the battery line from J4 to the BAT pin passes it"}),
+    # the battery rail's test pad; the battery line from J4 to the BAT pin passes it. A bench pad like the
+    # others (stage-2 review n2): no BOM line, as it has no placement row
+    bench_pad("TP1", "VBAT", "VBAT", (43.2, 3.3), (225, 50)),
     Part("D1", "Device:D_Schottky", "PMEG6010CEH", "Diode_SMD:D_SOD-123F", (240, 60), {"A": "VBUS_F", "K": "VSYS"},
          fields={"Manufacturer": "Nexperia", "MPN": "PMEG6010CEH",
                  "Description": "Schottky 60 V 1 A SOD-123F, VF <= 530 mV at 500 mA, IR 0.8 uA typ at 5 V (PMEG6010CEH v.4): "

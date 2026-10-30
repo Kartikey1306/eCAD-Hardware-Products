@@ -2142,6 +2142,9 @@ BRINGUP_PENDING = {
 # Boards that declare bench data but whose committed README predates it: the build writes the section,
 # and the next committed build (P4) brings the README in; then the board leaves this set.
 BRINGUP_README_PENDING = {"eos-motion-wing", "eos-feather-rp2040"}
+# Test pads older designs draw as BOM parts (Connector:TestPoint with in_bom yes); P4 makes them bench pads.
+TEST_PADS_IN_BOM_PENDING = {("eos-stm32-64", "TP1"), ("eos-stm32-64", "TP2"), ("eos-stm32-64", "TP3"),
+                            ("eos-stm32-64", "TP4"), ("eos-tm4c123-board", "TP1")}
 
 
 class _Bench(_Lib):
@@ -2230,6 +2233,16 @@ class BenchTest(_Bench):
             with self.subTest(kw=str(kw)[:70]), self.assertRaisesRegex(SystemExit, message):
                 build.check_bench(self.bench(**kw))
         build.check_bench(self.bench(pin_labels={"U1": {"VDD": "3V3", "3": "IO"}}))    # by pin number or name
+
+    def test_no_designs_test_pad_is_a_bom_line(self):
+        # stage-2 review n2: a test pad is bare copper with no placement row, so it is no BOM line either.
+        # Two older designs still draw theirs as BOM parts; P4 turns them into bench pads (ratchet)
+        found = set()
+        for path in sorted((REPO_ROOT / "tools" / "eos_boards" / "boards").glob("eos_*.py")):
+            board = importlib.import_module(f"eos_boards.boards.{path.stem}").BOARD
+            found |= {(board.name, p.ref) for p in board.parts if p.lib_id == design.TESTPOINT_SYMBOL and p.in_bom}
+        self.assertEqual(found, TEST_PADS_IN_BOM_PENDING)
+        self.assertFalse({name for name, _ in found} - BRINGUP_PENDING)    # a board with bench data has none
 
     def test_the_readme_section_is_written_from_the_data(self):
         board = self.bench()
