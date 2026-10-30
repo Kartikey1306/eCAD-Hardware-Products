@@ -389,13 +389,20 @@ def bringup_markdown(board: Board, unlabelled: Sequence[str] = ()) -> str:
                 + ("top" if all(p.side == "F" for p in pads) else "marked") + " side): "
                 + ", ".join(f"{p.ref} {p.value} ({p.nets.get('1', '')}) at ({p.pcb[0]:g}, {p.pcb[1]:g}"
                             + ("" if p.side == "F" else ", bottom") + ")" for p in pads)
-                + ". On the silkscreen each carries its rail name, or its reference where the name has no room."]
+                + "."]
         bare = [r for r in unlabelled if any(p.ref == r for p in pads)]
+        if len(bare) < len(pads):
+            out[-1] += (" On the silkscreen " + ("each" if not bare else "each of the others")
+                        + " carries its rail name, or its reference where the name has no room.")
         if bare:     # BENCH-READY C1's label, as a named exception: no room for even the reference
-            out += [f"{' and '.join([', '.join(bare[:-1]), bare[-1]] if len(bare) > 1 else bare)} "
-                    f"{'have' if len(bare) > 1 else 'has'} no label: on this board neither the rail name nor the "
-                    "reference fits beside the pad, so this list is how to find "
-                    f"{'them' if len(bare) > 1 else 'it'}."]
+            names = " and ".join([", ".join(bare[:-1]), bare[-1]] if len(bare) > 1 else bare)
+            if len(bare) == len(pads):
+                out[-1] += (" None of them is labelled on the silkscreen: on this board neither the rail name nor "
+                            "the reference fits beside any of them, so this list is how to find them.")
+            else:
+                out += [f"{names} {'have' if len(bare) > 1 else 'has'} no label: on this board neither the rail name "
+                        "nor the reference fits beside the pad, so this list is how to find "
+                        f"{'them' if len(bare) > 1 else 'it'}."]
         out += [""]
     polar = [p.ref for p in board.parts if p.on_board and (p.ref[:1] in "UDQ" or "Polarized" in p.lib_id)]
     out += ["### 1. Before power", "",

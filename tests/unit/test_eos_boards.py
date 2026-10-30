@@ -2319,10 +2319,16 @@ class BenchTest(_Bench):
         self.assertIn("On the silkscreen each carries its rail name, or its reference where the name has no room.", text)
         self.assertNotIn("no label", text)
         self.assertEqual(build.unlabelled_pads(board, ["TP4.1 REG", "J2.9 D24", "TP1.1 3V3"]), ["TP1", "TP4"])
+        some = build.bringup_markdown(board, ["TP1", "TP4"])
+        self.assertIn("On the silkscreen each of the others carries its rail name, or its reference where", some)
         self.assertIn("TP1 and TP4 have no label: on this board neither the rail name nor the reference fits beside "
-                      "the pad, so this list is how to find them.", build.bringup_markdown(board, ["TP1", "TP4"]))
+                      "the pad, so this list is how to find them.", some)
         self.assertIn("TP4 has no label: on this board neither the rail name nor the reference fits beside the pad, "
                       "so this list is how to find it.", build.bringup_markdown(board, ["TP4"]))
+        every = build.bringup_markdown(board, ["TP1", "TP2", "TP3", "TP4"])                  # the Feather's case
+        self.assertIn("None of them is labelled on the silkscreen: on this board neither the rail name nor the "
+                      "reference fits beside any of them, so this list is how to find them.", every)
+        self.assertNotIn("carries its rail name", every)
         self.assertIn("| +3V3 | TP1 | > 100 kohm |", text)
         self.assertIn("GND test points: TP2, TP3.", text)
         self.assertIn("from a bench supply limited to 20 mA. Expected current: about 0.3 mA (estimate)", text)
