@@ -1254,6 +1254,20 @@ class IdentityTest(_Lib):
         self.assertNotIn("0.8", fit)
         self.assertIn("allowed", fit)                        # other silkscreen checked (review n4)
 
+    def test_a_small_design_name_line_is_raised_to_1_mm(self):
+        # stage-2 review n1 (mutation S8 survived): every design draws its name line at 1.0 mm already, so a
+        # fixture with a 0.8 mm one is what exercises the identity line's raise
+        board = self.board([])
+        board.title = "EoS Test"
+        name = dict(self.OWN[0], text="EoS Test  rev A", y=6.6, size=0.8, bold=False)
+        out = build.identity_texts(board, self.OWN + [name])
+        identity = next(t for t in out if t.get("identity"))
+        self.assertEqual((identity["size"], identity["design_size"], identity["design_text"]), (1.0, 0.8, "EoS Test  rev A"))
+        self.assertEqual((identity["x"], identity["y"]), (10.0, 6.6))                      # where the design drew it
+        self.assertTrue(all(t["size"] >= 1.0 for t in out if t.get("fit")))
+        big = build.identity_texts(board, self.OWN + [dict(name, size=1.2)])               # never lowered
+        self.assertEqual(next(t for t in big if t.get("identity"))["size"], 1.2)
+
     def test_the_stroke_is_a_sixth_of_the_height(self):
         # stage-2 review n7: JLCPCB "The preferred ratio of width to height is 1:6"; 0.15 mm stays the floor
         for size in (1.0, 1.2, 1.5, 2.0):
