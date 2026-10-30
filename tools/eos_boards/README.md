@@ -219,8 +219,11 @@ gets it before its "## Rebuild" heading).
   horizontal row so that neighbours do not meet; to any side of a test pad), at the first spot that
   clears every pad, the edge, all other silkscreen, other parts' courtyards and the fiducial squares.
   A through-hole pin with no room on top is labelled on the bottom silkscreen (mirrored, read from
-  below; listed as `labels_on_back`). A label with no room on either side is left out and listed in
-  `build-report.json` (`labels_skipped`).
+  below; listed as `labels_on_back`). A test pad whose rail name has no room carries its reference
+  instead ("TP5", `labels_as_ref`); the bring-up section keys every reference to its rail. A label with
+  no room on either side is left out and listed in `build-report.json` (`labels_skipped`); a test pad
+  left bare that way is named in the bring-up section as unlabelled, with the reason (BENCH-READY C1's
+  label, as a named exception).
 
 ## Reusing a reference design's layout exactly
 

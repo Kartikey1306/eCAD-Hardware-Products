@@ -27,7 +27,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Sequence
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
@@ -363,7 +363,14 @@ def _degrees(t: float) -> str:
     return f"{t:g}".replace("-", "\u2212")
 
 
-def bringup_markdown(board: Board) -> str:
+def unlabelled_pads(board: Board, labels_skipped: List[str]) -> List[str]:
+    """The test pads a build left with no silkscreen label at all (neither the rail name nor the
+    reference had room), from its ``labels_skipped`` ("TP5.1 3V3"), in the design's order."""
+    skipped = {s.split(".", 1)[0] for s in labels_skipped}
+    return [p.ref for p in board.parts if p.lib_id == TESTPOINT_SYMBOL and p.ref in skipped]
+
+
+def bringup_markdown(board: Board, unlabelled: Sequence[str] = ()) -> str:
     """The README's "Bench bring-up" section (BENCH-READY C5), written from the design's ``rails``,
     ``bringup`` and ``temperature_range``: checks before power, each rail's resistance to GND, first
     power with its current limit and expected idle current, each rail's voltage, rail links, clocks,
@@ -377,12 +384,19 @@ def bringup_markdown(board: Board) -> str:
         out += [f"Rated operating range: {_degrees(lo)} to {_degrees(hi)} \u00b0C, the narrowest of its parts: "
                 f"{ref}, {why}.", ""]
     pads = [p for p in board.parts if p.lib_id == TESTPOINT_SYMBOL and p.pcb]
-    if pads:      # where to find them: a dense board has no room for every pad's silkscreen label
-        out += ["Test pads (centre, mm from the board's top-left corner, on its "
+    if pads:      # where to find them, and each reference keyed to its rail (stage-2 review n3)
+        out += ["Test pads (reference, rail, centre in mm from the board's top-left corner, on its "
                 + ("top" if all(p.side == "F" for p in pads) else "marked") + " side): "
-                + ", ".join(f"{p.ref} {p.value} ({p.pcb[0]:g}, {p.pcb[1]:g}"
+                + ", ".join(f"{p.ref} {p.value} ({p.nets.get('1', '')}) at ({p.pcb[0]:g}, {p.pcb[1]:g}"
                             + ("" if p.side == "F" else ", bottom") + ")" for p in pads)
-                + ". Each is labelled on the silkscreen where there is room.", ""]
+                + ". On the silkscreen each carries its rail name, or its reference where the name has no room."]
+        bare = [r for r in unlabelled if any(p.ref == r for p in pads)]
+        if bare:     # BENCH-READY C1's label, as a named exception: no room for even the reference
+            out += [f"{' and '.join([', '.join(bare[:-1]), bare[-1]] if len(bare) > 1 else bare)} "
+                    f"{'have' if len(bare) > 1 else 'has'} no label: on this board neither the rail name nor the "
+                    "reference fits beside the pad, so this list is how to find "
+                    f"{'them' if len(bare) > 1 else 'it'}."]
+        out += [""]
     polar = [p.ref for p in board.parts if p.on_board and (p.ref[:1] in "UDQ" or "Polarized" in p.lib_id)]
     out += ["### 1. Before power", "",
             "1. Look at the board: the orientation (pin 1 or polarity) of " + (", ".join(polar) if polar else "every polarised part")
@@ -805,6 +819,7 @@ def main() -> int:
     report["labels_placed"] = placed_spec.get("labels_placed", 0)
     report["labels_skipped"] = placed_spec.get("labels_skipped", [])
     report["labels_on_back"] = placed_spec.get("labels_on_back", [])
+    report["labels_as_ref"] = placed_spec.get("labels_as_ref", [])
     for t in texts:                        # the identity line as placed (it may have been shortened)
         if t.get("identity") and placed_spec.get("identity_text"):
             t["text"] = placed_spec["identity_text"]
@@ -877,7 +892,8 @@ def main() -> int:
     metrics.write(out, board.name, report)        # metrics.json: the board's fabrication numbers
     readme = out / "README.md"
     if board.bringup is not None and readme.is_file():      # the bench bring-up section, from the design file
-        readme.write_text(update_readme(readme.read_text(encoding="utf-8"), bringup_markdown(board)), encoding="utf-8")
+        section = bringup_markdown(board, unlabelled_pads(board, report.get("labels_skipped", [])))
+        readme.write_text(update_readme(readme.read_text(encoding="utf-8"), section), encoding="utf-8")
         report["readme_bringup"] = True
     report["outputs"] = sorted(str(p.relative_to(out)) for p in out.rglob("*")
                                if p.is_file() and ".build" not in p.parts)

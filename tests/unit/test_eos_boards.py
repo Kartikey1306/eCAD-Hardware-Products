@@ -2278,8 +2278,16 @@ class BenchTest(_Bench):
         self.assertIn("Rated operating range: \u221240 to 85 \u00b0C, the narrowest of its parts: U1", text)
         self.assertIn("2. Check the cell's polarity with a meter.", text)
         pads = [p for p in board.parts if p.lib_id == design.TESTPOINT_SYMBOL]
-        self.assertIn(f"Test pads (centre, mm from the board's top-left corner, on its top side): {pads[0].ref} "
-                      f"{pads[0].value} ({pads[0].pcb[0]:g}, {pads[0].pcb[1]:g})", text)
+        self.assertIn(f"Test pads (reference, rail, centre in mm from the board's top-left corner, on its top side): "
+                      f"{pads[0].ref} {pads[0].value} (+3V3) at ({pads[0].pcb[0]:g}, {pads[0].pcb[1]:g})", text)
+        # stage-2 review n3: each reference keyed to its rail; a pad with no label at all is named
+        self.assertIn("On the silkscreen each carries its rail name, or its reference where the name has no room.", text)
+        self.assertNotIn("no label", text)
+        self.assertEqual(build.unlabelled_pads(board, ["TP4.1 REG", "J2.9 D24", "TP1.1 3V3"]), ["TP1", "TP4"])
+        self.assertIn("TP1 and TP4 have no label: on this board neither the rail name nor the reference fits beside "
+                      "the pad, so this list is how to find them.", build.bringup_markdown(board, ["TP1", "TP4"]))
+        self.assertIn("TP4 has no label: on this board neither the rail name nor the reference fits beside the pad, "
+                      "so this list is how to find it.", build.bringup_markdown(board, ["TP4"]))
         self.assertIn("| +3V3 | TP1 | > 100 kohm |", text)
         self.assertIn("GND test points: TP2, TP3.", text)
         self.assertIn("from a bench supply limited to 20 mA. Expected current: about 0.3 mA (estimate)", text)
@@ -2315,7 +2323,11 @@ class BenchTest(_Bench):
                 if name in BRINGUP_README_PENDING:
                     self.assertNotIn(build.BRINGUP_BEGIN, readme, "README has the section: take it out of BRINGUP_README_PENDING")
                 else:
-                    self.assertIn(build.bringup_markdown(board).strip(), readme)
+                    # the section as the board's own build wrote it, with the pads it left unlabelled
+                    report_path = EOS_DIR / name / "build-report.json"
+                    report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.is_file() else {}
+                    section = build.bringup_markdown(board, build.unlabelled_pads(board, report.get("labels_skipped", [])))
+                    self.assertIn(section.strip(), readme)
                     self.assertEqual(readme.count("## Bench bring-up"), 1)
 
 
@@ -2357,6 +2369,20 @@ class LabelTest(_Bench):
         self.assertIn('spec["labels_on_back"]', labels)
         report = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
         self.assertIn('report["labels_on_back"] = placed_spec.get("labels_on_back", [])', report)
+
+    def test_a_test_pad_falls_back_to_its_reference(self):
+        # stage-2 review n3: where the rail name has no room, the shorter reference ("TP5"), keyed to its rail
+        # in the README; only a pad with room for neither is left bare, and the README names it
+        source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
+        labels = source[source.index("def place_labels("):source.index("def _place_label(")]
+        self.assertIn('jobs += [(p["ref"], "1", p["value"], p["ref"]) for p in spec["parts"] if p.get("test_pad")]', labels)
+        self.assertIn("tries += [(on_bottom, fallback) for on_bottom in sides]", labels)
+        self.assertLess(labels.index("tries = [(on_bottom, label) for on_bottom in sides]"),
+                        labels.index("tries += [(on_bottom, fallback) for on_bottom in sides]"))   # the name first
+        self.assertIn('spec["labels_as_ref"] = as_ref', labels)
+        report = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
+        self.assertIn('report["labels_as_ref"] = placed_spec.get("labels_as_ref", [])', report)
+        self.assertIn('bringup_markdown(board, unlabelled_pads(board, report.get("labels_skipped", [])))', report)
 
 
 class CrashSafetyTest(unittest.TestCase):

@@ -693,12 +693,15 @@ def place_labels(board, spec):
     side, beside the pad where it clears every pad, the board edge, every other silkscreen, every other
     part's courtyard and every fiducial square (fabrication.label_spots). A through-hole pin whose top
     has no room is labelled on the bottom silkscreen instead (mirrored, so it reads from below; the pin
-    is there too), and is listed in ``spec["labels_on_back"]``. A label that fits nowhere is left out
-    and reported (``spec["labels_skipped"]``). Returns (placed, skipped)."""
-    jobs = [(ref, pad, label) for ref, labels in spec.get("pin_labels", {}).items() for pad, label in labels.items()]
-    jobs += [(p["ref"], "1", p["value"]) for p in spec["parts"] if p.get("test_pad")]
-    placed, skipped, back = 0, [], []
-    for ref, number, label in jobs:
+    is there too), and is listed in ``spec["labels_on_back"]``. A test pad whose rail name has no room
+    gets its shorter reference ("TP5") instead, which the README's bring-up section keys to its rail
+    (stage-2 review n3), listed in ``spec["labels_as_ref"]``. A label that fits nowhere is left out and
+    reported (``spec["labels_skipped"]``); the README names those test pads as unlabelled. Returns
+    (placed, skipped)."""
+    jobs = [(ref, pad, label, None) for ref, labels in spec.get("pin_labels", {}).items() for pad, label in labels.items()]
+    jobs += [(p["ref"], "1", p["value"], p["ref"]) for p in spec["parts"] if p.get("test_pad")]
+    placed, skipped, back, as_ref = 0, [], [], []
+    for ref, number, label, fallback in jobs:
         fp = board.FindFootprintByReference(ref)
         pad = next((q for q in fp.Pads() if q.GetNumber() == number), None)
         if pad is None:
@@ -711,15 +714,21 @@ def place_labels(board, spec):
         row = "" if len(xs) < 2 else ("horizontal" if max(xs) - min(xs) >= max(ys) - min(ys) else "vertical")
         b = pad.GetBoundingBox()
         box = (P.ToMM(b.GetX()), P.ToMM(b.GetY()), P.ToMM(b.GetRight()), P.ToMM(b.GetBottom()))
-        for on_bottom in sides:
-            if _place_label(board, spec, ref, label, on_bottom, box, row):
+        tries = [(on_bottom, label) for on_bottom in sides]
+        if fallback and fallback != label:
+            tries += [(on_bottom, fallback) for on_bottom in sides]
+        for on_bottom, words in tries:
+            if _place_label(board, spec, ref, words, on_bottom, box, row):
                 placed += 1
                 if on_bottom and not bottom:
-                    back.append(f"{ref}.{number} {label}")
+                    back.append(f"{ref}.{number} {words}")
+                if words != label:
+                    as_ref.append(f"{ref}.{number} {label}: {words}")
                 break
         else:
             skipped.append(f"{ref}.{number} {label}")
     spec["labels_placed"], spec["labels_skipped"], spec["labels_on_back"] = placed, skipped, back
+    spec["labels_as_ref"] = as_ref
     return placed, skipped
 
 
