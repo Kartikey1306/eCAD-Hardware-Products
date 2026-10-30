@@ -535,15 +535,18 @@ BOARD = Board(
              "about 3.1 Mohm (R14 100 kohm into EN's internal pull-down; inferred)",
              link_note="No link: no room on this 50.8 x 22.86 mm board; measure at the USB input."),
         Rail("VBAT", "the cell on J4, charged by U4 MCP73831", "3.7 V",
-             "a cell reads 3.0-4.2 V; the charger regulates 4.168-4.232 V (MCP73831-2, DS20001984H)",
+             "a cell reads 3.0-4.2 V; the charger regulates 4.168-4.232 V (MCP73831-2: DS20001984H, DC "
+             "Characteristics, page 3, VREG)",
              ["TP1", "J3.1"], "open (the charger and Q1 only)",
              link_note="No link: measure the cell's current in series with J4."),
-        Rail("+3V3", "U5 AP2112K-3.3", "3.3 V", "3.25-3.35 V (AP2112K +-1.5 %, DS39724)", ["TP5", "J2.2"],
+        Rail("+3V3", "U5 AP2112K-3.3", "3.3 V", "3.25-3.35 V (AP2112K-3.3, 3.3 V +-1.5 %: Diodes DS39724 Rev. 2-2, "
+             "AP2112-3.3 Electrical Characteristics, page 8)", ["TP5", "J2.2"],
              "open (ICs only)",
              link_note="No link between U5 and the 3.3 V plane: no room on this board (audit g2 fix 6); measure "
                        "the board's current at the USB input instead."),
         Rail("+1V1", "the RP2040's own regulator (VREG_VOUT)", "1.1 V",
-             "1.067-1.133 V (RP2040 datasheet, VREG_VOUT +-3 %)", ["TP6"], "open",
+             "1.067-1.133 V (1.1 V +-3 %: RP2040 datasheet, build 2025-02-20, section 2.10.7, Table 192, output "
+             "voltage variation)", ["TP6"], "open",
              link_note="The RP2040's internal regulator: no link possible."),
         Rail("GND", "J1", "0 V", "-", ["TP7", "J2.4"], "-"),
     ],
@@ -564,10 +567,15 @@ BOARD = Board(
             BringUpTest("USER button", "Read GPIO4 with its internal pull-up, press SW3", "reads 1, then 0 while pressed"),
             BringUpTest("STEMMA QT", "I2C1 scan (GPIO2/3) with a known sensor on J5", "the sensor's address is found"),
             BringUpTest("UART", "Loop TX to RX on the header at 115200 Bd", "every byte sent comes back"),
-            BringUpTest("ADC", "A0-A3 each read a 1.65 V divider", "within +-2 %"),
+            BringUpTest("ADC", "A0-A3 each read a divider of two equal 1 % resistors across 3V3 and GND",
+                        "half of full scale within +-2 % (estimate: the resistors' 1 % plus the ADC's own error, "
+                        "8.7 ENOB, RP2040 datasheet section 4.9.3; ratiometric, so the 3.3 V rail's tolerance "
+                        "cancels)"),
             BringUpTest("EN", "Pull the EN pin (J3.2) to GND", "+3V3 at TP5 falls to 0 V"),
-            BringUpTest("Charger", "Fit a checked cell with USB connected", "CHG LED on; about 213 mA into the cell "
-                        "(1000 / RPROG 4.7 kohm, DS20001984H equation 5-1)"),
+            BringUpTest("Charger", "Fit a checked cell (below 4.0 V) with USB connected",
+                        "CHG LED on; 192-234 mA into the cell: 213 mA (1000 V / RPROG 4.7 kohm, DS20001984H "
+                        "equation 5-1) +-10 %, the band DS20001984H's DC Characteristics (page 3, fast charge "
+                        "current regulation) give at PROG 10 kohm and 2.0 kohm (inferred for 4.7 kohm)"),
             BringUpTest("Battery", "Unplug USB with the cell fitted", "+3V3 at TP5 stays 3.25-3.35 V"),
         ],
     ),

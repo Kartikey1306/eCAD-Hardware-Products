@@ -2260,6 +2260,31 @@ class BenchTest(_Bench):
         with self.assertRaisesRegex(SystemExit, "TP5 is on the bottom side with no reason"):
             build.check_bench(board)
 
+    def test_each_rail_range_holds_its_nominal_and_the_review_figures_are_sourced(self):
+        # stage-2 review n5: the Motion Wing's "3.0-3.3 V" made a correct 3.31 V reading fail; three figures had no
+        # table or page, and one no source at all
+        for name, module in EOS_BOARDS.items():
+            board = importlib.import_module(f"eos_boards.boards.{module}").BOARD
+            for rail in board.rails:
+                found = re.search(r"(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?) V", rail.tolerance)
+                nominal = re.match(r"(\d+(?:\.\d+)?) V", rail.nominal)
+                if found and nominal:
+                    with self.subTest(board=name, rail=rail.net):
+                        self.assertLess(float(found.group(1)), float(nominal.group(1)))
+                        self.assertLess(float(nominal.group(1)), float(found.group(2)))
+        wing = importlib.import_module("eos_boards.boards.eos_motion_wing").BOARD
+        feather = importlib.import_module("eos_boards.boards.eos_feather_rp2040").BOARD
+        rails = {r.net: r.tolerance for r in feather.rails}
+        self.assertIn("3.25-3.35 V", wing.rails[0].tolerance)
+        self.assertIn("DS39724 Rev. 2-2, AP2112-3.3 Electrical Characteristics, page 8", wing.rails[0].tolerance)
+        self.assertIn("Table 1, page 3", wing.bringup.idle_source)                                   # ADT7410
+        self.assertIn("section 2.10.7, Table 192", rails["+1V1"])                                  # RP2040 VREG
+        self.assertIn("page 8", rails["+3V3"])
+        tests = {t.peripheral: t.passes for t in feather.bringup.tests}
+        self.assertIn("estimate", tests["ADC"])
+        self.assertIn("192-234 mA", tests["Charger"])
+        self.assertIn("page 3", tests["Charger"])
+
     def test_the_feather_range_names_its_minus_25_connectors(self):
         # stage-2 review n6: the parts review corrected J4 (JST PH S2B-PH-SM4-TB) to -40/+105 C; J5 and J6
         # (JST SH) stop at -25 C with the B3U-1000P buttons

@@ -20,8 +20,9 @@ Form factor, from Adafruit's Feather Specification
   MO, MI, RX, TX, free pin. 12-pin: BAT, EN, USB, D13, D12, D11, D10, D9, D6, D5, SCL, SDA.
 * The spec puts I2C pull-ups on the wings, not on the Feather, so this wing carries them. JP1
   takes them off the bus when the Feather or another wing in the stack already has them.
-* The 3V pin may sag to 3.0 V on a flat battery; the spec recommends that a Feather leave at least
-  100 mA for wings.
+* The 3V pin is the host Feather's 3.3 V regulator output, so its tolerance is that regulator's (an
+  AP2112K-3.3 holds 3.25-3.35 V: Diodes DS39724 Rev. 2-2, AP2112-3.3 Electrical Characteristics, page 8);
+  the spec recommends that a Feather leave at least 100 mA for wings.
 
 The headers sit on the back: a wing's male headers point down into the Feather's sockets, with
 their plastic under the wing. The spec gives no corner radius; 2.54 mm is used, concentric with
@@ -246,7 +247,9 @@ BOARD = Board(
     # Bench data (BENCH-READY C): from the bench-ready audit g1 (24 Oct 2026), section 7
     rails=[
         Rail("+3V3", "the Feather's 3V pin (J1.2)", "3.3 V",
-             "3.0-3.3 V: the Feather's own regulator; the Feather Specification lets 3V sag to 3.0 V on a flat battery",
+             "3.25-3.35 V: a bench supply set to 3.30 V (the wing has no regulator, so it reads its supply), or the "
+             "host Feather's regulator, e.g. EoS Feather RP2040's AP2112K-3.3, 3.3 V +-1.5 % (Diodes DS39724 "
+             "Rev. 2-2, AP2112-3.3 Electrical Characteristics, page 8)",
              ["TP1", "J1.2"], "> 100 kohm (no resistor to GND; the reading climbs while C1, 10 uF, charges)",
              link_note="No regulator on the wing, so no link: measure its current in series with the 3V pin, J1.2."),
         Rail("GND", "the Feather's GND pin (J1.4)", "0 V", "-", ["TP2", "TP3", "J1.4"], "-"),
@@ -255,8 +258,9 @@ BOARD = Board(
         supply="3.3 V on J1 pin 2 (3V) and pin 4 (GND), or the wing plugged onto a Feather",
         current_limit_ma=20,
         idle_current="about 0.25 mA",
-        idle_source="ADT7410 converting from power-up, 210 uA typical and 250 uA maximum (ADT7410 data sheet Rev. C, "
-                    "Table 1); ADXL343 in standby from power-up; the sum is an estimate",
+        idle_source="ADT7410 converting from power-up, 210 uA typical and 250 uA maximum at 3.3 V (ADT7410 data "
+                    "sheet Rev. C, Table 1, page 3, supply current); ADXL343 in standby from power-up; the sum is an "
+                    "estimate",
         clock="N/A: the wing has no clock of its own; the ADXL343 and ADT7410 run on their internal oscillators.",
         programming="N/A: nothing on the wing is programmed; a Feather sets up both sensors over I2C.",
         tests=[
