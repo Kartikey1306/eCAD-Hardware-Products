@@ -1281,6 +1281,8 @@ class IdentityTest(_Lib):
         self.assertIn("for stroke in [preferred] + ([fabrication.SILK_MIN_STROKE] if preferred > fabrication.SILK_MIN_STROKE else []):", fit)
         self.assertLess(fit.index("for stroke in"), fit.index("for width in fabrication.SILK_WIDTHS:"))
         self.assertIn('stroke: none fits at', fit)
+        # PR #76 review (qodo): the comment on text()'s stroke said 15 % after the stroke became a sixth
+        self.assertIn("silk_stroke(size, bold)))     # a sixth of the height (20 % bold), >= 0.15 mm", source)
 
     def test_a_line_moves_then_shortens_then_narrows(self):
         # stage 2 sweep (30 Oct): at 1.0 mm the 26.4 mm ownership line fits nowhere on four boards, so a
@@ -1561,7 +1563,7 @@ for x in (12.0, 16.0, 20.0, 24.0, 28.0):         # 4 mm pads under the name line
     fp = P.FootprintLoad(sys.argv[2] + "/TestPoint.pretty", "TestPoint_Pad_4.0x4.0mm")
     board.Add(fp)
     fp.SetPosition(v(x, 6.3))
-own = pcb_build.text(board, "(c) 2026 Kartikeydheer Srivastava", 20.0, float(sys.argv[3]), 0.8, P.F_SilkS)
+own = pcb_build.text(board, "(c) 2026 Kartikeydheer Srivastava", 20.0, float(sys.argv[3]), 1.0, P.F_SilkS)  # 1.0 mm, as fitted
 t = {"text": "EoS T  rev A  2026", "x": 20.0, "y": 8.0, "size": 1.0, "bold": True, "identity": True, "fit": True,
      "variants": fabrication.identity_variants("EoS T", "A", "2026"), "design_text": "", "design_size": 1.0}
 item = pcb_build.text(board, t["text"], t["x"], t["y"], t["size"], P.F_SilkS, 0.0, True)
@@ -1575,7 +1577,8 @@ print(json.dumps({"where": where, "on_ownership": item.GetBoundingBox().Intersec
 
 class IdentityFitTest(unittest.TestCase):
     """PR #74 review (greptile, qodo): the name line, moved off pads, must not land on the ownership
-    line (or other silkscreen), and every design text is down before it is fitted."""
+    line (or other silkscreen), and every design text is down before it is fitted. One KiCad-backed case
+    for the stage-2 fitter, fit_text (PR #76 review, coderabbit: FitTextTest repeated it)."""
 
     def test_the_fitter_checks_other_silk_after_every_text_is_down(self):
         source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
@@ -1608,52 +1611,42 @@ class IdentityFitTest(unittest.TestCase):
         self.assertFalse(results[13.0]["on_ownership"])
 
 
-FIT_TEXT_SCRIPT = """
+LABEL_SCRIPT = """
 import json, sys
 sys.path.insert(0, sys.argv[1])
 import pcbnew as P
-import fabrication, pcb_build
-v = pcb_build.v
+import pcb_build
 board = P.BOARD()
-spec = {"width": 40.0, "height": 20.0, "corner_radius": 0.0}
-for x in (12.0, 16.0, 20.0, 24.0, 28.0):         # 4 mm pads under the name line and every spot above it
-    fp = P.FootprintLoad(sys.argv[2] + "/TestPoint.pretty", "TestPoint_Pad_4.0x4.0mm")
-    board.Add(fp)
-    fp.SetPosition(v(x, 6.3))
-own = pcb_build.text(board, "(c) 2026 Kartikeydheer Srivastava", 20.0, float(sys.argv[3]), 1.0, P.F_SilkS)
-t = {"text": "EoS T  rev A  2026", "x": 20.0, "y": 8.0, "size": 1.0, "bold": True, "identity": True, "fit": True,
-     "variants": fabrication.identity_variants("EoS T", "A", "2026"), "design_text": "", "design_size": 1.0}
-item = pcb_build.text(board, t["text"], t["x"], t["y"], t["size"], P.F_SilkS, 0.0, True)
-try:
-    where = pcb_build.fit_text(board, spec, item, t)[1]
-except SystemExit as e:
-    where = "stopped: " + str(e)
-print(json.dumps({"where": where, "on_ownership": item.GetBoundingBox().Intersects(own.GetBoundingBox())}))
+spec = {"width": float(sys.argv[3]), "height": 6.0, "corner_radius": 0.0, "fiducial_keepouts": [],
+        "pin_labels": {}, "parts": [{"ref": "TP1", "value": "VBAT_SENSE_RAIL", "test_pad": True}]}
+fp = P.FootprintLoad(sys.argv[2] + "/TestPoint.pretty", "TestPoint_Pad_D1.0mm")
+fp.SetReference("TP1")
+board.Add(fp)
+fp.SetPosition(pcb_build.v(spec["width"] / 2, 3.0))
+pcb_build.place_labels(board, spec)
+texts = sorted(d.GetText() for d in board.GetDrawings() if d.GetClass() == "PCB_TEXT")
+print(json.dumps({"texts": texts, "as_ref": spec["labels_as_ref"], "skipped": spec["labels_skipped"]}))
 """
 
 
-class FitTextTest(unittest.TestCase):
-    """PR #74 review (greptile, qodo), as it applies to the stage-2 fitter: a name line moved off pads
-    never lands on the ownership line (or other silkscreen)."""
+class LabelFallbackTest(unittest.TestCase):
+    """Verification m1: a test pad whose rail name has no room carries its reference, on a real board."""
 
-    @unittest.skipUnless(os.environ.get("EOS_KICAD_TESTS"), "set EOS_KICAD_TESTS=1 to run the KiCad-backed fit "
-                         "(one small KiCad job: run it through the campaign's locked.sh)")
-    def test_a_blocked_name_line_never_lands_on_the_ownership_line(self):
+    @unittest.skipUnless(os.environ.get("EOS_KICAD_TESTS"), "set EOS_KICAD_TESTS=1 to run the KiCad-backed label "
+                         "placement (one small KiCad job: run it through the campaign's locked.sh)")
+    def test_a_pad_with_no_room_for_its_rail_name_carries_its_reference(self):
         from eos_boards import kicad_env
         with tempfile.TemporaryDirectory() as tmp:
-            script = Path(tmp, "fit.py")
-            script.write_text(FIT_TEXT_SCRIPT, encoding="utf-8")
+            script = Path(tmp, "labels.py")
+            script.write_text(LABEL_SCRIPT, encoding="utf-8")
             results = {}
-            for own_y in (10.0, 13.0):           # the ownership line just below, or out of the way
+            for width in (8.0, 40.0):        # too narrow for the 15-letter rail name, but room for "TP1"; then room
                 run = subprocess.run([kicad_env.python(), str(script), str(REPO_ROOT / "tools" / "eos_boards"),
-                                      str(kicad_env.footprints()), str(own_y)], capture_output=True, text=True, timeout=300)
+                                      str(kicad_env.footprints()), str(width)], capture_output=True, text=True, timeout=300)
                 self.assertEqual(run.returncode, 0, run.stderr[-2000:])
-                results[own_y] = json.loads(run.stdout.strip().splitlines()[-1])
-        # just below: no spot within 2 mm clears both, so the build stops; out of the way: it moves below the pads
-        self.assertTrue(results[10.0]["where"].startswith("stopped: silkscreen line 'EoS T  rev A  2026' at 1.0 mm "
-                                                          "clears no pad, edge or other silkscreen"), results[10.0])
-        self.assertFalse(results[13.0]["where"].startswith("stopped"), results[13.0])
-        self.assertFalse(results[13.0]["on_ownership"])
+                results[width] = json.loads(run.stdout.strip().splitlines()[-1])
+        self.assertEqual(results[8.0], {"texts": ["TP1"], "as_ref": ["TP1.1 VBAT_SENSE_RAIL: TP1"], "skipped": []})
+        self.assertEqual(results[40.0], {"texts": ["VBAT_SENSE_RAIL"], "as_ref": [], "skipped": []})
 
 
 class FtshFootprintTest(unittest.TestCase):
@@ -2219,6 +2212,7 @@ class BenchTest(_Bench):
         bad = [({"rails": [dataclasses.replace(rails[0], test_points=[])] + rails[1:]}, "no test point"),
                ({"rails": [dataclasses.replace(rails[0], test_points=["TP1"])] + rails[1:]}, "TP1 is not a test pad"),
                ({"rails": rails[:2] + [dataclasses.replace(rails[2], test_points=["TP2"])]}, "at least two test points"),
+               ({"rails": rails[:2] + [dataclasses.replace(rails[2], test_points=["TP2", "TP2"])]}, "listed twice"),
                ({"rails": rails[:2] + [dataclasses.replace(rails[2], test_points=["TP2", "U1.3"])]}, "U1.3 is not"),
                ({"rails": [dataclasses.replace(rails[0], net="+5V")] + rails[1:]}, "no part has that net"),
                ({"rails": [dataclasses.replace(rails[0], link_note="")] + rails[1:]}, "no link, and no note"),
@@ -2233,6 +2227,40 @@ class BenchTest(_Bench):
             with self.subTest(kw=str(kw)[:70]), self.assertRaisesRegex(SystemExit, message):
                 build.check_bench(self.bench(**kw))
         build.check_bench(self.bench(pin_labels={"U1": {"VDD": "3V3", "3": "IO"}}))    # by pin number or name
+
+    def test_with_the_library_a_connector_pin_is_named_by_number_or_name(self):
+        # PR #76 review (qodo): the Feather's USB-C keys its VBUS pins by name, so J1.A4 (VBUS by number) was
+        # refused as "not a connector pin on VBUS", and a pin label keyed "A4" as a pin J1 does not have
+        Path(self.tmp.name, "Connector_Test.kicad_sym").write_text("""(kicad_symbol_lib (version 20231120) (generator "test")
+  (symbol "USB" (in_bom yes) (on_board yes)
+    (property "Reference" "J" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "USB" (at 0 0 0) (effects (font (size 1.27 1.27))))
+    (symbol "USB_1_1"
+      (pin passive line (at 0 0 90) (length 1.27) (name "VBUS" (effects (font (size 1.27 1.27)))) (number "A4" (effects (font (size 1.27 1.27)))))
+      (pin passive line (at 0 2.54 90) (length 1.27) (name "VBUS" (effects (font (size 1.27 1.27)))) (number "B9" (effects (font (size 1.27 1.27)))))
+      (pin passive line (at 0 5.08 90) (length 1.27) (name "GND" (effects (font (size 1.27 1.27)))) (number "A1" (effects (font (size 1.27 1.27))))))))
+""")
+        rails = self.bench().rails
+        rails = [rails[0], dataclasses.replace(rails[1], test_points=["TP1", "J1.A4"]), rails[2]]
+        board = self.bench(rails=rails, pin_labels={"J1": {"B9": "5V", "GND": "GND"}})
+        board.parts = board.parts + [Part("J1", "Connector_Test:USB", "USB", "fp", (40, 50), {"VBUS": "+3V3", "GND": "GND"})]
+        build.check_bench(board, self.lib)
+        spec = build.spec_for(board, self.lib, Path(self.tmp.name), [])                  # the build passes the library
+        self.assertEqual(spec["pin_labels"], {"J1": {"B9": "5V", "A1": "GND"}})
+        with self.assertRaisesRegex(SystemExit, "J1.A4 is not a test pad or connector pin on \\+3V3"):
+            build.check_bench(board)                     # without the library only the keys of its nets are known
+        wrong = [rails[0], rails[1], dataclasses.replace(rails[2], test_points=["TP2", "J1.A4"])]
+        split = dataclasses.replace(board.parts[-1], nets={"A4": "+3V3", "B9": "GND", "A1": "GND"})   # VBUS on two nets
+        ambiguous = [rails[0], dataclasses.replace(rails[1], test_points=["TP1", "J1.VBUS"]), rails[2]]
+        either = [rails[0], rails[1], dataclasses.replace(rails[2], test_points=["TP2", "J1.VBUS"])]
+        for kw, part, message in (({"rails": wrong}, board.parts[-1], "J1.A4 is not a test pad or connector pin on GND"),
+                                  ({"pin_labels": {"J1": {"B4": "X"}}}, board.parts[-1], "pins \\['B4'\\]"),
+                                  ({"rails": ambiguous}, split, "J1.VBUS is not a test pad or connector pin on \\+3V3"),
+                                  ({"rails": either}, split, "J1.VBUS is not a test pad or connector pin on GND")):
+            bad = self.bench(**kw)
+            bad.parts = bad.parts + [part]
+            with self.subTest(kw=str(kw)[:50]), self.assertRaisesRegex(SystemExit, message):
+                build.check_bench(bad, self.lib)
 
     def test_bom_exclusion_test_point_kinds_and_pad_side_are_checked(self):
         # stage-2 review n4: three options the build took on trust
@@ -2259,6 +2287,12 @@ class BenchTest(_Bench):
         board.parts = board.parts[:-1] + [dataclasses.replace(bottom, fields={"Description": "no reason"})]
         with self.assertRaisesRegex(SystemExit, "TP5 is on the bottom side with no reason"):
             build.check_bench(board)
+        # PR #76 review (qodo): a mistyped side passed as a bottom pad, but the placement step flips only "B"
+        with self.assertRaisesRegex(ValueError, "TP5: test pad side 'X'"):
+            design.bench_pad("TP5", "GND", "GND", (6.0, 2.0), (120, 50), side="X", bottom_reason="a typo")
+        board.parts = board.parts[:-1] + [dataclasses.replace(bottom, side="X")]
+        with self.assertRaisesRegex(SystemExit, "test pad TP5 side 'X'"):
+            build.check_bench(board)
 
     def test_each_rail_range_holds_its_nominal_and_the_review_figures_are_sourced(self):
         # stage-2 review n5: the Motion Wing's "3.0-3.3 V" made a correct 3.31 V reading fail; three figures had no
@@ -2284,6 +2318,28 @@ class BenchTest(_Bench):
         self.assertIn("estimate", tests["ADC"])
         self.assertIn("192-234 mA", tests["Charger"])
         self.assertIn("page 3", tests["Charger"])
+
+    def test_the_feather_charger_step_raises_the_first_power_limit(self):
+        # PR #76 review (qodo): first power is limited to 100 mA, and the charger step expects 192-234 mA into the
+        # cell from the same supply, so a correct charger read short
+        feather = importlib.import_module("eos_boards.boards.eos_feather_rp2040").BOARD
+        charger = next(t for t in feather.bringup.tests if t.peripheral == "Charger")
+        limit = float(re.search(r"raise its limit to (\d+) mA", charger.test).group(1))
+        charge = float(re.search(r"192-(\d+) mA into the cell", charger.passes).group(1))
+        board = float(re.search(r"about \d+-(\d+) mA", feather.bringup.idle_current).group(1))
+        self.assertGreater(limit, feather.bringup.current_limit_ma)
+        self.assertGreater(limit, charge + board)
+
+    def test_the_feather_battery_step_takes_a_cell_that_can_hold_3v3(self):
+        # PR #76 review (greptile): the charger step took any cell below 4.0 V, then the battery step wanted +3V3
+        # at 3.25-3.35 V from it, which a healthy 3.0-3.3 V cell cannot give through Q1 and the AP2112K
+        feather = importlib.import_module("eos_boards.boards.eos_feather_rp2040").BOARD
+        tests = {t.peripheral: t for t in feather.bringup.tests}
+        low, high = map(float, re.search(r"reading (\d\.\d+)-(\d\.\d+) V", tests["Charger"].test).groups())
+        top = float(re.search(r"\+3V3 at TP5 stays 3\.25-(\d\.\d+) V", tests["Battery"].passes).group(1))
+        self.assertLessEqual(high, 4.0)                  # still under the charger's VREG, so it charges at full current
+        self.assertGreaterEqual(low, top + 0.2)          # AP2112K-3.3 dropout at most 200 mV at 300 mA (DS39724 page 8)
+        self.assertIn("that cell", tests["Battery"].test)
 
     def test_the_feather_range_names_its_minus_25_connectors(self):
         # stage-2 review n6: the parts review corrected J4 (JST PH S2B-PH-SM4-TB) to -40/+105 C; J5 and J6
@@ -2417,9 +2473,13 @@ class LabelTest(_Bench):
         source = (REPO_ROOT / "tools" / "eos_boards" / "pcb_build.py").read_text(encoding="utf-8")
         labels = source[source.index("def place_labels("):source.index("def _place_label(")]
         self.assertIn('jobs += [(p["ref"], "1", p["value"], p["ref"]) for p in spec["parts"] if p.get("test_pad")]', labels)
-        self.assertIn("tries += [(on_bottom, fallback) for on_bottom in sides]", labels)
-        self.assertLess(labels.index("tries = [(on_bottom, label) for on_bottom in sides]"),
-                        labels.index("tries += [(on_bottom, fallback) for on_bottom in sides]"))   # the name first
+        # the behaviour (verification m1): the name first, then the reference; a pin label has no fallback
+        self.assertEqual(fabrication.label_texts("3V3", "TP5"), ["3V3", "TP5"])
+        self.assertEqual(fabrication.label_texts("RST"), ["RST"])
+        self.assertEqual(fabrication.label_texts("RST", None), ["RST"])
+        self.assertEqual(fabrication.label_texts("TP5", "TP5"), ["TP5"])               # never the same text twice
+        self.assertIn("tries = [(on_bottom, words) for words in fabrication.label_texts(label, fallback) "
+                      "for on_bottom in sides]", labels)
         self.assertIn('spec["labels_as_ref"] = as_ref', labels)
         report = (REPO_ROOT / "tools" / "eos_boards" / "build.py").read_text(encoding="utf-8")
         self.assertIn('report["labels_as_ref"] = placed_spec.get("labels_as_ref", [])', report)

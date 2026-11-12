@@ -471,6 +471,17 @@ def identity_variants(title, revision, year):
 LABEL_GAPS = (0.2, 0.6, 1.0, 1.4)    # mm from a pad's edge to its label, nearest first
 
 
+def label_texts(label, reference=None):
+    """The texts tried, in turn, as a pad's silkscreen label: its label (a connector pin's name, a test
+    pad's rail name), then, for a test pad, its shorter reference ("TP5") where the name has no room
+    (stage-2 review n3), which the README's bring-up section keys to its rail.
+
+    >>> label_texts("3V3", "TP5"), label_texts("RST"), label_texts("TP5", "TP5")
+    (['3V3', 'TP5'], ['RST'], ['TP5'])
+    """
+    return [label] + ([reference] if reference and reference != label else [])
+
+
 def label_spots(pad_box, row, text_w, text_h):
     """Where a pad's silkscreen label may go, best first, as (x, y, angle) of its centre in mm: beside
     the pad at each of LABEL_GAPS. ``row`` is "horizontal" or "vertical" for a connector pin (the label

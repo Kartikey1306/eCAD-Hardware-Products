@@ -572,11 +572,15 @@ BOARD = Board(
                         "8.7 ENOB, RP2040 datasheet section 4.9.3; ratiometric, so the 3.3 V rail's tolerance "
                         "cancels)"),
             BringUpTest("EN", "Pull the EN pin (J3.2) to GND", "+3V3 at TP5 falls to 0 V"),
-            BringUpTest("Charger", "Fit a checked cell (below 4.0 V) with USB connected",
+            BringUpTest("Charger", "With USB from the bench supply, raise its limit to 500 mA, F1's hold current (the "
+                        "charger adds up to 234 mA to the board's own), then fit a checked cell reading 3.6-4.0 V",
                         "CHG LED on; 192-234 mA into the cell: 213 mA (1000 V / RPROG 4.7 kohm, DS20001984H "
                         "equation 5-1) +-10 %, the band DS20001984H's DC Characteristics (page 3, fast charge "
                         "current regulation) give at PROG 10 kohm and 2.0 kohm (inferred for 4.7 kohm)"),
-            BringUpTest("Battery", "Unplug USB with the cell fitted", "+3V3 at TP5 stays 3.25-3.35 V"),
+            BringUpTest("Battery", "Unplug USB with that cell fitted",
+                        "+3V3 at TP5 stays 3.25-3.35 V: a cell of 3.6 V or more keeps U5 out of dropout (VSYS is the "
+                        "cell less Q1's drop; AP2112K-3.3 dropout at most 8 mV at 10 mA and 200 mV at 300 mA, DS39724 "
+                        "Rev. 2-2 page 8). A cell under about 3.4 V gives less, which is no fault: charge it first"),
         ],
     ),
     temperature_range=(-25, 70, "SW1", "SW1-SW3 Omron B3U-1000P, rated -25 to +70 C (Omron catalogue A162-E1-07); "

@@ -123,7 +123,7 @@ def text(board, s, x, y, size, layer=P.F_SilkS, angle=0.0, bold=False, mirror=Fa
     t.SetPosition(v(x, y))
     t.SetLayer(layer)
     t.SetTextSize(v(size, size))
-    t.SetTextThickness(MM(fabrication.silk_stroke(size, bold)))     # 15 % of the height (20 % bold), >= 0.15 mm
+    t.SetTextThickness(MM(fabrication.silk_stroke(size, bold)))     # a sixth of the height (20 % bold), >= 0.15 mm
     t.SetTextAngleDegrees(angle)
     board.Add(t)
     return t
@@ -714,9 +714,8 @@ def place_labels(board, spec):
         row = "" if len(xs) < 2 else ("horizontal" if max(xs) - min(xs) >= max(ys) - min(ys) else "vertical")
         b = pad.GetBoundingBox()
         box = (P.ToMM(b.GetX()), P.ToMM(b.GetY()), P.ToMM(b.GetRight()), P.ToMM(b.GetBottom()))
-        tries = [(on_bottom, label) for on_bottom in sides]
-        if fallback and fallback != label:
-            tries += [(on_bottom, fallback) for on_bottom in sides]
+        # the label on each side the pad has, then (a test pad) its reference on each side
+        tries = [(on_bottom, words) for words in fabrication.label_texts(label, fallback) for on_bottom in sides]
         for on_bottom, words in tries:
             if _place_label(board, spec, ref, words, on_bottom, box, row):
                 placed += 1

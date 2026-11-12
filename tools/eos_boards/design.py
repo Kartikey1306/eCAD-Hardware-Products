@@ -66,6 +66,8 @@ def bench_pad(ref: str, net: str, label: str, pcb: Tuple[float, float], sch: Tup
     """
     if diameter not in TESTPOINT_FOOTPRINTS:
         raise ValueError(f"{ref}: test pad diameter {diameter}; use one of {sorted(TESTPOINT_FOOTPRINTS)} mm")
+    if side not in ("F", "B"):         # the placement step flips only "B": any other side would build on top
+        raise ValueError(f"{ref}: test pad side {side!r}; use \"F\" (top) or \"B\" (bottom)")
     if side != "F" and not bottom_reason.strip():
         raise ValueError(f"{ref}: a test pad on the bottom side needs bottom_reason (BENCH-READY C1: top side)")
     fields = {"Description": f"Test pad {label} ({net}), {diameter} mm bare copper: no part fitted"}

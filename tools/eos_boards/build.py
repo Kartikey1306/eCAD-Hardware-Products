@@ -284,20 +284,32 @@ def generated_silk_problems(drc: Dict[str, Any], texts: List[Dict[str, Any]]) ->
     return out
 
 
-def check_bench(board: Board) -> None:
+def check_bench(board: Board, lib: Library | None = None) -> None:
     """Refuse bench data that does not match the design (BENCH-READY C1, C2, C5, A4, D8): a rail on a
     net no part has; a rail without a test point, or a test point that is not a test pad or connector pin
     on that rail's net (a pin counts only on a connector); a bench test pad on the bottom side with no
     reason given; fewer than two test points on GND; a supply net (``power_nets``) missing from the
     rail list; a rail link that is not a link from that rail to another net; bring-up data without
     rails; pin labels for pins the board does not have; a temperature range that is empty or names a part
-    the board does not have. Pins are read from each part's ``nets`` (by number or name), so this runs
-    without KiCad's libraries."""
+    the board does not have; a test point listed twice for one rail; a test pad on a side other than F
+    or B. Pins are read from each part's ``nets`` (by number or name), so this runs without KiCad's
+    libraries; given ``lib`` (the build passes it), a pin may also be named in the form its ``nets`` does
+    not use, as ``pin_labels`` already could: its number for a pin ``nets`` names, or the other way round
+    (PR #76 review: J1.A4 is the USB-C receptacle's VBUS pin)."""
     by_ref = {p.ref: p for p in board.parts}
     nets = {n for p in board.parts for n in p.nets.values() if n != NC}
 
     def fail(message):
         raise SystemExit(f"{board.name}: {message}")
+
+    def pin_net(part, key):
+        """The net on ``part``'s pin ``key`` (a number or a name), or None when it has no such pin."""
+        if key in part.nets:
+            return part.nets[key]
+        if lib is None:
+            return None
+        found = {net for number, (pin, net) in resolve(part, lib).items() if key in (number, pin.name)}
+        return found.pop() if len(found) == 1 else None
 
     def net_at(point):
         ref, _, pad = point.partition(".")
@@ -307,11 +319,13 @@ def check_bench(board: Board) -> None:
         if not pad:                                     # a test pad, by its reference
             return part.nets.get("1") if part.lib_id == TESTPOINT_SYMBOL else None
         # a pin a probe or clip can take: a connector's (stage-2 review n4: U1.5 is not a test point)
-        return part.nets.get(pad) if part.lib_id.startswith("Connector") else None
+        return pin_net(part, pad) if part.lib_id.startswith("Connector") else None
 
     if board.bringup is not None and not board.rails:
         fail("bring-up data needs the rail list (rails)")
     for part in board.parts:            # BENCH-READY C1: test pads on the top side, where the probe goes
+        if part.lib_id == TESTPOINT_SYMBOL and part.side not in ("F", "B"):     # PR #76 review: placed on top
+            fail(f"test pad {part.ref} side {part.side!r}: F (top) or B (bottom)")
         if part.lib_id == TESTPOINT_SYMBOL and not part.in_bom and part.side != "F" \
                 and not part.fields.get(BOTTOM_PAD_FIELD, "").strip():
             fail(f"test pad {part.ref} is on the bottom side with no reason; give bench_pad(..., bottom_reason=...)")
@@ -324,6 +338,8 @@ def check_bench(board: Board) -> None:
         seen.add(rail.net)
         if not rail.test_points:
             fail(f"rail {rail.net}: no test point (BENCH-READY C1)")
+        if len(set(rail.test_points)) < len(rail.test_points):    # PR #76 review: TP2 twice is not two GND points
+            fail(f"rail {rail.net}: a test point listed twice in {rail.test_points}")
         for point in rail.test_points:
             if net_at(point) != rail.net:
                 fail(f"rail {rail.net}: test point {point} is not a test pad or connector pin on {rail.net}")
@@ -345,7 +361,7 @@ def check_bench(board: Board) -> None:
         part = by_ref.get(ref)
         if part is None:
             fail(f"pin labels for {ref}, which the board does not have")
-        unknown = sorted(set(labels) - set(part.nets))
+        unknown = sorted(key for key in labels if pin_net(part, key) is None)
         if unknown:
             fail(f"pin labels for {ref} pins {unknown}, which it does not have")
     if board.temperature_range is not None:
@@ -531,7 +547,7 @@ def pad_numbers(number: str) -> List[str]:
 
 def spec_for(board: Board, lib: Library, footprint_dir: Path, texts: List[Dict[str, Any]]) -> Dict[str, Any]:
     check_shunts(board)
-    check_bench(board)
+    check_bench(board, lib)
     parts, nets = [], set()
     for part in board.parts:
         if not part.in_bom and not part.lib_id.startswith((TESTPOINT_SYMBOL, "Mechanical:")):
